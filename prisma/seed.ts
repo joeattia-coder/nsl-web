@@ -15,59 +15,79 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const adminRole = await prisma.roles.upsert({
-    where: { role_name: "Admin" },
+  const adminRole = await prisma.role.upsert({
+    where: { roleName: "Admin" },
     update: {},
     create: {
-      role_name: "Admin",
-      role_description: "Full access to manage the site",
+      roleName: "Admin",
+      description: "Full access to manage the site",
     },
   });
 
-  await prisma.roles.upsert({
-    where: { role_name: "League Manager" },
+  const leagueManagerRole = await prisma.role.upsert({
+    where: { roleName: "League Manager" },
     update: {},
     create: {
-      role_name: "League Manager",
-      role_description: "Can manage seasons, fixtures, standings, and tournaments",
+      roleName: "League Manager",
+      description: "Can manage seasons, fixtures, standings, and tournaments",
     },
   });
 
-  await prisma.roles.upsert({
-    where: { role_name: "Player" },
+  const playerRole = await prisma.role.upsert({
+    where: { roleName: "Player" },
     update: {},
     create: {
-      role_name: "Player",
-      role_description: "Can manage personal profile and player-related data",
+      roleName: "Player",
+      description: "Can manage personal profile and player-related data",
     },
   });
 
-  await prisma.seasons.upsert({
-    where: { seasonID: 1n },
+  const season = await prisma.season.upsert({
+    where: { seasonName: "2025-2026 Season 1" },
     update: {
-      seasonName: "2025-2026 Season 1",
-      currentSeason: true,
+      isActive: true,
     },
     create: {
-      seasonID: 1n,
       seasonName: "2025-2026 Season 1",
-      currentSeason: true,
+      isActive: true,
     },
   });
 
-  await prisma.users.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: "admin@example.com" },
-    update: {},
+    update: {
+      isLoginEnabled: true,
+      registrationStatus: "ACTIVE",
+    },
     create: {
       email: "admin@example.com",
-      display_name: "Site Admin",
-      role_id: adminRole.role_id,
-      is_login_enabled: true,
-      is_active: true,
+      isLoginEnabled: true,
+      registrationStatus: "ACTIVE",
+    },
+  });
+
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: {
+        userId: adminUser.id,
+        roleId: adminRole.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: adminUser.id,
+      roleId: adminRole.id,
     },
   });
 
   console.log("Seed complete");
+  console.log({
+    adminRole: adminRole.roleName,
+    leagueManagerRole: leagueManagerRole.roleName,
+    playerRole: playerRole.roleName,
+    season: season.seasonName,
+    adminUser: adminUser.email,
+  });
 }
 
 main()
