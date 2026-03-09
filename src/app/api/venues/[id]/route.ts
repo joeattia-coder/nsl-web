@@ -3,13 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   _request: Request,
-  context: { params: Promise<{ venue_id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { venue_id } = await context.params;
+    const { id } = await context.params;
 
     const venue = await prisma.venue.findUnique({
-      where: { id: venue_id },
+      where: { id },
     });
 
     if (!venue) {
@@ -18,7 +18,7 @@ export async function GET(
 
     return NextResponse.json(venue);
   } catch (error) {
-    console.error("GET /api/venues/[venue_id] error:", error);
+    console.error("GET /api/venues/[id] error:", error);
 
     return NextResponse.json(
       {
@@ -32,14 +32,14 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  context: { params: Promise<{ venue_id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { venue_id } = await context.params;
+    const { id } = await context.params;
     const body = await request.json();
 
     const existingVenue = await prisma.venue.findUnique({
-      where: { id: venue_id },
+      where: { id },
     });
 
     if (!existingVenue) {
@@ -47,7 +47,7 @@ export async function PATCH(
     }
 
     const venue = await prisma.venue.update({
-      where: { id: venue_id },
+      where: { id },
       data: {
         venueName: body.venueName ?? existingVenue.venueName,
         addressLine1: body.addressLine1 ?? existingVenue.addressLine1,
@@ -66,7 +66,7 @@ export async function PATCH(
 
     return NextResponse.json(venue);
   } catch (error) {
-    console.error("PATCH /api/venues/[venue_id] error:", error);
+    console.error("PATCH /api/venues/[id] error:", error);
 
     return NextResponse.json(
       {
@@ -80,13 +80,13 @@ export async function PATCH(
 
 export async function DELETE(
   _request: Request,
-  context: { params: Promise<{ venue_id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { venue_id } = await context.params;
+    const { id } = await context.params;
 
     const existingVenue = await prisma.venue.findUnique({
-      where: { id: venue_id },
+      where: { id },
     });
 
     if (!existingVenue) {
@@ -94,14 +94,14 @@ export async function DELETE(
     }
 
     await prisma.venue.delete({
-      where: { id: venue_id },
+      where: { id },
     });
 
     return NextResponse.json({
       message: "Venue deleted successfully",
     });
   } catch (error) {
-    console.error("DELETE /api/venues/[venue_id] error:", error);
+    console.error("DELETE /api/venues/[id] error:", error);
 
     return NextResponse.json(
       {
