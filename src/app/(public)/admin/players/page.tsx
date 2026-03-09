@@ -1,350 +1,390 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const DEFAULT_PLAYER_IMAGE = "/images/player-silhouette.png";
+type Player = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string | null;
+  phone: string | null;
+  photoUrl: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
 
-export default function NewPlayerPage() {
-  const router = useRouter();
+type PlayerForm = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  photoUrl: string;
+};
 
-  const [firstName, setFirstName] = useState("");
-  const [middleInitial, setMiddleInitial] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [addressLine1, setAddressLine1] = useState("");
-  const [addressLine2, setAddressLine2] = useState("");
-  const [city, setCity] = useState("");
-  const [stateProvince, setStateProvince] = useState("");
-  const [country, setCountry] = useState("");
-  const [postalCode, setPostalCode] = useState("");
+const emptyForm: PlayerForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  photoUrl: "",
+};
 
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
+export default function AdminPlayersPage() {
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const previewSrc = useMemo(() => {
-    return photoPreviewUrl || DEFAULT_PLAYER_IMAGE;
-  }, [photoPreviewUrl]);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState<PlayerForm>(emptyForm);
+  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  async function uploadPhoto(): Promise<string | null> {
-    if (!photoFile) return null;
-
-    setUploadingPhoto(true);
-
+  async function loadPlayers() {
     try {
-      const formData = new FormData();
-      formData.append("file", photoFile);
+      setLoading(true);
+      setError("");
 
-      const res = await fetch("/api/upload/player-photo", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json().catch(() => null);
+      const res = await fetch("/api/players", { cache: "no-store" });
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(
-          data?.details || data?.error || "Failed to upload player photo."
-        );
+        throw new Error(data?.error || "Failed to fetch players");
       }
 
-      return data?.url || null;
+      const list = Array.isArray(data) ? data : Array.isArray(data.players) ? data.players : [];
+      setPlayers(list);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load players");
     } finally {
-      setUploadingPhoto(false);
+      setLoading(false);
     }
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    loadPlayers();
+  }, []);
+
+  const filteredPlayers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return players;
+
+    return players.filter((player) => {
+      const fullName = `${player.firstName ?? ""} ${player.lastName ?? ""}`.toLowerCase();
+      return (
+        fullName.includes(q) ||
+        (player.email ?? "").toLowerCase().includes(q) ||
+        (player.phone ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [players, search]);
+
+  function resetForm() {
+    setForm(emptyForm);
+    setEditingPlayerId(null);
+    setError("");
+    setSuccess("");
+  }
+
+  function startEdit(player: Player) {
+    setEditingPlayerId(player.id);
+    setForm({
+      firstName: player.firstName ?? "",
+      lastName: player.lastName ?? "",
+      email: player.email ?? "",
+      phone: player.phone ?? "",
+      photoUrl: player.photoUrl ?? "",
+    });
+    setError("");
+    setSuccess("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    setSaving(true);
+    setError("");
+    setSuccess("");
+
     try {
-      setSaving(true);
-      setError(null);
+      const payload = {
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim() || null,
+        phone: form.phone.trim() || null,
+        photoUrl: form.photoUrl.trim() || null,
+      };
 
-      let uploadedPhotoUrl: string | null = null;
-
-      if (photoFile) {
-        uploadedPhotoUrl = await uploadPhoto();
+      if (!payload.firstName || !payload.lastName) {
+        throw new Error("First name and last name are required");
       }
 
-      const res = await fetch("/api/players", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName: firstName.trim(),
-          middleInitial: middleInitial.trim() || null,
-          lastName: lastName.trim(),
-          dateOfBirth: dateOfBirth || null,
-          emailAddress: emailAddress.trim() || null,
-          phoneNumber: phoneNumber.trim() || null,
-          addressLine1: addressLine1.trim() || null,
-          addressLine2: addressLine2.trim() || null,
-          city: city.trim() || null,
-          stateProvince: stateProvince.trim() || null,
-          country: country.trim() || null,
-          postalCode: postalCode.trim() || null,
-          photoUrl: uploadedPhotoUrl,
-        }),
-      });
+      const isEditing = !!editingPlayerId;
 
-      const data = await res.json().catch(() => null);
+      const res = await fetch(
+        isEditing ? `/api/players/${editingPlayerId}` : "/api/players",
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(
-          data?.details || data?.error || "Failed to create player."
-        );
+        throw new Error(data?.error || `Failed to ${isEditing ? "update" : "create"} player`);
       }
 
-      router.push("/admin/players");
-      router.refresh();
+      setSuccess(isEditing ? "Player updated successfully." : "Player created successfully.");
+      resetForm();
+      await loadPlayers();
     } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : "Failed to create player.");
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setSaving(false);
     }
   }
 
+  async function handleDelete(id: string) {
+    const confirmed = window.confirm("Are you sure you want to delete this player?");
+    if (!confirmed) return;
+
+    try {
+      setDeletingId(id);
+      setError("");
+      setSuccess("");
+
+      const res = await fetch(`/api/players/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to delete player");
+      }
+
+      if (editingPlayerId === id) {
+        resetForm();
+      }
+
+      setSuccess("Player deleted successfully.");
+      await loadPlayers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete player");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <div className="admin-page">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Add Player</h1>
-          <p className="admin-page-subtitle">
-            Create a new player record for the league.
-          </p>
-        </div>
-
-        <Link href="/admin/players" className="admin-link-button">
-          Back to Players
-        </Link>
-      </div>
-
       <div className="admin-card">
-        <form onSubmit={handleSubmit} className="admin-form">
-          {error ? <p className="admin-form-error">{error}</p> : null}
+        <h1 className="admin-page-title">Players</h1>
+        <p className="admin-page-subtitle">
+          Add, edit, and manage player profiles.
+        </p>
 
+        <form className="admin-form" onSubmit={handleSubmit}>
           <div className="admin-form-grid">
             <div className="admin-form-field">
-              <label htmlFor="firstName" className="admin-label">
+              <label className="admin-label" htmlFor="firstName">
                 First Name
               </label>
               <input
                 id="firstName"
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                name="firstName"
                 className="admin-input"
+                value={form.firstName}
+                onChange={handleChange}
                 required
               />
             </div>
 
             <div className="admin-form-field">
-              <label htmlFor="middleInitial" className="admin-label">
-                Middle Initial
-              </label>
-              <input
-                id="middleInitial"
-                type="text"
-                value={middleInitial}
-                onChange={(e) => setMiddleInitial(e.target.value)}
-                className="admin-input"
-                maxLength={1}
-              />
-            </div>
-
-            <div className="admin-form-field">
-              <label htmlFor="lastName" className="admin-label">
+              <label className="admin-label" htmlFor="lastName">
                 Last Name
               </label>
               <input
                 id="lastName"
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                name="lastName"
                 className="admin-input"
+                value={form.lastName}
+                onChange={handleChange}
                 required
               />
             </div>
 
             <div className="admin-form-field">
-              <label htmlFor="dateOfBirth" className="admin-label">
-                Date of Birth
+              <label className="admin-label" htmlFor="email">
+                Email
               </label>
               <input
-                id="dateOfBirth"
-                type="date"
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                className="admin-input"
-              />
-            </div>
-
-            <div className="admin-form-field">
-              <label htmlFor="emailAddress" className="admin-label">
-                Email Address
-              </label>
-              <input
-                id="emailAddress"
+                id="email"
+                name="email"
                 type="email"
-                value={emailAddress}
-                onChange={(e) => setEmailAddress(e.target.value)}
                 className="admin-input"
+                value={form.email}
+                onChange={handleChange}
               />
             </div>
 
             <div className="admin-form-field">
-              <label htmlFor="phoneNumber" className="admin-label">
-                Phone Number
+              <label className="admin-label" htmlFor="phone">
+                Phone
               </label>
               <input
-                id="phoneNumber"
-                type="text"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                id="phone"
+                name="phone"
                 className="admin-input"
+                value={form.phone}
+                onChange={handleChange}
               />
             </div>
 
             <div className="admin-form-field admin-form-field-full">
-              <label htmlFor="playerPhoto" className="admin-label">
-                Player Photo
+              <label className="admin-label" htmlFor="photoUrl">
+                Photo URL
               </label>
               <input
-                id="playerPhoto"
-                type="file"
-                accept="image/*"
+                id="photoUrl"
+                name="photoUrl"
                 className="admin-input"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  setPhotoFile(file);
-
-                  if (photoPreviewUrl) {
-                    URL.revokeObjectURL(photoPreviewUrl);
-                  }
-
-                  if (file) {
-                    const objectUrl = URL.createObjectURL(file);
-                    setPhotoPreviewUrl(objectUrl);
-                  } else {
-                    setPhotoPreviewUrl("");
-                  }
-                }}
-              />
-            </div>
-
-            <div className="admin-form-field admin-form-field-full">
-              <label className="admin-label">Photo Preview</label>
-              <div className="admin-photo-preview">
-                <img
-                  src={previewSrc}
-                  alt="Player preview"
-                  className="admin-photo-preview-img"
-                />
-              </div>
-            </div>
-
-            <div className="admin-form-field admin-form-field-full">
-              <label htmlFor="addressLine1" className="admin-label">
-                Address Line 1
-              </label>
-              <input
-                id="addressLine1"
-                type="text"
-                value={addressLine1}
-                onChange={(e) => setAddressLine1(e.target.value)}
-                className="admin-input"
-              />
-            </div>
-
-            <div className="admin-form-field admin-form-field-full">
-              <label htmlFor="addressLine2" className="admin-label">
-                Address Line 2
-              </label>
-              <input
-                id="addressLine2"
-                type="text"
-                value={addressLine2}
-                onChange={(e) => setAddressLine2(e.target.value)}
-                className="admin-input"
-              />
-            </div>
-
-            <div className="admin-form-field">
-              <label htmlFor="city" className="admin-label">
-                City
-              </label>
-              <input
-                id="city"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="admin-input"
-              />
-            </div>
-
-            <div className="admin-form-field">
-              <label htmlFor="stateProvince" className="admin-label">
-                State / Province
-              </label>
-              <input
-                id="stateProvince"
-                type="text"
-                value={stateProvince}
-                onChange={(e) => setStateProvince(e.target.value)}
-                className="admin-input"
-              />
-            </div>
-
-            <div className="admin-form-field">
-              <label htmlFor="country" className="admin-label">
-                Country
-              </label>
-              <input
-                id="country"
-                type="text"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="admin-input"
-              />
-            </div>
-
-            <div className="admin-form-field">
-              <label htmlFor="postalCode" className="admin-label">
-                Postal Code
-              </label>
-              <input
-                id="postalCode"
-                type="text"
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
-                className="admin-input"
+                value={form.photoUrl}
+                onChange={handleChange}
               />
             </div>
           </div>
+
+          {error ? <p className="admin-form-error">{error}</p> : null}
+          {success ? <p className="admin-form-success">{success}</p> : null}
 
           <div className="admin-form-actions">
-            <Link href="/admin/players" className="admin-link-button">
-              Cancel
-            </Link>
-
-            <button
-              type="submit"
-              className="admin-primary-button"
-              disabled={saving || uploadingPhoto}
-            >
-              {saving || uploadingPhoto ? "Saving..." : "Create Player"}
+            <button type="submit" className="admin-button" disabled={saving}>
+              {saving
+                ? editingPlayerId
+                  ? "Saving..."
+                  : "Creating..."
+                : editingPlayerId
+                ? "Update Player"
+                : "Add Player"}
             </button>
+
+            {editingPlayerId ? (
+              <button
+                type="button"
+                className="admin-button admin-button-secondary"
+                onClick={resetForm}
+                disabled={saving}
+              >
+                Cancel Edit
+              </button>
+            ) : null}
           </div>
         </form>
+      </div>
+
+      <div className="admin-card">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "12px",
+            alignItems: "center",
+            marginBottom: "16px",
+            flexWrap: "wrap",
+          }}
+        >
+          <h2 className="admin-section-title">Players List</h2>
+
+          <input
+            type="text"
+            className="admin-input"
+            placeholder="Search players..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ maxWidth: "320px" }}
+          />
+        </div>
+
+        {loading ? (
+          <p>Loading players...</p>
+        ) : filteredPlayers.length === 0 ? (
+          <p>No players found.</p>
+        ) : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Photo</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPlayers.map((player) => (
+                  <tr key={player.id}>
+                    <td>
+                      {player.photoUrl ? (
+                        <img
+                          src={player.photoUrl}
+                          alt={`${player.firstName} ${player.lastName}`}
+                          style={{
+                            width: "44px",
+                            height: "44px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                            display: "block",
+                          }}
+                        />
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </td>
+                    <td>{player.firstName} {player.lastName}</td>
+                    <td>{player.email || "-"}</td>
+                    <td>{player.phone || "-"}</td>
+                    <td>
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          className="admin-button admin-button-secondary"
+                          onClick={() => startEdit(player)}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="admin-button admin-button-danger"
+                          onClick={() => handleDelete(player.id)}
+                          disabled={deletingId === player.id}
+                        >
+                          {deletingId === player.id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
