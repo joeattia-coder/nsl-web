@@ -43,12 +43,49 @@ body {
   width: 220px;
   background: #1c1c1c;
   color: white;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-
   padding: 16px 10px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav ul li {
+  margin: 20px 0;
+}
+
+.sidebar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  gap: 6px;
+  padding: 6px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.sidebar-icon {
+  font-size: 40px;
+}
+
+.sidebar-nav .sidebar-label {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.sidebar-item:hover {
+  background: #2a2a2a;
+  border-radius: 10px;
+  opacity: 0.7;
 }
 
 .sidebar-logo {
@@ -77,22 +114,6 @@ body {
   width: 100%;
 }
 
-.sidebar-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-
-  margin-bottom: 30px;
-
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.sidebar-item:hover {
-  opacity: 0.7;
-}
-
 .sidebar-item span {
   font-size: 13px;
 }
@@ -119,11 +140,9 @@ body {
   height: auto;
   background: #111;
   color: white;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 18px 40px;
   gap: 18px;
 }
@@ -208,21 +227,16 @@ body {
 
 .hero {
   height: 350px;
-
   margin-left: -40px;
   margin-right: -40px;
   width: calc(100% + 80px);
-
   background-image: url("/images/snooker_hero.png");
   background-size: cover;
   background-position: center 75%;
-
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   padding-right: 60px;
-
   position: relative;
 }
 
@@ -254,12 +268,10 @@ body {
 
 .hero-copy {
   max-width: 640px;
-
   background: rgba(0, 0, 0, 0.28);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 18px;
   padding: 22px 22px;
-
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -289,15 +301,12 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   height: 42px;
   padding: 0 16px;
   border-radius: 12px;
-
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.01em;
-
   transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
 }
 
@@ -321,11 +330,13 @@ body {
   .hero-inner {
     padding: 0 20px;
   }
+
   .hero-copy {
     max-width: 100%;
     padding: 18px;
     border-radius: 16px;
   }
+
   .hero h1 {
     font-size: 32px;
   }
@@ -353,15 +364,11 @@ body {
   grid-auto-flow: column;
   grid-auto-columns: 420px;
   gap: 18px;
-
   overflow-x: auto;
   padding: 10px 4px 18px;
-
   scroll-snap-type: x mandatory;
   scroll-padding-left: 4px;
-
   -webkit-overflow-scrolling: touch;
-
   scrollbar-width: none;
 }
 
@@ -374,7 +381,6 @@ body {
   background: #0b0b0b;
   border-radius: 16px;
   padding: 16px;
-
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
@@ -443,15 +449,12 @@ body {
 .player-avatar.icon {
   width: 64px;
   height: 64px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
-
   color: #ddd;
 }
 
@@ -470,7 +473,7 @@ body {
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  background: transparent;
+  background: #da3036;
   color: white;
   cursor: pointer;
   transition: 0.2s ease;
@@ -505,22 +508,15 @@ body {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 320px;
-
   column-gap: 30px;
-
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-
   padding: 6px 60px 14px;
-
   scroll-snap-type: x mandatory;
   scroll-padding-left: 60px;
-
   -webkit-overflow-scrolling: touch;
-
   scrollbar-width: none;
-
   min-width: 0;
 }
 
@@ -573,23 +569,17 @@ body {
   top: 45%;
   transform: translateY(-50%);
   z-index: 999;
-
   width: 36px;
   height: 36px;
   border-radius: 999px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
-
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
-
   opacity: 0;
   pointer-events: none;
-
   transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 
@@ -608,6 +598,7 @@ body {
 .carousel-arrow.left {
   left: 10px;
 }
+
 .carousel-arrow.right {
   right: 10px;
 }
@@ -674,7 +665,6 @@ body {
 .season-switch-section {
   padding-top: 18px;
   padding-bottom: 16px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -692,14 +682,11 @@ body {
 .season-switch {
   width: 400px;
   max-width: 980px;
-
   display: grid;
   grid-template-columns: 1fr 1fr;
-
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
-
   padding: 6px;
   gap: 8px;
 }
@@ -709,16 +696,12 @@ body {
   padding: 0 12px;
   border-radius: 10px;
   border: 1px solid transparent;
-
   background: transparent;
   color: rgba(255, 255, 255, 0.85);
-
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.01em;
-
   cursor: pointer;
-
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
 
@@ -739,15 +722,11 @@ body {
 .groups-row {
   display: flex;
   gap: 12px;
-
   overflow-x: auto;
   overflow-y: hidden;
-
   padding: 6px 52px 10px;
-
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-
   scrollbar-width: none;
 }
 
@@ -758,25 +737,21 @@ body {
 .group-pill {
   all: unset;
   cursor: pointer;
-
   display: inline-flex;
   align-items: center;
   gap: 10px;
-
   padding: 10px 14px;
   border-radius: 8px;
-
-  background: rgba(255, 255, 255, 0.08);
+  background: #da3036;
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.9);
-
   transition: background 0.15s ease, border-color 0.15s ease;
   white-space: nowrap;
   flex: 0 0 auto;
 }
 
 .group-pill:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #ab2227;
 }
 
 .group-pill.active {
@@ -819,12 +794,10 @@ body {
   display: grid;
   grid-template-columns: 110px 1fr 170px;
   gap: 14px;
-
   padding-bottom: 20px;
   padding-top: 60px;
   padding-left: 6px;
   padding-right: 6px;
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -889,34 +862,29 @@ body {
   max-width: 320px;
 }
 
-/* Match icon box (your border container) */
 .match-icon {
   width: 100px;
-  height: 60px;              /* ✅ border box height */
-  position: relative;        /* ✅ so the silhouette can be positioned */
-  overflow: visible;         /* ✅ allow it to stick out */
+  height: 60px;
+  position: relative;
+  overflow: visible;
   display: flex;
-  align-items: flex-end;     /* ✅ silhouette sits on the bottom edge */
-
+  align-items: flex-end;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* The silhouette image/svg */
 .match-silhouette {
   position: absolute;
   left: 50%;
-  bottom: 0;                 /* ✅ sit on bottom of border */
+  bottom: 0;
   transform: translateX(-50%);
   width: 100px;
-  height: 100px;             /* ✅ total silhouette height */
+  height: 100px;
   pointer-events: none;
-
-  /* subtle shadow */
   filter:
-  drop-shadow(0px 4px 6px rgba(0,0,0,0.45))
-  drop-shadow(0px 1px 1px rgba(0,0,0,0.25));
+    drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.45))
+    drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25));
 }
 
 .match-score {
@@ -959,61 +927,51 @@ body {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* Each group block wrapper (NO rounded corners) */
 .standings-block {
   margin-top: 14px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0;          /* ✅ no rounding */
-  overflow: hidden;          /* keeps edges clean */
+  border-radius: 0;
+  overflow: hidden;
 }
 
-/* Group title header (NO rounded corners) */
 .standings-block-title {
   padding: 22px 22px;
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #fff;
-  border-radius: 0;          /* ✅ no rounding */
+  border-radius: 0;
 }
 
-/* Table wrapper (NO rounded corners) */
 .standings-table-wrap {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: 0;          /* ✅ no rounding */
+  border-radius: 0;
 }
 
-/* Table */
 .standings-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;       /* ✅ stable columns */
+  table-layout: fixed;
   min-width: 760px;
 }
 
-/* Header: not too bold, consistent padding */
 .standings-table thead th {
   text-align: left;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-
   padding: 12px 14px;
-
   color: rgba(255, 255, 255, 0.72);
   background: rgba(255, 255, 255, 0.02);
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Body cells */
 .standings-table tbody td {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -1029,12 +987,6 @@ body {
   border-bottom: none;
 }
 
-/* --------------------
-   Column sizing + alignment
-   IMPORTANT: apply widths to BOTH th and td via these classes
-   -------------------- */
-
-/* Rank column */
 .standings-table .col-rank {
   width: 48px;
   text-align: right;
@@ -1042,27 +994,24 @@ body {
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Player column: header + body must match, and body has ZERO padding so green fills cell */
 .standings-table thead th.col-team {
   width: 340px;
-  padding-left: 0;      /* ✅ aligns header text with body content edge */
+  padding-left: 0;
   padding-right: 0;
   text-align: left;
 }
 
 .standings-table tbody td.col-team {
   width: 340px;
-  padding: 0;           /* ✅ so green fills entire cell */
+  padding: 0;
 }
 
-/* Numeric columns */
 .standings-table .col-num {
   width: 70px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-/* Points column (slightly emphasized but not heavy) */
 .standings-table .col-pts {
   width: 80px;
   text-align: right;
@@ -1070,43 +1019,35 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* ✅ Player green background fills entire cell, NO padding, NO margin, NO rounding */
 .player-cell {
   width: 350px;
   height: 100%;
   display: flex;
   align-items: center;
-
   background: #1f7a3b;
-
-  padding: 12;           /* ✅ no padding */
-  margin: 0;            /* ✅ no margin */
-  border-radius: 0;     /* ✅ no rounding */
-
-  font-weight: 600;     /* not too bold */
+  padding: 12;
+  margin: 0;
+  border-radius: 0;
+  font-weight: 600;
   color: #fff;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* optional: give the name a tiny indent WITHOUT using padding (so green still fills) */
 .player-cell::before {
   content: "";
   display: inline-block;
-  width: 12px;          /* acts like left spacing but keeps "no padding" rule */
+  width: 12px;
   flex: 0 0 auto;
 }
 
-/* numeric columns aligned and stable */
 .col-num {
   width: 70px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-/* points column slightly emphasized but not heavy */
 .col-pts {
   width: 80px;
   text-align: right;
@@ -1114,7 +1055,6 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Empty state */
 .empty-state {
   padding: 18px 6px;
   color: rgba(255, 255, 255, 0.75);
@@ -1228,5 +1168,350 @@ body {
 
   .col-num {
     width: 54px;
+  }
+}
+
+/* -------------------- */
+/* ADMIN */
+/* -------------------- */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 240px;
+  background: #111827;
+  color: #ffffff;
+  padding: 24px 16px;
+  flex-shrink: 0;
+}
+
+.admin-sidebar-header {
+  margin-bottom: 24px;
+}
+
+.admin-logo {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.admin-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-nav li + li {
+  margin-top: 10px;
+}
+
+.admin-nav-link {
+  display: block;
+  color: #e5e7eb;
+  padding: 10px 12px;
+  border-radius: 0;
+}
+
+.admin-nav-link:hover {
+  background: #1f2937;
+  color: #ffffff;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 32px;
+  background: #f9fafb;
+}
+
+.admin-page {
+  padding: 24px;
+  color: #111827;
+  background: #f9fafb;
+}
+
+.admin-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-page h1.admin-page-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #111827 !important;
+}
+
+.admin-page p.admin-page-subtitle {
+  margin-top: 6px;
+  font-size: 1rem;
+  color: #6b7280 !important;
+}
+
+.admin-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-toolbar {
+  margin-bottom: 16px;
+}
+
+.admin-search-input {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  font: inherit;
+  background: #ffffff;
+  color: #111827;
+}
+
+.admin-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.admin-card {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 16px;
+}
+
+.admin-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 600px;
+  background: #ffffff;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.admin-table thead th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #6b7280;
+  background: #f9fafb;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.admin-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #111827;
+  background: #ffffff;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:nth-child(even) td {
+  background: #fbfbfb;
+}
+
+.admin-table tbody tr:hover td {
+  background: #f1f5f9;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-sort-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  color: inherit;
+}
+
+.admin-actions-col {
+  width: 180px;
+}
+
+.admin-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.admin-primary-button,
+.admin-link-button,
+.admin-danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.admin-link-button {
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.admin-link-button:hover {
+  background: #f9fafb;
+}
+
+.admin-danger-button {
+  border: 1px solid #ef4444;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #ef4444;
+}
+
+.admin-danger-button:hover {
+  background: #fef2f2;
+}
+
+.admin-danger-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.admin-primary-button {
+  border: 1px solid #111827;
+  background: #111827;
+  color: #ffffff;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+.admin-primary-button:hover {
+  background: #000000;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-form-field-full {
+  grid-column: 1 / -1;
+}
+
+.admin-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-input,
+.admin-select,
+.admin-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+}
+
+.admin-input::placeholder,
+.admin-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.admin-input:focus,
+.admin-select:focus,
+.admin-textarea:focus,
+.admin-search-input:focus {
+  outline: none;
+  border-color: #111827;
+}
+
+.admin-form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.admin-form-error {
+  color: #b91c1c;
+  font-size: 14px;
+  margin: 0;
+}
+
+.admin-photo-preview {
+  margin-top: 8px;
+}
+
+.admin-photo-preview-img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  display: block;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.admin-player-thumb-img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-field-full {
+    grid-column: auto;
+  }
+
+  .admin-form-actions {
+    justify-content: flex-start;
   }
 }
