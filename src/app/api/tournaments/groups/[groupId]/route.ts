@@ -70,11 +70,11 @@ export async function PUT(request: Request, context: RouteContext) {
 
     const entryIdsRaw = Array.isArray(body.entryIds) ? body.entryIds : [];
 
-    const entryIds = entryIdsRaw
-      .map((value) => String(value ?? "").trim())
-      .filter(Boolean);
+    const entryIds: string[] = (entryIdsRaw as unknown[])
+  .map((value: unknown): string => String(value ?? "").trim())
+  .filter((value: string): boolean => value.length > 0);
 
-    const uniqueEntryIds = Array.from(new Set(entryIds));
+    const uniqueEntryIds: string[] = Array.from(new Set(entryIds));
 
     if (uniqueEntryIds.length !== entryIds.length) {
       return NextResponse.json(
