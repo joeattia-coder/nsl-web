@@ -1,23 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
+export async function GET(_request: Request, context: RouteContext) {
   try {
     const { id: tournamentId } = await context.params;
-
-    const tournament = await prisma.tournament.findUnique({
-      where: { id: tournamentId },
-    });
-
-    if (!tournament) {
-      return NextResponse.json(
-        { error: "Tournament not found" },
-        { status: 404 }
-      );
-    }
 
     const entries = await prisma.tournamentEntry.findMany({
       where: { tournamentId },
@@ -26,9 +16,6 @@ export async function GET(
           include: {
             player: true,
           },
-          orderBy: {
-            createdAt: "asc",
-          },
         },
       },
       orderBy: [{ seedNumber: "asc" }, { createdAt: "asc" }],
@@ -36,7 +23,7 @@ export async function GET(
 
     return NextResponse.json(entries);
   } catch (error) {
-    console.error("GET /api/tournaments/[id]/entries error:", error);
+    console.error("Failed to fetch tournament entries:", error);
 
     return NextResponse.json(
       {
@@ -48,136 +35,187 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request, context: RouteContext) {
   try {
     const { id: tournamentId } = await context.params;
     const body = await request.json();
 
-    const { playerId, playerIds, entryName, seedNumber } = body;
+    const mode = String(body.mode ?? "").trim();
 
     const tournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
+      select: {
+        id: true,
+      },
     });
 
     if (!tournament) {
       return NextResponse.json(
-        { error: "Tournament not found" },
+        { error: "Tournament not found." },
         { status: 404 }
       );
     }
 
-    const submittedPlayerIds: string[] = Array.isArray(playerIds)
-      ? playerIds
-      : playerId
-      ? [playerId]
-      : [];
+    if (mode === "existing") {
+      const playerId = String(body.playerId ?? "").trim();
+      const entryName = String(body.entryName ?? "").trim() || null;
+      const seedNumber =
+        body.seedNumber === null ||
+        body.seedNumber === undefined ||
+        String(body.seedNumber).trim() === ""
+          ? null
+          : Number(body.seedNumber);
 
-    if (submittedPlayerIds.length === 0) {
-      return NextResponse.json(
-        { error: "At least one playerId is required" },
-        { status: 400 }
-      );
-    }
+      if (!playerId) {
+        return NextResponse.json(
+          { error: "Player is required." },
+          { status: 400 }
+        );
+      }
 
-    const uniquePlayerIds = [...new Set(submittedPlayerIds)];
+      if (
+        seedNumber !== null &&
+        (!Number.isInteger(seedNumber) || seedNumber < 1)
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Seed number must be a whole number greater than or equal to 1.",
+          },
+          { status: 400 }
+        );
+      }
 
-    const expectedCounts: Record<string, number | null> = {
-      SINGLES: 1,
-      DOUBLES: 2,
-      TRIPLES: 3,
-      TEAM: null,
-    };
+      const player = await prisma.player.findUnique({
+        where: { id: playerId },
+        select: { id: true },
+      });
 
-    const expectedCount = expectedCounts[tournament.participantType];
+      if (!player) {
+        return NextResponse.json(
+          { error: "Player not found." },
+          { status: 404 }
+        );
+      }
 
-    if (expectedCount !== null && uniquePlayerIds.length !== expectedCount) {
-      return NextResponse.json(
-        {
-          error: `This tournament requires exactly ${expectedCount} player(s) per entry`,
-        },
-        { status: 400 }
-      );
-    }
-
-    if (expectedCount === null && uniquePlayerIds.length < 1) {
-      return NextResponse.json(
-        { error: "Team entries must contain at least one player" },
-        { status: 400 }
-      );
-    }
-
-    const players = await prisma.player.findMany({
-      where: {
-        id: {
-          in: uniquePlayerIds,
-        },
-      },
-      orderBy: [{ firstName: "asc" }, { lastName: "asc" }],
-    });
-
-    if (players.length !== uniquePlayerIds.length) {
-      return NextResponse.json(
-        { error: "One or more players were not found" },
-        { status: 404 }
-      );
-    }
-
-    if (tournament.participantType === "SINGLES") {
-      const existingMember = await prisma.tournamentEntryMember.findFirst({
+      const existingRegistration = await prisma.tournamentEntryMember.findFirst({
         where: {
-          playerId: uniquePlayerIds[0],
+          playerId,
           tournamentEntry: {
             tournamentId,
           },
         },
-        include: {
-          tournamentEntry: true,
-        },
+        select: { id: true },
       });
 
-      if (existingMember) {
+      if (existingRegistration) {
         return NextResponse.json(
-          { error: "This player is already assigned to the tournament" },
+          { error: "This player is already registered in the tournament." },
           { status: 400 }
         );
       }
+
+      const entry = await prisma.$transaction(async (tx) => {
+        const createdEntry = await tx.tournamentEntry.create({
+          data: {
+            tournamentId,
+            entryName,
+            seedNumber,
+          },
+        });
+
+        await tx.tournamentEntryMember.create({
+          data: {
+            tournamentEntryId: createdEntry.id,
+            playerId,
+          },
+        });
+
+        return createdEntry;
+      });
+
+      return NextResponse.json(entry, { status: 201 });
     }
 
-    const generatedEntryName =
-      entryName ??
-      players
-        .map((player) => `${player.firstName} ${player.lastName}`.trim())
-        .join(" / ");
+    if (mode === "new") {
+      const player = body.player ?? {};
 
-    const entry = await prisma.tournamentEntry.create({
-      data: {
-        tournamentId,
-        entryName: generatedEntryName,
-        seedNumber: seedNumber ?? null,
-        members: {
-          create: uniquePlayerIds.map((playerIdValue) => ({
-            playerId: playerIdValue,
-          })),
-        },
-      },
-      include: {
-        members: {
-          include: {
-            player: true,
-          },
-          orderBy: {
-            createdAt: "asc",
-          },
-        },
-      },
-    });
+      const firstName = String(player.firstName ?? "").trim();
+      const middleInitial = String(player.middleInitial ?? "").trim();
+      const lastName = String(player.lastName ?? "").trim();
+      const emailAddress = String(player.emailAddress ?? "").trim();
+      const phoneNumber = String(player.phoneNumber ?? "").trim();
+      const country = String(player.country ?? "").trim();
 
-    return NextResponse.json(entry, { status: 201 });
+      const entryName = String(body.entryName ?? "").trim() || null;
+      const seedNumber =
+        body.seedNumber === null ||
+        body.seedNumber === undefined ||
+        String(body.seedNumber).trim() === ""
+          ? null
+          : Number(body.seedNumber);
+
+      if (!firstName || !lastName) {
+        return NextResponse.json(
+          { error: "First name and last name are required." },
+          { status: 400 }
+        );
+      }
+
+      if (
+        seedNumber !== null &&
+        (!Number.isInteger(seedNumber) || seedNumber < 1)
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Seed number must be a whole number greater than or equal to 1.",
+          },
+          { status: 400 }
+        );
+      }
+
+      const entry = await prisma.$transaction(async (tx) => {
+        const createdPlayer = await tx.player.create({
+          data: {
+            firstName,
+            middleInitial: middleInitial
+              ? middleInitial.slice(0, 1).toUpperCase()
+              : null,
+            lastName,
+            emailAddress: emailAddress || null,
+            phoneNumber: phoneNumber || null,
+            country: country || null,
+          },
+        });
+
+        const createdEntry = await tx.tournamentEntry.create({
+          data: {
+            tournamentId,
+            entryName,
+            seedNumber,
+          },
+        });
+
+        await tx.tournamentEntryMember.create({
+          data: {
+            tournamentEntryId: createdEntry.id,
+            playerId: createdPlayer.id,
+          },
+        });
+
+        return createdEntry;
+      });
+
+      return NextResponse.json(entry, { status: 201 });
+    }
+
+    return NextResponse.json(
+      { error: "Invalid entry mode." },
+      { status: 400 }
+    );
   } catch (error) {
-    console.error("POST /api/tournaments/[id]/entries error:", error);
+    console.error("Failed to create tournament entry:", error);
 
     return NextResponse.json(
       {

@@ -1,43 +1,34 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-const VALID_STAGE_TYPES = ["GROUP", "KNOCKOUT"];
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
 
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: Request, context: RouteContext) {
   try {
     const { id: tournamentId } = await context.params;
 
-    const tournament = await prisma.tournament.findUnique({
-      where: { id: tournamentId },
-    });
-
-    if (!tournament) {
-      return NextResponse.json(
-        { error: "Tournament not found" },
-        { status: 404 }
-      );
-    }
-
     const stages = await prisma.tournamentStage.findMany({
       where: { tournamentId },
-      orderBy: { sequence: "asc" },
+      orderBy: [{ sequence: "asc" }, { createdAt: "asc" }],
       include: {
-        rounds: {
-          orderBy: { sequence: "asc" },
+        _count: {
+          select: {
+            rounds: true,
+            matches: true,
+          },
         },
       },
     });
 
     return NextResponse.json(stages);
   } catch (error) {
-    console.error("GET /api/tournaments/[id]/stages error:", error);
+    console.error("Failed to fetch tournament stages:", error);
 
     return NextResponse.json(
       {
-        error: "Failed to fetch stages",
+        error: "Failed to fetch tournament stages",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
@@ -45,37 +36,32 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request, context: RouteContext) {
   try {
     const { id: tournamentId } = await context.params;
     const body = await request.json();
 
-    const { stageName, stageType, sequence } = body;
+    const stageName = String(body.stageName ?? "").trim();
+    const stageType = String(body.stageType ?? "").trim();
+    const sequence = Number(body.sequence);
 
-    if (!stageName) {
+    if (!stageName || !stageType || !Number.isInteger(sequence) || sequence < 1) {
       return NextResponse.json(
-        { error: "stageName is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!stageType || !VALID_STAGE_TYPES.includes(stageType)) {
-      return NextResponse.json(
-        { error: "stageType must be GROUP or KNOCKOUT" },
+        {
+          error: "Stage name, stage type, and a valid sequence are required.",
+        },
         { status: 400 }
       );
     }
 
     const tournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
+      select: { id: true },
     });
 
     if (!tournament) {
       return NextResponse.json(
-        { error: "Tournament not found" },
+        { error: "Tournament not found." },
         { status: 404 }
       );
     }
@@ -84,18 +70,18 @@ export async function POST(
       data: {
         tournamentId,
         stageName,
-        stageType,
+        stageType: stageType as "GROUP" | "KNOCKOUT",
         sequence,
       },
     });
 
     return NextResponse.json(stage, { status: 201 });
   } catch (error) {
-    console.error("POST /api/tournaments/[id]/stages error:", error);
+    console.error("Failed to create tournament stage:", error);
 
     return NextResponse.json(
       {
-        error: "Failed to create stage",
+        error: "Failed to create tournament stage",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }

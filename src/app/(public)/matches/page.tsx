@@ -80,7 +80,7 @@ function splitName(full: string): NameParts {
   return { first, last };
 }
 
-/** LeagueRepublic example: "20260225 16:55" */
+
 function parseLRDateTime(raw: string): Date | null {
   const s = (raw || "").trim();
   const m = s.match(/^(\d{4})(\d{2})(\d{2})\s+(\d{2}):(\d{2})$/);
@@ -192,7 +192,7 @@ export default function MatchesPage() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/leaguerepublic/fixture-groups")
+    fetch("/api/public/fixture-groups")
       .then(async (r) => {
         const data = await r.json();
         if (!r.ok) throw new Error(data?.error || `Request failed (${r.status})`);
@@ -219,7 +219,7 @@ export default function MatchesPage() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/leaguerepublic/fixtures")
+    fetch("/api/public/fixtures")
       .then(async (r) => {
         const data = await r.json();
         if (!r.ok) throw new Error(data?.error || `Request failed (${r.status})`);
@@ -356,10 +356,10 @@ export default function MatchesPage() {
     setStandingsGroups(null);
 
     fetch(
-      `/api/leaguerepublic/standings?fixtureTypeID=2&fixtureGroupIdentifier=${encodeURIComponent(
-        selectedGroupId
-      )}`
-    )
+  `/api/public/standings?fixtureGroupIdentifier=${encodeURIComponent(
+    selectedGroupId
+  )}`
+)
       .then(async (r) => {
         const data = (await r.json()) as StandingsApiResponse;
         if (!r.ok) throw new Error((data as any)?.error || `Request failed (${r.status})`);

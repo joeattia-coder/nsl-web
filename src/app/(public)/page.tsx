@@ -118,11 +118,10 @@ export default function Page() {
 
   const EPS = 2;
 
-  // Fetch LeagueRepublic fixtures from our Next API route
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/leaguerepublic/fixtures")
+    fetch("/api/public/fixtures")
       .then(async (r) => {
         const data = await r.json();
         if (!r.ok) {
@@ -388,8 +387,7 @@ export default function Page() {
 
             {fixturesRaw !== null && matches.length === 0 && (
               <div style={{ padding: 12, opacity: 0.9 }}>
-                No fixtures returned. If you know the correct season, set{" "}
-                <code>LEAGUEREPUBLIC_SEASON_ID</code> in <code>.env.local</code>.
+                No matches available yet.
               </div>
             )}
           </div>

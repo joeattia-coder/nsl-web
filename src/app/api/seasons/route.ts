@@ -4,7 +4,9 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const seasons = await prisma.season.findMany({
-      orderBy: { startDate: "desc" },
+      orderBy: {
+        seasonName: "asc",
+      },
     });
 
     return NextResponse.json(seasons);
@@ -25,7 +27,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { seasonName, startDate, endDate, isActive } = body;
+    const seasonName = String(body.seasonName ?? "").trim();
+    const startDate = body.startDate ? new Date(body.startDate) : null;
+    const endDate = body.endDate ? new Date(body.endDate) : null;
+    const isActive =
+      typeof body.isActive === "boolean" ? body.isActive : true;
 
     if (!seasonName) {
       return NextResponse.json(
@@ -37,9 +43,9 @@ export async function POST(request: Request) {
     const season = await prisma.season.create({
       data: {
         seasonName,
-        startDate: startDate ? new Date(startDate) : null,
-        endDate: endDate ? new Date(endDate) : null,
-        isActive: isActive ?? true,
+        startDate,
+        endDate,
+        isActive,
       },
     });
 

@@ -7,25 +7,13 @@ export async function GET() {
       include: {
         season: true,
         venue: true,
-        stages: {
-          orderBy: { sequence: "asc" },
-          include: {
-            rounds: {
-              orderBy: { sequence: "asc" },
-            },
-          },
-        },
       },
-      orderBy: [
-        { createdAt: "desc" },
-        { tournamentName: "asc" },
-      ],
+      orderBy: [{ createdAt: "desc" }],
     });
 
     return NextResponse.json(tournaments);
   } catch (error) {
-    console.error("GET /api/tournaments error:", error);
-
+    console.error("Failed to fetch tournaments:", error);
     return NextResponse.json(
       {
         error: "Failed to fetch tournaments",
@@ -40,103 +28,56 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const {
-      seasonId,
-      venueId,
-      tournamentName,
-      participantType,
-      startDate,
-      endDate,
-      status,
-      isPublished,
-      description,
-    } = body;
+    const seasonId = String(body.seasonId ?? "").trim();
+    const venueId = String(body.venueId ?? "").trim();
+    const tournamentName = String(body.tournamentName ?? "").trim();
+    const participantType = String(body.participantType ?? "").trim();
+    const startDate = body.startDate ? String(body.startDate) : null;
+    const endDate = body.endDate ? String(body.endDate) : null;
+    const status = String(body.status ?? "").trim();
+    const isPublished = Boolean(body.isPublished);
+    const description = String(body.description ?? "").trim();
 
-    if (!seasonId) {
-      return NextResponse.json(
-        { error: "seasonId is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!tournamentName) {
-      return NextResponse.json(
-        { error: "tournamentName is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!participantType) {
-      return NextResponse.json(
-        { error: "participantType is required" },
-        { status: 400 }
-      );
-    }
-
-    const validParticipantTypes = ["SINGLES", "DOUBLES", "TRIPLES", "TEAM"];
-    if (!validParticipantTypes.includes(participantType)) {
+    if (!seasonId || !tournamentName || !participantType) {
       return NextResponse.json(
         {
-          error:
-            "participantType must be one of SINGLES, DOUBLES, TRIPLES, TEAM",
+          error: "Season, tournament name, and participant type are required.",
         },
         { status: 400 }
       );
-    }
-
-    const season = await prisma.season.findUnique({
-      where: { id: seasonId },
-    });
-
-    if (!season) {
-      return NextResponse.json(
-        { error: "Season not found" },
-        { status: 404 }
-      );
-    }
-
-    if (venueId) {
-      const venue = await prisma.venue.findUnique({
-        where: { id: venueId },
-      });
-
-      if (!venue) {
-        return NextResponse.json(
-          { error: "Venue not found" },
-          { status: 404 }
-        );
-      }
     }
 
     const tournament = await prisma.tournament.create({
       data: {
         seasonId,
-        venueId: venueId ?? null,
+        venueId: venueId || null,
         tournamentName,
-        participantType,
+        participantType: participantType as
+          | "Singles"
+          | "Doubles"
+          | "Triples"
+          | "Teams",
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
-        status: status ?? "DRAFT",
-        isPublished: isPublished ?? false,
-        description: description ?? null,
+        status: (status || "DRAFT") as
+          | "DRAFT"
+          | "REGISTRATION_OPEN"
+          | "REGISTRATION_CLOSED"
+          | "IN_PROGRESS"
+          | "COMPLETED"
+          | "CANCELLED",
+        isPublished,
+        description: description || null,
       },
       include: {
         season: true,
         venue: true,
-        stages: {
-          orderBy: { sequence: "asc" },
-          include: {
-            rounds: {
-              orderBy: { sequence: "asc" },
-            },
-          },
-        },
       },
     });
 
     return NextResponse.json(tournament, { status: 201 });
   } catch (error) {
-    console.error("POST /api/tournaments error:", error);
+    console.error("Failed to create tournament:", error);
 
     return NextResponse.json(
       {

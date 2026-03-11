@@ -61,25 +61,28 @@ body {
 
 .sidebar-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  text-align: center;
+  justify-content: flex-start;
+  text-align: left;
   text-decoration: none;
   color: white;
-  gap: 6px;
-  padding: 6px;
-  margin-bottom: 30px;
+  gap: 12px;
+  padding: 8px 10px;
+  margin-bottom: 18px;
   cursor: pointer;
   transition: 0.2s ease;
 }
 
 .sidebar-icon {
-  font-size: 40px;
+  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .sidebar-nav .sidebar-label {
-  font-size: 16px;
+  font-size: 15px;
   opacity: 0.9;
+  line-height: 1;
 }
 
 .sidebar-item:hover {
@@ -104,7 +107,7 @@ body {
 }
 
 .sidebar-logo-img {
-  height: 240px;
+  height: 170px;
   width: auto;
   object-fit: contain;
 }
@@ -1110,6 +1113,14 @@ body {
   }
 }
 
+.mobile-menu-button {
+  display: none;
+}
+
+.mobile-sidebar-overlay {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .nav-links {
     gap: 12px;
@@ -1123,13 +1134,176 @@ body {
     height: 28px;
   }
 
+  .mobile-menu-button {
+    display: flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1200;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+
+  .mobile-menu-button svg {
+    font-size: 24px;
+  }
+
+  .mobile-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 1090;
+  }
+
+  .mobile-sidebar-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .sidebar {
-    width: 120px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    max-width: 82vw;
+    z-index: 1100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-logo {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sidebar-logo-img {
+    height: 84px;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+  }
+
+  .sidebar-nav ul {
+    width: 100%;
+  }
+
+  .sidebar-nav ul li {
+    width: 100%;
+  }
+
+  .sidebar-item {
+    width: 100%;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .sidebar-icon {
+    font-size: 18px;
   }
 
   .sidebar-item span {
     font-size: 11px;
   }
+
+  .main {
+    width: 100%;
+  }
+
+  .navbar {
+    padding-left: 68px;
+  }
+
+  .matches-row {
+    grid-auto-columns: 320px;
+  }
+
+  .player-avatar.icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .video-carousel {
+    grid-auto-columns: 280px;
+    column-gap: 30px;
+  }
+
+  .video-carousel-wrapper {
+    margin-left: -20px;
+    margin-right: -20px;
+    width: calc(100% + 40px);
+  }
+
+  .season-title {
+    font-size: 32px;
+  }
+
+  .season-switch {
+    padding: 6px;
+    border-radius: 12px;
+  }
+
+  .season-tab {
+    height: 36px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .col-num {
+    width: 54px;
+  }
+}@media (max-width: 768px) {
+  .nav-links {
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+  }
+
+  .navbar-logo-img {
+    height: 28px;
+  }
+
+  .sidebar {
+    width:150px;
+  }
+
+  .sidebar-logo-img {
+    height: 75px;
+  }
+
+  .sidebar-item {
+  gap: 8px;
+  padding: 8px;
+}
+
+.sidebar-icon {
+  font-size: 18px;
+}
+
+.sidebar-item span {
+  font-size: 11px;
+}
 
   .matches-row {
     grid-auto-columns: 320px;
@@ -1279,11 +1453,12 @@ body {
 }
 
 .admin-card {
-  background: #ffffff;
+  background: #f2f2f2;
   color: #111827;
-  border: 1px solid #e5e7eb;
-  border-radius: 0;
+  border: 1px solid #adacac73;
+  border-radius: 8px;
   padding: 16px;
+  margin: 25px;
 }
 
 .admin-table-card {
@@ -1514,4 +1689,786 @@ body {
   .admin-form-actions {
     justify-content: flex-start;
   }
+}
+
+/* -------------------- */
+/* ADMIN PLAYERS PAGE */
+/* -------------------- */
+
+.admin-players-header {
+  margin-bottom: 22px;
+}
+
+.admin-players-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.admin-players-toolbar-left {
+  flex: 1 1 280px;
+}
+
+.admin-players-search {
+  max-width: 360px;
+  border-radius: 6px;
+}
+
+.admin-players-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-page .admin-toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-page .admin-toolbar-button-add {
+  background: #4f82e4;
+  color: #ffffff;
+}
+
+.admin-page .admin-toolbar-button-add:hover {
+  opacity: 0.92;
+}
+
+.admin-toolbar-button svg {
+  font-size: 16px;
+}
+
+.admin-toolbar-button:hover {
+  opacity: 0.92;
+}
+
+.admin-toolbar-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-toolbar-button-import {
+  background: #7bc16f;
+}
+
+.admin-toolbar-button-export {
+  background: #ff9f43;
+}
+
+.admin-toolbar-button-bulk {
+  background: #da5252;
+}
+
+.admin-toolbar-button-add {
+  background: #16a34a;
+}
+
+.admin-toolbar-button-danger {
+  color:#ffffff;
+  background: #dc2626;
+}
+
+.admin-toolbar-button-danger:hover {
+  opacity: 0.92;
+}
+
+.admin-toolbar-button-cancel {
+  background: #6b7280;
+}
+
+.admin-selected-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 2px;
+  min-height: 38px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-players-table-shell {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.admin-players-table-wrap {
+  overflow-x: auto;
+  background: transparent;
+  border-radius: 6px;
+}
+
+.admin-players-table {
+  background: transparent;
+}
+
+.admin-players-table thead th {
+  background: #eef0f3;
+}
+
+.admin-players-table tbody td {
+  background: #ffffff;
+}
+
+.admin-players-table tbody tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+.admin-players-table tbody tr:hover td {
+  background: #f1f5f9;
+}
+
+.admin-checkbox-col,
+.admin-checkbox-cell {
+  width: 52px;
+  text-align: center;
+}
+
+.admin-checkbox-col input,
+.admin-checkbox-cell input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.admin-player-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.admin-player-list-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.admin-player-list-thumb-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d1d5db;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-player-full-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.admin-players-actions-col {
+  width: 110px;
+}
+
+.admin-player-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-icon-action {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-icon-action svg {
+  font-size: 16px;
+}
+
+.admin-page .admin-icon-action-edit {
+  color: #ffffff;
+  background: #4f82e4;
+}
+.admin-page .admin-icon-action-edit:hover {
+  opacity: 0.92;
+}
+
+.admin-page .admin-icon-action-delete {
+  color: #ffffff;
+  background: #da5252;
+}
+
+.admin-page .admin-icon-action-delete:hover {
+  opacity: 0.92;
+}
+
+.admin-players-empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 24px 16px;
+}
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.admin-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  padding: 22px;
+}
+
+.admin-modal-title {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.admin-modal-text {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.admin-modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-modal-button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-modal-button-cancel {
+  background: #6b7280;
+}
+
+.admin-modal-button-delete {
+  background: #dc2626;
+}
+
+.admin-modal-button:hover {
+  opacity: 0.92;
+}
+
+@media (max-width: 768px) {
+  .admin-players-toolbar {
+    align-items: stretch;
+  }
+
+  .admin-players-toolbar-left,
+  .admin-players-toolbar-right {
+    width: 100%;
+  }
+
+  .admin-players-search {
+    max-width: 100%;
+  }
+
+  .admin-players-toolbar-right {
+    justify-content: flex-start;
+  }
+
+  .admin-toolbar-button,
+  .admin-selected-count {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-player-name-cell {
+    min-width: 180px;
+  }
+}
+
+/* -------------------- */
+/* ADMIN PLAYER FORM */
+/* -------------------- */
+
+.admin-player-form-card {
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.admin-player-form-input {
+  border-radius: 6px;
+}
+
+.admin-player-form-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  text-decoration: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-player-form-button svg {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.admin-player-form-button-secondary {
+  background: #ffffff;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+.admin-player-form-button-secondary:hover {
+  background: #f9fafb;
+}
+
+.admin-player-form-button-primary {
+  background: #7bc16f;
+  color: #ffffff;
+}
+
+.admin-player-form-button-primary:hover {
+  opacity: 0.92;
+}
+
+.admin-player-form-button-create {
+  background: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+}
+
+.admin-player-form-button-create:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.admin-player-form-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.admin-player-form-actions {
+  margin-top: 4px;
+}
+
+.admin-player-photo-preview {
+  margin-top: 10px;
+}
+
+.admin-player-photo-preview-img {
+  width: 88px;
+  height: 88px;
+  border-radius: 6px;
+  object-fit: cover;
+  display: block;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+}
+
+@media (max-width: 768px) {
+  .admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-player-form-button {
+    width: 100%;
+  }
+
+  .admin-player-form-actions {
+    justify-content: flex-start;
+  }
+}
+
+.admin-player-file-input {
+  display: none;
+}
+
+.admin-player-upload-trigger {
+  width: fit-content;
+}
+
+.admin-player-file-help {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.admin-player-country-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.admin-player-country-flag-img {
+  display: inline-block;
+  width: 24px;
+  height: auto;
+  border-radius: 2px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.08);
+}
+
+.admin-venue-show-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-venue-show-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-venue-show-icon svg {
+  font-size: 16px;
+}
+
+.admin-venue-show-icon-yes {
+  color: #16a34a;
+}
+
+.admin-venue-show-icon-no {
+  color: #9ca3af;
+}
+
+.admin-venue-form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 5px;
+  align-items: start;
+}
+
+.admin-venue-form-card-left,
+.admin-venue-map-card {
+  margin: 5px;
+}
+
+.admin-venue-map-header {
+  margin-bottom: 14px;
+}
+
+.admin-venue-map-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.admin-venue-map-title-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #dbeafe;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.admin-venue-map-title-icon svg {
+  font-size: 18px;
+}
+
+.admin-venue-map-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.admin-venue-map-subtitle {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.admin-venue-map-help {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-venue-map-frame-wrap {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+}
+
+.admin-venue-map-frame {
+  display: block;
+  width: 100%;
+  height: 420px;
+  border: 0;
+}
+
+.admin-venue-map-empty {
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #6b7280;
+}
+
+.admin-venue-map-empty-inner {
+  max-width: 280px;
+}
+
+.admin-venue-map-empty-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.admin-venue-map-empty-icon svg {
+  font-size: 24px;
+}
+
+.admin-venue-map-empty-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.admin-venue-map-empty-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #6b7280;
+}
+
+@media (max-width: 1100px) {
+  .admin-venue-form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-venue-form-card-left,
+  .admin-venue-map-card {
+    margin: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-venue-map-frame,
+  .admin-venue-map-empty {
+    min-height: 300px;
+    height: 300px;
+  }
+}
+
+/* -------------------- */
+/* ADMIN SEASONS PAGE */
+/* -------------------- */
+
+.admin-season-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.admin-season-name-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #dcfce7;
+  color: #15803d;
+  flex-shrink: 0;
+}
+
+.admin-season-name-icon svg {
+  font-size: 16px;
+}
+
+.admin-season-name-text {
+  font-weight: 600;
+  color: #111827;
+}
+
+.admin-season-info-card {
+  margin-top: 0;
+}
+
+.admin-season-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.admin-season-info-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.admin-season-info-subtitle {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.admin-season-preview-pill {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #15803d;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.admin-tournament-subnav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.admin-tournament-subnav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.admin-tournament-subnav-link:hover {
+  background: #f9fafb;
+}
+
+.admin-tournament-subnav-link.is-active {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.admin-group-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-group-slot-row {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.admin-group-slot-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-group-slot-help {
+  grid-column: 2;
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .admin-group-slot-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .admin-group-slot-help {
+    grid-column: auto;
+  }
+}
+
+.admin-match-stage-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-match-meta-text {
+  font-size: 12px;
+  color: #6b7280;
 }
