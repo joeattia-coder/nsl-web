@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
@@ -15,10 +16,10 @@ type ScreenState =
   | { kind: "news-detail"; slug: string }
   | { kind: "fixture-detail"; fixtureId: string };
 
-const tabs: Array<{ key: ActiveTab; label: string }> = [
-  { key: "home", label: "Home" },
-  { key: "news", label: "News" },
-  { key: "fixtures", label: "Fixtures" },
+const tabs: Array<{ key: ActiveTab; label: string; icon: keyof typeof Feather.glyphMap }> = [
+  { key: "home", label: "Home", icon: "home" },
+  { key: "news", label: "News", icon: "file-text" },
+  { key: "fixtures", label: "Fixtures", icon: "calendar" },
 ];
 
 export default function App() {
@@ -57,8 +58,14 @@ export default function App() {
           const isActive = tab.key === activeTab;
 
           return (
-            <Pressable key={tab.key} onPress={() => setScreen({ kind: "tab", tab: tab.key })} style={[styles.tabButton, isActive ? styles.tabButtonActive : null]}>
-              <Text style={[styles.tabLabel, isActive ? styles.tabLabelActive : null]}>{tab.label}</Text>
+            <Pressable key={tab.key} onPress={() => setScreen({ kind: "tab", tab: tab.key })} style={styles.tabButton}>
+              <Feather
+                name={tab.icon}
+                size={18}
+                color={isActive ? "#f59e0b" : "#8ca5bb"}
+                style={styles.tabIcon}
+              />
+              {isActive ? <Text style={styles.tabLabel}>{tab.label}</Text> : null}
             </Pressable>
           );
         })}
@@ -70,38 +77,35 @@ export default function App() {
 const styles = StyleSheet.create({
   shell: {
     flex: 1,
-    backgroundColor: "#07131f",
+    backgroundColor: "#000000",
   },
   content: {
     flex: 1,
   },
   tabBar: {
     flexDirection: "row",
-    gap: 10,
-    paddingHorizontal: 16,
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 14,
-    backgroundColor: "#10243a",
+    backgroundColor: "#000000",
     borderTopWidth: 1,
     borderTopColor: "#1c3a57",
   },
   tabButton: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 16,
-    paddingVertical: 12,
-    backgroundColor: "#0b1d2f",
+    gap: 4,
+    minWidth: 54,
+    paddingVertical: 6,
   },
-  tabButtonActive: {
-    backgroundColor: "#f59e0b",
+  tabIcon: {
+    marginBottom: 1,
   },
   tabLabel: {
-    color: "#8ca5bb",
-    fontSize: 13,
+    color: "#f59e0b",
+    fontSize: 12,
     fontWeight: "700",
-  },
-  tabLabelActive: {
-    color: "#07131f",
   },
 });

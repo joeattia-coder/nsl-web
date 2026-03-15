@@ -3,13 +3,20 @@
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
+const directUrl = process.env.DIRECT_URL;
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!directUrl && !databaseUrl) {
+  throw new Error("Prisma requires DIRECT_URL or DATABASE_URL to be set.");
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-      seed: "ts-node ./prisma/seed.ts",
+    seed: "ts-node ./prisma/seed.ts",
   },
   datasource: {
-    url: env("DIRECT_URL"),
+    url: directUrl ?? env("DATABASE_URL"),
   },
 });

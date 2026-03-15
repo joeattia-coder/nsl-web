@@ -11,7 +11,8 @@ import {
 
 import type { PublicFixtureDetail } from "@nsl/shared";
 
-import { formatFixtureStatus, formatMatchDateTime, formatScoreLine } from "../src/lib/format";
+import { FixtureMatchCard } from "../src/components/fixture-match-card";
+import { formatScoreLine } from "../src/lib/format";
 import { publicApi } from "../src/lib/public-api";
 
 type FixtureDetailScreenProps = {
@@ -85,14 +86,7 @@ export default function FixtureDetailScreen({ fixtureId, onBack }: FixtureDetail
 
         {fixture ? (
           <>
-            <View style={styles.hero}>
-              <Text style={styles.eyebrow}>{fixture.fixtureGroupDesc}</Text>
-              <Text style={styles.title}>
-                {fixture.homeTeamName} vs {fixture.roadTeamName}
-              </Text>
-              <Text style={styles.copy}>{formatMatchDateTime(fixture.fixtureDateTime, fixture.fixtureTime)}</Text>
-              <Text style={styles.status}>{formatFixtureStatus(fixture)}</Text>
-            </View>
+            <FixtureMatchCard fixture={fixture} showCompetition />
 
             <View style={styles.scoreRow}>
               <View style={styles.scoreCard}>
@@ -144,7 +138,7 @@ export default function FixtureDetailScreen({ fixtureId, onBack }: FixtureDetail
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#07131f",
+    backgroundColor: "#000000",
   },
   content: {
     padding: 20,
@@ -165,45 +159,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
   },
-  hero: {
-    backgroundColor: "#10243a",
-    borderRadius: 28,
-    padding: 22,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#1e3a56",
-  },
-  eyebrow: {
-    color: "#7dd3fc",
-    fontSize: 12,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.8,
-  },
-  title: {
-    color: "#f8fafc",
-    fontSize: 28,
-    fontWeight: "800",
-    lineHeight: 34,
-  },
-  copy: {
-    color: "#c9d7e3",
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  status: {
-    color: "#f59e0b",
-    fontSize: 14,
-    fontWeight: "700",
-  },
   scoreRow: {
     flexDirection: "row",
     gap: 12,
   },
   scoreCard: {
     flex: 1,
-    backgroundColor: "#0b1d2f",
-    borderRadius: 20,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 16,
     gap: 6,
     borderWidth: 1,
@@ -223,8 +186,8 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   infoCard: {
-    backgroundColor: "#10243a",
-    borderRadius: 24,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 18,
     gap: 8,
     borderWidth: 1,
@@ -249,8 +212,8 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   errorCard: {
-    backgroundColor: "#3a1516",
-    borderRadius: 20,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 18,
     gap: 6,
     borderWidth: 1,
@@ -267,8 +230,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   loadingCard: {
-    backgroundColor: "#0b1d2f",
-    borderRadius: 18,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 16,
     borderWidth: 1,
     borderColor: "#18344d",

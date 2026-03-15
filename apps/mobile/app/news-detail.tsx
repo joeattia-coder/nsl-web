@@ -129,7 +129,7 @@ export default function NewsDetailScreen({ slug, onBack }: NewsDetailScreenProps
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#07131f",
+    backgroundColor: "#000000",
   },
   content: {
     padding: 20,
@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   hero: {
-    backgroundColor: "#10243a",
-    borderRadius: 28,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 22,
     gap: 10,
     borderWidth: 1,
@@ -181,8 +181,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   coverFrame: {
-    backgroundColor: "#0b1d2f",
-    borderRadius: 20,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "#18344d",
@@ -192,8 +192,8 @@ const styles = StyleSheet.create({
     aspectRatio: 16 / 9,
   },
   bodyCard: {
-    backgroundColor: "#10243a",
-    borderRadius: 24,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 18,
     gap: 12,
     borderWidth: 1,
@@ -210,8 +210,8 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   errorCard: {
-    backgroundColor: "#3a1516",
-    borderRadius: 20,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 18,
     gap: 6,
     borderWidth: 1,
@@ -228,8 +228,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   loadingCard: {
-    backgroundColor: "#0b1d2f",
-    borderRadius: 18,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     padding: 16,
     borderWidth: 1,
     borderColor: "#18344d",

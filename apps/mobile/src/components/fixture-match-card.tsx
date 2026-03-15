@@ -137,6 +137,7 @@ export function FixtureMatchCard({ fixture, onPress, showCompetition = false }: 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#0b0b0b",
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
     padding: 16,
@@ -197,13 +198,15 @@ const styles = StyleSheet.create({
   playerPhoto: {
     width: 76,
     height: 92,
+    borderRadius: 4,
     resizeMode: "cover",
-    backgroundColor: "#1f2937",
+    backgroundColor: "#ffffff0f",
   },
   playerFallback: {
     width: 76,
     height: 92,
-    backgroundColor: "rgba(255,255,255,0.06)",
+    borderRadius: 4,
+    backgroundColor: "#ffffff0f",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
@@ -255,6 +258,7 @@ const styles = StyleSheet.create({
   },
   centerPill: {
     minWidth: 92,
+    borderRadius: 4,
     paddingHorizontal: 12,
     paddingVertical: 11,
     borderWidth: 1,
