@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* -------------------- */
 /* RESET */
 /* -------------------- */
@@ -449,6 +451,14 @@ body {
   text-align: right;
 }
 
+.player-copy {
+  min-width: 0;
+}
+
+.player-copy-right {
+  text-align: right;
+}
+
 .player-avatar.icon {
   width: 64px;
   height: 64px;
@@ -469,6 +479,24 @@ body {
 
 .player-name.right {
   text-align: right;
+}
+
+.player-flag-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 6px;
+}
+
+.player-flag-row-right {
+  justify-content: flex-end;
+}
+
+.player-flag-img {
+  width: 22px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
 
 .match-cta {
@@ -694,6 +722,11 @@ body {
   gap: 8px;
 }
 
+.season-switch-three {
+  width: 560px;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
 .season-tab {
   height: 38px;
   padding: 0 12px;
@@ -863,6 +896,27 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 320px;
+}
+
+.name-flag-row {
+  display: flex;
+  margin-top: 8px;
+}
+
+.name-flag-row-left {
+  justify-content: flex-end;
+}
+
+.name-flag-row-right {
+  justify-content: flex-start;
+}
+
+.name-flag-img {
+  width: 22px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
 
 .match-icon {
@@ -1063,6 +1117,123 @@ body {
   color: rgba(255, 255, 255, 0.75);
 }
 
+.knockout-section {
+  margin-top: 18px;
+}
+
+.knockout-source-text {
+  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.knockout-bracket-shell {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 0 18px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.knockout-bracket {
+  display: flex;
+  align-items: flex-start;
+  gap: 56px;
+  min-width: max-content;
+  padding-right: 24px;
+}
+
+.knockout-round {
+  min-width: 240px;
+}
+
+.knockout-round-title {
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.knockout-round-slots {
+  display: flex;
+  flex-direction: column;
+}
+
+.knockout-slot {
+  position: relative;
+  width: 240px;
+}
+
+.knockout-slot::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -56px;
+  width: 56px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.knockout-slot.is-last-round::after {
+  display: none;
+}
+
+.knockout-player-card {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.knockout-player-text {
+  min-width: 0;
+}
+
+.knockout-player-first {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.knockout-player-last {
+  margin-top: 3px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.knockout-slot-divider {
+  position: relative;
+  height: 18px;
+}
+
+.knockout-slot-divider::before {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: -1px;
+  bottom: -1px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.knockout-flag-img {
+  width: 22px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
+  flex-shrink: 0;
+}
+
 /* -------------------- */
 /* RESPONSIVE */
 /* -------------------- */
@@ -1110,6 +1281,23 @@ body {
   .player-cell {
     width: 260px;
     max-width: 260px;
+  }
+
+  .knockout-bracket {
+    gap: 40px;
+  }
+
+  .knockout-round {
+    min-width: 220px;
+  }
+
+  .knockout-slot {
+    width: 220px;
+  }
+
+  .knockout-slot::after {
+    right: -40px;
+    width: 40px;
   }
 }
 
@@ -1268,6 +1456,23 @@ body {
     border-radius: 10px;
   }
 
+  .season-switch-three {
+    width: 100%;
+  }
+
+  .knockout-round {
+    min-width: 200px;
+  }
+
+  .knockout-slot {
+    width: 200px;
+  }
+
+  .knockout-player-card {
+    min-height: 64px;
+    padding: 12px 14px;
+  }
+
   .col-num {
     width: 54px;
   }
@@ -1412,14 +1617,14 @@ body {
   text-decoration: none;
 }
 
-.admin-page h1.admin-page-title {
+.admin-page .admin-page-title {
   margin: 0;
   font-size: 2rem;
   font-weight: 600;
   color: #111827 !important;
 }
 
-.admin-page p.admin-page-subtitle {
+.admin-page .admin-page-subtitle {
   margin-top: 6px;
   font-size: 1rem;
   color: #6b7280 !important;
@@ -2392,37 +2597,39 @@ body {
 
 .admin-tournament-subnav {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
+  align-items: flex-end;
+  gap: 0;
+  margin-bottom: 22px;
   flex-wrap: wrap;
+  padding-bottom: 0;
 }
 
 .admin-tournament-subnav-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
-  padding: 0 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #111827;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 0;
+  background: #f2f2f2;
+  color: #4b5563;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1;
   text-decoration: none;
   transition: 0.2s ease;
+  margin-bottom: -1px;
 }
 
 .admin-tournament-subnav-link:hover {
-  background: #f9fafb;
+  background: #ececec;
+  color: #111827;
 }
 
 .admin-tournament-subnav-link.is-active {
-  background: #111827;
-  border-color: #111827;
-  color: #ffffff;
+  background: #f9fafb;
+  color: #111827;
 }
 
 .admin-group-slots {

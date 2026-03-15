@@ -17,6 +17,7 @@ type EntryLike = {
 };
 
 type StandingAccumulator = {
+  entryId: string;
   teamName: string;
   played: number;
   won: number;
@@ -75,6 +76,33 @@ export async function GET(req: Request) {
         },
       },
       include: {
+        participants: {
+          include: {
+            tournamentEntry: {
+              select: {
+                id: true,
+                entryName: true,
+                seedNumber: true,
+                members: {
+                  include: {
+                    player: {
+                      select: {
+                        firstName: true,
+                        lastName: true,
+                      },
+                    },
+                  },
+                  orderBy: {
+                    createdAt: "asc",
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
         matches: {
           include: {
             homeEntry: {
@@ -89,6 +117,9 @@ export async function GET(req: Request) {
                         lastName: true,
                       },
                     },
+                  },
+                  orderBy: {
+                    createdAt: "asc",
                   },
                 },
               },
@@ -106,6 +137,55 @@ export async function GET(req: Request) {
                       },
                     },
                   },
+                  orderBy: {
+                    createdAt: "asc",
+                  },
+                },
+              },
+            },
+          },
+        },
+        stageRound: {
+          include: {
+            matches: {
+              include: {
+                homeEntry: {
+                  select: {
+                    id: true,
+                    entryName: true,
+                    members: {
+                      include: {
+                        player: {
+                          select: {
+                            firstName: true,
+                            lastName: true,
+                          },
+                        },
+                      },
+                      orderBy: {
+                        createdAt: "asc",
+                      },
+                    },
+                  },
+                },
+                awayEntry: {
+                  select: {
+                    id: true,
+                    entryName: true,
+                    members: {
+                      include: {
+                        player: {
+                          select: {
+                            firstName: true,
+                            lastName: true,
+                          },
+                        },
+                      },
+                      orderBy: {
+                        createdAt: "asc",
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -120,7 +200,43 @@ export async function GET(req: Request) {
     const resultGroups = groups.map((group) => {
       const standingsMap = new Map<string, StandingAccumulator>();
 
-      for (const match of group.matches) {
+      const participantEntryIds = new Set(
+        group.participants.map((p) => p.tournamentEntryId)
+      );
+
+      // 1) Initialize every participant with zero stats
+      for (const participant of group.participants) {
+        const entry = participant.tournamentEntry;
+
+        standingsMap.set(entry.id, {
+          entryId: entry.id,
+          teamName: getEntryDisplayName(entry),
+          played: 0,
+          won: 0,
+          tied: 0,
+          lost: 0,
+          framesFor: 0,
+          framesAgainst: 0,
+          diff: 0,
+          points: 0,
+        });
+      }
+
+      // 2) Use direct group matches first
+      let matchesForStandings = group.matches;
+
+      // 3) Fallback for legacy rows with null tournamentGroupId:
+      // use round matches where both entries belong to this group
+      if (matchesForStandings.length === 0) {
+        matchesForStandings = group.stageRound.matches.filter((match) => {
+          return (
+            participantEntryIds.has(match.homeEntryId) &&
+            participantEntryIds.has(match.awayEntryId)
+          );
+        });
+      }
+
+      for (const match of matchesForStandings) {
         const hasScore =
           match.homeScore !== null &&
           match.homeScore !== undefined &&
@@ -133,8 +249,13 @@ export async function GET(req: Request) {
         const homeKey = match.homeEntryId;
         const awayKey = match.awayEntryId;
 
+        if (!participantEntryIds.has(homeKey) || !participantEntryIds.has(awayKey)) {
+          continue;
+        }
+
         if (!standingsMap.has(homeKey)) {
           standingsMap.set(homeKey, {
+            entryId: homeKey,
             teamName: getEntryDisplayName(match.homeEntry),
             played: 0,
             won: 0,
@@ -149,6 +270,7 @@ export async function GET(req: Request) {
 
         if (!standingsMap.has(awayKey)) {
           standingsMap.set(awayKey, {
+            entryId: awayKey,
             teamName: getEntryDisplayName(match.awayEntry),
             played: 0,
             won: 0,

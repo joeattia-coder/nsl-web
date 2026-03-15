@@ -13,6 +13,7 @@
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.5.0",
     "@vercel/blob": "^2.3.1",
+    "cuid": "^3.0.0",
     "dotenv": "^17.3.1",
     "next": "16.1.6",
     "pg": "^8.20.0",
@@ -21,12 +22,16 @@
     "react-icons": "^5.6.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "postcss": "^8.5.8",
     "prisma": "^7.5.0",
+    "tailwindcss": "^4.2.1",
+    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5"
   }

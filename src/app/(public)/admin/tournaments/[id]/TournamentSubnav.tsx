@@ -35,7 +35,7 @@ export default function TournamentSubnav({
   ];
 
   return (
-    <div className="admin-tournament-subnav">
+    <nav className="admin-tournament-subnav" aria-label="Tournament sections">
       {links.map((link) => (
         <Link
           key={link.href}
@@ -43,10 +43,11 @@ export default function TournamentSubnav({
           className={`admin-tournament-subnav-link ${
             active === link.key ? "is-active" : ""
           }`}
+          aria-current={active === link.key ? "page" : undefined}
         >
           {link.label}
         </Link>
       ))}
-    </div>
+    </nav>
   );
 }

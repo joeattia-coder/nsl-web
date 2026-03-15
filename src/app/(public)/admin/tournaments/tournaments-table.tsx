@@ -167,7 +167,7 @@ export default function TournamentsTable({
                         {tournament.tournamentName}
                       </span>
                     </td>
-
+                    <td>{tournament.seasonName || "—"}</td>
 
                     <td>{tournament.venueName || "—"}</td>
                     <td>{tournament.participantType}</td>

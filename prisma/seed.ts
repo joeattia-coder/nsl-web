@@ -1,6 +1,6 @@
-import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../src/generated/prisma/client";
+require("dotenv/config");
+const { PrismaPg } = require("@prisma/adapter-pg");
+const { PrismaClient } = require("../src/generated/prisma/client");
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -15,6 +15,23 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  const league = await prisma.league.upsert({
+    where: { leagueName: "National Snooker League" },
+    update: {
+      description: "Default league",
+      isActive: true,
+      updatedAt: new Date(),
+    },
+    create: {
+      id: "nsl-league",
+      leagueName: "National Snooker League",
+      description: "Default league",
+      isActive: true,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+  });
+
   const adminRole = await prisma.role.upsert({
     where: { roleName: "Admin" },
     update: {},
@@ -46,11 +63,18 @@ async function main() {
     where: { seasonName: "2025-2026 Season 1" },
     update: {
       isActive: true,
+      leagueId: league.id,
     },
     create: {
       seasonName: "2025-2026 Season 1",
       isActive: true,
+      leagueId: league.id,
     },
+  });
+
+  await prisma.season.updateMany({
+    where: { leagueId: null },
+    data: { leagueId: league.id },
   });
 
   const adminUser = await prisma.user.upsert({
@@ -82,6 +106,7 @@ async function main() {
 
   console.log("Seed complete");
   console.log({
+    league: league.leagueName,
     adminRole: adminRole.roleName,
     leagueManagerRole: leagueManagerRole.roleName,
     playerRole: playerRole.roleName,

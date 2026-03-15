@@ -12,6 +12,7 @@ export default async function AdminSeasonsPage() {
       startDate: true,
       endDate: true,
       isActive: true,
+      League: { select: { leagueName: true } },
     },
   });
 
@@ -21,6 +22,7 @@ export default async function AdminSeasonsPage() {
     startDate: season.startDate ? season.startDate.toISOString() : "",
     endDate: season.endDate ? season.endDate.toISOString() : "",
     isActive: season.isActive,
+    leagueName: season.League?.leagueName ?? "",
   }));
 
   return (

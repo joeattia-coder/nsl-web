@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 type PlayerLike = {
   firstName: string;
   lastName: string;
+  country?: string | null;
 };
 
 type EntryMemberLike = {
@@ -80,6 +81,97 @@ function getEntryDisplayName(entry: EntryLike | null | undefined) {
   return names.join(" / ");
 }
 
+function normalizeCountryCode(country: string) {
+  const normalized = country.trim();
+
+  if (!normalized) return "";
+
+  if (/^[a-zA-Z]{2}$/.test(normalized)) {
+    return normalized.toUpperCase();
+  }
+
+  const countryToCode: Record<string, string> = {
+    canada: "CA",
+    "united states": "US",
+    usa: "US",
+    us: "US",
+    mexico: "MX",
+    england: "GB",
+    scotland: "GB",
+    wales: "GB",
+    "united kingdom": "GB",
+    uk: "GB",
+    ireland: "IE",
+    france: "FR",
+    germany: "DE",
+    italy: "IT",
+    spain: "ES",
+    portugal: "PT",
+    netherlands: "NL",
+    belgium: "BE",
+    switzerland: "CH",
+    austria: "AT",
+    sweden: "SE",
+    norway: "NO",
+    denmark: "DK",
+    finland: "FI",
+    poland: "PL",
+    czechia: "CZ",
+    "czech republic": "CZ",
+    slovakia: "SK",
+    hungary: "HU",
+    romania: "RO",
+    bulgaria: "BG",
+    greece: "GR",
+    turkey: "TR",
+    cyprus: "CY",
+    india: "IN",
+    pakistan: "PK",
+    china: "CN",
+    japan: "JP",
+    "south korea": "KR",
+    korea: "KR",
+    taiwan: "TW",
+    thailand: "TH",
+    vietnam: "VN",
+    philippines: "PH",
+    malaysia: "MY",
+    singapore: "SG",
+    indonesia: "ID",
+    australia: "AU",
+    "new zealand": "NZ",
+    egypt: "EG",
+    morocco: "MA",
+    tunisia: "TN",
+    "south africa": "ZA",
+    nigeria: "NG",
+    kenya: "KE",
+    brazil: "BR",
+    argentina: "AR",
+    chile: "CL",
+    colombia: "CO",
+    peru: "PE",
+    uruguay: "UY",
+  };
+
+  return countryToCode[normalized.toLowerCase()] || "";
+}
+
+function getEntryCountryCode(entry: EntryLike | null | undefined) {
+  if (!entry) return "";
+
+  const codes = Array.from(
+    new Set(
+      entry.members
+        .map((member) => normalizeCountryCode(member.player.country ?? ""))
+        .filter(Boolean)
+    )
+  );
+
+  if (codes.length === 1) return codes[0];
+  return "";
+}
+
 export async function GET() {
   try {
     const matches = await prisma.match.findMany({
@@ -105,6 +197,7 @@ export async function GET() {
           select: {
             id: true,
             roundName: true,
+            roundType: true,
           },
         },
         homeEntry: {
@@ -117,6 +210,7 @@ export async function GET() {
                   select: {
                     firstName: true,
                     lastName: true,
+                    country: true,
                   },
                 },
               },
@@ -133,6 +227,7 @@ export async function GET() {
                   select: {
                     firstName: true,
                     lastName: true,
+                    country: true,
                   },
                 },
               },
@@ -150,6 +245,8 @@ export async function GET() {
     const fixtures = matches.map((match) => {
       const homeName = getEntryDisplayName(match.homeEntry);
       const awayName = getEntryDisplayName(match.awayEntry);
+      const homeCountryCode = getEntryCountryCode(match.homeEntry);
+      const roadCountryCode = getEntryCountryCode(match.awayEntry);
       const fixtureDate = toCompactDateTime(match.matchDate, match.matchTime);
       const fixtureDateTime = toIsoDateTime(match.matchDate, match.matchTime);
       const fixtureTime = toTimeString(match.matchDate, match.matchTime);
@@ -162,11 +259,14 @@ export async function GET() {
         fixtureTime,
         homeTeamName: homeName,
         roadTeamName: awayName,
+        homeCountryCode,
+        roadCountryCode,
         homeScore: match.homeScore,
         roadScore: match.awayScore,
         fixtureGroupIdentifier: match.tournament.id,
         fixtureGroupDesc: match.tournament.tournamentName,
         roundDesc: match.stageRound.roundName,
+        roundType: match.stageRound.roundType,
         seasonId: match.tournament.seasonId,
         seasonDesc: match.tournament.season.seasonName,
         matchStatus: match.matchStatus,

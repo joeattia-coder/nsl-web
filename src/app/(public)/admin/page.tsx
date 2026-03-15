@@ -1,8 +1,14 @@
 export default function AdminDashboardPage() {
   return (
-    <div className="admin-page">
-      <h1>Admin Dashboard</h1>
-      <p>Welcome to the National Snooker League admin panel.</p>
-    </div>
+    <section className="admin-page">
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Admin Dashboard</h1>
+          <p className="admin-page-subtitle">
+            Welcome to the National Snooker League admin panel.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -10,6 +10,7 @@ type SeasonRow = {
   startDate: string;
   endDate: string;
   isActive: boolean;
+  leagueName: string;
 };
 
 type SeasonsTableProps = {
@@ -109,6 +110,7 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
             <thead>
               <tr>
                 <th>Season Name</th>
+                <th>League</th>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Active</th>
@@ -119,7 +121,7 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
             <tbody>
               {filteredSeasons.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="admin-players-empty">
+                  <td colSpan={6} className="admin-players-empty">
                     No seasons found.
                   </td>
                 </tr>
@@ -136,10 +138,9 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
                         </span>
                       </div>
                     </td>
-
+                    <td>{season.leagueName || "—"}</td>
                     <td>{formatDate(season.startDate)}</td>
                     <td>{formatDate(season.endDate)}</td>
-
                     <td>
                       <div className="admin-venue-show-cell">
                         {season.isActive ? (
@@ -161,7 +162,6 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
                         )}
                       </div>
                     </td>
-
                     <td>
                       <div className="admin-player-row-actions">
                         <Link
@@ -172,7 +172,6 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
                         >
                           <FiEdit2 />
                         </Link>
-
                         <button
                           type="button"
                           className="admin-icon-action admin-icon-action-delete"

@@ -83,7 +83,16 @@ export default function PublicLayout({
                     <span className="sidebar-label">Dashboard</span>
                   </Link>
                 </li>
-
+                <li>
+                  <Link
+                    href="/admin/leagues"
+                    className="sidebar-item"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <FiBarChart2 className="sidebar-icon" />
+                    <span className="sidebar-label">Leagues</span>
+                  </Link>
+                </li>
                 <li>
                   <Link
                     href="/admin/players"
@@ -94,7 +103,6 @@ export default function PublicLayout({
                     <span className="sidebar-label">Players</span>
                   </Link>
                 </li>
-
                 <li>
                   <Link
                     href="/admin/seasons"
@@ -105,7 +113,6 @@ export default function PublicLayout({
                     <span className="sidebar-label">Seasons</span>
                   </Link>
                 </li>
-
                 <li>
                   <Link
                     href="/admin/tournaments"
@@ -116,7 +123,6 @@ export default function PublicLayout({
                     <span className="sidebar-label">Tournaments</span>
                   </Link>
                 </li>
-
                 <li>
                   <Link
                     href="/admin/matches"
@@ -127,7 +133,6 @@ export default function PublicLayout({
                     <span className="sidebar-label">Matches</span>
                   </Link>
                 </li>
-
                 <li>
                   <Link
                     href="/admin/venues"
@@ -138,7 +143,6 @@ export default function PublicLayout({
                     <span className="sidebar-label">Venues</span>
                   </Link>
                 </li>
-
                 <li>
                   <Link
                     href="/admin/users"

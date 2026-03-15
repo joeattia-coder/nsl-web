@@ -14,6 +14,8 @@ type UiMatch = {
   round: string;
   home: string;
   away: string;
+  homeCountryCode: string;
+  awayCountryCode: string;
   ctaHref?: string;
 };
 
@@ -99,6 +101,8 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     round: round || "",
     home,
     away,
+    homeCountryCode: firstString(fx, ["homeCountryCode", "HomeCountryCode"], ""),
+    awayCountryCode: firstString(fx, ["roadCountryCode", "RoadCountryCode"], ""),
     ctaHref,
   };
 }
@@ -360,13 +364,37 @@ export default function Page() {
                     <div className="player-avatar icon">
                       <FiUser size={28} />
                     </div>
-                    <div className="player-name">{m.home}</div>
+                    <div className="player-copy">
+                      <div className="player-name">{m.home}</div>
+                      {m.homeCountryCode ? (
+                        <div className="player-flag-row">
+                          <img
+                            src={`https://flagcdn.com/w40/${m.homeCountryCode.toLowerCase()}.png`}
+                            alt={m.homeCountryCode}
+                            className="player-flag-img"
+                            title={m.homeCountryCode}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className="match-pill">{m.time}</div>
 
                   <div className="player right">
-                    <div className="player-name right">{m.away}</div>
+                    <div className="player-copy player-copy-right">
+                      <div className="player-name right">{m.away}</div>
+                      {m.awayCountryCode ? (
+                        <div className="player-flag-row player-flag-row-right">
+                          <img
+                            src={`https://flagcdn.com/w40/${m.awayCountryCode.toLowerCase()}.png`}
+                            alt={m.awayCountryCode}
+                            className="player-flag-img"
+                            title={m.awayCountryCode}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
                     <div className="player-avatar icon">
                       <FiUser size={28} />
                     </div>

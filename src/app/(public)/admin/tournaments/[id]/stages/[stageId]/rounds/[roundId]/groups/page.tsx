@@ -35,6 +35,11 @@ export default async function RoundGroupsPage({
           participants: true,
         },
       },
+      matches: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
@@ -86,6 +91,7 @@ export default async function RoundGroupsPage({
         stageId={round.tournamentStage.id}
         roundId={round.id}
         roundName={round.roundName}
+        existingMatchCount={round.matches.length}
         groups={groups}
       />
     </section>

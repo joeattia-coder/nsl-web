@@ -17,6 +17,7 @@ type GroupsTableProps = {
   stageId: string;
   roundId: string;
   roundName: string;
+  existingMatchCount: number;
   groups: GroupRow[];
 };
 
@@ -25,6 +26,7 @@ export default function GroupsTable({
   stageId,
   roundId,
   roundName,
+  existingMatchCount,
   groups,
 }: GroupsTableProps) {
   const [search, setSearch] = useState("");
@@ -32,6 +34,12 @@ export default function GroupsTable({
   const [addingGroup, setAddingGroup] = useState(false);
   const [deletingGroupId, setDeletingGroupId] = useState<string | null>(null);
   const [generatingMatches, setGeneratingMatches] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState<GroupRow | null>(null);
+  const [showGenerateMatchesModal, setShowGenerateMatchesModal] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
 
   const filteredGroups = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -69,18 +77,24 @@ export default function GroupsTable({
     }
   }
 
-  async function handleDeleteGroup(groupId: string, groupName: string) {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${groupName}?`
-    );
+  function openDeleteModal(group: GroupRow) {
+    setActionError(null);
+    setGroupToDelete(group);
+  }
 
-    if (!confirmed) return;
+  function closeDeleteModal() {
+    if (deletingGroupId) return;
+    setGroupToDelete(null);
+  }
+
+  async function handleDeleteGroup() {
+    if (!groupToDelete) return;
 
     try {
-      setDeletingGroupId(groupId);
+      setDeletingGroupId(groupToDelete.id);
       setActionError(null);
 
-      const res = await fetch(`/api/tournaments/groups/${groupId}`, {
+      const res = await fetch(`/api/tournaments/groups/${groupToDelete.id}`, {
         method: "DELETE",
       });
 
@@ -92,6 +106,7 @@ export default function GroupsTable({
         );
       }
 
+      setGroupToDelete(null);
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -103,57 +118,78 @@ export default function GroupsTable({
     }
   }
 
-  async function handleGenerateMatches() {
-  const confirmed = window.confirm(
-    "Generate all group matches for this round now?"
-  );
-
-  if (!confirmed) return;
-
-  try {
-    setGeneratingMatches(true);
+  function openGenerateMatchesModal() {
     setActionError(null);
 
-    const res = await fetch(
-      `/api/tournaments/rounds/${roundId}/generate-group-matches`,
-      {
-        method: "POST",
-      }
-    );
-
-    const rawText = await res.text();
-
-    let data: any = null;
-    try {
-      data = rawText ? JSON.parse(rawText) : null;
-    } catch {
-      data = null;
+    if (existingMatchCount > 0) {
+      setFeedbackModal({
+        title: "Matches already generated",
+        message: `This round already has ${existingMatchCount} generated match${existingMatchCount === 1 ? "" : "es"}. Delete the existing matches before generating them again.`,
+      });
+      return;
     }
 
-    if (!res.ok) {
-      setActionError(
-        [
+    setShowGenerateMatchesModal(true);
+  }
+
+  function closeGenerateMatchesModal() {
+    if (generatingMatches) return;
+    setShowGenerateMatchesModal(false);
+  }
+
+  async function handleGenerateMatches() {
+    try {
+      setGeneratingMatches(true);
+      setActionError(null);
+
+      const res = await fetch(
+        `/api/tournaments/rounds/${roundId}/generate-group-matches`,
+        {
+          method: "POST",
+        }
+      );
+
+      const rawText = await res.text();
+
+      let data: any = null;
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch {
+        data = null;
+      }
+
+      if (!res.ok) {
+        const message = [
           `HTTP ${res.status}`,
           data?.details,
           data?.error,
           rawText && !data ? rawText.slice(0, 500) : "",
         ]
           .filter(Boolean)
-          .join(" | ")
-      );
-      return;
-    }
+          .join(" | ");
 
-    window.alert(`Generated ${data?.createdCount ?? 0} matches.`);
-    window.location.reload();
-  } catch (err) {
-    setActionError(
-      err instanceof Error ? err.message : "Failed to generate matches."
-    );
-  } finally {
-    setGeneratingMatches(false);
+        setFeedbackModal({
+          title: "Could not generate matches",
+          message: message || "Failed to generate matches.",
+        });
+        return;
+      }
+
+      setShowGenerateMatchesModal(false);
+      setFeedbackModal({
+        title: "Matches generated",
+        message: `Generated ${data?.createdCount ?? 0} matches for ${roundName}.`,
+      });
+    } catch (err) {
+      setFeedbackModal({
+        title: "Could not generate matches",
+        message:
+          err instanceof Error ? err.message : "Failed to generate matches.",
+      });
+    } finally {
+      setGeneratingMatches(false);
+    }
   }
-}
 
   return (
     <>
@@ -196,7 +232,7 @@ export default function GroupsTable({
           <button
             type="button"
             className="admin-toolbar-button admin-toolbar-button-import"
-            onClick={handleGenerateMatches}
+            onClick={openGenerateMatchesModal}
             disabled={generatingMatches || addingGroup}
           >
             <span>{generatingMatches ? "Generating..." : "Generate Matches"}</span>
@@ -251,9 +287,7 @@ export default function GroupsTable({
                           className="admin-icon-action admin-icon-action-delete"
                           aria-label={`Delete ${group.groupName}`}
                           title="Delete"
-                          onClick={() =>
-                            handleDeleteGroup(group.id, group.groupName)
-                          }
+                          onClick={() => openDeleteModal(group)}
                           disabled={deletingGroupId === group.id || generatingMatches}
                         >
                           <FiTrash2 />
@@ -267,6 +301,133 @@ export default function GroupsTable({
           </table>
         </div>
       </div>
+
+      {groupToDelete ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="group-delete-title"
+          >
+            <h2 id="group-delete-title" className="admin-modal-title">
+              Delete group?
+            </h2>
+
+            <p className="admin-modal-text">
+              You are about to delete <strong>{groupToDelete.groupName}</strong>.
+              This action cannot be undone.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteModal}
+                disabled={Boolean(deletingGroupId)}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDeleteGroup}
+                disabled={Boolean(deletingGroupId)}
+              >
+                {deletingGroupId ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showGenerateMatchesModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeGenerateMatchesModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="generate-matches-title"
+          >
+            <h2 id="generate-matches-title" className="admin-modal-title">
+              Generate group matches?
+            </h2>
+
+            <p className="admin-modal-text">
+              Generate all matches for <strong>{roundName}</strong> now?
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeGenerateMatchesModal}
+                disabled={generatingMatches}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleGenerateMatches}
+                disabled={generatingMatches}
+              >
+                {generatingMatches ? "Generating..." : "Generate"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setFeedbackModal(null)}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="groups-feedback-title"
+          >
+            <h2 id="groups-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => {
+                  const shouldReload = feedbackModal.title === "Matches generated";
+                  setFeedbackModal(null);
+                  if (shouldReload) {
+                    window.location.reload();
+                  }
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -19,6 +19,9 @@ type UiMatch = {
 
   homeName: string;
   roadName: string;
+  homeCountryCode: string;
+  roadCountryCode: string;
+  roundType: string;
 
   homeParts: NameParts;
   roadParts: NameParts;
@@ -59,6 +62,32 @@ type StandingsApiResponse = {
   groups: StandingsGroup[];
 };
 
+type KnockoutEntrant = {
+  name: string;
+  countryCode: string;
+};
+
+type KnockoutSlot = {
+  id: string;
+  matchId: string | null;
+  top: KnockoutEntrant;
+  bottom: KnockoutEntrant;
+};
+
+type KnockoutRound = {
+  id: string;
+  label: string;
+  slots: KnockoutSlot[];
+};
+
+type KnockoutBracketResponse = {
+  fixtureGroupIdentifier: string;
+  entrantsCount: number;
+  bracketSize: number;
+  sourceRoundName: string;
+  rounds: KnockoutRound[];
+};
+
 function firstString(obj: AnyObj, keys: string[], fallback = ""): string {
   for (const k of keys) {
     const v = obj?.[k];
@@ -78,6 +107,16 @@ function splitName(full: string): NameParts {
   const last = parts[parts.length - 1];
   const first = parts.slice(0, -1).join(" ");
   return { first, last };
+}
+
+function splitBracketName(full: string): NameParts {
+  const parts = splitName(full);
+
+  if (!parts.first && !parts.last) {
+    return { first: "", last: full || "TBD" };
+  }
+
+  return parts;
 }
 
 
@@ -157,6 +196,9 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     timeLabel,
     homeName,
     roadName,
+    homeCountryCode: firstString(fx, ["homeCountryCode", "HomeCountryCode"], ""),
+    roadCountryCode: firstString(fx, ["roadCountryCode", "RoadCountryCode"], ""),
+    roundType: firstString(fx, ["roundType", "RoundType"], ""),
     homeParts,
     roadParts,
     homeScore,
@@ -176,7 +218,7 @@ export default function MatchesPage() {
   const [fixturesRaw, setFixturesRaw] = useState<AnyObj[] | null>(null);
   const [fixturesError, setFixturesError] = useState("");
 
-  const [activeTab, setActiveTab] = useState<"matches" | "groups">("matches");
+  const [activeTab, setActiveTab] = useState<"matches" | "groups" | "knockout">("matches");
 
   // Tournament pills carousel refs + arrow state
   const groupsRowRef = useRef<HTMLDivElement | null>(null);
@@ -187,6 +229,10 @@ export default function MatchesPage() {
   const [standingsGroups, setStandingsGroups] = useState<StandingsGroup[] | null>(null);
   const [standingsError, setStandingsError] = useState("");
   const [standingsLoading, setStandingsLoading] = useState(false);
+
+  const [knockoutBracket, setKnockoutBracket] = useState<KnockoutBracketResponse | null>(null);
+  const [knockoutError, setKnockoutError] = useState("");
+  const [knockoutLoading, setKnockoutLoading] = useState(false);
 
   // Load fixture groups (tournaments)
   useEffect(() => {
@@ -383,6 +429,41 @@ export default function MatchesPage() {
     };
   }, [activeTab, selectedGroupId]);
 
+  useEffect(() => {
+    if (activeTab !== "knockout") return;
+    if (!selectedGroupId) return;
+
+    let cancelled = false;
+
+    setKnockoutLoading(true);
+    setKnockoutError("");
+    setKnockoutBracket(null);
+
+    fetch(
+      `/api/public/knockout-bracket?fixtureGroupIdentifier=${encodeURIComponent(selectedGroupId)}`
+    )
+      .then(async (r) => {
+        const data = (await r.json()) as KnockoutBracketResponse & { error?: string };
+        if (!r.ok) throw new Error(data?.error || `Request failed (${r.status})`);
+        return data;
+      })
+      .then((data) => {
+        if (cancelled) return;
+
+        setKnockoutBracket(data);
+        setKnockoutLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setKnockoutError(err?.message || "Failed to load knockout bracket");
+        setKnockoutLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, selectedGroupId]);
+
   const totalStandingsPlayers = useMemo(() => {
     if (!standingsGroups) return 0;
     return standingsGroups.reduce((acc, g) => acc + (g?.rows?.length ?? 0), 0);
@@ -401,7 +482,7 @@ export default function MatchesPage() {
       <section className="season-switch-section">
         <h2 className="season-title">Season</h2>
 
-        <div className="season-switch" role="tablist" aria-label="Matches page view">
+        <div className="season-switch season-switch-three" role="tablist" aria-label="Matches page view">
           <button
             type="button"
             className={`season-tab ${activeTab === "matches" ? "active" : ""}`}
@@ -420,6 +501,16 @@ export default function MatchesPage() {
             aria-selected={activeTab === "groups"}
           >
             Groups
+          </button>
+
+          <button
+            type="button"
+            className={`season-tab ${activeTab === "knockout" ? "active" : ""}`}
+            onClick={() => setActiveTab("knockout")}
+            role="tab"
+            aria-selected={activeTab === "knockout"}
+          >
+            Knockout Stage
           </button>
         </div>
       </section>
@@ -502,6 +593,16 @@ export default function MatchesPage() {
                     <div className="name-stack left">
                       {!!m.homeParts.first && <div className="name-first">{m.homeParts.first}</div>}
                       <div className="name-last">{m.homeParts.last || m.homeName}</div>
+                      {m.homeCountryCode ? (
+                        <div className="name-flag-row name-flag-row-left">
+                          <img
+                            src={`https://flagcdn.com/w40/${m.homeCountryCode.toLowerCase()}.png`}
+                            alt={m.homeCountryCode}
+                            className="name-flag-img"
+                            title={m.homeCountryCode}
+                          />
+                        </div>
+                      ) : null}
                     </div>
 
                     <div className="match-icon">
@@ -525,6 +626,16 @@ export default function MatchesPage() {
                     <div className="name-stack right">
                       {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}
                       <div className="name-last">{m.roadParts.last || m.roadName}</div>
+                      {m.roadCountryCode ? (
+                        <div className="name-flag-row name-flag-row-right">
+                          <img
+                            src={`https://flagcdn.com/w40/${m.roadCountryCode.toLowerCase()}.png`}
+                            alt={m.roadCountryCode}
+                            className="name-flag-img"
+                            title={m.roadCountryCode}
+                          />
+                        </div>
+                      ) : null}
                     </div>
                   </div>
 
@@ -541,6 +652,116 @@ export default function MatchesPage() {
               <div className="empty-state">No matches found for this tournament.</div>
             )}
           </div>
+        </section>
+      )}
+
+      {activeTab === "knockout" && (
+        <section className="knockout-section">
+          <div className="matches-list-header">
+            <h2 className="matches-list-title">{selectedGroupDesc} - Knockout Stage</h2>
+
+            <div className="matches-list-meta">
+              {knockoutError
+                ? `Failed to load bracket: ${knockoutError}`
+                : knockoutLoading
+                ? "Loading bracket…"
+                : knockoutBracket
+                ? `${knockoutBracket.entrantsCount} advancing players`
+                : ""}
+            </div>
+          </div>
+
+          {knockoutBracket?.sourceRoundName ? (
+            <p className="knockout-source-text">
+              Bracket projection is based on {knockoutBracket.sourceRoundName} advancement settings.
+            </p>
+          ) : null}
+
+          {knockoutError ? <div className="empty-state">{knockoutError}</div> : null}
+
+          {!knockoutError && knockoutLoading ? (
+            <div className="empty-state">Loading knockout bracket…</div>
+          ) : null}
+
+          {!knockoutError && !knockoutLoading && knockoutBracket && knockoutBracket.rounds.length > 0 ? (
+            <div className="knockout-bracket-shell">
+              <div className="knockout-bracket">
+                {knockoutBracket.rounds.map((round, roundIndex) => {
+                  const isLastRound = roundIndex === knockoutBracket.rounds.length - 1;
+                  const slotGap = Math.max(20, 28 * (2 ** roundIndex - 1) + 20);
+                  const paddingTop = roundIndex === 0 ? 0 : 30 * 2 ** (roundIndex - 1);
+
+                  return (
+                    <div className="knockout-round" key={round.id}>
+                      <div className="knockout-round-title">{round.label}</div>
+
+                      <div
+                        className="knockout-round-slots"
+                        style={{ gap: `${slotGap}px`, paddingTop: `${paddingTop}px` }}
+                      >
+                        {round.slots.map((slot) => {
+                          const topParts = splitBracketName(slot.top.name);
+                          const bottomParts = splitBracketName(slot.bottom.name);
+
+                          return (
+                            <div
+                              key={slot.id}
+                              className={`knockout-slot ${isLastRound ? "is-last-round" : ""}`}
+                            >
+                              <div className="knockout-player-card">
+                                <div className="knockout-player-text">
+                                  {topParts.first ? (
+                                    <div className="knockout-player-first">{topParts.first}</div>
+                                  ) : null}
+                                  <div className="knockout-player-last">{topParts.last || slot.top.name}</div>
+                                </div>
+                                {slot.top.countryCode ? (
+                                  <img
+                                    src={`https://flagcdn.com/w40/${slot.top.countryCode.toLowerCase()}.png`}
+                                    alt={slot.top.countryCode}
+                                    className="knockout-flag-img"
+                                    title={slot.top.countryCode}
+                                  />
+                                ) : null}
+                              </div>
+
+                              <div className="knockout-slot-divider" />
+
+                              <div className="knockout-player-card">
+                                <div className="knockout-player-text">
+                                  {bottomParts.first ? (
+                                    <div className="knockout-player-first">{bottomParts.first}</div>
+                                  ) : null}
+                                  <div className="knockout-player-last">
+                                    {bottomParts.last || slot.bottom.name}
+                                  </div>
+                                </div>
+                                {slot.bottom.countryCode ? (
+                                  <img
+                                    src={`https://flagcdn.com/w40/${slot.bottom.countryCode.toLowerCase()}.png`}
+                                    alt={slot.bottom.countryCode}
+                                    className="knockout-flag-img"
+                                    title={slot.bottom.countryCode}
+                                  />
+                                ) : null}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          {!knockoutError &&
+          !knockoutLoading &&
+          knockoutBracket &&
+          knockoutBracket.rounds.length === 0 ? (
+            <div className="empty-state">No knockout bracket is available for this tournament yet.</div>
+          ) : null}
         </section>
       )}
 
