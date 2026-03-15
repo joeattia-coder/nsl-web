@@ -2,10 +2,13 @@ require("dotenv/config");
 const { PrismaPg } = require("@prisma/adapter-pg");
 const { PrismaClient } = require("../src/generated/prisma/client");
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString =
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_PRISMA_URL ??
+  process.env.POSTGRES_URL;
 
 if (!connectionString) {
-  throw new Error("DATABASE_URL is not set");
+  throw new Error("Database connection URL is not set. Expected DATABASE_URL, POSTGRES_PRISMA_URL, or POSTGRES_URL.");
 }
 
 const adapter = new PrismaPg({
