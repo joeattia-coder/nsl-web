@@ -1,38 +1,33 @@
 {
-  "name": "nsl-web",
-  "version": "0.1.0",
+  "name": "nsl-platform",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "next start",
-    "lint": "eslint",
-    "seed": "tsx prisma/seed.ts"
+  "packageManager": "npm@10.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "overrides": {
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
-  "dependencies": {
-    "@prisma/adapter-pg": "^7.4.2",
-    "@prisma/client": "^7.5.0",
-    "@vercel/blob": "^2.3.1",
-    "cuid": "^3.0.0",
-    "dotenv": "^17.3.1",
-    "next": "16.1.6",
-    "pg": "^8.20.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-icons": "^5.6.0"
+  "scripts": {
+    "dev": "turbo dev --filter=@nsl/web",
+    "build": "turbo build --filter=@nsl/web",
+    "lint": "turbo lint --filter=@nsl/web",
+    "expo": "npm --workspace=@nsl/mobile run start",
+    "dev:web": "npm --workspace=@nsl/web run dev",
+    "build:web": "npm --workspace=@nsl/web run build",
+    "start:web": "npm --workspace=@nsl/web run start",
+    "lint:web": "npm --workspace=@nsl/web run lint",
+    "seed:web": "npm --workspace=@nsl/web run seed",
+    "dev:mobile": "npm --workspace=@nsl/mobile run start",
+    "android:mobile": "npm --workspace=@nsl/mobile run android",
+    "ios:mobile": "npm --workspace=@nsl/mobile run ios",
+    "web:mobile": "npm --workspace=@nsl/mobile run web"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.1",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
-    "postcss": "^8.5.8",
-    "prisma": "^7.5.0",
-    "tailwindcss": "^4.2.1",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "^5"
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "turbo": "^2.5.0"
   }
 }

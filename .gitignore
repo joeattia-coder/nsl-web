@@ -44,6 +44,7 @@ next-env.d.ts
 
 node_modules
 .next
+.turbo
 .env
 .env.local
 .env.production
