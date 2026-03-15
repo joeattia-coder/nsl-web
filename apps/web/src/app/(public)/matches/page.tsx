@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiChevronLeft, FiChevronRight, FiUser } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 type AnyObj = Record<string, any>;
 
@@ -28,6 +28,8 @@ type UiMatch = {
 
   homeScore: string;
   roadScore: string;
+  homePlayerPhotoUrl: string;
+  roadPlayerPhotoUrl: string;
 
   fixtureGroupDesc: string;
   roundDesc: string;
@@ -189,6 +191,8 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
 
   const homeScore = homeScoreVal === null || homeScoreVal === undefined ? "" : String(homeScoreVal);
   const roadScore = roadScoreVal === null || roadScoreVal === undefined ? "" : String(roadScoreVal);
+  const homePlayerPhotoUrl = firstString(fx, ["homePlayerPhotoUrl", "HomePlayerPhotoUrl"], "");
+  const roadPlayerPhotoUrl = firstString(fx, ["roadPlayerPhotoUrl", "RoadPlayerPhotoUrl"], "");
 
   return {
     id,
@@ -203,6 +207,8 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     roadParts,
     homeScore,
     roadScore,
+    homePlayerPhotoUrl,
+    roadPlayerPhotoUrl,
     fixtureGroupDesc,
     roundDesc,
     fixtureGroupId,
@@ -606,22 +612,38 @@ export default function MatchesPage() {
                     </div>
 
                     <div className="match-icon">
+                      {m.homePlayerPhotoUrl ? (
                         <img
-                        src="/images/player_silhouette.svg"
-                        alt=""
-                        className="match-silhouette"
+                          src={m.homePlayerPhotoUrl}
+                          alt={m.homeName}
+                          className="match-player-photo"
                         />
-                        </div>
+                      ) : (
+                        <img
+                          src="/images/player_silhouette.svg"
+                          alt=""
+                          className="match-silhouette"
+                        />
+                      )}
+                    </div>
 
                     <div className="match-score">{scoreText}</div>
 
                     <div className="match-icon">
+                      {m.roadPlayerPhotoUrl ? (
                         <img
-                        src="/images/player_silhouette.svg"
-                        alt=""
-                        className="match-silhouette"
+                          src={m.roadPlayerPhotoUrl}
+                          alt={m.roadName}
+                          className="match-player-photo"
                         />
-                        </div>
+                      ) : (
+                        <img
+                          src="/images/player_silhouette.svg"
+                          alt=""
+                          className="match-silhouette"
+                        />
+                      )}
+                    </div>
 
                     <div className="name-stack right">
                       {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}

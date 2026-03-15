@@ -31,6 +31,69 @@ function getEntryDisplayName(entry: {
   return memberNames.join(" / ") || "Unnamed Entry";
 }
 
+function normalizeCountryCode(country: string | null) {
+  const normalized = country?.trim() ?? "";
+
+  if (!normalized) return "";
+
+  if (/^[a-zA-Z]{2}$/.test(normalized)) {
+    return normalized.toUpperCase();
+  }
+
+  const countryToCode: Record<string, string> = {
+    canada: "CA",
+    "united states": "US",
+    usa: "US",
+    us: "US",
+    mexico: "MX",
+    jamaica: "JM",
+    trinidad: "TT",
+    "trinidad and tobago": "TT",
+    guyana: "GY",
+    barbados: "BB",
+    england: "GB",
+    scotland: "GB",
+    wales: "GB",
+    ireland: "IE",
+    "northern ireland": "GB",
+    china: "CN",
+    india: "IN",
+    pakistan: "PK",
+  };
+
+  return countryToCode[normalized.toLowerCase()] ?? "";
+}
+
+function getEntryCountry(entry: {
+  members: Array<{
+    player: {
+      country: string | null;
+    };
+  }>;
+}) {
+  const memberCountries = Array.from(
+    new Set(
+      entry.members
+        .map(({ player }) => player.country?.trim() ?? "")
+        .filter(Boolean)
+    )
+  );
+
+  if (memberCountries.length !== 1) {
+    return {
+      countryName: memberCountries.length > 1 ? "Multiple countries" : "",
+      countryCode: "",
+    };
+  }
+
+  const countryName = memberCountries[0];
+
+  return {
+    countryName,
+    countryCode: normalizeCountryCode(countryName),
+  };
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function TournamentEntriesPage({
@@ -60,6 +123,7 @@ export default async function TournamentEntriesPage({
                 firstName: true,
                 middleInitial: true,
                 lastName: true,
+                country: true,
               },
             },
           },
@@ -75,6 +139,7 @@ export default async function TournamentEntriesPage({
         middleInitial: true,
         lastName: true,
         emailAddress: true,
+        country: true,
       },
     }),
   ]);
@@ -88,6 +153,7 @@ export default async function TournamentEntriesPage({
   );
 
   const formattedEntries = entries.map((entry) => ({
+    ...getEntryCountry(entry),
     id: entry.id,
     displayName: getEntryDisplayName(entry),
     seedNumber: entry.seedNumber,

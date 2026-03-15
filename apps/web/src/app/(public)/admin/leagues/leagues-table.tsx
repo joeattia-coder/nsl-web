@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiEdit2, FiTrash2, FiPlus } from "react-icons/fi";
 
 export type LeagueRow = {
@@ -20,19 +25,51 @@ export type LeaguesTableProps = {
   leagues: LeagueRow[];
 };
 
+type SortKey = "leagueName" | "description" | "isActive";
+
 export default function LeaguesTable({ leagues }: LeaguesTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("leagueName");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [leagueToDelete, setLeagueToDelete] = useState<LeagueRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const filteredLeagues = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return leagues;
-    return leagues.filter(l =>
-      l.leagueName.toLowerCase().includes(term) ||
-      l.description.toLowerCase().includes(term)
+
+    const rows = !term
+      ? leagues
+      : leagues.filter((league) =>
+          league.leagueName.toLowerCase().includes(term) ||
+          league.description.toLowerCase().includes(term)
+        );
+
+    return sortRows(
+      rows,
+      (league) => {
+        switch (sortKey) {
+          case "description":
+            return league.description;
+          case "isActive":
+            return league.isActive;
+          case "leagueName":
+          default:
+            return league.leagueName;
+        }
+      },
+      sortDirection
     );
-  }, [search, leagues]);
+  }, [leagues, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const openDeleteModal = (league: LeagueRow) => {
     setError(null);
@@ -103,9 +140,27 @@ export default function LeaguesTable({ leagues }: LeaguesTableProps) {
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Status</th>
+                <SortableHeader
+                  label="Name"
+                  columnKey="leagueName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Description"
+                  columnKey="description"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Status"
+                  columnKey="isActive"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>

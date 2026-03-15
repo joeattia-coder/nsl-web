@@ -27,7 +27,6 @@ export type AggregateVenue = {
 export type VenueMinAggregateOutputType = {
   id: string | null
   venueName: string | null
-  logoUrl: string | null
   addressLine1: string | null
   addressLine2: string | null
   city: string | null
@@ -40,12 +39,12 @@ export type VenueMinAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  logoUrl: string | null
 }
 
 export type VenueMaxAggregateOutputType = {
   id: string | null
   venueName: string | null
-  logoUrl: string | null
   addressLine1: string | null
   addressLine2: string | null
   city: string | null
@@ -58,12 +57,12 @@ export type VenueMaxAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  logoUrl: string | null
 }
 
 export type VenueCountAggregateOutputType = {
   id: number
   venueName: number
-  logoUrl: number
   addressLine1: number
   addressLine2: number
   city: number
@@ -76,6 +75,7 @@ export type VenueCountAggregateOutputType = {
   isActive: number
   createdAt: number
   updatedAt: number
+  logoUrl: number
   _all: number
 }
 
@@ -83,7 +83,6 @@ export type VenueCountAggregateOutputType = {
 export type VenueMinAggregateInputType = {
   id?: true
   venueName?: true
-  logoUrl?: true
   addressLine1?: true
   addressLine2?: true
   city?: true
@@ -96,12 +95,12 @@ export type VenueMinAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  logoUrl?: true
 }
 
 export type VenueMaxAggregateInputType = {
   id?: true
   venueName?: true
-  logoUrl?: true
   addressLine1?: true
   addressLine2?: true
   city?: true
@@ -114,12 +113,12 @@ export type VenueMaxAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  logoUrl?: true
 }
 
 export type VenueCountAggregateInputType = {
   id?: true
   venueName?: true
-  logoUrl?: true
   addressLine1?: true
   addressLine2?: true
   city?: true
@@ -132,6 +131,7 @@ export type VenueCountAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  logoUrl?: true
   _all?: true
 }
 
@@ -210,7 +210,6 @@ export type VenueGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type VenueGroupByOutputType = {
   id: string
   venueName: string
-  logoUrl: string | null
   addressLine1: string | null
   addressLine2: string | null
   city: string | null
@@ -223,6 +222,7 @@ export type VenueGroupByOutputType = {
   isActive: boolean
   createdAt: Date
   updatedAt: Date
+  logoUrl: string | null
   _count: VenueCountAggregateOutputType | null
   _min: VenueMinAggregateOutputType | null
   _max: VenueMaxAggregateOutputType | null
@@ -249,7 +249,6 @@ export type VenueWhereInput = {
   NOT?: Prisma.VenueWhereInput | Prisma.VenueWhereInput[]
   id?: Prisma.StringFilter<"Venue"> | string
   venueName?: Prisma.StringFilter<"Venue"> | string
-  logoUrl?: Prisma.StringNullableFilter<"Venue"> | string | null
   addressLine1?: Prisma.StringNullableFilter<"Venue"> | string | null
   addressLine2?: Prisma.StringNullableFilter<"Venue"> | string | null
   city?: Prisma.StringNullableFilter<"Venue"> | string | null
@@ -262,6 +261,7 @@ export type VenueWhereInput = {
   isActive?: Prisma.BoolFilter<"Venue"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
+  logoUrl?: Prisma.StringNullableFilter<"Venue"> | string | null
   matches?: Prisma.MatchListRelationFilter
   tournaments?: Prisma.TournamentListRelationFilter
 }
@@ -269,7 +269,6 @@ export type VenueWhereInput = {
 export type VenueOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   venueName?: Prisma.SortOrder
-  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine1?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine2?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -282,6 +281,7 @@ export type VenueOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   matches?: Prisma.MatchOrderByRelationAggregateInput
   tournaments?: Prisma.TournamentOrderByRelationAggregateInput
 }
@@ -292,7 +292,6 @@ export type VenueWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.VenueWhereInput[]
   NOT?: Prisma.VenueWhereInput | Prisma.VenueWhereInput[]
   venueName?: Prisma.StringFilter<"Venue"> | string
-  logoUrl?: Prisma.StringNullableFilter<"Venue"> | string | null
   addressLine1?: Prisma.StringNullableFilter<"Venue"> | string | null
   addressLine2?: Prisma.StringNullableFilter<"Venue"> | string | null
   city?: Prisma.StringNullableFilter<"Venue"> | string | null
@@ -305,6 +304,7 @@ export type VenueWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Venue"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
+  logoUrl?: Prisma.StringNullableFilter<"Venue"> | string | null
   matches?: Prisma.MatchListRelationFilter
   tournaments?: Prisma.TournamentListRelationFilter
 }, "id">
@@ -312,7 +312,6 @@ export type VenueWhereUniqueInput = Prisma.AtLeast<{
 export type VenueOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   venueName?: Prisma.SortOrder
-  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine1?: Prisma.SortOrderInput | Prisma.SortOrder
   addressLine2?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -325,6 +324,7 @@ export type VenueOrderByWithAggregationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.VenueCountOrderByAggregateInput
   _max?: Prisma.VenueMaxOrderByAggregateInput
   _min?: Prisma.VenueMinOrderByAggregateInput
@@ -336,7 +336,6 @@ export type VenueScalarWhereWithAggregatesInput = {
   NOT?: Prisma.VenueScalarWhereWithAggregatesInput | Prisma.VenueScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Venue"> | string
   venueName?: Prisma.StringWithAggregatesFilter<"Venue"> | string
-  logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Venue"> | string | null
   addressLine1?: Prisma.StringNullableWithAggregatesFilter<"Venue"> | string | null
   addressLine2?: Prisma.StringNullableWithAggregatesFilter<"Venue"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"Venue"> | string | null
@@ -349,12 +348,12 @@ export type VenueScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"Venue"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Venue"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Venue"> | Date | string
+  logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Venue"> | string | null
 }
 
 export type VenueCreateInput = {
   id?: string
   venueName: string
-  logoUrl?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
   city?: string | null
@@ -367,6 +366,7 @@ export type VenueCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  logoUrl?: string | null
   matches?: Prisma.MatchCreateNestedManyWithoutVenueInput
   tournaments?: Prisma.TournamentCreateNestedManyWithoutVenueInput
 }
@@ -374,7 +374,6 @@ export type VenueCreateInput = {
 export type VenueUncheckedCreateInput = {
   id?: string
   venueName: string
-  logoUrl?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
   city?: string | null
@@ -387,6 +386,7 @@ export type VenueUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  logoUrl?: string | null
   matches?: Prisma.MatchUncheckedCreateNestedManyWithoutVenueInput
   tournaments?: Prisma.TournamentUncheckedCreateNestedManyWithoutVenueInput
 }
@@ -394,7 +394,6 @@ export type VenueUncheckedCreateInput = {
 export type VenueUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -407,6 +406,7 @@ export type VenueUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matches?: Prisma.MatchUpdateManyWithoutVenueNestedInput
   tournaments?: Prisma.TournamentUpdateManyWithoutVenueNestedInput
 }
@@ -414,7 +414,6 @@ export type VenueUpdateInput = {
 export type VenueUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -427,6 +426,7 @@ export type VenueUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matches?: Prisma.MatchUncheckedUpdateManyWithoutVenueNestedInput
   tournaments?: Prisma.TournamentUncheckedUpdateManyWithoutVenueNestedInput
 }
@@ -434,7 +434,6 @@ export type VenueUncheckedUpdateInput = {
 export type VenueCreateManyInput = {
   id?: string
   venueName: string
-  logoUrl?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
   city?: string | null
@@ -447,12 +446,12 @@ export type VenueCreateManyInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  logoUrl?: string | null
 }
 
 export type VenueUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -465,12 +464,12 @@ export type VenueUpdateManyMutationInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type VenueUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -483,12 +482,12 @@ export type VenueUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type VenueCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   venueName?: Prisma.SortOrder
-  logoUrl?: Prisma.SortOrder
   addressLine1?: Prisma.SortOrder
   addressLine2?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -501,12 +500,12 @@ export type VenueCountOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
 }
 
 export type VenueMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   venueName?: Prisma.SortOrder
-  logoUrl?: Prisma.SortOrder
   addressLine1?: Prisma.SortOrder
   addressLine2?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -519,12 +518,12 @@ export type VenueMaxOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
 }
 
 export type VenueMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   venueName?: Prisma.SortOrder
-  logoUrl?: Prisma.SortOrder
   addressLine1?: Prisma.SortOrder
   addressLine2?: Prisma.SortOrder
   city?: Prisma.SortOrder
@@ -537,6 +536,7 @@ export type VenueMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
 }
 
 export type VenueNullableScalarRelationFilter = {
@@ -595,7 +595,6 @@ export type VenueUpdateOneWithoutMatchesNestedInput = {
 export type VenueCreateWithoutTournamentsInput = {
   id?: string
   venueName: string
-  logoUrl?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
   city?: string | null
@@ -608,13 +607,13 @@ export type VenueCreateWithoutTournamentsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  logoUrl?: string | null
   matches?: Prisma.MatchCreateNestedManyWithoutVenueInput
 }
 
 export type VenueUncheckedCreateWithoutTournamentsInput = {
   id?: string
   venueName: string
-  logoUrl?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
   city?: string | null
@@ -627,6 +626,7 @@ export type VenueUncheckedCreateWithoutTournamentsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  logoUrl?: string | null
   matches?: Prisma.MatchUncheckedCreateNestedManyWithoutVenueInput
 }
 
@@ -649,7 +649,6 @@ export type VenueUpdateToOneWithWhereWithoutTournamentsInput = {
 export type VenueUpdateWithoutTournamentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -662,13 +661,13 @@ export type VenueUpdateWithoutTournamentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matches?: Prisma.MatchUpdateManyWithoutVenueNestedInput
 }
 
 export type VenueUncheckedUpdateWithoutTournamentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -681,13 +680,13 @@ export type VenueUncheckedUpdateWithoutTournamentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matches?: Prisma.MatchUncheckedUpdateManyWithoutVenueNestedInput
 }
 
 export type VenueCreateWithoutMatchesInput = {
   id?: string
   venueName: string
-  logoUrl?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
   city?: string | null
@@ -700,13 +699,13 @@ export type VenueCreateWithoutMatchesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  logoUrl?: string | null
   tournaments?: Prisma.TournamentCreateNestedManyWithoutVenueInput
 }
 
 export type VenueUncheckedCreateWithoutMatchesInput = {
   id?: string
   venueName: string
-  logoUrl?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
   city?: string | null
@@ -719,6 +718,7 @@ export type VenueUncheckedCreateWithoutMatchesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  logoUrl?: string | null
   tournaments?: Prisma.TournamentUncheckedCreateNestedManyWithoutVenueInput
 }
 
@@ -741,7 +741,6 @@ export type VenueUpdateToOneWithWhereWithoutMatchesInput = {
 export type VenueUpdateWithoutMatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -754,13 +753,13 @@ export type VenueUpdateWithoutMatchesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournaments?: Prisma.TournamentUpdateManyWithoutVenueNestedInput
 }
 
 export type VenueUncheckedUpdateWithoutMatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   venueName?: Prisma.StringFieldUpdateOperationsInput | string
-  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -773,6 +772,7 @@ export type VenueUncheckedUpdateWithoutMatchesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournaments?: Prisma.TournamentUncheckedUpdateManyWithoutVenueNestedInput
 }
 
@@ -819,7 +819,6 @@ export type VenueCountOutputTypeCountTournamentsArgs<ExtArgs extends runtime.Typ
 export type VenueSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   venueName?: boolean
-  logoUrl?: boolean
   addressLine1?: boolean
   addressLine2?: boolean
   city?: boolean
@@ -832,6 +831,7 @@ export type VenueSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  logoUrl?: boolean
   matches?: boolean | Prisma.Venue$matchesArgs<ExtArgs>
   tournaments?: boolean | Prisma.Venue$tournamentsArgs<ExtArgs>
   _count?: boolean | Prisma.VenueCountOutputTypeDefaultArgs<ExtArgs>
@@ -840,7 +840,6 @@ export type VenueSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type VenueSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   venueName?: boolean
-  logoUrl?: boolean
   addressLine1?: boolean
   addressLine2?: boolean
   city?: boolean
@@ -853,12 +852,12 @@ export type VenueSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  logoUrl?: boolean
 }, ExtArgs["result"]["venue"]>
 
 export type VenueSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   venueName?: boolean
-  logoUrl?: boolean
   addressLine1?: boolean
   addressLine2?: boolean
   city?: boolean
@@ -871,12 +870,12 @@ export type VenueSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  logoUrl?: boolean
 }, ExtArgs["result"]["venue"]>
 
 export type VenueSelectScalar = {
   id?: boolean
   venueName?: boolean
-  logoUrl?: boolean
   addressLine1?: boolean
   addressLine2?: boolean
   city?: boolean
@@ -889,9 +888,10 @@ export type VenueSelectScalar = {
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  logoUrl?: boolean
 }
 
-export type VenueOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "venueName" | "logoUrl" | "addressLine1" | "addressLine2" | "city" | "stateProvince" | "country" | "postalCode" | "phoneNumber" | "mapLink" | "showOnVenuesPage" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["venue"]>
+export type VenueOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "venueName" | "addressLine1" | "addressLine2" | "city" | "stateProvince" | "country" | "postalCode" | "phoneNumber" | "mapLink" | "showOnVenuesPage" | "isActive" | "createdAt" | "updatedAt" | "logoUrl", ExtArgs["result"]["venue"]>
 export type VenueInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   matches?: boolean | Prisma.Venue$matchesArgs<ExtArgs>
   tournaments?: boolean | Prisma.Venue$tournamentsArgs<ExtArgs>
@@ -909,7 +909,6 @@ export type $VenuePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     venueName: string
-    logoUrl: string | null
     addressLine1: string | null
     addressLine2: string | null
     city: string | null
@@ -922,6 +921,7 @@ export type $VenuePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     isActive: boolean
     createdAt: Date
     updatedAt: Date
+    logoUrl: string | null
   }, ExtArgs["result"]["venue"]>
   composites: {}
 }
@@ -1349,7 +1349,6 @@ export interface Prisma__VenueClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface VenueFieldRefs {
   readonly id: Prisma.FieldRef<"Venue", 'String'>
   readonly venueName: Prisma.FieldRef<"Venue", 'String'>
-  readonly logoUrl: Prisma.FieldRef<"Venue", 'String'>
   readonly addressLine1: Prisma.FieldRef<"Venue", 'String'>
   readonly addressLine2: Prisma.FieldRef<"Venue", 'String'>
   readonly city: Prisma.FieldRef<"Venue", 'String'>
@@ -1362,6 +1361,7 @@ export interface VenueFieldRefs {
   readonly isActive: Prisma.FieldRef<"Venue", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Venue", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Venue", 'DateTime'>
+  readonly logoUrl: Prisma.FieldRef<"Venue", 'String'>
 }
     
 

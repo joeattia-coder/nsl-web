@@ -17,7 +17,7 @@ import type {
 
 import { FixtureMatchCard } from "../src/components/fixture-match-card";
 import { formatPublishedDate } from "../src/lib/format";
-import { apiBaseUrl, publicApi } from "../src/lib/public-api";
+import { publicApi } from "../src/lib/public-api";
 
 type HomeState = {
   articles: PublicNewsArticle[];
@@ -112,6 +112,7 @@ export default function HomeScreen({ onOpenNews, onOpenFixtures, onOpenArticle, 
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#f59e0b" />}
       >
+        {/*
         <View style={styles.hero}>
           <Text style={styles.eyebrow}>NSL Mobile</Text>
           <Text style={styles.title}>Live public data from the current web platform.</Text>
@@ -119,6 +120,45 @@ export default function HomeScreen({ onOpenNews, onOpenFixtures, onOpenArticle, 
             News, fixtures, and season context are now coming from the existing Next.js API.
           </Text>
           <Text style={styles.baseUrl}>API base: {apiBaseUrl}</Text>
+        </View>
+        */}
+
+        <View style={styles.bannerSection}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>Latest News</Text>
+            <Pressable onPress={onOpenNews}>
+              <Text style={styles.sectionAction}>Browse all</Text>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.bannerTrack}
+          >
+            {data.articles.length > 0 ? (
+              data.articles.map((article) => (
+                <Pressable
+                  key={article.id}
+                  style={styles.bannerCard}
+                  onPress={() => onOpenArticle(article.slug)}
+                >
+                  <Text style={styles.bannerMeta}>{formatPublishedDate(article.publishedAt)}</Text>
+                  <Text style={styles.bannerTitle} numberOfLines={2}>
+                    {article.title}
+                  </Text>
+                  <Text style={styles.bannerCopy} numberOfLines={3}>
+                    {article.excerpt || "Tap through to read the full story."}
+                  </Text>
+                  <Text style={styles.bannerLink}>Open story</Text>
+                </Pressable>
+              ))
+            ) : (
+              <View style={styles.bannerEmptyCard}>
+                <Text style={styles.emptyTitle}>No published articles yet.</Text>
+              </View>
+            )}
+          </ScrollView>
         </View>
 
         {error ? (
@@ -266,6 +306,55 @@ const styles = StyleSheet.create({
   metricsRow: {
     flexDirection: "row",
     gap: 12,
+  },
+  bannerSection: {
+    gap: 12,
+  },
+  bannerTrack: {
+    gap: 12,
+    paddingRight: 20,
+  },
+  bannerCard: {
+    width: 300,
+    minHeight: 170,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
+    padding: 18,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: "#1a3650",
+    justifyContent: "space-between",
+  },
+  bannerMeta: {
+    color: "#7dd3fc",
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  bannerTitle: {
+    color: "#f8fafc",
+    fontSize: 22,
+    fontWeight: "800",
+    lineHeight: 28,
+  },
+  bannerCopy: {
+    color: "#bfd0de",
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  bannerLink: {
+    color: "#f59e0b",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  bannerEmptyCard: {
+    width: 300,
+    backgroundColor: "#0b0b0b",
+    borderRadius: 4,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#18344d",
   },
   metricCard: {
     flex: 1,

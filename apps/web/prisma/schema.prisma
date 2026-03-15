@@ -10,7 +10,6 @@ datasource db {
 model Venue {
   id               String       @id @default(cuid())
   venueName        String
-  logoUrl          String?
   addressLine1     String?
   addressLine2     String?
   city             String?
@@ -23,6 +22,7 @@ model Venue {
   isActive         Boolean      @default(true)
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
+  logoUrl          String?
   matches          Match[]
   tournaments      Tournament[]
 
@@ -123,18 +123,34 @@ model TournamentGroup {
 }
 
 model User {
-  id                 String             @id @default(cuid())
-  email              String?            @unique
-  phoneNumber        String?
-  registrationStatus RegistrationStatus @default(INACTIVE)
-  isLoginEnabled     Boolean            @default(false)
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  approvedMatches    Match[]            @relation("MatchApprovedByUser")
-  enteredMatches     Match[]            @relation("MatchEnteredByUser")
-  updatedMatches     Match[]            @relation("MatchUpdatedByUser")
-  player             Player?
-  userRoles          UserRole[]
+  id                         String                   @id @default(cuid())
+  username                   String?
+  normalizedUsername         String?                  @unique
+  email                      String?                  @unique
+  normalizedEmail            String?                  @unique
+  emailVerifiedAt            DateTime?
+  passwordHash               String?
+  passwordSetAt              DateTime?
+  phoneNumber                String?
+  registrationStatus         RegistrationStatus       @default(INACTIVE)
+  isLoginEnabled             Boolean                  @default(false)
+  createdAt                  DateTime                 @default(now())
+  updatedAt                  DateTime                 @updatedAt
+  approvedMatches            Match[]                  @relation("MatchApprovedByUser")
+  enteredMatches             Match[]                  @relation("MatchEnteredByUser")
+  updatedMatches             Match[]                  @relation("MatchUpdatedByUser")
+  player                     Player?
+  authAccounts               AuthAccount[]
+  targetInvitations          Invitation[]             @relation("InvitationTargetUser")
+  createdInvitations         Invitation[]             @relation("InvitationCreatedByUser")
+  acceptedInvitations        Invitation[]             @relation("InvitationAcceptedByUser")
+  userRoles                  UserRole[]
+  roleAssignments            UserRoleAssignment[]
+  grantedRoleAssignments     UserRoleAssignment[]     @relation("RoleAssignmentGrantedByUser")
+  permissionOverrides        UserPermissionOverride[]
+  grantedPermissionOverrides UserPermissionOverride[] @relation("PermissionOverrideGrantedByUser")
+  emailVerificationTokens    EmailVerificationToken[]
+  passwordResetTokens        PasswordResetToken[]
 
   @@index([registrationStatus])
 }
@@ -160,18 +176,23 @@ model Player {
   user          User?                   @relation(fields: [userId], references: [id])
   breaks        PlayerBreak[]
   entryMembers  TournamentEntryMember[]
+  invitations   Invitation[]
 
   @@index([lastName, firstName])
   @@index([emailAddress])
 }
 
 model Role {
-  id          String     @id @default(cuid())
-  roleName    String     @unique
-  description String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  userRoles   UserRole[]
+  id                  String               @id @default(cuid())
+  roleKey             String               @unique
+  roleName            String               @unique
+  description         String?
+  isSystemRole        Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  userRoles           UserRole[]
+  rolePermissions     RolePermission[]
+  userRoleAssignments UserRoleAssignment[]
 }
 
 model UserRole {
@@ -185,6 +206,146 @@ model UserRole {
   @@unique([userId, roleId])
   @@index([userId])
   @@index([roleId])
+}
+
+model AuthAccount {
+  id                      String       @id @default(cuid())
+  userId                  String
+  provider                AuthProvider
+  providerAccountId       String
+  providerEmail           String?
+  providerEmailNormalized String?
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+  user                    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@index([providerEmailNormalized])
+}
+
+model Invitation {
+  id               String            @id @default(cuid())
+  playerId         String?
+  userId           String?
+  email            String
+  normalizedEmail  String
+  purpose          InvitationPurpose @default(ACCOUNT_SETUP)
+  tokenHash        String            @unique
+  status           InvitationStatus  @default(PENDING)
+  expiresAt        DateTime
+  acceptedAt       DateTime?
+  acceptedByUserId String?
+  revokedAt        DateTime?
+  createdByUserId  String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  player           Player?           @relation(fields: [playerId], references: [id], onDelete: SetNull)
+  targetUser       User?             @relation("InvitationTargetUser", fields: [userId], references: [id], onDelete: SetNull)
+  acceptedByUser   User?             @relation("InvitationAcceptedByUser", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+  createdByUser    User              @relation("InvitationCreatedByUser", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([playerId])
+  @@index([userId])
+  @@index([normalizedEmail])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id              String    @id @default(cuid())
+  userId          String?
+  email           String
+  normalizedEmail String
+  tokenHash       String    @unique
+  expiresAt       DateTime
+  consumedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  user            User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([normalizedEmail])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Permission {
+  id                      String                   @id @default(cuid())
+  permissionKey           String                   @unique
+  permissionName          String
+  description             String?
+  category                String
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  rolePermissions         RolePermission[]
+  userPermissionOverrides UserPermissionOverride[]
+
+  @@index([category])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model UserRoleAssignment {
+  id              String              @id @default(cuid())
+  userId          String
+  roleId          String
+  scopeType       AssignmentScopeType
+  scopeId         String              @default("")
+  grantedByUserId String?
+  createdAt       DateTime            @default(now())
+  expiresAt       DateTime?
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role            Role                @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  grantedByUser   User?               @relation("RoleAssignmentGrantedByUser", fields: [grantedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, roleId, scopeType, scopeId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([scopeType, scopeId])
+}
+
+model UserPermissionOverride {
+  id              String              @id @default(cuid())
+  userId          String
+  permissionId    String
+  scopeType       AssignmentScopeType
+  scopeId         String              @default("")
+  effect          PermissionEffect
+  reason          String?
+  grantedByUserId String?
+  createdAt       DateTime            @default(now())
+  expiresAt       DateTime?
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission      Permission          @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  grantedByUser   User?               @relation("PermissionOverrideGrantedByUser", fields: [grantedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, permissionId, scopeType, scopeId])
+  @@index([userId])
+  @@index([permissionId])
+  @@index([scopeType, scopeId])
 }
 
 model TournamentEntry {
@@ -327,30 +488,74 @@ model League {
 }
 
 model NewsArticle {
-  id              String              @id @default(cuid())
+  id              String               @id @default(cuid())
   title           String
-  slug            String              @unique
+  slug            String               @unique
   excerpt         String?
   contentHtml     String
   contentJson     Json?
   coverImageUrl   String?
-  status          NewsStatus          @default(DRAFT)
+  status          NewsStatus           @default(DRAFT)
   publishedAt     DateTime?
-  showOnHomePage  Boolean             @default(false)
+  showOnHomePage  Boolean              @default(false)
   homePlacement   HomeNewsPlacement?
   homeDisplayMode HomeNewsDisplayMode?
-  homeSortOrder   Int                 @default(0)
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  homeSortOrder   Int                  @default(0)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   @@index([status])
   @@index([publishedAt])
   @@index([showOnHomePage, homePlacement, homeSortOrder])
 }
 
+model VideoHighlight {
+  id                String          @id @default(cuid())
+  title             String
+  sourceType        VideoSourceType
+  videoUrl          String
+  showInCarousel    Boolean         @default(false)
+  carouselSortOrder Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([showInCarousel, carouselSortOrder, updatedAt])
+}
+
 enum RegistrationStatus {
   ACTIVE
   INACTIVE
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  FACEBOOK
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum InvitationPurpose {
+  ACCOUNT_SETUP
+  PASSWORDLESS_LOGIN
+}
+
+enum AssignmentScopeType {
+  GLOBAL
+  LEAGUE
+  SEASON
+  TOURNAMENT
+  PLAYER
+}
+
+enum PermissionEffect {
+  ALLOW
+  DENY
 }
 
 enum ParticipantType {
@@ -408,4 +613,9 @@ enum HomeNewsDisplayMode {
   THUMBNAIL
   TITLE
   THUMBNAIL_TITLE
+}
+
+enum VideoSourceType {
+  YOUTUBE
+  UPLOAD
 }

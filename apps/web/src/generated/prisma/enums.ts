@@ -17,6 +17,52 @@ export const RegistrationStatus = {
 export type RegistrationStatus = (typeof RegistrationStatus)[keyof typeof RegistrationStatus]
 
 
+export const AuthProvider = {
+  LOCAL: 'LOCAL',
+  GOOGLE: 'GOOGLE',
+  FACEBOOK: 'FACEBOOK'
+} as const
+
+export type AuthProvider = (typeof AuthProvider)[keyof typeof AuthProvider]
+
+
+export const InvitationStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED'
+} as const
+
+export type InvitationStatus = (typeof InvitationStatus)[keyof typeof InvitationStatus]
+
+
+export const InvitationPurpose = {
+  ACCOUNT_SETUP: 'ACCOUNT_SETUP',
+  PASSWORDLESS_LOGIN: 'PASSWORDLESS_LOGIN'
+} as const
+
+export type InvitationPurpose = (typeof InvitationPurpose)[keyof typeof InvitationPurpose]
+
+
+export const AssignmentScopeType = {
+  GLOBAL: 'GLOBAL',
+  LEAGUE: 'LEAGUE',
+  SEASON: 'SEASON',
+  TOURNAMENT: 'TOURNAMENT',
+  PLAYER: 'PLAYER'
+} as const
+
+export type AssignmentScopeType = (typeof AssignmentScopeType)[keyof typeof AssignmentScopeType]
+
+
+export const PermissionEffect = {
+  ALLOW: 'ALLOW',
+  DENY: 'DENY'
+} as const
+
+export type PermissionEffect = (typeof PermissionEffect)[keyof typeof PermissionEffect]
+
+
 export const ParticipantType = {
   Singles: 'Singles',
   Doubles: 'Doubles',
@@ -99,3 +145,11 @@ export const HomeNewsDisplayMode = {
 } as const
 
 export type HomeNewsDisplayMode = (typeof HomeNewsDisplayMode)[keyof typeof HomeNewsDisplayMode]
+
+
+export const VideoSourceType = {
+  YOUTUBE: 'YOUTUBE',
+  UPLOAD: 'UPLOAD'
+} as const
+
+export type VideoSourceType = (typeof VideoSourceType)[keyof typeof VideoSourceType]

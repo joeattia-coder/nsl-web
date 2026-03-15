@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiArrowLeft, FiEdit2, FiFolder, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type RoundRow = {
@@ -22,6 +27,14 @@ type StageRoundsTableProps = {
   rounds: RoundRow[];
 };
 
+type SortKey =
+  | "roundName"
+  | "roundType"
+  | "sequence"
+  | "matchesPerPairing"
+  | "groupsCount"
+  | "matchesCount";
+
 function formatRoundType(roundType: string) {
   return roundType
     .toLowerCase()
@@ -37,22 +50,57 @@ export default function StageRoundsTable({
   rounds,
 }: StageRoundsTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("sequence");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [roundToDelete, setRoundToDelete] = useState<RoundRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const filteredRounds = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return rounds;
 
-    return rounds.filter((round) => {
-      return (
-        round.roundName.toLowerCase().includes(term) ||
-        formatRoundType(round.roundType).toLowerCase().includes(term) ||
-        String(round.sequence).includes(term)
-      );
-    });
-  }, [rounds, search]);
+    const rows = !term
+      ? rounds
+      : rounds.filter((round) => {
+          return (
+            round.roundName.toLowerCase().includes(term) ||
+            formatRoundType(round.roundType).toLowerCase().includes(term) ||
+            String(round.sequence).includes(term)
+          );
+        });
+
+    return sortRows(
+      rows,
+      (round) => {
+        switch (sortKey) {
+          case "roundName":
+            return round.roundName;
+          case "roundType":
+            return formatRoundType(round.roundType);
+          case "matchesPerPairing":
+            return round.matchesPerPairing;
+          case "groupsCount":
+            return round.groupsCount;
+          case "matchesCount":
+            return round.matchesCount;
+          case "sequence":
+          default:
+            return round.sequence;
+        }
+      },
+      sortDirection
+    );
+  }, [rounds, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const openSingleDeleteModal = (round: RoundRow) => {
     setActionError(null);
@@ -138,12 +186,48 @@ export default function StageRoundsTable({
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Round Name</th>
-                <th>Type</th>
-                <th>Sequence</th>
-                <th>Matches / Pairing</th>
-                <th>Groups</th>
-                <th>Matches</th>
+                <SortableHeader
+                  label="Round Name"
+                  columnKey="roundName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Type"
+                  columnKey="roundType"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Sequence"
+                  columnKey="sequence"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Matches / Pairing"
+                  columnKey="matchesPerPairing"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Groups"
+                  columnKey="groupsCount"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Matches"
+                  columnKey="matchesCount"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>

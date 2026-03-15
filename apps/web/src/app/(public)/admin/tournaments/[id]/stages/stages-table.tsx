@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiArrowLeft, FiEdit2, FiPlus, FiTrash2, FiFolder } from "react-icons/fi";
 
 type StageRow = {
@@ -19,6 +24,8 @@ type TournamentStagesTableProps = {
   stages: StageRow[];
 };
 
+type SortKey = "stageName" | "stageType" | "sequence" | "roundsCount" | "matchesCount";
+
 function formatStageType(stageType: string) {
   return stageType
     .toLowerCase()
@@ -33,22 +40,55 @@ export default function TournamentStagesTable({
   stages,
 }: TournamentStagesTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("sequence");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [stageToDelete, setStageToDelete] = useState<StageRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const filteredStages = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return stages;
 
-    return stages.filter((stage) => {
-      return (
-        stage.stageName.toLowerCase().includes(term) ||
-        formatStageType(stage.stageType).toLowerCase().includes(term) ||
-        String(stage.sequence).includes(term)
-      );
-    });
-  }, [stages, search]);
+    const rows = !term
+      ? stages
+      : stages.filter((stage) => {
+          return (
+            stage.stageName.toLowerCase().includes(term) ||
+            formatStageType(stage.stageType).toLowerCase().includes(term) ||
+            String(stage.sequence).includes(term)
+          );
+        });
+
+    return sortRows(
+      rows,
+      (stage) => {
+        switch (sortKey) {
+          case "stageName":
+            return stage.stageName;
+          case "stageType":
+            return formatStageType(stage.stageType);
+          case "roundsCount":
+            return stage.roundsCount;
+          case "matchesCount":
+            return stage.matchesCount;
+          case "sequence":
+          default:
+            return stage.sequence;
+        }
+      },
+      sortDirection
+    );
+  }, [stages, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const openSingleDeleteModal = (stage: StageRow) => {
     setActionError(null);
@@ -134,11 +174,41 @@ export default function TournamentStagesTable({
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Stage Name</th>
-                <th>Type</th>
-                <th>Sequence</th>
-                <th>Rounds</th>
-                <th>Matches</th>
+                <SortableHeader
+                  label="Stage Name"
+                  columnKey="stageName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Type"
+                  columnKey="stageType"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Sequence"
+                  columnKey="sequence"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Rounds"
+                  columnKey="roundsCount"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Matches"
+                  columnKey="matchesCount"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>

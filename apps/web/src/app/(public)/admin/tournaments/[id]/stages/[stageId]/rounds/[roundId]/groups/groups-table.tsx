@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiArrowLeft, FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type GroupRow = {
@@ -21,6 +26,8 @@ type GroupsTableProps = {
   groups: GroupRow[];
 };
 
+type SortKey = "groupName" | "sequence" | "assignedCount";
+
 export default function GroupsTable({
   tournamentId,
   stageId,
@@ -30,6 +37,8 @@ export default function GroupsTable({
   groups,
 }: GroupsTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("sequence");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [actionError, setActionError] = useState<string | null>(null);
   const [addingGroup, setAddingGroup] = useState(false);
   const [deletingGroupId, setDeletingGroupId] = useState<string | null>(null);
@@ -43,15 +52,42 @@ export default function GroupsTable({
 
   const filteredGroups = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return groups;
 
-    return groups.filter((group) => {
-      return (
-        group.groupName.toLowerCase().includes(term) ||
-        String(group.sequence).includes(term)
-      );
-    });
-  }, [groups, search]);
+    const rows = !term
+      ? groups
+      : groups.filter((group) => {
+          return (
+            group.groupName.toLowerCase().includes(term) ||
+            String(group.sequence).includes(term)
+          );
+        });
+
+    return sortRows(
+      rows,
+      (group) => {
+        switch (sortKey) {
+          case "groupName":
+            return group.groupName;
+          case "assignedCount":
+            return group.assignedCount;
+          case "sequence":
+          default:
+            return group.sequence;
+        }
+      },
+      sortDirection
+    );
+  }, [groups, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   async function handleAddGroup() {
     try {
@@ -245,9 +281,27 @@ export default function GroupsTable({
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Group</th>
-                <th>Sequence</th>
-                <th>Assigned</th>
+                <SortableHeader
+                  label="Group"
+                  columnKey="groupName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Sequence"
+                  columnKey="sequence"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Assigned"
+                  columnKey="assignedCount"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>

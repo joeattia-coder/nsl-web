@@ -281,6 +281,7 @@ export type PlayerWhereInput = {
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   breaks?: Prisma.PlayerBreakListRelationFilter
   entryMembers?: Prisma.TournamentEntryMemberListRelationFilter
+  invitations?: Prisma.InvitationListRelationFilter
 }
 
 export type PlayerOrderByWithRelationInput = {
@@ -304,6 +305,7 @@ export type PlayerOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   breaks?: Prisma.PlayerBreakOrderByRelationAggregateInput
   entryMembers?: Prisma.TournamentEntryMemberOrderByRelationAggregateInput
+  invitations?: Prisma.InvitationOrderByRelationAggregateInput
 }
 
 export type PlayerWhereUniqueInput = Prisma.AtLeast<{
@@ -330,6 +332,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   breaks?: Prisma.PlayerBreakListRelationFilter
   entryMembers?: Prisma.TournamentEntryMemberListRelationFilter
+  invitations?: Prisma.InvitationListRelationFilter
 }, "id" | "userId">
 
 export type PlayerOrderByWithAggregationInput = {
@@ -398,6 +401,7 @@ export type PlayerCreateInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateInput = {
@@ -420,6 +424,7 @@ export type PlayerUncheckedCreateInput = {
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUpdateInput = {
@@ -442,6 +447,7 @@ export type PlayerUpdateInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateInput = {
@@ -464,6 +470,7 @@ export type PlayerUncheckedUpdateInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateManyInput = {
@@ -627,6 +634,22 @@ export type PlayerUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutUserInput, Prisma.PlayerUpdateWithoutUserInput>, Prisma.PlayerUncheckedUpdateWithoutUserInput>
 }
 
+export type PlayerCreateNestedOneWithoutInvitationsInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutInvitationsInput, Prisma.PlayerUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutInvitationsInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneWithoutInvitationsNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutInvitationsInput, Prisma.PlayerUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutInvitationsInput
+  upsert?: Prisma.PlayerUpsertWithoutInvitationsInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutInvitationsInput, Prisma.PlayerUpdateWithoutInvitationsInput>, Prisma.PlayerUncheckedUpdateWithoutInvitationsInput>
+}
+
 export type PlayerCreateNestedOneWithoutEntryMembersInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutEntryMembersInput, Prisma.PlayerUncheckedCreateWithoutEntryMembersInput>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutEntryMembersInput
@@ -674,6 +697,7 @@ export type PlayerCreateWithoutUserInput = {
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutUserInput = {
@@ -695,6 +719,7 @@ export type PlayerUncheckedCreateWithoutUserInput = {
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutUserInput = {
@@ -732,10 +757,116 @@ export type PlayerUpdateWithoutUserInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stateProvince?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
+  entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutInvitationsInput = {
+  id?: string
+  firstName: string
+  middleInitial?: string | null
+  lastName: string
+  dateOfBirth?: Date | string | null
+  emailAddress?: string | null
+  phoneNumber?: string | null
+  addressLine1?: string | null
+  addressLine2?: string | null
+  city?: string | null
+  stateProvince?: string | null
+  country?: string | null
+  postalCode?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  photoUrl?: string | null
+  user?: Prisma.UserCreateNestedOneWithoutPlayerInput
+  breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
+  entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutInvitationsInput = {
+  id?: string
+  userId?: string | null
+  firstName: string
+  middleInitial?: string | null
+  lastName: string
+  dateOfBirth?: Date | string | null
+  emailAddress?: string | null
+  phoneNumber?: string | null
+  addressLine1?: string | null
+  addressLine2?: string | null
+  city?: string | null
+  stateProvince?: string | null
+  country?: string | null
+  postalCode?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  photoUrl?: string | null
+  breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
+  entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutInvitationsInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutInvitationsInput, Prisma.PlayerUncheckedCreateWithoutInvitationsInput>
+}
+
+export type PlayerUpsertWithoutInvitationsInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutInvitationsInput, Prisma.PlayerUncheckedUpdateWithoutInvitationsInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutInvitationsInput, Prisma.PlayerUncheckedCreateWithoutInvitationsInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutInvitationsInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutInvitationsInput, Prisma.PlayerUncheckedUpdateWithoutInvitationsInput>
+}
+
+export type PlayerUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stateProvince?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
+  breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
+  entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -774,6 +905,7 @@ export type PlayerCreateWithoutEntryMembersInput = {
   photoUrl?: string | null
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutEntryMembersInput = {
@@ -795,6 +927,7 @@ export type PlayerUncheckedCreateWithoutEntryMembersInput = {
   updatedAt?: Date | string
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutEntryMembersInput = {
@@ -832,6 +965,7 @@ export type PlayerUpdateWithoutEntryMembersInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutEntryMembersInput = {
@@ -853,6 +987,7 @@ export type PlayerUncheckedUpdateWithoutEntryMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutBreaksInput = {
@@ -874,6 +1009,7 @@ export type PlayerCreateWithoutBreaksInput = {
   photoUrl?: string | null
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutBreaksInput = {
@@ -895,6 +1031,7 @@ export type PlayerUncheckedCreateWithoutBreaksInput = {
   updatedAt?: Date | string
   photoUrl?: string | null
   entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutBreaksInput = {
@@ -932,6 +1069,7 @@ export type PlayerUpdateWithoutBreaksInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutBreaksInput = {
@@ -953,6 +1091,7 @@ export type PlayerUncheckedUpdateWithoutBreaksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 
@@ -963,11 +1102,13 @@ export type PlayerUncheckedUpdateWithoutBreaksInput = {
 export type PlayerCountOutputType = {
   breaks: number
   entryMembers: number
+  invitations: number
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   breaks?: boolean | PlayerCountOutputTypeCountBreaksArgs
   entryMembers?: boolean | PlayerCountOutputTypeCountEntryMembersArgs
+  invitations?: boolean | PlayerCountOutputTypeCountInvitationsArgs
 }
 
 /**
@@ -994,6 +1135,13 @@ export type PlayerCountOutputTypeCountEntryMembersArgs<ExtArgs extends runtime.T
   where?: Prisma.TournamentEntryMemberWhereInput
 }
 
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InvitationWhereInput
+}
+
 
 export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1016,6 +1164,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   user?: boolean | Prisma.Player$userArgs<ExtArgs>
   breaks?: boolean | Prisma.Player$breaksArgs<ExtArgs>
   entryMembers?: boolean | Prisma.Player$entryMembersArgs<ExtArgs>
+  invitations?: boolean | Prisma.Player$invitationsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
@@ -1086,6 +1235,7 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   user?: boolean | Prisma.Player$userArgs<ExtArgs>
   breaks?: boolean | Prisma.Player$breaksArgs<ExtArgs>
   entryMembers?: boolean | Prisma.Player$entryMembersArgs<ExtArgs>
+  invitations?: boolean | Prisma.Player$invitationsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PlayerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1101,6 +1251,7 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     user: Prisma.$UserPayload<ExtArgs> | null
     breaks: Prisma.$PlayerBreakPayload<ExtArgs>[]
     entryMembers: Prisma.$TournamentEntryMemberPayload<ExtArgs>[]
+    invitations: Prisma.$InvitationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1517,6 +1668,7 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   user<T extends Prisma.Player$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   breaks<T extends Prisma.Player$breaksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$breaksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerBreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   entryMembers<T extends Prisma.Player$entryMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$entryMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentEntryMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invitations<T extends Prisma.Player$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2028,6 +2180,30 @@ export type Player$entryMembersArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.TournamentEntryMemberScalarFieldEnum | Prisma.TournamentEntryMemberScalarFieldEnum[]
+}
+
+/**
+ * Player.invitations
+ */
+export type Player$invitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Invitation
+   */
+  select?: Prisma.InvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Invitation
+   */
+  omit?: Prisma.InvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InvitationInclude<ExtArgs> | null
+  where?: Prisma.InvitationWhereInput
+  orderBy?: Prisma.InvitationOrderByWithRelationInput | Prisma.InvitationOrderByWithRelationInput[]
+  cursor?: Prisma.InvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InvitationScalarFieldEnum | Prisma.InvitationScalarFieldEnum[]
 }
 
 /**

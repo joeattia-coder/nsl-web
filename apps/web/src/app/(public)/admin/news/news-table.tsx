@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 export type NewsRow = {
@@ -21,6 +26,8 @@ type NewsTableProps = {
   articles: NewsRow[];
 };
 
+type SortKey = "title" | "status" | "homepage" | "updatedAt";
+
 function formatPlacement(article: NewsRow) {
   if (!article.showOnHomePage || !article.homePlacement || !article.homeDisplayMode) {
     return "Not featured";
@@ -34,22 +41,53 @@ function formatPlacement(article: NewsRow) {
 
 export default function NewsTable({ articles }: NewsTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("updatedAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [articleToDelete, setArticleToDelete] = useState<NewsRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const filteredArticles = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return articles;
 
-    return articles.filter((article) => {
-      return (
-        article.title.toLowerCase().includes(term) ||
-        article.slug.toLowerCase().includes(term) ||
-        formatPlacement(article).toLowerCase().includes(term)
-      );
-    });
-  }, [articles, search]);
+    const rows = !term
+      ? articles
+      : articles.filter((article) => {
+          return (
+            article.title.toLowerCase().includes(term) ||
+            article.slug.toLowerCase().includes(term) ||
+            formatPlacement(article).toLowerCase().includes(term)
+          );
+        });
+
+    return sortRows(
+      rows,
+      (article) => {
+        switch (sortKey) {
+          case "status":
+            return article.status === "PUBLISHED" ? "Published" : "Draft";
+          case "homepage":
+            return formatPlacement(article);
+          case "updatedAt":
+            return article.updatedAt;
+          case "title":
+          default:
+            return article.title;
+        }
+      },
+      sortDirection
+    );
+  }, [articles, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const handleDelete = async () => {
     if (!articleToDelete) return;
@@ -108,10 +146,34 @@ export default function NewsTable({ articles }: NewsTableProps) {
             <table className="admin-table admin-players-table">
               <thead>
                 <tr>
-                  <th>Article</th>
-                  <th>Status</th>
-                  <th>Homepage</th>
-                  <th>Updated</th>
+                  <SortableHeader
+                    label="Article"
+                    columnKey="title"
+                    sortKey={sortKey}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label="Status"
+                    columnKey="status"
+                    sortKey={sortKey}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label="Homepage"
+                    columnKey="homepage"
+                    sortKey={sortKey}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label="Updated"
+                    columnKey="updatedAt"
+                    sortKey={sortKey}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                  />
                   <th className="admin-players-actions-col">Actions</th>
                 </tr>
               </thead>

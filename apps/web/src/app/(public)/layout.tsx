@@ -6,6 +6,7 @@ import {
   FiAward,
   FiBarChart2,
   FiFileText,
+  FiFilm,
   FiUser,
   FiHome,
   FiUsers,
@@ -156,6 +157,16 @@ export default function PublicLayout({
                 </li>
                 <li>
                   <Link
+                    href="/admin/videos"
+                    className="sidebar-item"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <FiFilm className="sidebar-icon" />
+                    <span className="sidebar-label">Videos</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/admin/users"
                     className="sidebar-item"
                     onClick={() => setMobileMenuOpen(false)}
@@ -215,6 +226,7 @@ export default function PublicLayout({
                 <Link href="/admin/seasons">Seasons</Link>
                 <Link href="/admin/tournaments">Tournaments</Link>
                 <Link href="/admin/matches">Matches</Link>
+                <Link href="/admin/videos">Videos</Link>
               </>
             ) : (
               <>

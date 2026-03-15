@@ -1,6 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 
 type MatchRow = {
   id: string;
@@ -25,6 +30,19 @@ type TournamentMatchesTableProps = {
   tournamentId: string;
   matches: MatchRow[];
 };
+
+type SortKey =
+  | "stageName"
+  | "roundName"
+  | "groupName"
+  | "homeName"
+  | "awayName"
+  | "score"
+  | "winnerName"
+  | "matchDate"
+  | "matchTime"
+  | "matchStatus"
+  | "venueName";
 
 function formatDate(dateString: string) {
   if (!dateString) return "—";
@@ -56,24 +74,71 @@ export default function TournamentMatchesTable({
   matches,
 }: TournamentMatchesTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("matchDate");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const filteredMatches = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return matches;
 
-    return matches.filter((match) => {
-      return (
-        match.stageName.toLowerCase().includes(term) ||
-        match.roundName.toLowerCase().includes(term) ||
-        match.groupName.toLowerCase().includes(term) ||
-        match.homeName.toLowerCase().includes(term) ||
-        match.awayName.toLowerCase().includes(term) ||
-        match.venueName.toLowerCase().includes(term) ||
-        formatStatus(match.matchStatus).toLowerCase().includes(term) ||
-        formatStatus(match.scheduleStatus).toLowerCase().includes(term)
-      );
-    });
-  }, [matches, search]);
+    const rows = !term
+      ? matches
+      : matches.filter((match) => {
+          return (
+            match.stageName.toLowerCase().includes(term) ||
+            match.roundName.toLowerCase().includes(term) ||
+            match.groupName.toLowerCase().includes(term) ||
+            match.homeName.toLowerCase().includes(term) ||
+            match.awayName.toLowerCase().includes(term) ||
+            match.venueName.toLowerCase().includes(term) ||
+            formatStatus(match.matchStatus).toLowerCase().includes(term) ||
+            formatStatus(match.scheduleStatus).toLowerCase().includes(term)
+          );
+        });
+
+    return sortRows(
+      rows,
+      (match) => {
+        switch (sortKey) {
+          case "roundName":
+            return match.roundName;
+          case "groupName":
+            return match.groupName;
+          case "homeName":
+            return match.homeName;
+          case "awayName":
+            return match.awayName;
+          case "score":
+            return match.homeScore === null || match.awayScore === null
+              ? null
+              : `${match.homeScore}-${match.awayScore}`;
+          case "winnerName":
+            return match.winnerName;
+          case "matchDate":
+            return match.matchDate;
+          case "matchTime":
+            return match.matchTime;
+          case "matchStatus":
+            return formatStatus(match.matchStatus);
+          case "venueName":
+            return match.venueName;
+          case "stageName":
+          default:
+            return match.stageName;
+        }
+      },
+      sortDirection
+    );
+  }, [matches, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   return (
     <>
@@ -94,17 +159,83 @@ export default function TournamentMatchesTable({
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Stage</th>
-                <th>Round</th>
-                <th>Group</th>
-                <th>Home</th>
-                <th>Away</th>
-                <th>Score</th>
-                <th>Winner</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
-                <th>Venue</th>
+                <SortableHeader
+                  label="Stage"
+                  columnKey="stageName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Round"
+                  columnKey="roundName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Group"
+                  columnKey="groupName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Home"
+                  columnKey="homeName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Away"
+                  columnKey="awayName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Score"
+                  columnKey="score"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Winner"
+                  columnKey="winnerName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Date"
+                  columnKey="matchDate"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Time"
+                  columnKey="matchTime"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Status"
+                  columnKey="matchStatus"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Venue"
+                  columnKey="venueName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
               </tr>
             </thead>
 

@@ -50,6 +50,17 @@ export async function PATCH(
       body.seasonName !== undefined
         ? String(body.seasonName).trim()
         : existingSeason.seasonName;
+    const leagueId =
+      body.leagueId !== undefined
+        ? String(body.leagueId).trim()
+        : existingSeason.leagueId ?? "";
+
+    if (!leagueId) {
+      return NextResponse.json(
+        { error: "leagueId is required" },
+        { status: 400 }
+      );
+    }
 
     if (!seasonName) {
       return NextResponse.json(
@@ -58,10 +69,23 @@ export async function PATCH(
       );
     }
 
+    const league = await prisma.league.findUnique({
+      where: { id: leagueId },
+      select: { id: true },
+    });
+
+    if (!league) {
+      return NextResponse.json(
+        { error: "Selected league was not found" },
+        { status: 404 }
+      );
+    }
+
     const season = await prisma.season.update({
       where: { id },
       data: {
         seasonName,
+        leagueId,
         startDate:
           body.startDate !== undefined
             ? body.startDate

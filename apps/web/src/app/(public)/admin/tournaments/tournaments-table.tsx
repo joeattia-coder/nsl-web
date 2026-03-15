@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiEdit2, FiLayers, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type TournamentRow = {
@@ -19,6 +24,16 @@ type TournamentRow = {
 type TournamentsTableProps = {
   tournaments: TournamentRow[];
 };
+
+type SortKey =
+  | "tournamentName"
+  | "seasonName"
+  | "venueName"
+  | "participantType"
+  | "status"
+  | "isPublished"
+  | "startDate"
+  | "endDate";
 
 function formatDate(date: string) {
   if (!date) return "—";
@@ -42,6 +57,8 @@ export default function TournamentsTable({
   tournaments,
 }: TournamentsTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("tournamentName");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [tournamentToDelete, setTournamentToDelete] =
     useState<TournamentRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
@@ -50,19 +67,55 @@ export default function TournamentsTable({
   const filteredTournaments = useMemo(() => {
     const term = search.trim().toLowerCase();
 
-    if (!term) return tournaments;
+    const rows = !term
+      ? tournaments
+      : tournaments.filter((tournament) => {
+          return (
+            tournament.tournamentName.toLowerCase().includes(term) ||
+            tournament.seasonName.toLowerCase().includes(term) ||
+            tournament.venueName.toLowerCase().includes(term) ||
+            tournament.participantType.toLowerCase().includes(term) ||
+            formatStatus(tournament.status).toLowerCase().includes(term) ||
+            (tournament.isPublished ? "yes" : "no").includes(term)
+          );
+        });
 
-    return tournaments.filter((tournament) => {
-      return (
-        tournament.tournamentName.toLowerCase().includes(term) ||
-        tournament.seasonName.toLowerCase().includes(term) ||
-        tournament.venueName.toLowerCase().includes(term) ||
-        tournament.participantType.toLowerCase().includes(term) ||
-        formatStatus(tournament.status).toLowerCase().includes(term) ||
-        (tournament.isPublished ? "yes" : "no").includes(term)
-      );
-    });
-  }, [tournaments, search]);
+    return sortRows(
+      rows,
+      (tournament) => {
+        switch (sortKey) {
+          case "seasonName":
+            return tournament.seasonName;
+          case "venueName":
+            return tournament.venueName;
+          case "participantType":
+            return tournament.participantType;
+          case "status":
+            return formatStatus(tournament.status);
+          case "isPublished":
+            return tournament.isPublished;
+          case "startDate":
+            return tournament.startDate;
+          case "endDate":
+            return tournament.endDate;
+          case "tournamentName":
+          default:
+            return tournament.tournamentName;
+        }
+      },
+      sortDirection
+    );
+  }, [tournaments, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const openSingleDeleteModal = (tournament: TournamentRow) => {
     setActionError(null);
@@ -140,14 +193,62 @@ export default function TournamentsTable({
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Season</th>
-                <th>Venue</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Published</th>
-                <th>Start</th>
-                <th>End</th>
+                <SortableHeader
+                  label="Name"
+                  columnKey="tournamentName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Season"
+                  columnKey="seasonName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Venue"
+                  columnKey="venueName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Type"
+                  columnKey="participantType"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Status"
+                  columnKey="status"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Published"
+                  columnKey="isPublished"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Start"
+                  columnKey="startDate"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="End"
+                  columnKey="endDate"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>

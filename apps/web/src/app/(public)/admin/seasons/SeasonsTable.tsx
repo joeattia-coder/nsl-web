@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiCalendar, FiCheck, FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 
 type SeasonRow = {
@@ -17,8 +22,12 @@ type SeasonsTableProps = {
   seasons: SeasonRow[];
 };
 
+type SortKey = "seasonName" | "leagueName" | "startDate" | "endDate" | "isActive";
+
 export default function SeasonsTable({ seasons }: SeasonsTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("seasonName");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [seasonToDelete, setSeasonToDelete] = useState<SeasonRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -26,12 +35,42 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
   const filteredSeasons = useMemo(() => {
     const term = search.trim().toLowerCase();
 
-    if (!term) return seasons;
+    const rows = !term
+      ? seasons
+      : seasons.filter((season) =>
+          season.seasonName.toLowerCase().includes(term)
+        );
 
-    return seasons.filter((season) =>
-      season.seasonName.toLowerCase().includes(term)
+    return sortRows(
+      rows,
+      (season) => {
+        switch (sortKey) {
+          case "leagueName":
+            return season.leagueName;
+          case "startDate":
+            return season.startDate;
+          case "endDate":
+            return season.endDate;
+          case "isActive":
+            return season.isActive;
+          case "seasonName":
+          default:
+            return season.seasonName;
+        }
+      },
+      sortDirection
     );
-  }, [seasons, search]);
+  }, [seasons, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const openSingleDeleteModal = (season: SeasonRow) => {
     setActionError(null);
@@ -109,11 +148,41 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Season Name</th>
-                <th>League</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Active</th>
+                <SortableHeader
+                  label="Season Name"
+                  columnKey="seasonName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="League"
+                  columnKey="leagueName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Start Date"
+                  columnKey="startDate"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="End Date"
+                  columnKey="endDate"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Active"
+                  columnKey="isActive"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>

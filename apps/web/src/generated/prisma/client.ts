@@ -92,6 +92,46 @@ export type Role = Prisma.RoleModel
  */
 export type UserRole = Prisma.UserRoleModel
 /**
+ * Model AuthAccount
+ * 
+ */
+export type AuthAccount = Prisma.AuthAccountModel
+/**
+ * Model Invitation
+ * 
+ */
+export type Invitation = Prisma.InvitationModel
+/**
+ * Model EmailVerificationToken
+ * 
+ */
+export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
+/**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
+ * Model Permission
+ * 
+ */
+export type Permission = Prisma.PermissionModel
+/**
+ * Model RolePermission
+ * 
+ */
+export type RolePermission = Prisma.RolePermissionModel
+/**
+ * Model UserRoleAssignment
+ * 
+ */
+export type UserRoleAssignment = Prisma.UserRoleAssignmentModel
+/**
+ * Model UserPermissionOverride
+ * 
+ */
+export type UserPermissionOverride = Prisma.UserPermissionOverrideModel
+/**
  * Model TournamentEntry
  * 
  */
@@ -131,3 +171,8 @@ export type League = Prisma.LeagueModel
  * 
  */
 export type NewsArticle = Prisma.NewsArticleModel
+/**
+ * Model VideoHighlight
+ * 
+ */
+export type VideoHighlight = Prisma.VideoHighlightModel

@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
 import { FiCheck, FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 
 type VenueRow = {
@@ -19,8 +24,12 @@ type VenuesTableProps = {
   venues: VenueRow[];
 };
 
+type SortKey = "venueName" | "address" | "phoneNumber" | "show";
+
 export default function VenuesTable({ venues }: VenuesTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("venueName");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [venueToDelete, setVenueToDelete] = useState<VenueRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -28,16 +37,44 @@ export default function VenuesTable({ venues }: VenuesTableProps) {
   const filteredVenues = useMemo(() => {
     const term = search.trim().toLowerCase();
 
-    if (!term) return venues;
+    const rows = !term
+      ? venues
+      : venues.filter((venue) => {
+          return (
+            venue.venueName.toLowerCase().includes(term) ||
+            venue.address.toLowerCase().includes(term) ||
+            venue.phoneNumber.toLowerCase().includes(term)
+          );
+        });
 
-    return venues.filter((venue) => {
-      return (
-        venue.venueName.toLowerCase().includes(term) ||
-        venue.address.toLowerCase().includes(term) ||
-        venue.phoneNumber.toLowerCase().includes(term)
-      );
-    });
-  }, [venues, search]);
+    return sortRows(
+      rows,
+      (venue) => {
+        switch (sortKey) {
+          case "address":
+            return venue.address;
+          case "phoneNumber":
+            return venue.phoneNumber;
+          case "show":
+            return venue.isActive && venue.showOnVenuesPage;
+          case "venueName":
+          default:
+            return venue.venueName;
+        }
+      },
+      sortDirection
+    );
+  }, [sortDirection, sortKey, venues, search]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const openSingleDeleteModal = (venue: VenueRow) => {
     setActionError(null);
@@ -113,10 +150,34 @@ export default function VenuesTable({ venues }: VenuesTableProps) {
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <th>Venue Name</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Show</th>
+                <SortableHeader
+                  label="Venue Name"
+                  columnKey="venueName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Address"
+                  columnKey="address"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Phone"
+                  columnKey="phoneNumber"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Show"
+                  columnKey="show"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>

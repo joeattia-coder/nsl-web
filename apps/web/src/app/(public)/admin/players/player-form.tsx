@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FiArrowLeft, FiSave, FiUpload, FiUserPlus, FiX } from "react-icons/fi";
 
 type PlayerFormMode = "create" | "edit";
@@ -61,6 +61,7 @@ export default function PlayerForm({
 
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string>("");
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!isEdit || !playerId) return;
@@ -154,6 +155,17 @@ export default function PlayerForm({
 
     setError(null);
     setPhotoFile(file);
+  }
+
+  function handleRemovePhoto() {
+    setError(null);
+    setPhotoFile(null);
+    setPhotoPreviewUrl("");
+    setPhotoUrl("");
+
+    if (photoInputRef.current) {
+      photoInputRef.current.value = "";
+    }
   }
 
   async function uploadPhotoIfNeeded() {
@@ -379,6 +391,7 @@ export default function PlayerForm({
               </label>
 
               <input
+                ref={photoInputRef}
                 id="photoFile"
                 type="file"
                 accept=".jpg,.jpeg,.png,image/jpeg,image/png"
@@ -400,6 +413,15 @@ export default function PlayerForm({
                     className="admin-player-photo-preview-img"
                     unoptimized
                   />
+
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="admin-player-form-button admin-player-form-button-danger"
+                  >
+                    <FiX />
+                    <span>{photoFile ? "Remove Selected Photo" : "Remove Photo"}</span>
+                  </button>
                 </div>
               ) : null}
             </div>

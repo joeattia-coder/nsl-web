@@ -16,7 +16,17 @@ type UiMatch = {
   away: string;
   homeCountryCode: string;
   awayCountryCode: string;
+  homePlayerPhotoUrl: string;
+  awayPlayerPhotoUrl: string;
   ctaHref?: string;
+};
+
+type HomeVideoHighlight = {
+  id: string;
+  title: string;
+  sourceType: "YOUTUBE" | "UPLOAD";
+  embedUrl: string;
+  watchUrl: string;
 };
 
 type HomeNewsArticle = {
@@ -115,13 +125,19 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     away,
     homeCountryCode: firstString(fx, ["homeCountryCode", "HomeCountryCode"], ""),
     awayCountryCode: firstString(fx, ["roadCountryCode", "RoadCountryCode"], ""),
+    homePlayerPhotoUrl: firstString(fx, ["homePlayerPhotoUrl", "HomePlayerPhotoUrl"], ""),
+    awayPlayerPhotoUrl: firstString(fx, ["roadPlayerPhotoUrl", "RoadPlayerPhotoUrl"], ""),
     ctaHref,
   };
 }
 
 export default function Page() {
+  const newsRowRef = useRef<HTMLDivElement | null>(null);
   const videoRowRef = useRef<HTMLDivElement | null>(null);
   const matchesRowRef = useRef<HTMLDivElement | null>(null);
+
+  const [canScrollNewsLeft, setCanScrollNewsLeft] = useState(false);
+  const [canScrollNewsRight, setCanScrollNewsRight] = useState(false);
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -131,8 +147,8 @@ export default function Page() {
 
   const [fixturesRaw, setFixturesRaw] = useState<AnyObj[] | null>(null);
   const [fixturesError, setFixturesError] = useState<string>("");
-  const [bannerNews, setBannerNews] = useState<HomeNewsArticle[]>([]);
-  const [sectionNews, setSectionNews] = useState<HomeNewsArticle[]>([]);
+  const [featuredNews, setFeaturedNews] = useState<HomeNewsArticle[]>([]);
+  const [featuredVideos, setFeaturedVideos] = useState<HomeVideoHighlight[]>([]);
 
   const EPS = 2;
 
@@ -167,33 +183,21 @@ export default function Page() {
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([
-      fetch("/api/public/news?placement=SCROLLING_BANNER&limit=8"),
-      fetch("/api/public/news?placement=NEWS_SECTION&limit=6"),
-    ])
-      .then(async ([bannerResponse, sectionResponse]) => {
-        const [bannerData, sectionData] = await Promise.all([
-          bannerResponse.json().catch(() => null),
-          sectionResponse.json().catch(() => null),
-        ]);
+    fetch("/api/public/videos?limit=12")
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
 
-        if (!bannerResponse.ok) {
-          throw new Error(bannerData?.error || `Banner request failed (${bannerResponse.status})`);
-        }
-
-        if (!sectionResponse.ok) {
-          throw new Error(sectionData?.error || `Section request failed (${sectionResponse.status})`);
+        if (!response.ok) {
+          throw new Error(data?.error || `Video request failed (${response.status})`);
         }
 
         if (cancelled) return;
-        setBannerNews(Array.isArray(bannerData?.articles) ? bannerData.articles : []);
-        setSectionNews(Array.isArray(sectionData?.articles) ? sectionData.articles : []);
+        setFeaturedVideos(Array.isArray(data?.videos) ? data.videos : []);
       })
       .catch((error) => {
         if (cancelled) return;
-        console.error("Failed to load homepage news:", error);
-        setBannerNews([]);
-        setSectionNews([]);
+        console.error("Failed to load homepage videos:", error);
+        setFeaturedVideos([]);
       });
 
     return () => {
@@ -201,25 +205,86 @@ export default function Page() {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/public/news?placement=NEWS_SECTION&limit=10")
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(data?.error || `News request failed (${response.status})`);
+        }
+
+        if (cancelled) return;
+        setFeaturedNews(Array.isArray(data?.articles) ? data.articles : []);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error("Failed to load homepage news:", error);
+        setFeaturedNews([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [featuredVideos.length]);
+
   const matches: UiMatch[] = useMemo(() => {
     const arr = fixturesRaw ?? [];
     // Pick a reasonable number to show in the carousel
     return arr.slice(0, 12).map(toUiMatch);
   }, [fixturesRaw]);
 
-  const bannerLoop = useMemo(() => {
-    if (bannerNews.length === 0) return [];
-    return bannerNews.length === 1 ? bannerNews : [...bannerNews, ...bannerNews];
-  }, [bannerNews]);
+  // FEATURED NEWS CAROUSEL ARROWS
+  useEffect(() => {
+    const el = newsRowRef.current;
+    if (!el) return;
 
-  const newsCards = useMemo(() => sectionNews.slice(0, 3), [sectionNews]);
+    el.scrollLeft = 0;
 
-  const shouldShowThumbnail = (article: HomeNewsArticle) => {
-    return article.homeDisplayMode === "THUMBNAIL" || article.homeDisplayMode === "THUMBNAIL_TITLE";
-  };
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth;
 
-  const shouldShowTitle = (article: HomeNewsArticle) => {
-    return article.homeDisplayMode === "TITLE" || article.homeDisplayMode === "THUMBNAIL_TITLE";
+      if (max <= 1) {
+        setCanScrollNewsLeft(false);
+        setCanScrollNewsRight(false);
+        return;
+      }
+
+      setCanScrollNewsLeft(el.scrollLeft > EPS);
+      setCanScrollNewsRight(el.scrollLeft < max - EPS);
+    };
+
+    update();
+    requestAnimationFrame(update);
+    const t1 = window.setTimeout(update, 300);
+    const t2 = window.setTimeout(update, 900);
+
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [featuredNews.length]);
+
+  const scrollNews = (direction: "left" | "right") => {
+    const el = newsRowRef.current;
+    if (!el) return;
+
+    const firstCard = el.querySelector<HTMLElement>(".featured-news-card");
+    const cardWidth = firstCard?.offsetWidth ?? 360;
+    const gap = 18;
+    const step = cardWidth + gap;
+
+    el.scrollBy({
+      left: direction === "left" ? -step : step,
+      behavior: "smooth",
+    });
   };
 
   // VIDEO CAROUSEL ARROWS
@@ -365,87 +430,50 @@ export default function Page() {
         </div>
       </div>
 
-      {bannerNews.length > 0 ? (
-        <section className="px-4 pb-2 pt-6 md:px-8">
-          <div className="home-news-banner-shell">
-            <div className="home-news-banner-track">
-              {bannerLoop.map((article, index) => (
-                <Link key={`${article.id}-${index}`} href={`/news/${article.slug}`} className="home-news-banner-item">
-                  {shouldShowThumbnail(article) ? (
-                    article.coverImageUrl ? (
-                      <img
-                        src={article.coverImageUrl}
-                        alt={article.title}
-                        className="h-14 w-20 rounded-xl object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-14 w-20 items-center justify-center rounded-xl bg-white/10 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/70">
-                        NSL
-                      </div>
-                    )
-                  ) : null}
-                  {shouldShowTitle(article) ? (
-                    <span className="max-w-[260px] text-sm font-semibold leading-5 text-white md:text-base">
-                      {article.title}
-                    </span>
-                  ) : null}
-                </Link>
-              ))}
-            </div>
+      {featuredNews.length > 0 ? (
+        <section className="featured-news-section">
+          <div className="section-header">
+            <h2 className="section-heading">Featured Matches and News</h2>
+
+            <Link href="/news" className="view-all-link">
+              View All News →
+            </Link>
           </div>
-        </section>
-      ) : null}
 
-      {newsCards.length > 0 ? (
-        <section className="px-4 py-8 md:px-8">
-          <div className="mx-auto max-w-7xl rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] md:p-8">
-            <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">From the Newsroom</p>
-                <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-                  Stories shaping the season
-                </h2>
-              </div>
-              <Link href="/news" className="text-sm font-semibold text-sky-700 hover:text-sky-900">
-                View all news
-              </Link>
-            </div>
+          <div className="featured-news-carousel-wrapper">
+            {canScrollNewsLeft && (
+              <button
+                className="carousel-arrow left"
+                onClick={() => scrollNews("left")}
+                aria-label="Scroll featured news left"
+                type="button"
+              >
+                <FiChevronLeft size={24} style={{ stroke: "#fff" }} />
+              </button>
+            )}
 
-            <div className="grid gap-5 lg:grid-cols-3">
-              {newsCards.map((article) => (
-                <Link
-                  key={article.id}
-                  href={`/news/${article.slug}`}
-                  className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)]"
-                >
-                  {shouldShowThumbnail(article) ? (
-                    article.coverImageUrl ? (
-                      <img src={article.coverImageUrl} alt={article.title} className="h-52 w-full object-cover" />
-                    ) : (
-                      <div className="flex h-52 items-center justify-center bg-[radial-gradient(circle_at_top_left,#dbeafe,transparent_38%),linear-gradient(135deg,#0f172a,#2563eb)] text-sm font-semibold uppercase tracking-[0.28em] text-white/85">
-                        Featured Story
-                      </div>
-                    )
-                  ) : null}
+            {canScrollNewsRight && (
+              <button
+                className="carousel-arrow right"
+                onClick={() => scrollNews("right")}
+                aria-label="Scroll featured news right"
+                type="button"
+              >
+                <FiChevronRight size={24} style={{ stroke: "#fff" }} />
+              </button>
+            )}
 
-                  <div className="flex flex-col gap-3 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-                      {article.publishedAt
-                        ? new Date(article.publishedAt).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })
-                        : "Latest update"}
-                    </p>
-                    {shouldShowTitle(article) ? (
-                      <h3 className="text-xl font-semibold leading-tight text-slate-900 transition group-hover:text-sky-700">
-                        {article.title}
-                      </h3>
-                    ) : null}
-                    <p className="text-sm leading-7 text-slate-600">
-                      {article.excerpt || "Open the full article for the complete NSL story."}
-                    </p>
+            <div className="featured-news-row" ref={newsRowRef}>
+              {featuredNews.map((article) => (
+                <Link key={article.id} href={`/news/${article.slug}`} className="featured-news-card">
+                  {article.coverImageUrl ? (
+                    <img src={article.coverImageUrl} alt={article.title} className="featured-news-thumbnail" />
+                  ) : (
+                    <div className="featured-news-thumbnail featured-news-media-fallback">NSL</div>
+                  )}
+
+                  <div className="featured-news-body compact">
+                    <h3 className="featured-news-title compact">{article.title}</h3>
                   </div>
                 </Link>
               ))}
@@ -517,7 +545,11 @@ export default function Page() {
                 <div className="match-vs">
                   <div className="player">
                     <div className="player-avatar icon">
-                      <FiUser size={28} />
+                      {m.homePlayerPhotoUrl ? (
+                        <img src={m.homePlayerPhotoUrl} alt={m.home} className="player-avatar-photo" />
+                      ) : (
+                        <FiUser size={28} />
+                      )}
                     </div>
                     <div className="player-copy">
                       <div className="player-name">{m.home}</div>
@@ -551,7 +583,11 @@ export default function Page() {
                       ) : null}
                     </div>
                     <div className="player-avatar icon">
-                      <FiUser size={28} />
+                      {m.awayPlayerPhotoUrl ? (
+                        <img src={m.awayPlayerPhotoUrl} alt={m.away} className="player-avatar-photo" />
+                      ) : (
+                        <FiUser size={28} />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -578,123 +614,68 @@ export default function Page() {
       </section>
 
       {/* Latest Video Highlights */}
-      <div className="video-section">
-        <h2 className="video-heading">Latest Video Highlights</h2>
+      {featuredVideos.length > 0 ? (
+        <div className="video-section">
+          <div className="section-header">
+            <h2 className="video-heading">Latest Video Highlights</h2>
+          </div>
 
-        <div className="video-carousel-wrapper">
-          {canScrollLeft && (
-            <button
-              className="carousel-arrow left"
-              onClick={() => scrollVideos("left")}
-              aria-label="Scroll videos left"
-              type="button"
-            >
-              <FiChevronLeft size={24} style={{ stroke: "#fff" }} />
-            </button>
-          )}
-
-          {canScrollRight && (
-            <button
-              className="carousel-arrow right"
-              onClick={() => scrollVideos("right")}
-              aria-label="Scroll videos right"
-              type="button"
-            >
-              <FiChevronRight size={24} style={{ stroke: "#fff" }} />
-            </button>
-          )}
-
-          <div className="video-carousel" ref={videoRowRef}>
-            <div className="video-card">
-              <div className="video-container">
-                <iframe
-                  src="https://www.youtube.com/embed/kjQWAElNfpY?si=qTKOVVMLeyWVOu4X"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                ></iframe>
-              </div>
-
-              <a
-                className="video-title-link"
-                href="https://www.youtube.com/watch?v=kjQWAElNfpY"
-                target="_blank"
-                rel="noopener noreferrer"
+          <div className="video-carousel-wrapper">
+            {canScrollLeft && (
+              <button
+                className="carousel-arrow left"
+                onClick={() => scrollVideos("left")}
+                aria-label="Scroll videos left"
+                type="button"
               >
-                EPIC FINISH! Ronnie O&apos;Sullivan vs Kyren Wilson Delivers The
-                Goods | Saudi Arabia Snooker Masters
-              </a>
-            </div>
+                <FiChevronLeft size={24} style={{ stroke: "#fff" }} />
+              </button>
+            )}
 
-            <div className="video-card">
-              <div className="video-container">
-                <iframe
-                  src="https://www.youtube.com/embed/yg-DU7by4v8?si=JxlpEvO4FEAWPjy1"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                ></iframe>
-              </div>
-
-              <a
-                className="video-title-link"
-                href="https://www.youtube.com/watch?v=yg-DU7by4v8"
-                target="_blank"
-                rel="noopener noreferrer"
+            {canScrollRight && (
+              <button
+                className="carousel-arrow right"
+                onClick={() => scrollVideos("right")}
+                aria-label="Scroll videos right"
+                type="button"
               >
-                EPIC FINISH! Ronnie O&apos;Sullivan vs Kyren Wilson Delivers The
-                Goods | Saudi Arabia Snooker Masters
-              </a>
-            </div>
+                <FiChevronRight size={24} style={{ stroke: "#fff" }} />
+              </button>
+            )}
 
-            <div className="video-card">
-              <div className="video-container">
-                <iframe
-                  src="https://www.youtube.com/embed/ypuVCLn0H5Q?si=r-4t2whinc8lsUXj"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                ></iframe>
-              </div>
+            <div className="video-carousel" ref={videoRowRef}>
+              {featuredVideos.map((video) => (
+                <div className="video-card" key={video.id}>
+                  <div className="video-container">
+                    {video.sourceType === "YOUTUBE" ? (
+                      <iframe
+                        src={video.embedUrl}
+                        title={video.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                      ></iframe>
+                    ) : (
+                      <video controls preload="metadata" playsInline>
+                        <source src={video.embedUrl} />
+                      </video>
+                    )}
+                  </div>
 
-              <a
-                className="video-title-link"
-                href="https://www.youtube.com/watch?v=ypuVCLn0H5Q"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                BOTH 147s! Ronnie O&apos;Sullivan&apos;s TWO MAXIMUMS In Same
-                Match vs Wakelin | Saudi Arabia Snooker Masters
-              </a>
-            </div>
-
-            <div className="video-card">
-              <div className="video-container">
-                <iframe
-                  src="https://www.youtube.com/embed/kjQWAElNfpY?si=qTKOVVMLeyWVOu4X"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                ></iframe>
-              </div>
-
-              <a
-                className="video-title-link"
-                href="https://www.youtube.com/watch?v=kjQWAElNfpY"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                EPIC FINISH! Ronnie O&apos;Sullivan vs Kyren Wilson Delivers The
-                Goods | Saudi Arabia Snooker Masters
-              </a>
+                  <a
+                    className="video-title-link"
+                    href={video.watchUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {video.title}
+                  </a>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      ) : null}
     </main>
   );
 }

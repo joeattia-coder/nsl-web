@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import {
   FiArrowLeft,
   FiPlusCircle,
@@ -109,6 +109,16 @@ export default function TournamentForm({
   );
   const [description, setDescription] = useState(
     initialData?.description ?? ""
+  );
+
+  const sortedVenues = useMemo(
+    () =>
+      [...venues].sort((left, right) =>
+        left.venueName.localeCompare(right.venueName, undefined, {
+          sensitivity: "base",
+        })
+      ),
+    [venues]
   );
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -296,7 +306,7 @@ export default function TournamentForm({
                 className="admin-select admin-player-form-input"
               >
                 <option value="">No venue assigned</option>
-                {venues.map((venue) => (
+                {sortedVenues.map((venue) => (
                   <option key={venue.id} value={venue.id}>
                     {venue.venueName}
                   </option>

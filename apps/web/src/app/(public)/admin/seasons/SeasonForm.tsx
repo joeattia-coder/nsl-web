@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { FiArrowLeft, FiCalendar, FiPlus, FiSave, FiX } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { FiArrowLeft, FiPlus, FiSave, FiX } from "react-icons/fi";
 
 type SeasonFormMode = "create" | "edit";
 
@@ -13,14 +13,25 @@ type Season = {
   startDate?: string | null;
   endDate?: string | null;
   isActive?: boolean | null;
+  leagueId?: string | null;
+};
+
+type LeagueOption = {
+  id: string;
+  leagueName: string;
 };
 
 type SeasonFormProps = {
   mode: SeasonFormMode;
   seasonId?: string;
+  leagues: LeagueOption[];
 };
 
-export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
+export default function SeasonForm({
+  mode,
+  seasonId,
+  leagues,
+}: SeasonFormProps) {
   const router = useRouter();
   const isEdit = mode === "edit";
 
@@ -29,12 +40,16 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const [seasonName, setSeasonName] = useState("");
+  const [leagueId, setLeagueId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    if (!isEdit || !seasonId) return;
+    if (!isEdit || !seasonId) {
+      setLoading(false);
+      return;
+    }
 
     async function loadSeason() {
       try {
@@ -49,22 +64,25 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
           await res.json().catch(() => null);
 
         if (!res.ok) {
-          const message =
+          throw new Error(
             (data as { details?: string; error?: string } | null)?.details ||
-            (data as { error?: string } | null)?.error ||
-            "Failed to fetch season.";
-          throw new Error(message);
+              (data as { error?: string } | null)?.error ||
+              "Failed to fetch season."
+          );
         }
 
         const season = data as Season;
 
         setSeasonName(season.seasonName ?? "");
+        setLeagueId(season.leagueId ?? "");
         setStartDate(season.startDate ? String(season.startDate).slice(0, 10) : "");
         setEndDate(season.endDate ? String(season.endDate).slice(0, 10) : "");
         setIsActive(season.isActive ?? true);
       } catch (err) {
         console.error(err);
-        setError(err instanceof Error ? err.message : "Failed to load season.");
+        setError(
+          err instanceof Error ? err.message : "Failed to load season."
+        );
       } finally {
         setLoading(false);
       }
@@ -73,22 +91,33 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
     void loadSeason();
   }, [isEdit, seasonId]);
 
-  const previewText = useMemo(() => {
-    const name = seasonName.trim() || "New Season";
-    const start = startDate || "—";
-    const end = endDate || "—";
-    return `${name} • ${start} to ${end}`;
-  }, [seasonName, startDate, endDate]);
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
+    const trimmedSeasonName = seasonName.trim();
+
+    if (!leagueId) {
+      setError("Please select a league.");
+      return;
+    }
+
+    if (!trimmedSeasonName) {
+      setError("Season name is required.");
+      return;
+    }
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      setError("End date must be the same as or later than the start date.");
+      return;
+    }
 
     try {
       setSaving(true);
       setError(null);
 
       const payload = {
-        seasonName: seasonName.trim(),
+        seasonName: trimmedSeasonName,
+        leagueId,
         startDate: startDate || null,
         endDate: endDate || null,
         isActive,
@@ -135,7 +164,7 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
     return (
       <div className="admin-page">
         <div className="admin-card admin-player-form-card">
-          <p>Loading season...</p>
+          {error ? <p className="admin-form-error">{error}</p> : <p>Loading season...</p>}
         </div>
       </div>
     );
@@ -150,8 +179,8 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
           </h1>
           <p className="admin-page-subtitle">
             {isEdit
-              ? "Update the season name, dates, and status."
-              : "Create a new season for tournaments and standings."}
+              ? "Update the season name, league, dates, and status."
+              : "Create a new season within a league for tournaments and standings."}
           </p>
         </div>
 
@@ -178,11 +207,43 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
                   id="seasonName"
                   type="text"
                   value={seasonName}
-                  onChange={(e) => setSeasonName(e.target.value)}
+                  onChange={(event) => setSeasonName(event.target.value)}
                   className="admin-input admin-player-form-input"
                   placeholder="e.g. 2025 / 2026"
                   required
                 />
+              </div>
+
+              <div className="admin-form-field">
+                <label htmlFor="leagueId" className="admin-label">
+                  League
+                </label>
+                <select
+                  id="leagueId"
+                  value={leagueId}
+                  onChange={(event) => setLeagueId(event.target.value)}
+                  className="admin-input admin-player-form-input"
+                  required
+                >
+                  <option value="">Select a league</option>
+                  {leagues.map((league) => (
+                    <option key={league.id} value={league.id}>
+                      {league.leagueName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="admin-form-field">
+                <label className="admin-label">Season Status</label>
+                <label className="admin-checkbox-inline">
+                  <input
+                    type="checkbox"
+                    checked={isActive}
+                    onChange={(event) => setIsActive(event.target.checked)}
+                  />
+                  <span>Season is active</span>
+                </label>
               </div>
 
               <div className="admin-form-field">
@@ -193,7 +254,7 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
                   id="startDate"
                   type="date"
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={(event) => setStartDate(event.target.value)}
                   className="admin-input admin-player-form-input"
                 />
               </div>
@@ -206,21 +267,9 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
                   id="endDate"
                   type="date"
                   value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                  onChange={(event) => setEndDate(event.target.value)}
                   className="admin-input admin-player-form-input"
                 />
-              </div>
-
-              <div className="admin-form-field">
-                <label className="admin-label">Season Status</label>
-                <label className="admin-checkbox-inline">
-                  <input
-                    type="checkbox"
-                    checked={isActive}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                  />
-                  <span>Season is active</span>
-                </label>
               </div>
             </div>
 
@@ -256,8 +305,6 @@ export default function SeasonForm({ mode, seasonId }: SeasonFormProps) {
             </div>
           </form>
         </div>
-
-        
       </div>
     </div>
   );

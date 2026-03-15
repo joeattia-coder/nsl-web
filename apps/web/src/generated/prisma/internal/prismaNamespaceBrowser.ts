@@ -61,6 +61,14 @@ export const ModelName = {
   Player: 'Player',
   Role: 'Role',
   UserRole: 'UserRole',
+  AuthAccount: 'AuthAccount',
+  Invitation: 'Invitation',
+  EmailVerificationToken: 'EmailVerificationToken',
+  PasswordResetToken: 'PasswordResetToken',
+  Permission: 'Permission',
+  RolePermission: 'RolePermission',
+  UserRoleAssignment: 'UserRoleAssignment',
+  UserPermissionOverride: 'UserPermissionOverride',
   TournamentEntry: 'TournamentEntry',
   TournamentEntryMember: 'TournamentEntryMember',
   GroupParticipant: 'GroupParticipant',
@@ -68,7 +76,8 @@ export const ModelName = {
   MatchFrame: 'MatchFrame',
   PlayerBreak: 'PlayerBreak',
   League: 'League',
-  NewsArticle: 'NewsArticle'
+  NewsArticle: 'NewsArticle',
+  VideoHighlight: 'VideoHighlight'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -90,7 +99,6 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const VenueScalarFieldEnum = {
   id: 'id',
   venueName: 'venueName',
-  logoUrl: 'logoUrl',
   addressLine1: 'addressLine1',
   addressLine2: 'addressLine2',
   city: 'city',
@@ -102,7 +110,8 @@ export const VenueScalarFieldEnum = {
   showOnVenuesPage: 'showOnVenuesPage',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  logoUrl: 'logoUrl'
 } as const
 
 export type VenueScalarFieldEnum = (typeof VenueScalarFieldEnum)[keyof typeof VenueScalarFieldEnum]
@@ -184,7 +193,13 @@ export type TournamentGroupScalarFieldEnum = (typeof TournamentGroupScalarFieldE
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  username: 'username',
+  normalizedUsername: 'normalizedUsername',
   email: 'email',
+  normalizedEmail: 'normalizedEmail',
+  emailVerifiedAt: 'emailVerifiedAt',
+  passwordHash: 'passwordHash',
+  passwordSetAt: 'passwordSetAt',
   phoneNumber: 'phoneNumber',
   registrationStatus: 'registrationStatus',
   isLoginEnabled: 'isLoginEnabled',
@@ -220,8 +235,10 @@ export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof 
 
 export const RoleScalarFieldEnum = {
   id: 'id',
+  roleKey: 'roleKey',
   roleName: 'roleName',
   description: 'description',
+  isSystemRole: 'isSystemRole',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -237,6 +254,120 @@ export const UserRoleScalarFieldEnum = {
 } as const
 
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
+
+
+export const AuthAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  providerEmail: 'providerEmail',
+  providerEmailNormalized: 'providerEmailNormalized',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AuthAccountScalarFieldEnum = (typeof AuthAccountScalarFieldEnum)[keyof typeof AuthAccountScalarFieldEnum]
+
+
+export const InvitationScalarFieldEnum = {
+  id: 'id',
+  playerId: 'playerId',
+  userId: 'userId',
+  email: 'email',
+  normalizedEmail: 'normalizedEmail',
+  purpose: 'purpose',
+  tokenHash: 'tokenHash',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  acceptedByUserId: 'acceptedByUserId',
+  revokedAt: 'revokedAt',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
+
+
+export const EmailVerificationTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  normalizedEmail: 'normalizedEmail',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
+
+
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
+export const PermissionScalarFieldEnum = {
+  id: 'id',
+  permissionKey: 'permissionKey',
+  permissionName: 'permissionName',
+  description: 'description',
+  category: 'category',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
+
+
+export const RolePermissionScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  permissionId: 'permissionId',
+  createdAt: 'createdAt'
+} as const
+
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const UserRoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roleId: 'roleId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  grantedByUserId: 'grantedByUserId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type UserRoleAssignmentScalarFieldEnum = (typeof UserRoleAssignmentScalarFieldEnum)[keyof typeof UserRoleAssignmentScalarFieldEnum]
+
+
+export const UserPermissionOverrideScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  permissionId: 'permissionId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  effect: 'effect',
+  reason: 'reason',
+  grantedByUserId: 'grantedByUserId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type UserPermissionOverrideScalarFieldEnum = (typeof UserPermissionOverrideScalarFieldEnum)[keyof typeof UserPermissionOverrideScalarFieldEnum]
 
 
 export const TournamentEntryScalarFieldEnum = {
@@ -358,6 +489,20 @@ export const NewsArticleScalarFieldEnum = {
 } as const
 
 export type NewsArticleScalarFieldEnum = (typeof NewsArticleScalarFieldEnum)[keyof typeof NewsArticleScalarFieldEnum]
+
+
+export const VideoHighlightScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  sourceType: 'sourceType',
+  videoUrl: 'videoUrl',
+  showInCarousel: 'showInCarousel',
+  carouselSortOrder: 'carouselSortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VideoHighlightScalarFieldEnum = (typeof VideoHighlightScalarFieldEnum)[keyof typeof VideoHighlightScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -4,6 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
+  SortableHeader,
+  type SortDirection,
+  sortRows,
+} from "@/lib/admin-table-sorting";
+import {
   FiCheckSquare,
   FiDownload,
   FiEdit2,
@@ -26,8 +31,12 @@ type PlayersTableProps = {
   players: PlayerRow[];
 };
 
+type SortKey = "fullName" | "email" | "phoneNumber" | "country";
+
 export default function PlayersTable({ players }: PlayersTableProps) {
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("fullName");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -39,17 +48,45 @@ export default function PlayersTable({ players }: PlayersTableProps) {
   const filteredPlayers = useMemo(() => {
     const term = search.trim().toLowerCase();
 
-    if (!term) return players;
+    const rows = !term
+      ? players
+      : players.filter((player) => {
+          return (
+            player.fullName.toLowerCase().includes(term) ||
+            player.email.toLowerCase().includes(term) ||
+            player.phoneNumber.toLowerCase().includes(term) ||
+            player.country.toLowerCase().includes(term)
+          );
+        });
 
-    return players.filter((player) => {
-      return (
-        player.fullName.toLowerCase().includes(term) ||
-        player.email.toLowerCase().includes(term) ||
-        player.phoneNumber.toLowerCase().includes(term) ||
-        player.country.toLowerCase().includes(term)
-      );
-    });
-  }, [players, search]);
+    return sortRows(
+      rows,
+      (player) => {
+        switch (sortKey) {
+          case "email":
+            return player.email;
+          case "phoneNumber":
+            return player.phoneNumber;
+          case "country":
+            return player.country;
+          case "fullName":
+          default:
+            return player.fullName;
+        }
+      },
+      sortDirection
+    );
+  }, [players, search, sortDirection, sortKey]);
+
+  const handleSort = (columnKey: SortKey) => {
+    if (sortKey === columnKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(columnKey);
+    setSortDirection("asc");
+  };
 
   const visibleIds = filteredPlayers.map((player) => player.id);
   const selectedVisibleCount = visibleIds.filter((id) =>
@@ -293,10 +330,34 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                     />
                   </th>
                 )}
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Country</th>
+                <SortableHeader
+                  label="Name"
+                  columnKey="fullName"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Email"
+                  columnKey="email"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Phone Number"
+                  columnKey="phoneNumber"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Country"
+                  columnKey="country"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>
