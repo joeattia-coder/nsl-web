@@ -1,5 +1,26 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "BLOB_READ_WRITE_TOKEN",
+    "DATABASE_URL",
+    "DATABASE_URL_UNPOOLED",
+    "DIRECT_URL",
+    "LEAGUEREPUBLIC_LEAGUE_ID",
+    "NEON_PROJECT_ID",
+    "PGDATABASE",
+    "PGHOST",
+    "PGHOST_UNPOOLED",
+    "PGPASSWORD",
+    "PGUSER",
+    "POSTGRES_DATABASE",
+    "POSTGRES_HOST",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_PRISMA_URL",
+    "POSTGRES_URL",
+    "POSTGRES_URL_NON_POOLING",
+    "POSTGRES_URL_NO_SSL",
+    "POSTGRES_USER"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
@@ -8,6 +29,27 @@
     "build": {
       "dependsOn": [
         "^build"
+      ],
+      "env": [
+        "BLOB_READ_WRITE_TOKEN",
+        "DATABASE_URL",
+        "DATABASE_URL_UNPOOLED",
+        "DIRECT_URL",
+        "LEAGUEREPUBLIC_LEAGUE_ID",
+        "NEON_PROJECT_ID",
+        "PGDATABASE",
+        "PGHOST",
+        "PGHOST_UNPOOLED",
+        "PGPASSWORD",
+        "PGUSER",
+        "POSTGRES_DATABASE",
+        "POSTGRES_HOST",
+        "POSTGRES_PASSWORD",
+        "POSTGRES_PRISMA_URL",
+        "POSTGRES_URL",
+        "POSTGRES_URL_NON_POOLING",
+        "POSTGRES_URL_NO_SSL",
+        "POSTGRES_USER"
       ],
       "outputs": [
         ".next/**",
