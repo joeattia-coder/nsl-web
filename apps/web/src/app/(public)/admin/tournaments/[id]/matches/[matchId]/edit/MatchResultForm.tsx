@@ -1,0 +1,260 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
+import { FiSave, FiX } from "react-icons/fi";
+
+type MatchResultFormProps = {
+  tournamentId: string;
+  matchId: string;
+  homeEntry: { id: string; label: string };
+  awayEntry: { id: string; label: string };
+  initialData: {
+    startDateTime: string;
+    endDateTime: string;
+    homeScore: number | null;
+    awayScore: number | null;
+    winnerEntryId: string | null;
+    matchStatus: string;
+  };
+};
+
+const matchStatusOptions = [
+  "SCHEDULED",
+  "IN_PROGRESS",
+  "COMPLETED",
+  "POSTPONED",
+  "CANCELLED",
+  "FORFEIT",
+  "ABANDONED",
+] as const;
+
+function formatStatusLabel(value: string) {
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+export default function MatchResultForm({
+  tournamentId,
+  matchId,
+  homeEntry,
+  awayEntry,
+  initialData,
+}: MatchResultFormProps) {
+  const router = useRouter();
+
+  const [homeScore, setHomeScore] = useState(
+    initialData.homeScore === null ? "" : String(initialData.homeScore)
+  );
+  const [awayScore, setAwayScore] = useState(
+    initialData.awayScore === null ? "" : String(initialData.awayScore)
+  );
+  const [startDateTime, setStartDateTime] = useState(initialData.startDateTime);
+  const [endDateTime, setEndDateTime] = useState(initialData.endDateTime);
+  const [winnerEntryId, setWinnerEntryId] = useState(
+    initialData.winnerEntryId ?? ""
+  );
+  const [matchStatus, setMatchStatus] = useState(initialData.matchStatus);
+
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const parsedHomeScore = homeScore.trim() === "" ? null : Number(homeScore);
+    const parsedAwayScore = awayScore.trim() === "" ? null : Number(awayScore);
+
+    if (
+      parsedHomeScore !== null &&
+      (!Number.isInteger(parsedHomeScore) || parsedHomeScore < 0)
+    ) {
+      setError("Home score must be a whole number greater than or equal to 0.");
+      return;
+    }
+
+    if (
+      parsedAwayScore !== null &&
+      (!Number.isInteger(parsedAwayScore) || parsedAwayScore < 0)
+    ) {
+      setError("Away score must be a whole number greater than or equal to 0.");
+      return;
+    }
+
+    if (
+      winnerEntryId &&
+      winnerEntryId !== homeEntry.id &&
+      winnerEntryId !== awayEntry.id
+    ) {
+      setError("Winner must be either the home or away entry.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      const res = await fetch(`/api/matches/${matchId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          matchDate:
+            startDateTime.trim() === ""
+              ? null
+              : startDateTime.slice(0, 10),
+          matchTime:
+            startDateTime.trim() === ""
+              ? null
+              : startDateTime.slice(11, 16),
+          resultSubmittedAt:
+            endDateTime.trim() === "" ? null : new Date(endDateTime).toISOString(),
+          homeScore: parsedHomeScore,
+          awayScore: parsedAwayScore,
+          winnerEntryId: winnerEntryId || null,
+          matchStatus,
+        }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(data?.details || data?.error || "Failed to update match result.");
+      }
+
+      router.push(`/admin/tournaments/${tournamentId}/matches`);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error ? err.message : "Failed to update match result."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="admin-card admin-player-form-card">
+      <form onSubmit={handleSubmit} className="admin-form">
+        {error ? <p className="admin-form-error">{error}</p> : null}
+
+        <div className="admin-form-grid">
+          <div className="admin-form-field">
+            <label htmlFor="startDateTime" className="admin-label">
+              Match start date/time
+            </label>
+            <input
+              id="startDateTime"
+              type="datetime-local"
+              className="admin-input admin-player-form-input"
+              value={startDateTime}
+              onChange={(e) => setStartDateTime(e.target.value)}
+            />
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="endDateTime" className="admin-label">
+              Match end date/time
+            </label>
+            <input
+              id="endDateTime"
+              type="datetime-local"
+              className="admin-input admin-player-form-input"
+              value={endDateTime}
+              onChange={(e) => setEndDateTime(e.target.value)}
+            />
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="homeScore" className="admin-label">
+              {homeEntry.label} score
+            </label>
+            <input
+              id="homeScore"
+              type="number"
+              min={0}
+              step={1}
+              className="admin-input admin-player-form-input"
+              value={homeScore}
+              onChange={(e) => setHomeScore(e.target.value)}
+            />
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="awayScore" className="admin-label">
+              {awayEntry.label} score
+            </label>
+            <input
+              id="awayScore"
+              type="number"
+              min={0}
+              step={1}
+              className="admin-input admin-player-form-input"
+              value={awayScore}
+              onChange={(e) => setAwayScore(e.target.value)}
+            />
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="winnerEntryId" className="admin-label">
+              Winner
+            </label>
+            <select
+              id="winnerEntryId"
+              className="admin-select admin-player-form-input"
+              value={winnerEntryId}
+              onChange={(e) => setWinnerEntryId(e.target.value)}
+            >
+              <option value="">No winner selected</option>
+              <option value={homeEntry.id}>{homeEntry.label}</option>
+              <option value={awayEntry.id}>{awayEntry.label}</option>
+            </select>
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="matchStatus" className="admin-label">
+              Match status
+            </label>
+            <select
+              id="matchStatus"
+              className="admin-select admin-player-form-input"
+              value={matchStatus}
+              onChange={(e) => setMatchStatus(e.target.value)}
+            >
+              {matchStatusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {formatStatusLabel(option)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="admin-form-actions">
+          <Link
+            href={`/admin/tournaments/${tournamentId}/matches`}
+            className="admin-player-form-button admin-player-form-button-secondary"
+          >
+            <FiX />
+            <span>Cancel</span>
+          </Link>
+
+          <button
+            type="submit"
+            className="admin-player-form-button admin-player-form-button-primary"
+            disabled={saving}
+          >
+            <FiSave />
+            <span>{saving ? "Saving..." : "Save Result"}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

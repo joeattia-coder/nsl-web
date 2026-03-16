@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { FiArrowLeft, FiSave, FiUserPlus } from "react-icons/fi";
 import { notifyAdminAuthChanged } from "@/app/(public)/AdminAuthContext";
+import PasswordField from "@/components/admin/PasswordField";
 
 type UserFormMode = "create" | "edit";
 
@@ -180,7 +181,13 @@ export default function UserForm({
   }, [isEdit, userId]);
 
   const playerOptions = useMemo(() => {
-    return players.filter((player) => !player.userId || player.userId === userId);
+    return players
+      .filter((player) => !player.userId || player.userId === userId)
+      .toSorted((left, right) =>
+        left.fullName.localeCompare(right.fullName, undefined, {
+          sensitivity: "base",
+        })
+      );
   }, [players, userId]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -341,9 +348,8 @@ export default function UserForm({
               <label htmlFor="password" className="admin-label">
                 {isEdit ? "Set New Password" : "Password"}
               </label>
-              <input
+              <PasswordField
                 id="password"
-                type="password"
                 className="admin-input"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -352,6 +358,7 @@ export default function UserForm({
                     ? "Leave blank to keep the current password"
                     : "Required when login is enabled"
                 }
+                autoComplete={isEdit ? "new-password" : "current-password"}
               />
             </div>
 

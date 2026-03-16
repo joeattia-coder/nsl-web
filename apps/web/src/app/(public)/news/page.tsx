@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
@@ -43,10 +44,13 @@ export default async function NewsListingPage() {
                 className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(15,23,42,0.12)]"
               >
                 {article.coverImageUrl ? (
-                  <img
+                  <Image
                     src={article.coverImageUrl}
                     alt={article.title}
+                    width={960}
+                    height={560}
                     className="h-56 w-full object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                   />
                 ) : (
                   <div className="flex h-56 items-center justify-center bg-[radial-gradient(circle_at_top_left,#bfdbfe,transparent_48%),linear-gradient(135deg,#0f172a,#1e40af)] text-sm font-semibold uppercase tracking-[0.3em] text-white/80">

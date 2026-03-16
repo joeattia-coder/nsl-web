@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 type PlayerLike = {
@@ -15,20 +14,6 @@ type EntryLike = {
   id: string;
   entryName: string | null;
   members: EntryMemberLike[];
-};
-
-type StandingAccumulator = {
-  entryId: string;
-  teamName: string;
-  countryCode: string;
-  played: number;
-  won: number;
-  tied: number;
-  lost: number;
-  framesFor: number;
-  framesAgainst: number;
-  diff: number;
-  points: number;
 };
 
 function getEntryDisplayName(entry: EntryLike | null | undefined) {
@@ -139,13 +124,6 @@ function getEntryCountryCode(entry: EntryLike | null | undefined) {
 
   if (codes.length === 1) return codes[0];
   return "";
-}
-
-function sortRows(a: StandingAccumulator, b: StandingAccumulator) {
-  if (b.points !== a.points) return b.points - a.points;
-  if (b.diff !== a.diff) return b.diff - a.diff;
-  if (b.framesFor !== a.framesFor) return b.framesFor - a.framesFor;
-  return a.teamName.localeCompare(b.teamName);
 }
 
 function nextPowerOfTwo(value: number) {

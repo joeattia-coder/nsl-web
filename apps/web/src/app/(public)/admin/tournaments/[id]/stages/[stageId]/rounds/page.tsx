@@ -62,7 +62,7 @@ export default async function StageRoundsPage({
         </p>
       </div>
 
-      <TournamentSubnav tournamentId={stage.tournament.id} active="stages" />
+      <TournamentSubnav tournamentId={stage.tournament.id} active="rounds" />
       <StageSubnav
         tournamentId={stage.tournament.id}
         stageId={stage.id}

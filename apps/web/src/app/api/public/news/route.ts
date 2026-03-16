@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseHomePlacement } from "@/lib/news";
 import { publicApiJson, publicApiOptions } from "@/lib/public-api-response";
 
 export function OPTIONS() {
@@ -9,14 +9,14 @@ export function OPTIONS() {
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const placement = searchParams.get("placement");
+    const placement = parseHomePlacement(searchParams.get("placement"));
     const limitValue = Number(searchParams.get("limit") ?? "0");
     const limit = Number.isFinite(limitValue) && limitValue > 0 ? limitValue : undefined;
 
     const articles = await prisma.newsArticle.findMany({
       where: {
         status: "PUBLISHED",
-        ...(placement ? { homePlacement: placement as any, showOnHomePage: true } : {}),
+        ...(placement ? { homePlacement: placement, showOnHomePage: true } : {}),
       },
       orderBy: [{ homeSortOrder: "asc" }, { publishedAt: "desc" }],
       ...(limit ? { take: limit } : {}),

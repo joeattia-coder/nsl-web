@@ -1,9 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-type AnyObj = Record<string, any>;
+type AnyObj = Record<string, unknown>;
+
+type ApiErrorResponse = {
+  error?: string;
+};
+
+type AsyncGroupData<T> = {
+  key: string;
+  data: T | null;
+  error: string;
+};
 
 type UiGroup = {
   id: string;
@@ -232,13 +243,17 @@ export default function MatchesPage() {
   const [canScrollGroupsRight, setCanScrollGroupsRight] = useState(false);
 
   // Standings state (Groups tab)
-  const [standingsGroups, setStandingsGroups] = useState<StandingsGroup[] | null>(null);
-  const [standingsError, setStandingsError] = useState("");
-  const [standingsLoading, setStandingsLoading] = useState(false);
+  const [standingsState, setStandingsState] = useState<AsyncGroupData<StandingsGroup[]>>({
+    key: "",
+    data: null,
+    error: "",
+  });
 
-  const [knockoutBracket, setKnockoutBracket] = useState<KnockoutBracketResponse | null>(null);
-  const [knockoutError, setKnockoutError] = useState("");
-  const [knockoutLoading, setKnockoutLoading] = useState(false);
+  const [knockoutState, setKnockoutState] = useState<AsyncGroupData<KnockoutBracketResponse>>({
+    key: "",
+    data: null,
+    error: "",
+  });
 
   // Load fixture groups (tournaments)
   useEffect(() => {
@@ -313,22 +328,22 @@ export default function MatchesPage() {
       .filter((g) => g.desc.toLowerCase() !== "other matches");
   }, [groupsRaw, groupIdsWithFixtures]);
 
-  // Ensure selected tournament is valid
-  useEffect(() => {
-    if (!groups.length) return;
-    if (!selectedGroupId || !groups.some((g) => String(g.id) === String(selectedGroupId))) {
-      setSelectedGroupId(groups[0].id);
-    }
+  const activeGroupId = useMemo(() => {
+    if (!groups.length) return "";
+
+    return groups.some((group) => String(group.id) === String(selectedGroupId))
+      ? selectedGroupId
+      : groups[0].id;
   }, [groups, selectedGroupId]);
 
   // Filter matches by selected tournament
   const filteredMatches: UiMatch[] = useMemo(() => {
     const arr = fixturesRaw ?? [];
-    if (!selectedGroupId) return [];
+    if (!activeGroupId) return [];
 
     const byGroup = arr.filter(
       (fx) =>
-        String(fx?.fixtureGroupIdentifier ?? fx?.FixtureGroupIdentifier) === String(selectedGroupId)
+        String(fx?.fixtureGroupIdentifier ?? fx?.FixtureGroupIdentifier) === String(activeGroupId)
     );
 
     byGroup.sort((a, b) => {
@@ -338,11 +353,21 @@ export default function MatchesPage() {
     });
 
     return byGroup.slice(0, 300).map(toUiMatch);
-  }, [fixturesRaw, selectedGroupId]);
+  }, [activeGroupId, fixturesRaw]);
 
   const selectedGroupDesc =
-    groups.find((g) => String(g.id) === String(selectedGroupId))?.desc || "Matches";
+    groups.find((g) => String(g.id) === String(activeGroupId))?.desc || "Matches";
   const roundDesc = filteredMatches[0]?.roundDesc || "";
+
+  const standingsGroups = standingsState.key === activeGroupId ? standingsState.data : null;
+  const standingsError = standingsState.key === activeGroupId ? standingsState.error : "";
+  const standingsLoading =
+    activeTab === "groups" && Boolean(activeGroupId) && standingsState.key !== activeGroupId;
+
+  const knockoutBracket = knockoutState.key === activeGroupId ? knockoutState.data : null;
+  const knockoutError = knockoutState.key === activeGroupId ? knockoutState.error : "";
+  const knockoutLoading =
+    activeTab === "knockout" && Boolean(activeGroupId) && knockoutState.key !== activeGroupId;
 
   // -----------------------------
   // TOURNAMENT PILLS ARROW LOGIC
@@ -399,54 +424,52 @@ export default function MatchesPage() {
   // -----------------------------
   useEffect(() => {
     if (activeTab !== "groups") return;
-    if (!selectedGroupId) return;
+    if (!activeGroupId) return;
 
     let cancelled = false;
 
-    setStandingsLoading(true);
-    setStandingsError("");
-    setStandingsGroups(null);
-
     fetch(
   `/api/public/standings?fixtureGroupIdentifier=${encodeURIComponent(
-    selectedGroupId
+    activeGroupId
   )}`
 )
       .then(async (r) => {
-        const data = (await r.json()) as StandingsApiResponse;
-        if (!r.ok) throw new Error((data as any)?.error || `Request failed (${r.status})`);
+        const data = (await r.json()) as StandingsApiResponse & ApiErrorResponse;
+        if (!r.ok) throw new Error(data.error || `Request failed (${r.status})`);
         return data;
       })
       .then((data) => {
         if (cancelled) return;
 
         const arr = Array.isArray(data?.groups) ? data.groups : [];
-        setStandingsGroups(arr);
-        setStandingsLoading(false);
+        setStandingsState({
+          key: activeGroupId,
+          data: arr,
+          error: "",
+        });
       })
       .catch((err) => {
         if (cancelled) return;
-        setStandingsError(err?.message || "Failed to load standings");
-        setStandingsLoading(false);
+        setStandingsState({
+          key: activeGroupId,
+          data: null,
+          error: err instanceof Error ? err.message : "Failed to load standings",
+        });
       });
 
     return () => {
       cancelled = true;
     };
-  }, [activeTab, selectedGroupId]);
+  }, [activeGroupId, activeTab]);
 
   useEffect(() => {
     if (activeTab !== "knockout") return;
-    if (!selectedGroupId) return;
+    if (!activeGroupId) return;
 
     let cancelled = false;
 
-    setKnockoutLoading(true);
-    setKnockoutError("");
-    setKnockoutBracket(null);
-
     fetch(
-      `/api/public/knockout-bracket?fixtureGroupIdentifier=${encodeURIComponent(selectedGroupId)}`
+      `/api/public/knockout-bracket?fixtureGroupIdentifier=${encodeURIComponent(activeGroupId)}`
     )
       .then(async (r) => {
         const data = (await r.json()) as KnockoutBracketResponse & { error?: string };
@@ -456,19 +479,25 @@ export default function MatchesPage() {
       .then((data) => {
         if (cancelled) return;
 
-        setKnockoutBracket(data);
-        setKnockoutLoading(false);
+        setKnockoutState({
+          key: activeGroupId,
+          data,
+          error: "",
+        });
       })
       .catch((err) => {
         if (cancelled) return;
-        setKnockoutError(err?.message || "Failed to load knockout bracket");
-        setKnockoutLoading(false);
+        setKnockoutState({
+          key: activeGroupId,
+          data: null,
+          error: err instanceof Error ? err.message : "Failed to load knockout bracket",
+        });
       });
 
     return () => {
       cancelled = true;
     };
-  }, [activeTab, selectedGroupId]);
+  }, [activeGroupId, activeTab]);
 
   const totalStandingsPlayers = useMemo(() => {
     if (!standingsGroups) return 0;
@@ -551,7 +580,7 @@ export default function MatchesPage() {
               <button
                 key={g.id}
                 type="button"
-                className={`group-pill ${String(selectedGroupId) === String(g.id) ? "active" : ""}`}
+                className={`group-pill ${String(activeGroupId) === String(g.id) ? "active" : ""}`}
                 onClick={() => setSelectedGroupId(g.id)}
                 title={g.desc}
               >
@@ -601,9 +630,11 @@ export default function MatchesPage() {
                       <div className="name-last">{m.homeParts.last || m.homeName}</div>
                       {m.homeCountryCode ? (
                         <div className="name-flag-row name-flag-row-left">
-                          <img
+                          <Image
                             src={`https://flagcdn.com/w40/${m.homeCountryCode.toLowerCase()}.png`}
                             alt={m.homeCountryCode}
+                            width={40}
+                            height={30}
                             className="name-flag-img"
                             title={m.homeCountryCode}
                           />
@@ -613,15 +644,19 @@ export default function MatchesPage() {
 
                     <div className="match-icon">
                       {m.homePlayerPhotoUrl ? (
-                        <img
+                        <Image
                           src={m.homePlayerPhotoUrl}
                           alt={m.homeName}
+                          width={72}
+                          height={72}
                           className="match-player-photo"
                         />
                       ) : (
-                        <img
+                        <Image
                           src="/images/player_silhouette.svg"
                           alt=""
+                          width={72}
+                          height={72}
                           className="match-silhouette"
                         />
                       )}
@@ -631,15 +666,19 @@ export default function MatchesPage() {
 
                     <div className="match-icon">
                       {m.roadPlayerPhotoUrl ? (
-                        <img
+                        <Image
                           src={m.roadPlayerPhotoUrl}
                           alt={m.roadName}
+                          width={72}
+                          height={72}
                           className="match-player-photo"
                         />
                       ) : (
-                        <img
+                        <Image
                           src="/images/player_silhouette.svg"
                           alt=""
+                          width={72}
+                          height={72}
                           className="match-silhouette"
                         />
                       )}
@@ -650,9 +689,11 @@ export default function MatchesPage() {
                       <div className="name-last">{m.roadParts.last || m.roadName}</div>
                       {m.roadCountryCode ? (
                         <div className="name-flag-row name-flag-row-right">
-                          <img
+                          <Image
                             src={`https://flagcdn.com/w40/${m.roadCountryCode.toLowerCase()}.png`}
                             alt={m.roadCountryCode}
+                            width={40}
+                            height={30}
                             className="name-flag-img"
                             title={m.roadCountryCode}
                           />
@@ -738,9 +779,11 @@ export default function MatchesPage() {
                                   <div className="knockout-player-last">{topParts.last || slot.top.name}</div>
                                 </div>
                                 {slot.top.countryCode ? (
-                                  <img
+                                    <Image
                                     src={`https://flagcdn.com/w40/${slot.top.countryCode.toLowerCase()}.png`}
                                     alt={slot.top.countryCode}
+                                      width={40}
+                                      height={30}
                                     className="knockout-flag-img"
                                     title={slot.top.countryCode}
                                   />
@@ -759,9 +802,11 @@ export default function MatchesPage() {
                                   </div>
                                 </div>
                                 {slot.bottom.countryCode ? (
-                                  <img
+                                  <Image
                                     src={`https://flagcdn.com/w40/${slot.bottom.countryCode.toLowerCase()}.png`}
                                     alt={slot.bottom.countryCode}
+                                    width={40}
+                                    height={30}
                                     className="knockout-flag-img"
                                     title={slot.bottom.countryCode}
                                   />

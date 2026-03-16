@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -390,9 +391,11 @@ export default function VenueForm({ mode, venueId }: VenueFormProps) {
 
                 {logoUrl ? (
                   <div className="admin-player-photo-preview admin-venue-logo-preview">
-                    <img
+                    <Image
                       src={logoUrl}
                       alt="Venue logo preview"
+                      width={96}
+                      height={96}
                       className="admin-player-photo-preview-img"
                     />
                   </div>

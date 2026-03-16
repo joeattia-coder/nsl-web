@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
 import { useRouter } from "next/navigation";
@@ -28,7 +29,6 @@ export default function LeagueForm({ mode, leagueId }: LeagueFormProps) {
   const [isActive, setIsActive] = useState(true);
   const [logoUrl, setLogoUrl] = useState("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string>("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(isEdit);
@@ -64,7 +64,6 @@ export default function LeagueForm({ mode, leagueId }: LeagueFormProps) {
     let uploadedLogoUrl = logoUrl;
     try {
       if (logoFile) {
-        setUploadingLogo(true);
         const formData = new FormData();
         formData.append("file", logoFile);
         const uploadRes = await fetch("/api/upload/league-logo", {
@@ -109,7 +108,6 @@ export default function LeagueForm({ mode, leagueId }: LeagueFormProps) {
       );
     } finally {
       setSaving(false);
-      setUploadingLogo(false);
     }
   }
 
@@ -207,7 +205,7 @@ export default function LeagueForm({ mode, leagueId }: LeagueFormProps) {
                 </p>
                 {logoPreview ? (
                   <div className="admin-player-photo-preview">
-                    <img
+                    <Image
                       src={logoPreview}
                       alt="League logo preview"
                       width={88}
@@ -217,7 +215,7 @@ export default function LeagueForm({ mode, leagueId }: LeagueFormProps) {
                   </div>
                 ) : logoUrl ? (
                   <div className="admin-player-photo-preview">
-                    <img
+                    <Image
                       src={logoUrl}
                       alt="League logo preview"
                       width={88}

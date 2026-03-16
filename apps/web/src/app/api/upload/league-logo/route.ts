@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const publicUrl = `/uploads/leagues/${fileName}`;
 
     return NextResponse.json({ url: publicUrl });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to upload league logo" },
       { status: 500 }

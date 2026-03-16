@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiUser, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-type AnyObj = Record<string, any>;
+type AnyObj = Record<string, unknown>;
 
 type UiMatch = {
   id: string;
@@ -467,7 +468,14 @@ export default function Page() {
               {featuredNews.map((article) => (
                 <Link key={article.id} href={`/news/${article.slug}`} className="featured-news-card">
                   {article.coverImageUrl ? (
-                    <img src={article.coverImageUrl} alt={article.title} className="featured-news-thumbnail" />
+                    <Image
+                      src={article.coverImageUrl}
+                      alt={article.title}
+                      width={640}
+                      height={360}
+                      className="featured-news-thumbnail"
+                      sizes="(max-width: 768px) 100vw, 360px"
+                    />
                   ) : (
                     <div className="featured-news-thumbnail featured-news-media-fallback">NSL</div>
                   )}
@@ -546,7 +554,13 @@ export default function Page() {
                   <div className="player">
                     <div className="player-avatar icon">
                       {m.homePlayerPhotoUrl ? (
-                        <img src={m.homePlayerPhotoUrl} alt={m.home} className="player-avatar-photo" />
+                        <Image
+                          src={m.homePlayerPhotoUrl}
+                          alt={m.home}
+                          width={72}
+                          height={72}
+                          className="player-avatar-photo"
+                        />
                       ) : (
                         <FiUser size={28} />
                       )}
@@ -555,9 +569,11 @@ export default function Page() {
                       <div className="player-name">{m.home}</div>
                       {m.homeCountryCode ? (
                         <div className="player-flag-row">
-                          <img
+                          <Image
                             src={`https://flagcdn.com/w40/${m.homeCountryCode.toLowerCase()}.png`}
                             alt={m.homeCountryCode}
+                            width={40}
+                            height={30}
                             className="player-flag-img"
                             title={m.homeCountryCode}
                           />
@@ -573,9 +589,11 @@ export default function Page() {
                       <div className="player-name right">{m.away}</div>
                       {m.awayCountryCode ? (
                         <div className="player-flag-row player-flag-row-right">
-                          <img
+                          <Image
                             src={`https://flagcdn.com/w40/${m.awayCountryCode.toLowerCase()}.png`}
                             alt={m.awayCountryCode}
+                            width={40}
+                            height={30}
                             className="player-flag-img"
                             title={m.awayCountryCode}
                           />
@@ -584,7 +602,13 @@ export default function Page() {
                     </div>
                     <div className="player-avatar icon">
                       {m.awayPlayerPhotoUrl ? (
-                        <img src={m.awayPlayerPhotoUrl} alt={m.away} className="player-avatar-photo" />
+                        <Image
+                          src={m.awayPlayerPhotoUrl}
+                          alt={m.away}
+                          width={72}
+                          height={72}
+                          className="player-avatar-photo"
+                        />
                       ) : (
                         <FiUser size={28} />
                       )}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { FaFacebookF, FaGoogle } from "react-icons/fa6";
+import PasswordField from "@/components/admin/PasswordField";
 import { useAdminAuth } from "../AdminAuthContext";
 
 function getAuthMessage(errorCode: string | null) {
@@ -97,8 +98,7 @@ export default function LoginForm() {
 
       <label className="admin-form-field">
         <span className="admin-label">Password</span>
-        <input
-          type="password"
+        <PasswordField
           className="admin-input"
           value={password}
           onChange={(event) => setPassword(event.target.value)}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
@@ -29,7 +30,14 @@ export default async function NewsArticlePage({ params }: PageProps) {
         <div className="news-article-flow text-slate-200">
           {article.coverImageUrl ? (
             <figure className="news-article-hero-image">
-              <img src={article.coverImageUrl} alt={article.title} className="block h-auto w-full" />
+              <Image
+                src={article.coverImageUrl}
+                alt={article.title}
+                width={1600}
+                height={900}
+                className="block h-auto w-full"
+                sizes="(max-width: 768px) 100vw, 1200px"
+              />
             </figure>
           ) : null}
 

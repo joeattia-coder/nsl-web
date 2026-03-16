@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import {
@@ -373,9 +374,11 @@ export default function TournamentEntriesManager({
                           </td>
                           <td className="admin-player-country-cell admin-tournament-entry-centered-cell">
                             {countryCode ? (
-                              <img
+                              <Image
                                 src={`https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`}
                                 alt={entry.countryName || countryCode}
+                                width={40}
+                                height={30}
                                 className="admin-player-country-flag-img"
                                 title={entry.countryName || countryCode}
                               />

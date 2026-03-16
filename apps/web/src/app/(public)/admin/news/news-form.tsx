@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -318,7 +319,13 @@ export default function NewsForm({ mode, articleId }: NewsFormProps) {
                 </div>
                 {coverImageUrl ? (
                   <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                    <img src={coverImageUrl} alt="Cover preview" className="h-52 w-full object-cover" />
+                    <Image
+                      src={coverImageUrl}
+                      alt="Cover preview"
+                      width={960}
+                      height={416}
+                      className="h-52 w-full object-cover"
+                    />
                   </div>
                 ) : null}
               </div>

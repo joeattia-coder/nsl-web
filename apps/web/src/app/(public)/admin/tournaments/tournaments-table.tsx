@@ -7,10 +7,11 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
-import { FiEdit2, FiLayers, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type TournamentRow = {
   id: string;
+  seasonId: string;
   tournamentName: string;
   seasonName: string;
   venueName: string;
@@ -19,31 +20,29 @@ type TournamentRow = {
   isPublished: boolean;
   startDate: string;
   endDate: string;
+  entriesCount: number;
+  matchesCount: number;
+};
+
+type SeasonOption = {
+  id: string;
+  seasonName: string;
+  startDate: string;
+  endDate: string;
 };
 
 type TournamentsTableProps = {
   tournaments: TournamentRow[];
+  seasons: SeasonOption[];
 };
 
 type SortKey =
   | "tournamentName"
-  | "seasonName"
-  | "venueName"
   | "participantType"
   | "status"
   | "isPublished"
-  | "startDate"
-  | "endDate";
-
-function formatDate(date: string) {
-  if (!date) return "—";
-
-  return new Intl.DateTimeFormat("en-CA", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(date));
-}
+  | "entriesCount"
+  | "matchesCount";
 
 function formatStatus(status: string) {
   return status
@@ -55,6 +54,7 @@ function formatStatus(status: string) {
 
 export default function TournamentsTable({
   tournaments,
+  seasons,
 }: TournamentsTableProps) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("tournamentName");
@@ -64,12 +64,36 @@ export default function TournamentsTable({
   const [deletingSingle, setDeletingSingle] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const defaultSeasonId = useMemo(() => {
+    const today = new Date();
+
+    const currentSeason = seasons.find((season) => {
+      if (!season.startDate && !season.endDate) return false;
+
+      const seasonStart = season.startDate ? new Date(season.startDate) : null;
+      const seasonEnd = season.endDate ? new Date(season.endDate) : null;
+
+      const startsBeforeToday = seasonStart ? seasonStart <= today : true;
+      const endsAfterToday = seasonEnd ? seasonEnd >= today : true;
+
+      return startsBeforeToday && endsAfterToday;
+    });
+
+    return currentSeason?.id ?? seasons[0]?.id ?? "";
+  }, [seasons]);
+
+  const [selectedSeasonId, setSelectedSeasonId] = useState(defaultSeasonId);
+
   const filteredTournaments = useMemo(() => {
     const term = search.trim().toLowerCase();
 
-    const rows = !term
-      ? tournaments
-      : tournaments.filter((tournament) => {
+    const rowsBySeason = selectedSeasonId
+      ? tournaments.filter((tournament) => tournament.seasonId === selectedSeasonId)
+      : tournaments;
+
+    const rowsBySearch = !term
+      ? rowsBySeason
+      : rowsBySeason.filter((tournament) => {
           return (
             tournament.tournamentName.toLowerCase().includes(term) ||
             tournament.seasonName.toLowerCase().includes(term) ||
@@ -81,23 +105,19 @@ export default function TournamentsTable({
         });
 
     return sortRows(
-      rows,
+      rowsBySearch,
       (tournament) => {
         switch (sortKey) {
-          case "seasonName":
-            return tournament.seasonName;
-          case "venueName":
-            return tournament.venueName;
           case "participantType":
             return tournament.participantType;
           case "status":
             return formatStatus(tournament.status);
           case "isPublished":
             return tournament.isPublished;
-          case "startDate":
-            return tournament.startDate;
-          case "endDate":
-            return tournament.endDate;
+          case "entriesCount":
+            return tournament.entriesCount;
+          case "matchesCount":
+            return tournament.matchesCount;
           case "tournamentName":
           default:
             return tournament.tournamentName;
@@ -105,7 +125,19 @@ export default function TournamentsTable({
       },
       sortDirection
     );
-  }, [tournaments, search, sortDirection, sortKey]);
+  }, [tournaments, selectedSeasonId, search, sortDirection, sortKey]);
+
+  const seasonLabel =
+    seasons.find((season) => season.id === selectedSeasonId)?.seasonName ??
+    "selected season";
+
+  const handleSeasonChange = (seasonId: string) => {
+    setSelectedSeasonId(seasonId);
+  };
+
+  const rowsForSeason = selectedSeasonId
+    ? tournaments.filter((tournament) => tournament.seasonId === selectedSeasonId)
+    : tournaments;
 
   const handleSort = (columnKey: SortKey) => {
     if (sortKey === columnKey) {
@@ -168,10 +200,24 @@ export default function TournamentsTable({
 
       <div className="admin-players-toolbar">
         <div className="admin-players-toolbar-left">
+          <select
+            className="admin-select admin-players-search admin-tournaments-season-filter"
+            value={selectedSeasonId}
+            onChange={(e) => handleSeasonChange(e.target.value)}
+            aria-label="Filter tournaments by season"
+            style={{ width: "220px", minWidth: "220px", marginRight: "12px" }}
+          >
+            {seasons.map((season) => (
+              <option key={season.id} value={season.id}>
+                {season.seasonName}
+              </option>
+            ))}
+          </select>
+
           <input
             type="text"
             className="admin-search-input admin-players-search"
-            placeholder="Search tournaments..."
+            placeholder={`Search ${seasonLabel} tournaments...`}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -201,20 +247,6 @@ export default function TournamentsTable({
                   onSort={handleSort}
                 />
                 <SortableHeader
-                  label="Season"
-                  columnKey="seasonName"
-                  sortKey={sortKey}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                />
-                <SortableHeader
-                  label="Venue"
-                  columnKey="venueName"
-                  sortKey={sortKey}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                />
-                <SortableHeader
                   label="Type"
                   columnKey="participantType"
                   sortKey={sortKey}
@@ -236,15 +268,15 @@ export default function TournamentsTable({
                   onSort={handleSort}
                 />
                 <SortableHeader
-                  label="Start"
-                  columnKey="startDate"
+                  label="Entries"
+                  columnKey="entriesCount"
                   sortKey={sortKey}
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
                 <SortableHeader
-                  label="End"
-                  columnKey="endDate"
+                  label="Matches"
+                  columnKey="matchesCount"
                   sortKey={sortKey}
                   sortDirection={sortDirection}
                   onSort={handleSort}
@@ -256,26 +288,28 @@ export default function TournamentsTable({
             <tbody>
               {filteredTournaments.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="admin-players-empty">
-                    No tournaments found.
+                  <td colSpan={7} className="admin-players-empty">
+                    {rowsForSeason.length === 0
+                      ? "No tournaments found for this season."
+                      : "No tournaments match your search."}
                   </td>
                 </tr>
               ) : (
                 filteredTournaments.map((tournament) => (
                   <tr key={tournament.id}>
                     <td>
-                      <span className="admin-player-full-name">
+                      <Link
+                        href={`/admin/tournaments/${tournament.id}/edit`}
+                        className="admin-player-full-name admin-tournament-name-link"
+                      >
                         {tournament.tournamentName}
-                      </span>
+                      </Link>
                     </td>
-                    <td>{tournament.seasonName || "—"}</td>
-
-                    <td>{tournament.venueName || "—"}</td>
                     <td>{tournament.participantType}</td>
                     <td>{formatStatus(tournament.status)}</td>
                     <td>{tournament.isPublished ? "Yes" : "No"}</td>
-                    <td>{formatDate(tournament.startDate)}</td>
-                    <td>{formatDate(tournament.endDate)}</td>
+                    <td>{tournament.entriesCount}</td>
+                    <td>{tournament.matchesCount}</td>
 
                     <td>
                       <div className="admin-player-row-actions">
@@ -286,15 +320,6 @@ export default function TournamentsTable({
                           title="Edit"
                         >
                           <FiEdit2 />
-                        </Link>
-
-                        <Link
-                          href={`/admin/tournaments/${tournament.id}/stages`}
-                          className="admin-icon-action"
-                          aria-label={`Manage stages for ${tournament.tournamentName}`}
-                          title="Stages"
-                        >
-                          <FiLayers />
                         </Link>
 
                         <button

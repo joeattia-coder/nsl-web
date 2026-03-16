@@ -28,6 +28,12 @@ type GroupsTableProps = {
 
 type SortKey = "groupName" | "sequence" | "assignedCount";
 
+type GenerateMatchesResponse = {
+  createdCount?: number;
+  details?: string;
+  error?: string;
+};
+
 export default function GroupsTable({
   tournamentId,
   stageId,
@@ -187,9 +193,9 @@ export default function GroupsTable({
 
       const rawText = await res.text();
 
-      let data: any = null;
+      let data: GenerateMatchesResponse | null = null;
       try {
-        data = rawText ? JSON.parse(rawText) : null;
+        data = rawText ? (JSON.parse(rawText) as GenerateMatchesResponse) : null;
       } catch {
         data = null;
       }

@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 import { prisma } from "@/lib/prisma";
 import { publicApiJson, publicApiOptions } from "@/lib/public-api-response";
 

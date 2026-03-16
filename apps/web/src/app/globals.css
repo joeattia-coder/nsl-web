@@ -2440,6 +2440,39 @@ body {
   gap: 8px;
 }
 
+.password-field {
+  position: relative;
+}
+
+.password-field-input {
+  padding-right: 44px;
+}
+
+.password-field-toggle {
+  position: absolute;
+  top: 50%;
+  right: 1px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: calc(100% - 2px);
+  border: 0;
+  background: transparent;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.password-field-toggle:hover {
+  color: #111827;
+}
+
+.password-field-toggle:focus-visible {
+  outline: 2px solid #111827;
+  outline-offset: -2px;
+}
+
 .admin-form-field-full {
   grid-column: 1 / -1;
 }
@@ -2559,6 +2592,10 @@ body {
 .admin-players-search {
   max-width: 360px;
   border-radius: 6px;
+}
+
+.admin-tournaments-season-filter {
+  height: 42px;
 }
 
 .admin-players-toolbar-right {
@@ -2723,6 +2760,16 @@ body {
 .admin-player-full-name {
   font-weight: 600;
   color: #111827;
+}
+
+.admin-tournament-name-link {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.admin-tournament-name-link:hover {
+  color: #6b7280;
+  text-decoration: none;
 }
 
 .admin-players-actions-col {

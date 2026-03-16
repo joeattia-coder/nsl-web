@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   SortableHeader,
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { FiEdit2 } from "react-icons/fi";
 
 type MatchRow = {
   id: string;
@@ -32,8 +34,6 @@ type TournamentMatchesTableProps = {
 };
 
 type SortKey =
-  | "stageName"
-  | "roundName"
   | "groupName"
   | "homeName"
   | "awayName"
@@ -71,6 +71,7 @@ function formatScore(homeScore: number | null, awayScore: number | null) {
 }
 
 export default function TournamentMatchesTable({
+  tournamentId,
   matches,
 }: TournamentMatchesTableProps) {
   const [search, setSearch] = useState("");
@@ -84,8 +85,6 @@ export default function TournamentMatchesTable({
       ? matches
       : matches.filter((match) => {
           return (
-            match.stageName.toLowerCase().includes(term) ||
-            match.roundName.toLowerCase().includes(term) ||
             match.groupName.toLowerCase().includes(term) ||
             match.homeName.toLowerCase().includes(term) ||
             match.awayName.toLowerCase().includes(term) ||
@@ -121,9 +120,8 @@ export default function TournamentMatchesTable({
             return formatStatus(match.matchStatus);
           case "venueName":
             return match.venueName;
-          case "stageName":
           default:
-            return match.stageName;
+            return match.matchDate;
         }
       },
       sortDirection
@@ -159,20 +157,6 @@ export default function TournamentMatchesTable({
           <table className="admin-table admin-players-table">
             <thead>
               <tr>
-                <SortableHeader
-                  label="Stage"
-                  columnKey="stageName"
-                  sortKey={sortKey}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                />
-                <SortableHeader
-                  label="Round"
-                  columnKey="roundName"
-                  sortKey={sortKey}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                />
                 <SortableHeader
                   label="Group"
                   columnKey="groupName"
@@ -236,31 +220,20 @@ export default function TournamentMatchesTable({
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
+                <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>
 
             <tbody>
               {filteredMatches.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="admin-players-empty">
+                  <td colSpan={10} className="admin-players-empty">
                     No matches found.
                   </td>
                 </tr>
               ) : (
                 filteredMatches.map((match) => (
                   <tr key={match.id}>
-                    <td>
-                      <div className="admin-match-stage-cell">
-                        <div className="admin-player-full-name">{match.stageName}</div>
-                        <div className="admin-match-meta-text">{match.stageType}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="admin-match-stage-cell">
-                        <div>{match.roundName}</div>
-                        <div className="admin-match-meta-text">{match.roundType}</div>
-                      </div>
-                    </td>
                     <td>{match.groupName || "—"}</td>
                     <td>{match.homeName}</td>
                     <td>{match.awayName}</td>
@@ -270,6 +243,18 @@ export default function TournamentMatchesTable({
                     <td>{match.matchTime || "—"}</td>
                     <td>{formatStatus(match.matchStatus)}</td>
                     <td>{match.venueName || "—"}</td>
+                    <td>
+                      <div className="admin-player-row-actions">
+                        <Link
+                          href={`/admin/tournaments/${tournamentId}/matches/${match.id}/edit`}
+                          className="admin-icon-action admin-icon-action-edit"
+                          aria-label={`Edit ${match.homeName} vs ${match.awayName}`}
+                          title="Edit results"
+                        >
+                          <FiEdit2 />
+                        </Link>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}

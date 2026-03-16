@@ -4,16 +4,27 @@ import TournamentsTable from "./tournaments-table";
 export const dynamic = "force-dynamic";
 
 export default async function AdminTournamentsPage() {
+  const seasons = await prisma.season.findMany({
+    orderBy: [{ startDate: "desc" }, { createdAt: "desc" }],
+  });
+
   const tournaments = await prisma.tournament.findMany({
     include: {
       season: true,
       venue: true,
+      _count: {
+        select: {
+          entries: true,
+          matches: true,
+        },
+      },
     },
     orderBy: [{ createdAt: "desc" }],
   });
 
   const formattedTournaments = tournaments.map((tournament) => ({
     id: tournament.id,
+    seasonId: tournament.seasonId,
     tournamentName: tournament.tournamentName,
     seasonName: tournament.season.seasonName,
     venueName: tournament.venue?.venueName ?? "",
@@ -22,6 +33,15 @@ export default async function AdminTournamentsPage() {
     isPublished: tournament.isPublished,
     startDate: tournament.startDate ? tournament.startDate.toISOString() : "",
     endDate: tournament.endDate ? tournament.endDate.toISOString() : "",
+    entriesCount: tournament._count.entries,
+    matchesCount: tournament._count.matches,
+  }));
+
+  const formattedSeasons = seasons.map((season) => ({
+    id: season.id,
+    seasonName: season.seasonName,
+    startDate: season.startDate ? season.startDate.toISOString() : "",
+    endDate: season.endDate ? season.endDate.toISOString() : "",
   }));
 
   return (
@@ -33,7 +53,10 @@ export default async function AdminTournamentsPage() {
         </p>
       </div>
 
-      <TournamentsTable tournaments={formattedTournaments} />
+      <TournamentsTable
+        tournaments={formattedTournaments}
+        seasons={formattedSeasons}
+      />
     </section>
   );
 }

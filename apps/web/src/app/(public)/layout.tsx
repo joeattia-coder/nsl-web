@@ -79,6 +79,8 @@ function LayoutChrome({
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const showAdminNavigation = isAdminRoute || Boolean(currentUser);
+  const closeMenu = () => setMenuOpen(false);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const visibleSidebarItems = adminSidebarItems.filter((item) => {
     if (!item.permissions || item.permissions.length === 0) {
@@ -102,7 +104,7 @@ function LayoutChrome({
 
   const handleLogout = async () => {
     await logout();
-    setMenuOpen(false);
+    closeMenu();
     router.push("/");
     router.refresh();
   };
@@ -114,19 +116,22 @@ function LayoutChrome({
         className="mobile-menu-button"
         aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
         aria-expanded={mobileMenuOpen}
-        onClick={() => setMobileMenuOpen((prev) => !prev)}
+        onClick={() => {
+          closeMenu();
+          setMobileMenuOpen((prev) => !prev);
+        }}
       >
         {mobileMenuOpen ? <FiX /> : <FiMenu />}
       </button>
 
       <div
         className={`mobile-sidebar-overlay${mobileMenuOpen ? " is-open" : ""}`}
-        onClick={() => setMobileMenuOpen(false)}
+        onClick={closeMobileMenu}
       />
 
       <aside className={`sidebar${mobileMenuOpen ? " sidebar-open" : ""}`}>
         <div className="sidebar-logo">
-          <Link href={showAdminNavigation ? "/admin" : "/"} onClick={() => setMobileMenuOpen(false)}>
+          <Link href={showAdminNavigation ? "/admin" : "/"} onClick={closeMobileMenu}>
             <Image
               src="/images/nsl-logo.svg"
               alt="National Snooker League Logo"
@@ -153,7 +158,7 @@ function LayoutChrome({
                       <Link
                         href={item.href}
                         className="sidebar-item"
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={closeMobileMenu}
                       >
                         <Icon className="sidebar-icon" />
                         <span className="sidebar-label">{item.label}</span>
@@ -168,7 +173,7 @@ function LayoutChrome({
                   <Link
                     href="/match-hub"
                     className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     <FiActivity className="sidebar-icon" />
                     <span className="sidebar-label">Match Hub</span>
@@ -179,7 +184,7 @@ function LayoutChrome({
                   <Link
                     href="/competitions"
                     className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     <FiAward className="sidebar-icon" />
                     <span className="sidebar-label">Competitions</span>
@@ -190,7 +195,7 @@ function LayoutChrome({
                   <Link
                     href="/statistics"
                     className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     <FiBarChart2 className="sidebar-icon" />
                     <span className="sidebar-label">Statistics</span>
@@ -247,7 +252,7 @@ function LayoutChrome({
                       href="/profile"
                       className="admin-user-menu-item"
                       role="menuitem"
-                      onClick={() => setMenuOpen(false)}
+                      onClick={closeMenu}
                     >
                       Profile
                     </Link>
@@ -255,7 +260,7 @@ function LayoutChrome({
                       href="/settings"
                       className="admin-user-menu-item"
                       role="menuitem"
-                      onClick={() => setMenuOpen(false)}
+                      onClick={closeMenu}
                     >
                       Settings
                     </Link>
@@ -295,7 +300,7 @@ export default function PublicLayout({
 
   useEffect(() => {
     setMobileMenuOpen(false);
-  }, [pathname]);
+  }, [pathname, setMobileMenuOpen]);
 
   return (
     <AdminAuthProvider enabled>

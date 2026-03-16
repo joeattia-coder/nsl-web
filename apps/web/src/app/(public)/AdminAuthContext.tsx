@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { CurrentAdminUserSummary } from "@/lib/admin-auth-types";
 
@@ -41,7 +41,7 @@ export function AdminAuthProvider({
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
 
-  async function loadCurrentUser() {
+  const loadCurrentUser = useCallback(async (signal?: AbortSignal) => {
     if (!enabled) {
       setCurrentUser(null);
       setIsLoading(false);
@@ -53,6 +53,7 @@ export function AdminAuthProvider({
     try {
       const response = await fetch("/api/admin/me", {
         cache: "no-store",
+        signal,
       });
 
       if (!response.ok) {
@@ -61,66 +62,36 @@ export function AdminAuthProvider({
       }
 
       const data = (await response.json()) as CurrentAdminUserSummary;
+      if (signal?.aborted) {
+        return null;
+      }
+
       setCurrentUser(data);
       return data;
     } catch (error) {
+      if (signal?.aborted) {
+        return null;
+      }
+
       console.error("Failed to load current admin user:", error);
       setCurrentUser(null);
       return null;
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
     }
-  }
+  }, [enabled]);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
-    void (async () => {
-      if (!enabled) {
-        if (!cancelled) {
-          setCurrentUser(null);
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      setIsLoading(true);
-
-      try {
-        const response = await fetch("/api/admin/me", {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          if (!cancelled) {
-            setCurrentUser(null);
-          }
-
-          return;
-        }
-
-        const data = (await response.json()) as CurrentAdminUserSummary;
-
-        if (!cancelled) {
-          setCurrentUser(data);
-        }
-      } catch (error) {
-        console.error("Failed to load current admin user:", error);
-
-        if (!cancelled) {
-          setCurrentUser(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    })();
+    void loadCurrentUser(controller.signal);
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
-  }, [enabled, pathname]);
+  }, [loadCurrentUser, pathname]);
 
   useEffect(() => {
     if (!enabled) {
@@ -136,7 +107,7 @@ export function AdminAuthProvider({
     return () => {
       window.removeEventListener(ADMIN_AUTH_CHANGED_EVENT, handleAuthChanged);
     };
-  }, [enabled, pathname]);
+  }, [enabled, loadCurrentUser]);
 
   const value = useMemo<AdminAuthContextValue>(
     () => ({
@@ -153,7 +124,7 @@ export function AdminAuthProvider({
       },
       refreshCurrentUser: loadCurrentUser,
     }),
-    [currentUser, isLoading]
+    [currentUser, isLoading, loadCurrentUser]
   );
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;

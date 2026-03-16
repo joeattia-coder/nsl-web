@@ -187,18 +187,6 @@ function resolvePermissions(user: NonNullable<LoadedAdminUser>) {
   return Array.from(resolved).sort();
 }
 
-async function loadAdminUserByEmail(email: string) {
-  return prisma.user.findFirst({
-    where: {
-      OR: [
-        { email: email.toLowerCase() },
-        { normalizedEmail: email.toLowerCase() },
-      ],
-    },
-    select: currentAdminSelect,
-  });
-}
-
 async function loadAdminUserById(userId: string) {
   return prisma.user.findFirst({
     where: {

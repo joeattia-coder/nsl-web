@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { FiArrowLeft, FiFilm, FiPlus, FiSave, FiUpload, FiX } from "react-icons/fi";
+import { FiArrowLeft, FiPlus, FiSave, FiUpload, FiX } from "react-icons/fi";
 import {
   extractYouTubeVideoId,
   getVideoPresentation,

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
+import PasswordField from "@/components/admin/PasswordField";
 
 export default function ResetPasswordForm() {
   const router = useRouter();
@@ -102,8 +103,7 @@ export default function ResetPasswordForm() {
     <form className="login-form" onSubmit={handleConfirmReset}>
       <label className="admin-form-field">
         <span className="admin-label">New password</span>
-        <input
-          type="password"
+        <PasswordField
           className="admin-input"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
@@ -114,8 +114,7 @@ export default function ResetPasswordForm() {
 
       <label className="admin-form-field">
         <span className="admin-label">Confirm password</span>
-        <input
-          type="password"
+        <PasswordField
           className="admin-input"
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}

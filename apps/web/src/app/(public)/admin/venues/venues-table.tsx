@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
@@ -195,9 +196,11 @@ export default function VenuesTable({ venues }: VenuesTableProps) {
                     <td>
                       <div className="admin-venue-name-cell">
                         {venue.logoUrl ? (
-                          <img
+                          <Image
                             src={venue.logoUrl}
                             alt={`${venue.venueName} logo`}
+                            width={44}
+                            height={44}
                             className="admin-venue-logo-thumb"
                           />
                         ) : (
