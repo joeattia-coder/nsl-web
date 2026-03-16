@@ -29,6 +29,24 @@ npm run lint:web
 npm run seed:web
 ```
 
+## Password Reset Email Setup
+
+The web app can send real password reset emails over SMTP. Configure these variables for `apps/web`:
+
+```bash
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-user
+SMTP_PASSWORD=your-smtp-password
+SMTP_FROM_EMAIL=no-reply@example.com
+SMTP_FROM_NAME="National Snooker League"
+SMTP_REPLY_TO=support@example.com
+APP_URL=http://localhost:3000
+```
+
+If SMTP is not configured, the reset flow falls back to returning the reset link in local development only.
+
 ## Why This Layout
 
 This workspace structure lets us add:

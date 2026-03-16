@@ -1,13 +1,16 @@
 "use client";
 
 import "../globals.css";
+import { AdminAuthProvider, useAdminAuth } from "./AdminAuthContext";
 import {
   FiActivity,
   FiAward,
   FiBarChart2,
+  FiChevronDown,
   FiFileText,
   FiFilm,
   FiUser,
+  FiLogOut,
   FiHome,
   FiUsers,
   FiMapPin,
@@ -18,21 +21,91 @@ import {
 } from "react-icons/fi";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function PublicLayout({
+type AdminNavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  permissions?: string[];
+};
+
+const adminSidebarItems: AdminNavItem[] = [
+  { href: "/admin", label: "Dashboard", icon: FiHome },
+  { href: "/admin/leagues", label: "Leagues", icon: FiBarChart2 },
+  { href: "/admin/players", label: "Players", icon: FiUsers },
+  { href: "/admin/seasons", label: "Seasons", icon: FiCalendar },
+  { href: "/admin/tournaments", label: "Tournaments", icon: FiAward },
+  { href: "/admin/matches", label: "Matches", icon: FiActivity },
+  { href: "/admin/venues", label: "Venues", icon: FiMapPin },
+  { href: "/admin/news", label: "News", icon: FiFileText },
+  { href: "/admin/videos", label: "Videos", icon: FiFilm },
+  {
+    href: "/admin/security",
+    label: "Security",
+    icon: FiShield,
+    permissions: ["users.view", "roles.view", "permissions.view"],
+  },
+];
+
+const adminTopLinks = [
+  { href: "/admin", label: "Admin Home" },
+  { href: "/admin/players", label: "Players" },
+  { href: "/admin/seasons", label: "Seasons" },
+  { href: "/admin/tournaments", label: "Tournaments" },
+  { href: "/admin/matches", label: "Matches" },
+  { href: "/admin/videos", label: "Videos" },
+  {
+    href: "/admin/security",
+    label: "Security",
+    permissions: ["users.view", "roles.view", "permissions.view"],
+  },
+];
+
+function LayoutChrome({
   children,
+  isAdminRoute,
+  mobileMenuOpen,
+  setMobileMenuOpen,
 }: {
   children: React.ReactNode;
+  isAdminRoute: boolean;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { currentUser, hasPermission, logout } = useAdminAuth();
+  const router = useRouter();
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const showAdminNavigation = isAdminRoute || Boolean(currentUser);
+
+  const visibleSidebarItems = adminSidebarItems.filter((item) => {
+    if (!item.permissions || item.permissions.length === 0) {
+      return true;
+    }
+
+    return item.permissions.some((permission) => hasPermission(permission));
+  });
+
+  const visibleTopLinks = adminTopLinks.filter((item) => {
+    if (!item.permissions || item.permissions.length === 0) {
+      return true;
+    }
+
+    return item.permissions.some((permission) => hasPermission(permission));
+  });
 
   useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
+    setMenuOpen(false);
+  }, [pathname, mobileMenuOpen]);
+
+  const handleLogout = async () => {
+    await logout();
+    setMenuOpen(false);
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <div className="layout">
@@ -53,10 +126,7 @@ export default function PublicLayout({
 
       <aside className={`sidebar${mobileMenuOpen ? " sidebar-open" : ""}`}>
         <div className="sidebar-logo">
-          <Link
-            href={isAdmin ? "/admin" : "/"}
-            onClick={() => setMobileMenuOpen(false)}
-          >
+          <Link href={showAdminNavigation ? "/admin" : "/"} onClick={() => setMobileMenuOpen(false)}>
             <Image
               src="/images/nsl-logo.svg"
               alt="National Snooker League Logo"
@@ -70,111 +140,27 @@ export default function PublicLayout({
 
         <nav
           className="sidebar-nav"
-          aria-label={isAdmin ? "Admin navigation" : "Sidebar navigation"}
+          aria-label={showAdminNavigation ? "Admin navigation" : "Sidebar navigation"}
         >
           <ul>
-            {isAdmin ? (
+            {showAdminNavigation ? (
               <>
-                <li>
-                  <Link
-                    href="/admin"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiHome className="sidebar-icon" />
-                    <span className="sidebar-label">Dashboard</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/leagues"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiBarChart2 className="sidebar-icon" />
-                    <span className="sidebar-label">Leagues</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/players"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiUsers className="sidebar-icon" />
-                    <span className="sidebar-label">Players</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/seasons"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiCalendar className="sidebar-icon" />
-                    <span className="sidebar-label">Seasons</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/tournaments"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiAward className="sidebar-icon" />
-                    <span className="sidebar-label">Tournaments</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/matches"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiActivity className="sidebar-icon" />
-                    <span className="sidebar-label">Matches</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/venues"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiMapPin className="sidebar-icon" />
-                    <span className="sidebar-label">Venues</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/news"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiFileText className="sidebar-icon" />
-                    <span className="sidebar-label">News</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/videos"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiFilm className="sidebar-icon" />
-                    <span className="sidebar-label">Videos</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin/users"
-                    className="sidebar-item"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiShield className="sidebar-icon" />
-                    <span className="sidebar-label">Users</span>
-                  </Link>
-                </li>
+                {visibleSidebarItems.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className="sidebar-item"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Icon className="sidebar-icon" />
+                        <span className="sidebar-label">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </>
             ) : (
               <>
@@ -219,14 +205,13 @@ export default function PublicLayout({
       <div className="main">
         <nav className="navbar">
           <div className="nav-links">
-            {isAdmin ? (
+            {showAdminNavigation ? (
               <>
-                <Link href="/admin">Admin Home</Link>
-                <Link href="/admin/players">Players</Link>
-                <Link href="/admin/seasons">Seasons</Link>
-                <Link href="/admin/tournaments">Tournaments</Link>
-                <Link href="/admin/matches">Matches</Link>
-                <Link href="/admin/videos">Videos</Link>
+                {visibleTopLinks.map((item) => (
+                  <Link key={item.href} href={item.href}>
+                    {item.label}
+                  </Link>
+                ))}
               </>
             ) : (
               <>
@@ -239,19 +224,56 @@ export default function PublicLayout({
           </div>
 
           <div className="navbar-right">
-            {isAdmin ? (
-              <Link href="/" className="login-link">
+            {currentUser ? (
+              <div className="admin-user-menu-shell">
+                <button
+                  type="button"
+                  className="admin-current-user-chip admin-user-menu-trigger"
+                  onClick={() => setMenuOpen((open) => !open)}
+                  aria-expanded={menuOpen}
+                  aria-haspopup="menu"
+                >
+                  <FiLogOut size={18} className="login-icon" />
+                  <div className="admin-current-user-copy">
+                    <span className="admin-current-user-name">{currentUser.displayName}</span>
+                    <span className="admin-current-user-meta">Logged in</span>
+                  </div>
+                  <FiChevronDown className="admin-user-menu-chevron" />
+                </button>
+
+                {menuOpen ? (
+                  <div className="admin-user-menu-dropdown" role="menu">
+                    <Link
+                      href="/profile"
+                      className="admin-user-menu-item"
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/settings"
+                      className="admin-user-menu-item"
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Settings
+                    </Link>
+                    <button
+                      type="button"
+                      className="admin-user-menu-item admin-user-menu-item-danger"
+                      onClick={handleLogout}
+                      role="menuitem"
+                    >
+                      Log out
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <Link href="/login" className="login-link">
                 <FiUser size={28} className="login-icon" />
               </Link>
-            ) : (
-              <a
-                href="https://a.leaguerepublic.com/myaccount/login/index.html?lver=2"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="login-link"
-              >
-                <FiUser size={28} className="login-icon" />
-              </a>
             )}
           </div>
         </nav>
@@ -259,5 +281,31 @@ export default function PublicLayout({
         {children}
       </div>
     </div>
+  );
+}
+
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  return (
+    <AdminAuthProvider enabled>
+      <LayoutChrome
+        isAdminRoute={isAdminRoute}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+      >
+        {children}
+      </LayoutChrome>
+    </AdminAuthProvider>
   );
 }
