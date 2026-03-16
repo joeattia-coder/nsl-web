@@ -76,7 +76,6 @@ export default function LeagueForm({ mode, leagueId }: LeagueFormProps) {
         }
         uploadedLogoUrl = uploadData.url;
         setLogoUrl(uploadedLogoUrl);
-        setUploadingLogo(false);
       }
       const payload = {
         leagueName,
