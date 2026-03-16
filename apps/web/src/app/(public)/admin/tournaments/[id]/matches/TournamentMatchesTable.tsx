@@ -34,6 +34,7 @@ type TournamentMatchesTableProps = {
 };
 
 type SortKey =
+  | "roundName"
   | "groupName"
   | "homeName"
   | "awayName"
