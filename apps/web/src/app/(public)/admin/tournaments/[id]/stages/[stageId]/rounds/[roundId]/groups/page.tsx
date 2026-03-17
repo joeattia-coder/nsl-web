@@ -72,7 +72,7 @@ export default async function RoundGroupsPage({
 
       <TournamentSubnav
         tournamentId={round.tournamentStage.tournament.id}
-        active="rounds"
+        active="groups"
       />
       <StageSubnav
         tournamentId={round.tournamentStage.tournament.id}

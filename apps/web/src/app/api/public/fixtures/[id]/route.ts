@@ -3,6 +3,7 @@ import { publicApiJson, publicApiOptions } from "@/lib/public-api-response";
 
 type PlayerLike = {
   firstName: string;
+  middleInitial?: string | null;
   lastName: string;
   country?: string | null;
   photoUrl?: string | null;
@@ -56,8 +57,9 @@ function getEntryDisplayName(entry: EntryLike | null | undefined) {
   const names = entry.members
     .map((member) => {
       const first = member.player.firstName?.trim() ?? "";
+      const middle = member.player.middleInitial?.trim() ?? "";
       const last = member.player.lastName?.trim() ?? "";
-      return `${first} ${last}`.trim();
+      return [first, middle, last].filter(Boolean).join(" ");
     })
     .filter(Boolean);
 
@@ -250,6 +252,7 @@ export async function GET(_request: Request, context: RouteContext) {
                 player: {
                   select: {
                     firstName: true,
+                    middleInitial: true,
                     lastName: true,
                     country: true,
                     photoUrl: true,
@@ -267,6 +270,7 @@ export async function GET(_request: Request, context: RouteContext) {
                 player: {
                   select: {
                     firstName: true,
+                    middleInitial: true,
                     lastName: true,
                     country: true,
                     photoUrl: true,

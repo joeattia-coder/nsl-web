@@ -6,87 +6,67 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  FiBold,
-  FiImage,
-  FiItalic,
-  FiLink,
-  FiList,
-  FiRotateCcw,
-  FiRotateCw,
-  FiType,
-} from "react-icons/fi";
+import TextAlign from "@tiptap/extension-text-align";
+import Underline from "@tiptap/extension-underline";
+import ModernRichTextToolbar, { ToolbarPresets } from "./ModernRichTextToolbar";
 
 type NewsRichTextEditorProps = {
   initialContent: string;
   onChange: (value: { html: string; json: unknown }) => void;
+  placeholder?: string;
+  statusLabel?: string;
 };
-
-type ToolbarButtonProps = {
-  label: string;
-  onClick: () => void;
-  active?: boolean;
-  disabled?: boolean;
-  children: React.ReactNode;
-};
-
-function ToolbarButton({
-  label,
-  onClick,
-  active = false,
-  disabled = false,
-  children,
-}: ToolbarButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`inline-flex h-10 items-center justify-center rounded-md border px-3 text-sm font-semibold transition ${
-        active
-          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-      } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
-      aria-label={label}
-      title={label}
-    >
-      {children}
-    </button>
-  );
-}
 
 export default function NewsRichTextEditor({
   initialContent,
   onChange,
+  placeholder = "Write the article body here...",
+  statusLabel = "Formatted article body",
 }: NewsRichTextEditorProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const lastEmittedHtmlRef = useRef(initialContent || "<p></p>");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
       Image,
+      Underline,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
       Link.configure({
         openOnClick: false,
         autolink: true,
         protocols: ["http", "https", "mailto"],
       }),
       Placeholder.configure({
-        placeholder: "Write the article body here...",
+        placeholder,
       }),
     ],
     content: initialContent || "<p></p>",
     editorProps: {
       attributes: {
         class:
-          "min-h-[320px] rounded-b-xl border border-t-0 border-slate-200 bg-white px-4 py-4 text-[15px] leading-7 text-slate-800 outline-none",
+          "rich-text-editor-input min-h-[320px] rounded-b-lg border border-t-0 border-slate-200 bg-white px-4 py-4 text-[15px] leading-7 text-slate-800 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50",
       },
     },
     onUpdate({ editor: nextEditor }) {
+      const html = nextEditor.getHTML();
+      lastEmittedHtmlRef.current = html;
       onChange({
-        html: nextEditor.getHTML(),
+        html,
         json: nextEditor.getJSON(),
       });
     },
@@ -94,8 +74,19 @@ export default function NewsRichTextEditor({
 
   useEffect(() => {
     if (!editor) return;
-    if (editor.getHTML() === (initialContent || "<p></p>")) return;
-    editor.commands.setContent(initialContent || "<p></p>", { emitUpdate: false });
+
+    const nextContent = initialContent || "<p></p>";
+
+    // Avoid re-applying content we just emitted from this editor instance.
+    if (nextContent === lastEmittedHtmlRef.current) return;
+
+    if (editor.getHTML() === nextContent) {
+      lastEmittedHtmlRef.current = nextContent;
+      return;
+    }
+
+    editor.commands.setContent(nextContent, { emitUpdate: false });
+    lastEmittedHtmlRef.current = nextContent;
   }, [editor, initialContent]);
 
   const handleSetLink = () => {
@@ -145,74 +136,49 @@ export default function NewsRichTextEditor({
     }
   };
 
+  if (!editor) return null;
+
+  const toolbarGroups = ToolbarPresets.full(
+    {
+      bold: () => editor.chain().focus().toggleBold().run(),
+      italic: () => editor.chain().focus().toggleItalic().run(),
+      underline: () => editor.chain().focus().toggleUnderline().run(),
+      strikethrough: () => editor.chain().focus().toggleStrike().run(),
+      heading1: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+      heading2: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+      bulletList: () => editor.chain().focus().toggleBulletList().run(),
+      orderedList: () => editor.chain().focus().toggleOrderedList().run(),
+      alignLeft: () => editor.chain().focus().setTextAlign("left").run(),
+      alignCenter: () => editor.chain().focus().setTextAlign("center").run(),
+      alignRight: () => editor.chain().focus().setTextAlign("right").run(),
+      link: handleSetLink,
+      code: () => editor.chain().focus().toggleCodeBlock().run(),
+      blockquote: () => editor.chain().focus().toggleBlockquote().run(),
+      image: () => fileInputRef.current?.click(),
+    },
+    {
+      bold: editor.isActive("bold"),
+      italic: editor.isActive("italic"),
+      underline: editor.isActive("underline"),
+      strikethrough: editor.isActive("strike"),
+      heading1: editor.isActive("heading", { level: 1 }),
+      heading2: editor.isActive("heading", { level: 2 }),
+      bulletList: editor.isActive("bulletList"),
+      orderedList: editor.isActive("orderedList"),
+      alignLeft: editor.isActive({ textAlign: "left" }),
+      alignCenter: editor.isActive({ textAlign: "center" }),
+      alignRight: editor.isActive({ textAlign: "right" }),
+      code: editor.isActive("codeBlock"),
+      blockquote: editor.isActive("blockquote"),
+    }
+  );
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm">
-      <div className="flex flex-wrap gap-2 rounded-t-xl border-b border-slate-200 bg-white p-3">
-        <ToolbarButton
-          label="Paragraph"
-          onClick={() => editor?.chain().focus().setParagraph().run()}
-          active={editor?.isActive("paragraph")}
-          disabled={!editor}
-        >
-          <FiType />
-        </ToolbarButton>
-        <ToolbarButton
-          label="Bold"
-          onClick={() => editor?.chain().focus().toggleBold().run()}
-          active={editor?.isActive("bold")}
-          disabled={!editor}
-        >
-          <FiBold />
-        </ToolbarButton>
-        <ToolbarButton
-          label="Italic"
-          onClick={() => editor?.chain().focus().toggleItalic().run()}
-          active={editor?.isActive("italic")}
-          disabled={!editor}
-        >
-          <FiItalic />
-        </ToolbarButton>
-        <ToolbarButton
-          label="Bulleted List"
-          onClick={() => editor?.chain().focus().toggleBulletList().run()}
-          active={editor?.isActive("bulletList")}
-          disabled={!editor}
-        >
-          <FiList />
-        </ToolbarButton>
-        <ToolbarButton
-          label="Numbered List"
-          onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-          active={editor?.isActive("orderedList")}
-          disabled={!editor}
-        >
-          <span className="text-xs font-bold">1.</span>
-        </ToolbarButton>
-        <ToolbarButton label="Link" onClick={handleSetLink} disabled={!editor}>
-          <FiLink />
-        </ToolbarButton>
-        <ToolbarButton
-          label="Insert Image"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={!editor || uploading}
-        >
-          <FiImage />
-        </ToolbarButton>
-        <ToolbarButton
-          label="Undo"
-          onClick={() => editor?.chain().focus().undo().run()}
-          disabled={!editor?.can().chain().focus().undo().run()}
-        >
-          <FiRotateCcw />
-        </ToolbarButton>
-        <ToolbarButton
-          label="Redo"
-          onClick={() => editor?.chain().focus().redo().run()}
-          disabled={!editor?.can().chain().focus().redo().run()}
-        >
-          <FiRotateCw />
-        </ToolbarButton>
-      </div>
+    <div className="rounded-lg border border-slate-200 bg-slate-50/80 shadow-sm overflow-hidden">
+      <ModernRichTextToolbar
+        groups={toolbarGroups}
+        onImageUpload={handleImageUpload}
+      />
 
       <input
         ref={fileInputRef}
@@ -230,7 +196,7 @@ export default function NewsRichTextEditor({
       <EditorContent editor={editor} />
 
       <div className="flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
-        <span>{uploading ? "Uploading image..." : "Formatted article body"}</span>
+        <span>{uploading ? "Uploading image..." : statusLabel}</span>
         {error ? <span className="font-medium text-rose-600">{error}</span> : null}
       </div>
     </div>

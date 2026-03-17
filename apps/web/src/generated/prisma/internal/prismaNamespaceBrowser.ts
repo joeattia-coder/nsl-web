@@ -77,6 +77,7 @@ export const ModelName = {
   PlayerBreak: 'PlayerBreak',
   League: 'League',
   NewsArticle: 'NewsArticle',
+  FaqItem: 'FaqItem',
   VideoHighlight: 'VideoHighlight'
 } as const
 
@@ -489,6 +490,20 @@ export const NewsArticleScalarFieldEnum = {
 } as const
 
 export type NewsArticleScalarFieldEnum = (typeof NewsArticleScalarFieldEnum)[keyof typeof NewsArticleScalarFieldEnum]
+
+
+export const FaqItemScalarFieldEnum = {
+  id: 'id',
+  question: 'question',
+  answerHtml: 'answerHtml',
+  answerJson: 'answerJson',
+  sortOrder: 'sortOrder',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FaqItemScalarFieldEnum = (typeof FaqItemScalarFieldEnum)[keyof typeof FaqItemScalarFieldEnum]
 
 
 export const VideoHighlightScalarFieldEnum = {

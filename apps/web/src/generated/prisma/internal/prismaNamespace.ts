@@ -410,6 +410,7 @@ export const ModelName = {
   PlayerBreak: 'PlayerBreak',
   League: 'League',
   NewsArticle: 'NewsArticle',
+  FaqItem: 'FaqItem',
   VideoHighlight: 'VideoHighlight'
 } as const
 
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "videoHighlight"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "videoHighlight"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2354,6 +2355,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FaqItem: {
+      payload: Prisma.$FaqItemPayload<ExtArgs>
+      fields: Prisma.FaqItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FaqItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FaqItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>
+        }
+        findFirst: {
+          args: Prisma.FaqItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FaqItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>
+        }
+        findMany: {
+          args: Prisma.FaqItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>[]
+        }
+        create: {
+          args: Prisma.FaqItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>
+        }
+        createMany: {
+          args: Prisma.FaqItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FaqItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>[]
+        }
+        delete: {
+          args: Prisma.FaqItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>
+        }
+        update: {
+          args: Prisma.FaqItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.FaqItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FaqItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FaqItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.FaqItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaqItemPayload>
+        }
+        aggregate: {
+          args: Prisma.FaqItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFaqItem>
+        }
+        groupBy: {
+          args: Prisma.FaqItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FaqItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FaqItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FaqItemCountAggregateOutputType> | number
+        }
+      }
+    }
     VideoHighlight: {
       payload: Prisma.$VideoHighlightPayload<ExtArgs>
       fields: Prisma.VideoHighlightFieldRefs
@@ -2862,6 +2937,20 @@ export const NewsArticleScalarFieldEnum = {
 export type NewsArticleScalarFieldEnum = (typeof NewsArticleScalarFieldEnum)[keyof typeof NewsArticleScalarFieldEnum]
 
 
+export const FaqItemScalarFieldEnum = {
+  id: 'id',
+  question: 'question',
+  answerHtml: 'answerHtml',
+  answerJson: 'answerJson',
+  sortOrder: 'sortOrder',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FaqItemScalarFieldEnum = (typeof FaqItemScalarFieldEnum)[keyof typeof FaqItemScalarFieldEnum]
+
+
 export const VideoHighlightScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -3344,6 +3433,7 @@ export type GlobalOmitConfig = {
   playerBreak?: Prisma.PlayerBreakOmit
   league?: Prisma.LeagueOmit
   newsArticle?: Prisma.NewsArticleOmit
+  faqItem?: Prisma.FaqItemOmit
   videoHighlight?: Prisma.VideoHighlightOmit
 }
 

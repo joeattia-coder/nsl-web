@@ -4,7 +4,7 @@ import Link from "next/link";
 
 type Props = {
   tournamentId: string;
-  active: "details" | "stages" | "rounds" | "entries" | "matches";
+  active: "details" | "stages" | "rounds" | "groups" | "entries" | "matches";
 };
 
 export default function TournamentSubnav({
@@ -26,6 +26,11 @@ export default function TournamentSubnav({
       key: "rounds" as const,
       label: "Rounds",
       href: `/admin/tournaments/${tournamentId}/rounds`,
+    },
+    {
+      key: "groups" as const,
+      label: "Groups",
+      href: `/admin/tournaments/${tournamentId}/groups`,
     },
     {
       key: "entries" as const,

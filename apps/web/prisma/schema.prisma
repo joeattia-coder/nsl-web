@@ -509,6 +509,19 @@ model NewsArticle {
   @@index([showOnHomePage, homePlacement, homeSortOrder])
 }
 
+model FaqItem {
+  id         String   @id @default(cuid())
+  question   String
+  answerHtml String
+  answerJson Json?
+  sortOrder  Int      @default(0)
+  isPublished Boolean @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isPublished, sortOrder, updatedAt])
+}
+
 model VideoHighlight {
   id                String          @id @default(cuid())
   title             String

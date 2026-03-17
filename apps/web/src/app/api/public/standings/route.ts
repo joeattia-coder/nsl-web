@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 type PlayerLike = {
   firstName: string;
+  middleInitial?: string | null;
   lastName: string;
 };
 
@@ -37,8 +38,9 @@ function getEntryDisplayName(entry: EntryLike | null | undefined) {
   const names = entry.members
     .map((member) => {
       const first = member.player.firstName?.trim() ?? "";
+      const middle = member.player.middleInitial?.trim() ?? "";
       const last = member.player.lastName?.trim() ?? "";
-      return `${first} ${last}`.trim();
+      return [first, middle, last].filter(Boolean).join(" ");
     })
     .filter(Boolean);
 
@@ -88,6 +90,7 @@ export async function GET(req: Request) {
                     player: {
                       select: {
                         firstName: true,
+                        middleInitial: true,
                         lastName: true,
                       },
                     },
@@ -114,6 +117,7 @@ export async function GET(req: Request) {
                     player: {
                       select: {
                         firstName: true,
+                        middleInitial: true,
                         lastName: true,
                       },
                     },
@@ -133,6 +137,7 @@ export async function GET(req: Request) {
                     player: {
                       select: {
                         firstName: true,
+                        middleInitial: true,
                         lastName: true,
                       },
                     },
@@ -158,6 +163,7 @@ export async function GET(req: Request) {
                         player: {
                           select: {
                             firstName: true,
+                            middleInitial: true,
                             lastName: true,
                           },
                         },
@@ -177,6 +183,7 @@ export async function GET(req: Request) {
                         player: {
                           select: {
                             firstName: true,
+                            middleInitial: true,
                             lastName: true,
                           },
                         },

@@ -10,6 +10,7 @@ type AnyObj = Record<string, unknown>;
 type UiMatch = {
   id: string;
   time: string;
+  scoreLabel: string;
   dateLabel: string;
   event: string;
   round: string;
@@ -70,6 +71,56 @@ function parseTimeLabel(raw: string): string {
   return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }
 
+function sanitizeMatchCtaHref(rawHref: string): string | undefined {
+  const trimmed = rawHref.trim();
+  if (!trimmed) return undefined;
+
+  // Keep CTA navigation internal to this app.
+  if (trimmed.startsWith("/")) return trimmed;
+
+  return undefined;
+}
+
+function firstNumber(obj: AnyObj, keys: string[]): number | null {
+  for (const k of keys) {
+    const v = obj?.[k];
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+    if (typeof v === "string" && v.trim() !== "") {
+      const parsed = Number(v);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return null;
+}
+
+function formatScoreLabel(homeScore: number | null, awayScore: number | null): string {
+  if (homeScore !== null && awayScore !== null) {
+    return `${homeScore} - ${awayScore}`;
+  }
+
+  return "VS";
+}
+
+function splitPlayerName(fullName: string): { first: string; last: string } {
+  const parts = fullName
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return { first: "", last: "" };
+  }
+
+  if (parts.length === 1) {
+    return { first: parts[0], last: "" };
+  }
+
+  return {
+    first: parts[0],
+    last: parts.slice(1).join(" "),
+  };
+}
+
 function toUiMatch(fx: AnyObj, idx: number): UiMatch {
   const id =
     firstString(fx, ["FixtureID", "fixtureID", "fixtureId", "ID", "Id"], "") ||
@@ -108,17 +159,22 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
 
   const dateLabel = rawDateTime ? parseDateLabel(rawDateTime) : parseDateLabel(rawDate);
   const time = rawDateTime ? parseTimeLabel(rawDateTime) : parseTimeLabel(rawTime);
+  const homeScore = firstNumber(fx, ["homeScore", "HomeScore", "HomeTeamScore"]);
+  const awayScore = firstNumber(fx, ["roadScore", "RoadScore", "AwayScore", "RoadTeamScore"]);
 
   // Optional: link to match centre if LR provides it
-  const ctaHref = firstString(
+  const ctaHref = sanitizeMatchCtaHref(
+    firstString(
     fx,
     ["MatchCentreUrl", "matchCentreUrl", "FixtureUrl", "fixtureUrl", "URL", "Url"],
     ""
-  ) || undefined;
+    )
+  );
 
   return {
     id,
     time: time || "TBA",
+    scoreLabel: formatScoreLabel(homeScore, awayScore),
     dateLabel: dateLabel || "",
     event,
     round: round || "",
@@ -536,7 +592,11 @@ export default function Page() {
           )}
 
           <div className="matches-row" ref={matchesRowRef}>
-            {matches.map((m) => (
+            {matches.map((m) => {
+              const homeName = splitPlayerName(m.home);
+              const awayName = splitPlayerName(m.away);
+
+              return (
               <div className="match-card" key={m.id}>
                 <div className="match-meta-top">
                   <div className="match-datetime">
@@ -566,7 +626,10 @@ export default function Page() {
                       )}
                     </div>
                     <div className="player-copy">
-                      <div className="player-name">{m.home}</div>
+                      <div className="player-name">
+                        <span className="player-name-line">{homeName.first}</span>
+                        <span className="player-name-line">{homeName.last}</span>
+                      </div>
                       {m.homeCountryCode ? (
                         <div className="player-flag-row">
                           <Image
@@ -582,11 +645,14 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div className="match-pill">{m.time}</div>
+                  <div className="match-pill">{m.scoreLabel}</div>
 
                   <div className="player right">
                     <div className="player-copy player-copy-right">
-                      <div className="player-name right">{m.away}</div>
+                      <div className="player-name right">
+                        <span className="player-name-line">{awayName.first}</span>
+                        <span className="player-name-line">{awayName.last}</span>
+                      </div>
                       {m.awayCountryCode ? (
                         <div className="player-flag-row player-flag-row-right">
                           <Image
@@ -626,7 +692,8 @@ export default function Page() {
                   </button>
                 )}
               </div>
-            ))}
+              );
+            })}
 
             {fixturesRaw !== null && matches.length === 0 && (
               <div style={{ padding: 12, opacity: 0.9 }}>

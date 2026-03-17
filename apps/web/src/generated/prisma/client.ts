@@ -172,6 +172,11 @@ export type League = Prisma.LeagueModel
  */
 export type NewsArticle = Prisma.NewsArticleModel
 /**
+ * Model FaqItem
+ * 
+ */
+export type FaqItem = Prisma.FaqItemModel
+/**
  * Model VideoHighlight
  * 
  */
