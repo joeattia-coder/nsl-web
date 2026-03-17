@@ -1,0 +1,213 @@
+.container {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  padding: 32px 24px;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 48px 32px;
+  }
+}
+
+.header {
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  line-height: 1.1;
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 1.8rem;
+  }
+}
+
+.leagueInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #0a0a0a;
+  border: 1px solid #222;
+  border-radius: 8px;
+  max-width: 500px;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: #1a1a1a;
+}
+
+.leagueDetails {
+  flex: 1;
+}
+
+.leagueName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.seasonName {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 4px 0 0 0;
+}
+
+.competitionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .competitionsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.competitionCard {
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0a;
+  border: 1px solid #222;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.competitionCard:hover {
+  border-color: #444;
+  background: #111;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.08);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.participantBadge {
+  display: inline-block;
+  background: #222;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardDescription {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.cardMeta {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+  margin-bottom: 16px;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metaLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metaValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.status-draft {
+  color: #888;
+}
+
+.status-registration_open {
+  color: #4a9eff;
+}
+
+.status-registration_closed {
+  color: #ffa54a;
+}
+
+.status-in_progress {
+  color: #4aff9a;
+}
+
+.status-completed {
+  color: #999;
+}
+
+.status-cancelled {
+  color: #ff4a4a;
+}
+
+.cardFooter {
+  padding-top: 12px;
+}
+
+.viewButton {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.2s ease;
+}
+
+.competitionCard:hover .viewButton {
+  color: #fff;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.emptyState p {
+  font-size: 1.1rem;
+  margin: 0;
+}

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import styles from "./NewsArticlePage.module.css";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -25,9 +26,9 @@ export default async function NewsArticlePage({ params }: PageProps) {
   const publishedDate = article.publishedAt ?? article.updatedAt;
 
   return (
-    <main className="content px-4 py-12 md:px-8">
-      <article className="mx-auto max-w-6xl">
-        <div className="news-article-flow text-slate-200">
+    <main className={styles.newsArticlePage}>
+      <article className={styles.newsArticleContainer}>
+        <div className={`news-article-flow ${styles.newsArticleFlow}`}>
           {article.coverImageUrl ? (
             <figure className="news-article-hero-image">
               <Image
@@ -35,31 +36,31 @@ export default async function NewsArticlePage({ params }: PageProps) {
                 alt={article.title}
                 width={1600}
                 height={900}
-                className="block h-auto w-full"
+                className={styles.newsArticleHeroImage}
                 sizes="(max-width: 768px) 100vw, 1200px"
               />
             </figure>
           ) : null}
 
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white">
+          <p className={styles.newsArticleDate}>
             {publishedDate.toLocaleDateString(undefined, {
               year: "numeric",
               month: "long",
               day: "numeric",
             })}
           </p>
-          <h1 className="mt-4 max-w-3xl text-2xl font-semibold leading-tight text-white md:text-4xl">
+          <h1 className={styles.newsArticleTitle}>
             {article.title}
           </h1>
 
           {article.excerpt ? (
-            <p className="mt-6 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{article.excerpt}</p>
+            <p className={styles.newsArticleExcerpt}>{article.excerpt}</p>
           ) : null}
 
-          {article.excerpt ? <div aria-hidden="true" className="h-8 md:h-12" /> : null}
+          {article.excerpt ? <div aria-hidden="true" className={styles.newsArticleSpacer} /> : null}
 
           <div
-            className="news-article-body mt-0 max-w-none text-slate-200"
+            className={`news-article-body ${styles.newsArticleBody}`}
             dangerouslySetInnerHTML={{ __html: article.contentHtml }}
           />
         </div>

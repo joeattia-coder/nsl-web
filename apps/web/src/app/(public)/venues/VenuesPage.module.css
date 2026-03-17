@@ -1,0 +1,138 @@
+.venuesPage {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  padding: 24px 24px 32px;
+}
+
+.venuesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.venuesHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.venuesTitle {
+  font-size: 1.95rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.venuesSubtitle {
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+}
+
+.emptyState {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.venuesGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.venueCard {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 16px;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.venueCard:hover {
+  background: #171717;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.venueCardLogoShell {
+  width: 120px;
+  height: 96px;
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.venueCardLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #111;
+}
+
+.venueCardLogoFallback {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.venueCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.venueCardTitle {
+  font-size: 1.3rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.venueCardAddress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.venueCardAddressLine {
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+  .venueCard {
+    grid-template-columns: 1fr;
+  }
+
+  .venueCardLogoShell {
+    width: 100%;
+    height: 140px;
+  }
+}
+
+@media (min-width: 768px) {
+  .venuesPage {
+    padding-top: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .venuesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .venuesGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

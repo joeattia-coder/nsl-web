@@ -1,0 +1,140 @@
+.venuePage {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  padding: 24px 24px 32px;
+}
+
+.venueLayout {
+  display: grid;
+  gap: 24px;
+}
+
+.venueDetailsColumn,
+.venueMapColumn {
+  min-width: 0;
+}
+
+.venueHeader {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.venueLogoShell {
+  width: 140px;
+  height: 112px;
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.venueLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #111;
+}
+
+.venueLogoFallback {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.venueHeaderCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.venueTitle {
+  font-size: 1.95rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.venueSubtitle {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.venueCard,
+.mapCard {
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 18px;
+}
+
+.sectionTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 14px;
+}
+
+.addressBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.addressLine,
+.detailText {
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.7;
+}
+
+.mapFrame {
+  width: 100%;
+  min-height: 420px;
+  border: 0;
+  background: #161616;
+}
+
+.mapEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  color: rgba(255, 255, 255, 0.62);
+  background: #161616;
+}
+
+@media (max-width: 767px) {
+  .venueHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .venueLogoShell {
+    width: 100%;
+    height: 160px;
+  }
+}
+
+@media (min-width: 768px) {
+  .venuePage {
+    padding-top: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .venueLayout {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
+    align-items: start;
+  }
+
+  .venueMapColumn {
+    position: sticky;
+    top: 84px;
+  }
+}

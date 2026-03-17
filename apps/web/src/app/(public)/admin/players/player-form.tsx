@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { FiArrowLeft, FiSave, FiUpload, FiUserPlus, FiX } from "react-icons/fi";
+import { FiArrowLeft, FiImage, FiSave, FiScissors, FiUpload, FiUserPlus, FiX } from "react-icons/fi";
+import { PhotoCropModal } from "./PhotoCropModal";
+import { dataUrlToFile } from "@/lib/image-processing";
 
 type PlayerFormMode = "create" | "edit";
 
@@ -30,7 +32,7 @@ type PlayerFormProps = {
   playerId?: string;
 };
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 
 export default function PlayerForm({
@@ -62,6 +64,10 @@ export default function PlayerForm({
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string>("");
   const photoInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Crop modal state
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [isRemovingBackground, setIsRemovingBackground] = useState(false);
 
   useEffect(() => {
     if (!isEdit || !playerId) return;
@@ -133,6 +139,8 @@ export default function PlayerForm({
     return photoUrl.trim() || "";
   }, [photoPreviewUrl, photoUrl]);
 
+  const hasSelectedPhoto = Boolean(photoFile);
+
   function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
 
@@ -142,7 +150,7 @@ export default function PlayerForm({
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("Only JPG and PNG files are allowed.");
+      setError("Only JPG, PNG, and WebP files are allowed.");
       e.target.value = "";
       return;
     }
@@ -154,6 +162,7 @@ export default function PlayerForm({
     }
 
     setError(null);
+    setIsCropModalOpen(false);
     setPhotoFile(file);
   }
 
@@ -162,10 +171,69 @@ export default function PlayerForm({
     setPhotoFile(null);
     setPhotoPreviewUrl("");
     setPhotoUrl("");
+    setIsCropModalOpen(false);
 
     if (photoInputRef.current) {
       photoInputRef.current.value = "";
     }
+  }
+
+  async function handleRemoveBackground() {
+    if (!photoFile) return;
+
+    const formData = new FormData();
+    formData.append("file", photoFile);
+
+    setIsRemovingBackground(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/uploads/remove-background", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(
+          data?.error || "Failed to remove background from image."
+        );
+      }
+
+      const extension = data?.mimeType === "image/png" ? "png" : "webp";
+      const processedFile = await dataUrlToFile(
+        data.dataUrl,
+        `player-photo-${Date.now()}-no-bg.${extension}`
+      );
+
+      setPhotoFile(processedFile);
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to process image. Please try again."
+      );
+    } finally {
+      setIsRemovingBackground(false);
+    }
+  }
+
+  function handleOpenCropModal() {
+    if (!previewImage) {
+      setError("Upload a photo before cropping.");
+      return;
+    }
+
+    setError(null);
+    setIsCropModalOpen(true);
+  }
+
+  async function handleCropComplete(processedFile: File) {
+    // Update the photo file with the cropped, resized, WebP version.
+    setPhotoFile(processedFile);
+    setError(null);
   }
 
   async function uploadPhotoIfNeeded() {
@@ -270,6 +338,13 @@ export default function PlayerForm({
 
   return (
     <div className="admin-page">
+      <PhotoCropModal
+        imageDataUrl={previewImage}
+        isOpen={isCropModalOpen}
+        onClose={() => setIsCropModalOpen(false)}
+        onConfirm={handleCropComplete}
+      />
+
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">
@@ -394,13 +469,14 @@ export default function PlayerForm({
                 ref={photoInputRef}
                 id="photoFile"
                 type="file"
-                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                 onChange={handlePhotoChange}
                 className="admin-player-file-input"
+                disabled={isRemovingBackground || isCropModalOpen}
               />
 
               <p className="admin-player-file-help">
-                JPG or PNG only. Maximum size: 4 MB.
+                JPG, PNG, or WebP. Maximum size: 4 MB. Upload first, then optionally remove the background or crop the photo.
               </p>
 
               {previewImage ? (
@@ -414,9 +490,34 @@ export default function PlayerForm({
                     unoptimized
                   />
 
+                  {hasSelectedPhoto ? (
+                    <button
+                      type="button"
+                      onClick={handleRemoveBackground}
+                      disabled={isRemovingBackground || saving || uploadingPhoto}
+                      className="admin-player-form-button admin-player-form-button-secondary"
+                    >
+                      <FiImage />
+                      <span>
+                        {isRemovingBackground ? "Removing Background..." : "Remove Background"}
+                      </span>
+                    </button>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={handleOpenCropModal}
+                    disabled={isRemovingBackground || saving || uploadingPhoto}
+                    className="admin-player-form-button admin-player-form-button-secondary"
+                  >
+                    <FiScissors />
+                    <span>Crop Photo</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
+                    disabled={isRemovingBackground || saving || uploadingPhoto}
                     className="admin-player-form-button admin-player-form-button-danger"
                   >
                     <FiX />
@@ -521,19 +622,21 @@ export default function PlayerForm({
                   ? "admin-player-form-button-primary"
                   : "admin-player-form-button-create"
               }`}
-              disabled={saving || uploadingPhoto}
+              disabled={saving || uploadingPhoto || isRemovingBackground}
             >
               {isEdit ? <FiSave /> : <FiUserPlus />}
               <span>
-                {uploadingPhoto
-                  ? "Uploading Photo..."
-                  : saving
-                    ? isEdit
-                      ? "Saving..."
-                      : "Creating..."
-                    : isEdit
-                      ? "Save Changes"
-                      : "Save Player"}
+                {isRemovingBackground
+                  ? "Removing Background..."
+                  : uploadingPhoto
+                    ? "Uploading Photo..."
+                    : saving
+                      ? isEdit
+                        ? "Saving..."
+                        : "Creating..."
+                      : isEdit
+                        ? "Save Changes"
+                        : "Save Player"}
               </span>
             </button>
           </div>

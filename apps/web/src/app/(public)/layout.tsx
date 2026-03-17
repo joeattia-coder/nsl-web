@@ -174,7 +174,7 @@ function LayoutChrome({
               <>
                 <li>
                   <Link
-                    href="/match-hub"
+                    href="/matches"
                     className="sidebar-item"
                     onClick={closeMobileMenu}
                   >
@@ -191,6 +191,17 @@ function LayoutChrome({
                   >
                     <FiAward className="sidebar-icon" />
                     <span className="sidebar-label">Competitions</span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    href="/venues"
+                    className="sidebar-item"
+                    onClick={closeMobileMenu}
+                  >
+                    <FiMapPin className="sidebar-icon" />
+                    <span className="sidebar-label">Venues</span>
                   </Link>
                 </li>
 
@@ -224,9 +235,11 @@ function LayoutChrome({
             ) : (
               <>
                 <Link href="/">Home</Link>
-                <Link href="/players">Players</Link>
                 <Link href="/tournaments">Tournaments</Link>
-                <Link href="/faqs">FAQs</Link>
+                <Link href="/venues">Venues</Link>
+                <Link href="/documents">Documents</Link>
+                <Link href="/faqs">FAQ</Link>
+                <Link href="/about">About</Link>
                 <Link href="/contact">Contact</Link>
               </>
             )}

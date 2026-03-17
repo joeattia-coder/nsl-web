@@ -1,0 +1,131 @@
+.publicFaqMain {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  padding: 24px 24px 32px;
+}
+
+.publicFaqContainer {
+  width: 100%;
+}
+
+.publicFaqSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.publicFaqHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.publicFaqTitle {
+  font-size: 1.95rem;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.publicFaqSubtitle {
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 760px;
+}
+
+.publicFaqSearch {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.publicFaqSearchLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.publicFaqSearchInput {
+  width: 100%;
+  max-width: 460px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  padding: 10px 12px;
+}
+
+.publicFaqSearchInput:focus {
+  outline: 1px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 0;
+}
+
+.publicFaqSearchMeta {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.publicFaqEmpty {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.publicFaqList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.publicFaqItem {
+  border: none;
+}
+
+.publicFaqQuestion {
+  cursor: pointer;
+  padding: 12px 16px;
+  font-weight: 600;
+  background: #151515;
+}
+
+.publicFaqAnswer {
+  padding: 12px 16px;
+  background: #1d1d1d;
+}
+
+.publicFaqAnswerContent {
+  max-width: 100%;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+.publicFaqAnswerContent p + p {
+  margin-top: 0.8rem;
+}
+
+.publicFaqAnswerContent ul,
+.publicFaqAnswerContent ol {
+  margin: 0.8rem 0;
+  padding-left: 1.3rem;
+}
+
+.publicFaqAnswerContent ul {
+  list-style-type: disc;
+}
+
+.publicFaqAnswerContent ol {
+  list-style-type: decimal;
+}
+
+.publicFaqAnswerContent li + li {
+  margin-top: 0.3rem;
+}
+
+.publicFaqAnswerContent a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .publicFaqMain {
+    padding-top: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}

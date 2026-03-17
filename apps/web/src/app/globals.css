@@ -537,6 +537,15 @@ body {
   background: #000;
 }
 
+  /* Enforce square-ish button radius on public Home + Matches controls */
+  .content .hero-btn,
+  .content .match-cta,
+  .content .season-tab,
+  .content .group-pill,
+  .content .carousel-arrow {
+    border-radius: 4px !important;
+  }
+
 /* -------------------- */
 /* HERO */
 /* -------------------- */
@@ -619,7 +628,7 @@ body {
   justify-content: center;
   height: 42px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 4px;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -643,7 +652,7 @@ body {
 }
 
 @media (max-width: 768px) {
-  .hero-inner {
+.hero-inner {
     padding: 0 20px;
   }
 
@@ -656,7 +665,331 @@ body {
   .hero h1 {
     font-size: 32px;
   }
+
+.featured-news-row {
+    grid-auto-columns: 260px;
+  }
+
+  .featured-news-card {
+    grid-template-columns: 84px 1fr;
+    padding: 14px;
+  }
+
+  .featured-news-thumbnail {
+    width: 84px;
+    height: 64px;
+  }
+
+.news-article-body {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .news-article-body h2 {
+    font-size: 1.5rem;
+  }
+
+  .news-article-body h3 {
+    font-size: 1.25rem;
+  }
+
+.nav-links {
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+  }
+
+  .navbar-logo-img {
+    height: 28px;
+  }
+
+  .mobile-menu-button {
+    display: flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1200;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+
+  .mobile-menu-button svg {
+    font-size: 24px;
+  }
+
+  .mobile-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 1090;
+  }
+
+  .mobile-sidebar-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 150px;
+    max-width: 82vw;
+    z-index: 1100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-logo {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sidebar-logo-img {
+    height: 75px;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+  }
+
+  .sidebar-nav ul {
+    width: 100%;
+  }
+
+  .sidebar-nav ul li {
+    width: 100%;
+  }
+
+  .sidebar-item {
+    width: 100%;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .sidebar-icon {
+    font-size: 18px;
+  }
+
+  .sidebar-item span {
+    font-size: 11px;
+  }
+
+  .main {
+    width: 100%;
+  }
+
+  .navbar {
+    padding-left: 68px;
+  }
+
+  .matches-row {
+    grid-auto-columns: clamp(320px, 86vw, 380px);
+  }
+
+  .player-avatar.icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .video-carousel {
+    grid-auto-columns: 280px;
+    column-gap: 30px;
+  }
+
+  .video-carousel-wrapper {
+    margin-left: -20px;
+    margin-right: -20px;
+    width: calc(100% + 40px);
+  }
+
+  .season-title {
+    font-size: 32px;
+  }
+
+  .season-switch {
+    padding: 6px;
+    border-radius: 4px;
+  }
+
+  .season-tab {
+    height: 36px;
+    font-size: 13px;
+    border-radius: 4px;
+  }
+
+  .season-switch-three {
+    width: 100%;
+  }
+
+  .knockout-round {
+    min-width: 200px;
+  }
+
+  .knockout-slot {
+    width: 200px;
+  }
+
+  .knockout-player-card {
+    min-height: 64px;
+    padding: 12px 14px;
+  }
+
+  .col-num {
+    width: 54px;
+  }
+
+.login-form-row,
+  .account-settings-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .social-auth-actions,
+  .account-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-field-full {
+    grid-column: auto;
+  }
+
+  .admin-form-actions {
+    justify-content: flex-start;
+  }
+
+.admin-players-toolbar {
+    align-items: stretch;
+  }
+
+  .admin-players-toolbar-left,
+  .admin-players-toolbar-right {
+    width: 100%;
+  }
+
+  .admin-players-search {
+    max-width: 100%;
+  }
+
+  .admin-players-toolbar-right {
+    justify-content: flex-start;
+  }
+
+  .admin-toolbar-button,
+  .admin-selected-count {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-player-name-cell {
+    min-width: 180px;
+  }
+
+.home-news-banner-track {
+    animation-duration: 22s;
+  }
+
+  .home-news-banner-item {
+    min-width: 210px;
+  }
+
+.admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-panel,
+  .admin-dashboard-panel-wide,
+  .admin-dashboard-panel-gauge {
+    grid-column: auto;
+  }
+
+  .admin-dashboard-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-dashboard-trend {
+    height: 180px;
+  }
+
+  .admin-dashboard-action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-activity-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-player-form-button {
+    width: 100%;
+  }
+
+  .admin-player-form-actions {
+    justify-content: flex-start;
+  }
+
+.admin-venue-map-frame,
+  .admin-venue-map-empty {
+    min-height: 300px;
+    height: 300px;
+  }
+
+.admin-security-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-security-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-security-panel {
+    padding: 18px;
+  }
+
+  .admin-security-panel-header {
+    padding: 18px 18px 0;
+  }
+
+.admin-group-slot-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .admin-group-slot-help {
+    grid-column: auto;
+  }
 }
+
 
 /* -------------------- */
 /* MATCHES SECTION (HORIZONTAL SCROLL) */
@@ -779,21 +1112,7 @@ body {
   color: #ffffff;
 }
 
-@media (max-width: 768px) {
-  .featured-news-row {
-    grid-auto-columns: 260px;
-  }
 
-  .featured-news-card {
-    grid-template-columns: 84px 1fr;
-    padding: 14px;
-  }
-
-  .featured-news-thumbnail {
-    width: 84px;
-    height: 64px;
-  }
-}
 
 .matches-carousel-wrapper {
   position: relative;
@@ -967,7 +1286,7 @@ body {
 .match-cta {
   width: 100%;
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: #da3036;
   color: white;
@@ -1075,7 +1394,7 @@ body {
   z-index: 999;
   width: 36px;
   height: 36px;
-  border-radius: 999px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1291,29 +1610,15 @@ body {
   margin: 0.2rem 0;
 }
 
-@media (max-width: 768px) {
-  .news-article-body {
-    font-size: 16px;
-    line-height: 1.8;
-  }
-
-  .news-article-body h2 {
-    font-size: 1.5rem;
-  }
-
-  .news-article-body h3 {
-    font-size: 1.25rem;
-  }
-}
-
 @media (min-width: 768px) {
-  .news-article-hero-image {
+.news-article-hero-image {
     float: right;
     width: 520px;
     margin-left: 4rem;
     margin-bottom: 2rem;
   }
 }
+
 
 /* =========================
    SEASON HEADER + SEGMENTED PILL
@@ -1343,7 +1648,7 @@ body {
   grid-template-columns: 1fr 1fr;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  border-radius: 4px;
   padding: 6px;
   gap: 8px;
 }
@@ -1356,7 +1661,7 @@ body {
 .season-tab {
   height: 38px;
   padding: 0 12px;
-  border-radius: 10px;
+  border-radius: 4px;
   border: 1px solid transparent;
   background: transparent;
   color: rgba(255, 255, 255, 0.85);
@@ -1403,7 +1708,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: #da3036;
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.9);
@@ -1880,7 +2185,7 @@ body {
 /* -------------------- */
 
 @media (max-width: 900px) {
-  .sidebar {
+.sidebar {
     width: 160px;
   }
 
@@ -1942,6 +2247,7 @@ body {
   }
 }
 
+
 .mobile-menu-button {
   display: none;
 }
@@ -1950,246 +2256,7 @@ body {
   display: none;
 }
 
-@media (max-width: 768px) {
-  .nav-links {
-    gap: 12px;
-  }
 
-  .nav-links a {
-    font-size: 12px;
-  }
-
-  .navbar-logo-img {
-    height: 28px;
-  }
-
-  .mobile-menu-button {
-    display: flex;
-    position: fixed;
-    top: 14px;
-    left: 14px;
-    z-index: 1200;
-    width: 44px;
-    height: 44px;
-    border: none;
-    border-radius: 10px;
-    background: #111;
-    color: #fff;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  }
-
-  .mobile-menu-button svg {
-    font-size: 24px;
-  }
-
-  .mobile-sidebar-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 1090;
-  }
-
-  .mobile-sidebar-overlay.is-open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 240px;
-    max-width: 82vw;
-    z-index: 1100;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    align-items: flex-start;
-    overflow-y: auto;
-  }
-
-  .sidebar.sidebar-open {
-    transform: translateX(0);
-  }
-
-  .sidebar-logo {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .sidebar-logo-img {
-    height: 84px;
-  }
-
-  .sidebar-nav {
-    width: 100%;
-  }
-
-  .sidebar-nav ul {
-    width: 100%;
-  }
-
-  .sidebar-nav ul li {
-    width: 100%;
-  }
-
-  .sidebar-item {
-    width: 100%;
-    gap: 8px;
-    padding: 8px 10px;
-  }
-
-  .sidebar-icon {
-    font-size: 18px;
-  }
-
-  .sidebar-item span {
-    font-size: 11px;
-  }
-
-  .main {
-    width: 100%;
-  }
-
-  .navbar {
-    padding-left: 68px;
-  }
-
-  .matches-row {
-    grid-auto-columns: clamp(320px, 86vw, 380px);
-  }
-
-  .player-avatar.icon {
-    width: 56px;
-    height: 56px;
-  }
-
-  .video-carousel {
-    grid-auto-columns: 280px;
-    column-gap: 30px;
-  }
-
-  .video-carousel-wrapper {
-    margin-left: -20px;
-    margin-right: -20px;
-    width: calc(100% + 40px);
-  }
-
-  .season-title {
-    font-size: 32px;
-  }
-
-  .season-switch {
-    padding: 6px;
-    border-radius: 12px;
-  }
-
-  .season-tab {
-    height: 36px;
-    font-size: 13px;
-    border-radius: 10px;
-  }
-
-  .season-switch-three {
-    width: 100%;
-  }
-
-  .knockout-round {
-    min-width: 200px;
-  }
-
-  .knockout-slot {
-    width: 200px;
-  }
-
-  .knockout-player-card {
-    min-height: 64px;
-    padding: 12px 14px;
-  }
-
-  .col-num {
-    width: 54px;
-  }
-}@media (max-width: 768px) {
-  .nav-links {
-    gap: 12px;
-  }
-
-  .nav-links a {
-    font-size: 12px;
-  }
-
-  .navbar-logo-img {
-    height: 28px;
-  }
-
-  .sidebar {
-    width:150px;
-  }
-
-  .sidebar-logo-img {
-    height: 75px;
-  }
-
-  .sidebar-item {
-  gap: 8px;
-  padding: 8px;
-}
-
-.sidebar-icon {
-  font-size: 18px;
-}
-
-.sidebar-item span {
-  font-size: 11px;
-}
-
-  .matches-row {
-    grid-auto-columns: clamp(320px, 86vw, 380px);
-  }
-
-  .player-avatar.icon {
-    width: 56px;
-    height: 56px;
-  }
-
-  .video-carousel {
-    grid-auto-columns: 280px;
-    column-gap: 30px;
-  }
-
-  .video-carousel-wrapper {
-    margin-left: -20px;
-    margin-right: -20px;
-    width: calc(100% + 40px);
-  }
-
-  .season-title {
-    font-size: 32px;
-  }
-
-  .season-switch {
-    padding: 6px;
-    border-radius: 12px;
-  }
-
-  .season-tab {
-    height: 36px;
-    font-size: 13px;
-    border-radius: 10px;
-  }
-
-  .col-num {
-    width: 54px;
-  }
-}
 
 /* -------------------- */
 /* ADMIN */
@@ -2962,30 +3029,7 @@ body {
   background: #ffffff;
 }
 
-@media (max-width: 768px) {
-  .login-form-row,
-  .account-settings-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
 
-  .social-auth-actions,
-  .account-settings-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-form-field-full {
-    grid-column: auto;
-  }
-
-  .admin-form-actions {
-    justify-content: flex-start;
-  }
-}
 
 /* -------------------- */
 /* ADMIN PLAYERS PAGE */
@@ -3305,34 +3349,7 @@ body {
   opacity: 0.92;
 }
 
-@media (max-width: 768px) {
-  .admin-players-toolbar {
-    align-items: stretch;
-  }
 
-  .admin-players-toolbar-left,
-  .admin-players-toolbar-right {
-    width: 100%;
-  }
-
-  .admin-players-search {
-    max-width: 100%;
-  }
-
-  .admin-players-toolbar-right {
-    justify-content: flex-start;
-  }
-
-  .admin-toolbar-button,
-  .admin-selected-count {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .admin-player-name-cell {
-    min-width: 180px;
-  }
-}
 
 /* -------------------- */
 /* ADMIN PLAYER FORM */
@@ -3470,15 +3487,7 @@ body {
   }
 }
 
-@media (max-width: 768px) {
-  .home-news-banner-track {
-    animation-duration: 22s;
-  }
 
-  .home-news-banner-item {
-    min-width: 210px;
-  }
-}
 
 .admin-player-photo-preview-img {
   width: 88px;
@@ -3533,47 +3542,7 @@ body {
   font-size: 14px;
 }
 
-@media (max-width: 768px) {
-  .admin-page-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 
-  .admin-dashboard-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-dashboard-panel,
-  .admin-dashboard-panel-wide,
-  .admin-dashboard-panel-gauge {
-    grid-column: auto;
-  }
-
-  .admin-dashboard-metrics-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .admin-dashboard-trend {
-    height: 180px;
-  }
-
-  .admin-dashboard-action-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-dashboard-activity-item {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .admin-player-form-button {
-    width: 100%;
-  }
-
-  .admin-player-form-actions {
-    justify-content: flex-start;
-  }
-}
 
 .admin-player-file-input {
   display: none;
@@ -3782,7 +3751,7 @@ body {
 }
 
 @media (max-width: 1100px) {
-  .admin-venue-form-layout {
+.admin-venue-form-layout {
     grid-template-columns: 1fr;
   }
 
@@ -3801,13 +3770,8 @@ body {
   }
 }
 
-@media (max-width: 768px) {
-  .admin-venue-map-frame,
-  .admin-venue-map-empty {
-    min-height: 300px;
-    height: 300px;
-  }
-}
+
+
 
 /* -------------------- */
 /* ADMIN SEASONS PAGE */
@@ -4205,23 +4169,7 @@ body {
   line-height: 1.6;
 }
 
-@media (max-width: 768px) {
-  .admin-security-summary-grid {
-    grid-template-columns: 1fr;
-  }
 
-  .admin-security-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-security-panel {
-    padding: 18px;
-  }
-
-  .admin-security-panel-header {
-    padding: 18px 18px 0;
-  }
-}
 
 .admin-group-slots {
   display: flex;
@@ -4249,16 +4197,7 @@ body {
   color: #6b7280;
 }
 
-@media (max-width: 768px) {
-  .admin-group-slot-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
 
-  .admin-group-slot-help {
-    grid-column: auto;
-  }
-}
 
 .admin-match-stage-cell {
   display: flex;
