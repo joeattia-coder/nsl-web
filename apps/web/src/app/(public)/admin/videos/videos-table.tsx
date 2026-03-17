@@ -174,7 +174,9 @@ export default function VideosTable({ videos }: VideosTableProps) {
                     <tr key={video.id}>
                       <td>
                         <div className="flex min-w-[220px] flex-col gap-1">
-                          <span className="font-semibold text-slate-900">{video.title}</span>
+                          <Link href={`/admin/videos/${video.id}`} className="font-semibold text-slate-900">
+                            {video.title}
+                          </Link>
                           <span className="text-xs text-slate-500">Order: {video.carouselSortOrder}</span>
                         </div>
                       </td>

@@ -206,9 +206,12 @@ export default function VenuesTable({ venues }: VenuesTableProps) {
                         ) : (
                           <div className="admin-venue-logo-thumb admin-venue-logo-thumb-spacer" aria-hidden="true" />
                         )}
-                        <span className="admin-venue-name-text">
+                        <Link
+                          href={`/admin/venues/${venue.id}/edit`}
+                          className="admin-venue-name-text"
+                        >
                           {venue.venueName}
-                        </span>
+                        </Link>
                       </div>
                     </td>
 

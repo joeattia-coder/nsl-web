@@ -323,9 +323,12 @@ export default function GroupsTable({
                 filteredGroups.map((group) => (
                   <tr key={group.id}>
                     <td>
-                      <span className="admin-player-full-name">
+                      <Link
+                        href={`/admin/tournaments/${tournamentId}/stages/${stageId}/rounds/${roundId}/groups/${group.id}`}
+                        className="admin-player-full-name"
+                      >
                         {group.groupName}
-                      </span>
+                      </Link>
                     </td>
                     <td>{group.sequence}</td>
                     <td>

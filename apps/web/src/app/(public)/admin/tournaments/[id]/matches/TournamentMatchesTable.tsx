@@ -236,8 +236,22 @@ export default function TournamentMatchesTable({
                 filteredMatches.map((match) => (
                   <tr key={match.id}>
                     <td>{match.groupName || "—"}</td>
-                    <td>{match.homeName}</td>
-                    <td>{match.awayName}</td>
+                    <td>
+                      <Link
+                        href={`/admin/tournaments/${tournamentId}/matches/${match.id}/edit`}
+                        className="admin-player-full-name"
+                      >
+                        {match.homeName}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        href={`/admin/tournaments/${tournamentId}/matches/${match.id}/edit`}
+                        className="admin-player-full-name"
+                      >
+                        {match.awayName}
+                      </Link>
+                    </td>
                     <td>{formatScore(match.homeScore, match.awayScore)}</td>
                     <td>{match.winnerName || "—"}</td>
                     <td>{formatDate(match.matchDate)}</td>

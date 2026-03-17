@@ -207,7 +207,13 @@ export default function UsersTable({
                   <tr key={user.id}>
                     <td>
                       <div className="admin-security-cell-stack">
-                        <strong>{user.displayName}</strong>
+                        {canEdit ? (
+                          <Link href={`/admin/security/users/${user.id}`}>
+                            <strong>{user.displayName}</strong>
+                          </Link>
+                        ) : (
+                          <strong>{user.displayName}</strong>
+                        )}
                         <span className="admin-security-muted">{user.username}</span>
                       </div>
                     </td>

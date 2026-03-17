@@ -41,6 +41,7 @@ const adminSidebarItems: AdminNavItem[] = [
   { href: "/admin/matches", label: "Matches", icon: FiActivity },
   { href: "/admin/venues", label: "Venues", icon: FiMapPin },
   { href: "/admin/news", label: "News", icon: FiFileText },
+  { href: "/admin/documents", label: "Documents", icon: FiFileText },
   { href: "/admin/faqs", label: "FAQs", icon: FiHelpCircle },
   { href: "/admin/videos", label: "Videos", icon: FiFilm },
   {
@@ -57,6 +58,7 @@ const adminTopLinks = [
   { href: "/admin/seasons", label: "Seasons" },
   { href: "/admin/tournaments", label: "Tournaments" },
   { href: "/admin/matches", label: "Matches" },
+  { href: "/admin/documents", label: "Documents" },
   { href: "/admin/faqs", label: "FAQs" },
   { href: "/admin/videos", label: "Videos" },
   {

@@ -243,9 +243,12 @@ export default function StageRoundsTable({
                 filteredRounds.map((round) => (
                   <tr key={round.id}>
                     <td>
-                      <span className="admin-player-full-name">
+                      <Link
+                        href={`/admin/tournaments/${tournamentId}/stages/${stageId}/rounds/${round.id}/edit`}
+                        className="admin-player-full-name"
+                      >
                         {round.roundName}
-                      </span>
+                      </Link>
                     </td>
                     <td>{formatRoundType(round.roundType)}</td>
                     <td>{round.sequence}</td>

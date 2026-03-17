@@ -157,3 +157,8 @@ export type FaqItem = Prisma.FaqItemModel
  * 
  */
 export type VideoHighlight = Prisma.VideoHighlightModel
+/**
+ * Model Document
+ * 
+ */
+export type Document = Prisma.DocumentModel

@@ -173,7 +173,9 @@ export default function FaqsTable({ faqs }: FaqsTableProps) {
                     <tr key={faq.id}>
                       <td>
                         <div className="flex min-w-[220px] flex-col gap-1">
-                          <span className="font-semibold text-slate-900">{faq.question}</span>
+                          <Link href={`/admin/faqs/${faq.id}`} className="font-semibold text-slate-900">
+                            {faq.question}
+                          </Link>
                         </div>
                       </td>
                       <td>{faq.isPublished ? "Published" : "Draft"}</td>

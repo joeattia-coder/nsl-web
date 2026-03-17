@@ -78,7 +78,8 @@ export const ModelName = {
   League: 'League',
   NewsArticle: 'NewsArticle',
   FaqItem: 'FaqItem',
-  VideoHighlight: 'VideoHighlight'
+  VideoHighlight: 'VideoHighlight',
+  Document: 'Document'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -519,6 +520,21 @@ export const VideoHighlightScalarFieldEnum = {
 } as const
 
 export type VideoHighlightScalarFieldEnum = (typeof VideoHighlightScalarFieldEnum)[keyof typeof VideoHighlightScalarFieldEnum]
+
+
+export const DocumentScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  showOnPublicDocumentsPage: 'showOnPublicDocumentsPage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
 
 
 export const SortOrder = {

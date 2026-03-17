@@ -224,9 +224,12 @@ export default function TournamentStagesTable({
                 filteredStages.map((stage) => (
                   <tr key={stage.id}>
                     <td>
-                      <span className="admin-player-full-name">
+                      <Link
+                        href={`/admin/tournaments/${tournamentId}/stages/${stage.id}/edit`}
+                        className="admin-player-full-name"
+                      >
                         {stage.stageName}
-                      </span>
+                      </Link>
                     </td>
                     <td>{formatStageType(stage.stageType)}</td>
                     <td>{stage.sequence}</td>

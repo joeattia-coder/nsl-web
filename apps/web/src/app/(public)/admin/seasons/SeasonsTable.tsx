@@ -202,9 +202,12 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
                         <span className="admin-season-name-icon">
                           <FiCalendar />
                         </span>
-                        <span className="admin-season-name-text">
+                        <Link
+                          href={`/admin/seasons/${season.id}/edit`}
+                          className="admin-season-name-text"
+                        >
                           {season.seasonName}
-                        </span>
+                        </Link>
                       </div>
                     </td>
                     <td>{season.leagueName || "—"}</td>

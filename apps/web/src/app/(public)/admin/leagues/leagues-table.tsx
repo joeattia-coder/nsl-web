@@ -172,7 +172,11 @@ export default function LeaguesTable({ leagues }: LeaguesTableProps) {
               ) : (
                 filteredLeagues.map(l => (
                   <tr key={l.id}>
-                    <td>{l.leagueName}</td>
+                    <td>
+                      <Link href={`/admin/leagues/${l.id}`} className="admin-player-full-name">
+                        {l.leagueName}
+                      </Link>
+                    </td>
                     <td>{l.description}</td>
                     <td>{l.isActive ? "Active" : "Inactive"}</td>
                     <td>

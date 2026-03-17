@@ -1,0 +1,130 @@
+.documentsPage {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  padding: 24px 24px 32px;
+}
+
+.documentsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.documentsHero {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.documentsEyebrow {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.documentsTitle {
+  font-size: 1.95rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.documentsSubtitle {
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+}
+
+.emptyState {
+  padding: 20px 0;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.documentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.documentRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.documentRow:hover {
+  background: #171717;
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.documentMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.documentTitle {
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.documentSubMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fileTypeBadge {
+  border-radius: 9999px;
+  background: #334155;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+}
+
+.fileDetailText {
+  color: #94a3b8;
+  font-size: 0.8125rem;
+}
+
+.fileDetailDivider {
+  color: #64748b;
+}
+
+.documentDate {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .documentsPage {
+    padding-top: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .documentRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .documentDate {
+    white-space: normal;
+  }
+}

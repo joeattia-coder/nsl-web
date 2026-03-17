@@ -406,9 +406,12 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                             </div>
                           )}
 
-                          <span className="admin-player-full-name">
+                          <Link
+                            href={`/admin/players/${player.id}/edit`}
+                            className="admin-player-full-name"
+                          >
                             {player.fullName}
-                          </span>
+                          </Link>
                         </div>
                       </td>
 
