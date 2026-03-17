@@ -33,6 +33,8 @@ body {
 /* -------------------- */
 
 .layout {
+  --site-navbar-height: 72px;
+  --site-navbar-height-mobile: 64px;
   display: flex;
   min-height: 100vh;
   width: 100%;
@@ -158,8 +160,9 @@ body {
 /* -------------------- */
 
 .navbar {
-  min-height: 60px;
-  height: auto;
+  height: var(--site-navbar-height);
+  min-height: var(--site-navbar-height);
+  max-height: var(--site-navbar-height);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -168,7 +171,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 40px;
+  padding: 0 40px;
   gap: 18px;
 }
 
@@ -196,6 +199,10 @@ body {
   display: flex;
   gap: 20px;
   justify-content: flex-start;
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .nav-links a {
@@ -213,6 +220,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .login-link {
@@ -461,6 +469,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  min-height: 40px;
   padding: 6px 12px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.06);
@@ -822,7 +831,11 @@ body {
   }
 
   .navbar {
+    height: var(--site-navbar-height-mobile);
+    min-height: var(--site-navbar-height-mobile);
+    max-height: var(--site-navbar-height-mobile);
     padding-left: 68px;
+    padding-right: 16px;
   }
 
   .matches-row {
