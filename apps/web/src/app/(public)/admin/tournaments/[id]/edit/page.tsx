@@ -69,6 +69,9 @@ export default async function EditTournamentPage({ params }: PageProps) {
           venueId: tournament.venueId ?? "",
           tournamentName: tournament.tournamentName,
           participantType: tournament.participantType,
+          registrationDeadline: toDateTimeLocal(
+            tournament.registrationDeadline
+          ),
           startDate: toDateTimeLocal(tournament.startDate),
           endDate: toDateTimeLocal(tournament.endDate),
           status: tournament.status,

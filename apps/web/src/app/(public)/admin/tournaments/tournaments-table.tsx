@@ -18,6 +18,7 @@ type TournamentRow = {
   participantType: string;
   status: string;
   isPublished: boolean;
+  registrationDeadline: string;
   startDate: string;
   endDate: string;
   entriesCount: number;
@@ -41,6 +42,7 @@ type SortKey =
   | "participantType"
   | "status"
   | "isPublished"
+  | "registrationDeadline"
   | "entriesCount"
   | "matchesCount";
 
@@ -50,6 +52,18 @@ function formatStatus(status: string) {
     .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+function formatDateTime(value: string) {
+  if (!value) return "-";
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "-";
+  }
+
+  return parsed.toLocaleString();
 }
 
 export default function TournamentsTable({
@@ -114,6 +128,10 @@ export default function TournamentsTable({
             return formatStatus(tournament.status);
           case "isPublished":
             return tournament.isPublished;
+          case "registrationDeadline":
+            return tournament.registrationDeadline
+              ? new Date(tournament.registrationDeadline).getTime()
+              : -1;
           case "entriesCount":
             return tournament.entriesCount;
           case "matchesCount":
@@ -268,6 +286,13 @@ export default function TournamentsTable({
                   onSort={handleSort}
                 />
                 <SortableHeader
+                  label="Registration Deadline"
+                  columnKey="registrationDeadline"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
                   label="Entries"
                   columnKey="entriesCount"
                   sortKey={sortKey}
@@ -288,7 +313,7 @@ export default function TournamentsTable({
             <tbody>
               {filteredTournaments.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="admin-players-empty">
+                  <td colSpan={8} className="admin-players-empty">
                     {rowsForSeason.length === 0
                       ? "No tournaments found for this season."
                       : "No tournaments match your search."}
@@ -308,6 +333,7 @@ export default function TournamentsTable({
                     <td>{tournament.participantType}</td>
                     <td>{formatStatus(tournament.status)}</td>
                     <td>{tournament.isPublished ? "Yes" : "No"}</td>
+                    <td>{formatDateTime(tournament.registrationDeadline)}</td>
                     <td>{tournament.entriesCount}</td>
                     <td>{tournament.matchesCount}</td>
 

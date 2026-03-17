@@ -50,6 +50,7 @@ model Tournament {
   venueId         String?
   tournamentName  String
   participantType ParticipantType
+  registrationDeadline DateTime?
   startDate       DateTime?
   endDate         DateTime?
   status          TournamentStatus  @default(DRAFT)

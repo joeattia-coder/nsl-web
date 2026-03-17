@@ -31,6 +31,9 @@ export default async function AdminTournamentsPage() {
     participantType: tournament.participantType,
     status: tournament.status,
     isPublished: tournament.isPublished,
+    registrationDeadline: tournament.registrationDeadline
+      ? tournament.registrationDeadline.toISOString()
+      : "",
     startDate: tournament.startDate ? tournament.startDate.toISOString() : "",
     endDate: tournament.endDate ? tournament.endDate.toISOString() : "",
     entriesCount: tournament._count.entries,

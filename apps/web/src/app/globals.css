@@ -23,6 +23,7 @@ html,
 body {
   height: 100%;
   width: 100%;
+  overflow-x: hidden;
   font-family: Arial, sans-serif;
   background: #f4f4f4;
 }
@@ -35,6 +36,7 @@ body {
   display: flex;
   min-height: 100vh;
   width: 100%;
+  overflow-x: hidden;
 }
 
 /* -------------------- */
@@ -43,12 +45,19 @@ body {
 
 .sidebar {
   width: 220px;
+  flex-shrink: 0;
   background: #1c1c1c;
   color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 16px 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .sidebar-nav ul {
@@ -132,8 +141,16 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  width: calc(100% - 220px);
+  margin-left: 220px;
+  height: 100vh;
+  overflow-y: auto;
   background: #000;
   color: white;
+}
+
+.main.main-admin {
+  background: #f9fafb;
 }
 
 /* -------------------- */
@@ -143,6 +160,9 @@ body {
 .navbar {
   min-height: 60px;
   height: auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background: #111;
   color: white;
   display: flex;
@@ -798,6 +818,7 @@ body {
 
   .main {
     width: 100%;
+    margin-left: 0;
   }
 
   .navbar {
@@ -2184,9 +2205,14 @@ body {
 /* RESPONSIVE */
 /* -------------------- */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-width: 769px) {
 .sidebar {
     width: 160px;
+  }
+
+  .main {
+    width: calc(100% - 160px);
+    margin-left: 160px;
   }
 
   .match-line {
@@ -2248,12 +2274,14 @@ body {
 }
 
 
-.mobile-menu-button {
-  display: none;
-}
+@media (min-width: 769px) {
+  .mobile-menu-button {
+    display: none;
+  }
 
-.mobile-sidebar-overlay {
-  display: none;
+  .mobile-sidebar-overlay {
+    display: none;
+  }
 }
 
 
@@ -2320,12 +2348,16 @@ body {
   background: #f9fafb;
 }
 
+.main:has(.admin-page) {
+  background: #f9fafb;
+}
+
 .admin-main:has(.admin-dashboard-page) {
   padding: 0;
 }
 
 .admin-dashboard-page {
-  min-height: calc(100vh - 60px);
+  min-height: 100%;
   padding: 16px 20px 24px;
 }
 
@@ -2365,7 +2397,7 @@ body {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 16px;
-  min-height: calc(100vh - 150px);
+  min-height: 0;
   align-content: start;
 }
 

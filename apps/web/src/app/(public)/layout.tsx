@@ -221,7 +221,7 @@ function LayoutChrome({
         </nav>
       </aside>
 
-      <div className="main">
+      <div className={`main${isAdminRoute ? " main-admin" : ""}`}>
         <nav className="navbar">
           <div className="nav-links">
             {showAdminNavigation ? (

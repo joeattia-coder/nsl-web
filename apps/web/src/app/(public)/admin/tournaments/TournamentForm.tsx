@@ -41,6 +41,7 @@ type TournamentFormData = {
   venueId: string;
   tournamentName: string;
   participantType: TournamentParticipantType;
+  registrationDeadline: string;
   startDate: string;
   endDate: string;
   status: TournamentStatus;
@@ -99,6 +100,9 @@ export default function TournamentForm({
     useState<TournamentParticipantType>(
       initialData?.participantType ?? "Singles"
     );
+  const [registrationDeadline, setRegistrationDeadline] = useState(
+    initialData?.registrationDeadline ?? ""
+  );
   const [startDate, setStartDate] = useState(initialData?.startDate ?? "");
   const [endDate, setEndDate] = useState(initialData?.endDate ?? "");
   const [status, setStatus] = useState<TournamentStatus>(
@@ -150,6 +154,7 @@ export default function TournamentForm({
         venueId: venueId || null,
         tournamentName: trimmedTournamentName,
         participantType,
+        registrationDeadline: registrationDeadline || null,
         startDate: startDate || null,
         endDate: endDate || null,
         status,
@@ -335,6 +340,19 @@ export default function TournamentForm({
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className="admin-form-field">
+              <label htmlFor="registrationDeadline" className="admin-label">
+                Registration Deadline
+              </label>
+              <input
+                id="registrationDeadline"
+                type="datetime-local"
+                value={registrationDeadline}
+                onChange={(e) => setRegistrationDeadline(e.target.value)}
+                className="admin-input admin-player-form-input"
+              />
             </div>
 
             <div className="admin-form-field">
