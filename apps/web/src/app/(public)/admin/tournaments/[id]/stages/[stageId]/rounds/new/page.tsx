@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TournamentSubnav from "../../../../TournamentSubnav";
-import StageSubnav from "../../StageSubnav";
 import StageRoundForm from "../StageRoundForm";
 
 export default async function NewStageRoundPage({
@@ -44,11 +43,6 @@ export default async function NewStageRoundPage({
       </div>
 
       <TournamentSubnav tournamentId={stage.tournament.id} active="rounds" />
-      <StageSubnav
-        tournamentId={stage.tournament.id}
-        stageId={stage.id}
-        active="rounds"
-      />
 
       <StageRoundForm
         mode="create"

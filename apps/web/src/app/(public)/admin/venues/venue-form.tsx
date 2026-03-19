@@ -359,10 +359,10 @@ export default function VenueForm({ mode, venueId }: VenueFormProps) {
 
               <div className="admin-form-field admin-form-field-full">
                 <label className="admin-label">Venue Logo</label>
-                <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                <div className="admin-upload-panel">
                   <button
                     type="button"
-                    className="admin-player-form-button admin-player-form-button-secondary"
+                    className="admin-player-form-button admin-player-form-button-secondary admin-player-form-button-upload"
                     onClick={() => logoInputRef.current?.click()}
                     disabled={uploadingLogo}
                   >
@@ -382,7 +382,7 @@ export default function VenueForm({ mode, venueId }: VenueFormProps) {
                     }}
                   />
                   <input type="hidden" value={logoUrl} readOnly />
-                  <div className="text-sm text-slate-500">
+                  <div className="admin-upload-help">
                     {logoUrl
                       ? "Venue logo uploaded and ready for homepage or venue listings."
                       : "Upload a venue logo to use in admin and public displays."}

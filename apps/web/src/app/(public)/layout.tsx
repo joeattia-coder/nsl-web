@@ -53,19 +53,12 @@ const adminSidebarItems: AdminNavItem[] = [
 ];
 
 const adminTopLinks = [
-  { href: "/admin", label: "Admin Home" },
-  { href: "/admin/players", label: "Players" },
-  { href: "/admin/seasons", label: "Seasons" },
-  { href: "/admin/tournaments", label: "Tournaments" },
-  { href: "/admin/matches", label: "Matches" },
-  { href: "/admin/documents", label: "Documents" },
-  { href: "/admin/faqs", label: "FAQs" },
-  { href: "/admin/videos", label: "Videos" },
-  {
-    href: "/admin/security",
-    label: "Security",
-    permissions: ["users.view", "roles.view", "permissions.view"],
-  },
+  { href: "/", label: "Home" },
+  { href: "/news", label: "News" },
+  { href: "/documents", label: "Documents" },
+  { href: "/faqs", label: "FAQ" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 function LayoutChrome({
@@ -73,11 +66,15 @@ function LayoutChrome({
   isAdminRoute,
   mobileMenuOpen,
   setMobileMenuOpen,
+  theme,
+  onToggleTheme,
 }: {
   children: React.ReactNode;
   isAdminRoute: boolean;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  theme: "dark" | "light";
+  onToggleTheme: () => void;
 }) {
   const { currentUser, hasPermission, logout } = useAdminAuth();
   const router = useRouter();
@@ -136,7 +133,7 @@ function LayoutChrome({
 
       <aside className={`sidebar${mobileMenuOpen ? " sidebar-open" : ""}`}>
         <div className="sidebar-logo">
-          <Link href={showAdminNavigation ? "/admin" : "/"} onClick={closeMobileMenu}>
+          <Link href={isAdminRoute ? "/admin" : "/"} onClick={closeMobileMenu}>
             <Image
               src="/images/nsl-logo.svg"
               alt="National Snooker League Logo"
@@ -237,8 +234,7 @@ function LayoutChrome({
             ) : (
               <>
                 <Link href="/">Home</Link>
-                <Link href="/tournaments">Tournaments</Link>
-                <Link href="/venues">Venues</Link>
+                <Link href="/news">News</Link>
                 <Link href="/documents">Documents</Link>
                 <Link href="/faqs">FAQ</Link>
                 <Link href="/about">About</Link>
@@ -248,6 +244,15 @@ function LayoutChrome({
           </div>
 
           <div className="navbar-right">
+            <button
+              type="button"
+              className="theme-toggle-button"
+              onClick={onToggleTheme}
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            >
+              {theme === "dark" ? "Light" : "Dark"}
+            </button>
+
             {currentUser ? (
               <div className="admin-user-menu-shell">
                 <button
@@ -316,10 +321,27 @@ export default function PublicLayout({
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname, setMobileMenuOpen]);
+
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem("nsl-theme");
+
+    if (storedTheme === "light" || storedTheme === "dark") {
+      setTheme(storedTheme);
+      return;
+    }
+
+    setTheme("dark");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    window.localStorage.setItem("nsl-theme", theme);
+  }, [theme]);
 
   return (
     <AdminAuthProvider enabled>
@@ -327,6 +349,8 @@ export default function PublicLayout({
         isAdminRoute={isAdminRoute}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        theme={theme}
+        onToggleTheme={() => setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"))}
       >
         {children}
       </LayoutChrome>

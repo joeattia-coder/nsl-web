@@ -179,7 +179,7 @@ export default function LeagueForm({ mode, leagueId }: LeagueFormProps) {
                 </label>
                 <label
                   htmlFor="logoFile"
-                  className="admin-player-form-button admin-player-form-button-secondary admin-player-upload-trigger"
+                  className="admin-player-form-button admin-player-form-button-secondary admin-player-form-button-upload admin-player-upload-trigger"
                   style={{ display: "inline-flex", alignItems: "center", cursor: "pointer", marginBottom: 8 }}
                 >
                   <span style={{ marginRight: 8 }}>Upload Logo</span>

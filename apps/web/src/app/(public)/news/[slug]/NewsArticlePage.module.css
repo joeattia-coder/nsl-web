@@ -1,7 +1,7 @@
 .newsArticlePage {
   min-height: 100vh;
-  background: #000;
-  color: #fff;
+  background: var(--theme-page-bg);
+  color: var(--theme-page-text);
   padding: 24px 24px 32px;
 }
 
@@ -10,7 +10,7 @@
 }
 
 .newsArticleFlow {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--theme-page-muted-1);
 }
 
 .newsArticleHeroImage {
@@ -24,7 +24,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--theme-page-muted-4);
 }
 
 .newsArticleTitle {
@@ -33,7 +33,7 @@
   font-size: 2rem;
   line-height: 1.12;
   font-weight: 700;
-  color: #fff;
+  color: var(--theme-page-text);
 }
 
 .newsArticleExcerpt {
@@ -41,7 +41,7 @@
   max-width: 960px;
   font-size: 1rem;
   line-height: 1.8;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--theme-page-muted-2);
 }
 
 .newsArticleSpacer {
@@ -51,7 +51,7 @@
 .newsArticleBody {
   margin-top: 0;
   max-width: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--theme-page-muted-1);
 }
 
 @media (min-width: 768px) {

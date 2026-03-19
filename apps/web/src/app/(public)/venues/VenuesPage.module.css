@@ -1,7 +1,7 @@
 .venuesPage {
   min-height: 100vh;
-  background: #000;
-  color: #fff;
+  background: var(--theme-page-bg);
+  color: var(--theme-page-text);
   padding: 24px 24px 32px;
 }
 
@@ -25,12 +25,12 @@
 
 .venuesSubtitle {
   max-width: 760px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--theme-page-muted-2);
   line-height: 1.7;
 }
 
 .emptyState {
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--theme-page-muted-3);
 }
 
 .venuesGrid {
@@ -44,24 +44,24 @@
   gap: 16px;
   align-items: start;
   padding: 16px;
-  background: #111;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--theme-surface-1);
+  border: 1px solid var(--theme-border-soft);
   text-decoration: none;
   color: inherit;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .venueCard:hover {
-  background: #171717;
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--theme-surface-2);
+  border-color: var(--theme-border-strong);
   transform: translateY(-2px);
 }
 
 .venueCardLogoShell {
   width: 120px;
   height: 96px;
-  background: #161616;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--theme-surface-3);
+  border: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,11 +73,11 @@
   height: 100%;
   object-fit: contain;
   display: block;
-  background: #111;
+  background: var(--theme-surface-1);
 }
 
 .venueCardLogoFallback {
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--theme-page-muted-5);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -104,7 +104,7 @@
 }
 
 .venueCardAddressLine {
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--theme-page-muted-3);
   line-height: 1.6;
 }
 

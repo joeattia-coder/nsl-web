@@ -1,7 +1,7 @@
 .newsPage {
   min-height: 100vh;
-  background: #000;
-  color: #fff;
+  background: var(--theme-page-bg);
+  color: var(--theme-page-text);
   padding: 24px 24px 32px;
 }
 
@@ -22,7 +22,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--theme-page-muted-3);
 }
 
 .newsTitle {
@@ -33,13 +33,13 @@
 
 .newsSubtitle {
   max-width: 760px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--theme-page-muted-2);
   line-height: 1.7;
 }
 
 .emptyState {
   padding: 20px 0;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--theme-page-muted-3);
 }
 
 .newsGrid {
@@ -51,14 +51,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #111;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--theme-surface-1);
+  border: 1px solid var(--theme-border-soft);
+  border-radius: 8px;
   transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .newsCard:hover {
-  background: #171717;
-  border-color: rgba(255, 255, 255, 0.22);
+  background: var(--theme-surface-2);
+  border-color: var(--theme-border-strong);
   transform: translateY(-2px);
 }
 
@@ -74,8 +75,8 @@
   align-items: center;
   justify-content: center;
   height: 224px;
-  background: #151515;
-  color: rgba(255, 255, 255, 0.7);
+  background: var(--theme-surface-5);
+  color: var(--theme-page-muted-4);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -94,14 +95,14 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
+  color: var(--theme-page-muted-5);
 }
 
 .newsCardTitle {
   font-size: 1.45rem;
   line-height: 1.2;
   font-weight: 700;
-  color: #fff;
+  color: var(--theme-page-text);
 }
 
 .newsCardTitleLink {
@@ -109,11 +110,11 @@
 }
 
 .newsCardTitleLink:hover {
-  color: rgba(255, 255, 255, 0.84);
+  color: var(--theme-page-muted-1);
 }
 
 .newsCardExcerpt {
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--theme-page-muted-3);
   line-height: 1.7;
 }
 
@@ -124,9 +125,9 @@
   justify-content: center;
   min-height: 38px;
   padding: 9px 14px;
-  background: #fff;
-  color: #111;
-  border: 1px solid #fff;
+  background: var(--theme-button-solid-bg);
+  color: var(--theme-button-solid-text);
+  border: 1px solid var(--theme-button-solid-border);
   border-radius: 4px;
   font-size: 0.92rem;
   font-weight: 700;
@@ -136,9 +137,9 @@
 .newsCardLink:visited,
 .newsCardLink:hover,
 .newsCardLink:active {
-  background: #fff;
-  color: #111;
-  border-color: #fff;
+  background: var(--theme-button-solid-bg);
+  color: var(--theme-button-solid-text);
+  border-color: var(--theme-button-solid-border);
 }
 
 .newsCardLink:hover {

@@ -7,7 +7,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
-import { FiArrowLeft, FiEdit2, FiPlus, FiTrash2, FiFolder } from "react-icons/fi";
+import { FiEdit2, FiPlus, FiTrash2, FiFolder } from "react-icons/fi";
 
 type StageRow = {
   id: string;
@@ -152,14 +152,6 @@ export default function TournamentStagesTable({
 
         <div className="admin-players-toolbar-right">
           <Link
-            href={`/admin/tournaments/${tournamentId}/edit`}
-            className="admin-toolbar-button admin-toolbar-button-cancel"
-          >
-            <FiArrowLeft />
-            <span>Back to Tournament</span>
-          </Link>
-
-          <Link
             href={`/admin/tournaments/${tournamentId}/stages/new`}
             className="admin-toolbar-button admin-toolbar-button-add"
           >
@@ -248,7 +240,7 @@ export default function TournamentStagesTable({
 
                         <Link
                             href={`/admin/tournaments/${tournamentId}/stages/${stage.id}/rounds`}
-                            className="admin-icon-action"
+                            className="admin-icon-action admin-icon-action-navigate"
                             aria-label={`Manage rounds for ${stage.stageName}`}
                             title="Rounds"
                             >

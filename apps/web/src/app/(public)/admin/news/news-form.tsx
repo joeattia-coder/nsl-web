@@ -288,10 +288,10 @@ export default function NewsForm({ mode, articleId }: NewsFormProps) {
 
               <div className="admin-form-field admin-form-field-full">
                 <label className="admin-label">Cover Image</label>
-                <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                <div className="admin-upload-panel">
                   <button
                     type="button"
-                    className="admin-player-form-button admin-player-form-button-secondary"
+                    className="admin-player-form-button admin-player-form-button-secondary admin-player-form-button-upload"
                     onClick={() => coverInputRef.current?.click()}
                     disabled={uploadingCover}
                   >
@@ -311,7 +311,7 @@ export default function NewsForm({ mode, articleId }: NewsFormProps) {
                     }}
                   />
                   <input type="hidden" value={coverImageUrl} readOnly />
-                  <div className="text-sm text-slate-500">
+                  <div className="admin-upload-help">
                     {coverImageUrl
                       ? "Cover image uploaded and attached to this article."
                       : "Upload a cover image to feature with this article."}

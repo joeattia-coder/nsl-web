@@ -1,13 +1,16 @@
 .page {
-  --background: #fafafa;
-  --foreground: #fff;
+  --background: var(--theme-page-bg);
+  --foreground: var(--theme-surface-1);
 
-  --text-primary: #000;
-  --text-secondary: #666;
+  --text-primary: var(--theme-page-text);
+  --text-secondary: var(--theme-page-muted-3);
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
+  --button-primary-bg: var(--theme-button-solid-bg);
+  --button-primary-text: var(--theme-button-solid-text);
+  --button-primary-hover: color-mix(in srgb, var(--theme-button-solid-bg) 88%, var(--theme-page-bg));
+  --button-secondary-bg: transparent;
+  --button-secondary-hover: var(--theme-surface-2);
+  --button-secondary-border: var(--theme-border-soft);
 
   display: flex;
   min-height: 100vh;
@@ -84,12 +87,14 @@
 }
 
 a.primary {
-  background: var(--text-primary);
-  color: var(--background);
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
   gap: 8px;
 }
 
 a.secondary {
+  background: var(--button-secondary-bg);
+  color: var(--text-primary);
   border-color: var(--button-secondary-border);
 }
 
@@ -122,20 +127,8 @@ a.secondary {
   }
 }
 
-@media (prefers-color-scheme: dark) {
+html[data-theme="dark"] {
   .logo {
     filter: invert();
-  }
-
-  .page {
-    --background: #000;
-    --foreground: #000;
-
-    --text-primary: #ededed;
-    --text-secondary: #999;
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
   }
 }

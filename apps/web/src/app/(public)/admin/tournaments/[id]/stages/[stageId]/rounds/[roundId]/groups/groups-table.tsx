@@ -7,7 +7,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
-import { FiArrowLeft, FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type GroupRow = {
   id: string;
@@ -253,14 +253,6 @@ export default function GroupsTable({
         </div>
 
         <div className="admin-players-toolbar-right">
-          <Link
-            href={`/admin/tournaments/${tournamentId}/stages/${stageId}/rounds`}
-            className="admin-toolbar-button admin-toolbar-button-cancel"
-          >
-            <FiArrowLeft />
-            <span>Back to Rounds</span>
-          </Link>
-
           <button
             type="button"
             className="admin-toolbar-button admin-toolbar-button-add"

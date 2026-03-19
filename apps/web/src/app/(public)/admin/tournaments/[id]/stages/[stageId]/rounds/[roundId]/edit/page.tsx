@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TournamentSubnav from "../../../../../TournamentSubnav";
-import StageSubnav from "../../../StageSubnav";
 import StageRoundForm from "../../StageRoundForm";
 
 export default async function EditStageRoundPage({
@@ -50,11 +49,7 @@ export default async function EditStageRoundPage({
         tournamentId={round.tournamentStage.tournament.id}
         active="rounds"
       />
-      <StageSubnav
-        tournamentId={round.tournamentStage.tournament.id}
-        stageId={round.tournamentStage.id}
-        active="rounds"
-      />
+
 
       <StageRoundForm
         mode="edit"

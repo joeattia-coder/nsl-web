@@ -64,7 +64,7 @@ export default async function AdminLeaguesPage() {
 
   return (
     <section className="admin-page">
-      <div className="admin-leagues-header">
+      <div className="admin-players-header">
         <h1 className="admin-page-title">Leagues</h1>
         <p className="admin-page-subtitle">
           Manage leagues, descriptions, and status.

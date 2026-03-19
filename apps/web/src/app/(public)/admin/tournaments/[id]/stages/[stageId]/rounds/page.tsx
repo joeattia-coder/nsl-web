@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TournamentSubnav from "../../../TournamentSubnav";
-import StageSubnav from "../StageSubnav";
 import StageRoundsTable from "./rounds-table";
 
 export const dynamic = "force-dynamic";
@@ -63,11 +62,6 @@ export default async function StageRoundsPage({
       </div>
 
       <TournamentSubnav tournamentId={stage.tournament.id} active="rounds" />
-      <StageSubnav
-        tournamentId={stage.tournament.id}
-        stageId={stage.id}
-        active="rounds"
-      />
 
       <StageRoundsTable
         tournamentId={stage.tournament.id}

@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--theme-overlay-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,16 +17,16 @@
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
-  background: #1a1a1a;
+  background: var(--theme-modal-bg);
   border-radius: 8px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-  color: #fff;
+  box-shadow: var(--theme-shadow-strong);
+  color: var(--theme-page-text);
   overflow: hidden;
 }
 
 .header {
   padding: 20px 24px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--theme-modal-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,7 +41,7 @@
 .closeButton {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--theme-page-text);
   font-size: 24px;
   cursor: pointer;
   padding: 0;
@@ -55,7 +55,7 @@
 }
 
 .closeButton:hover:not(:disabled) {
-  background-color: #333;
+  background-color: var(--theme-surface-3);
 }
 
 .closeButton:disabled {
@@ -83,8 +83,8 @@
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #333;
-  border-top-color: #fff;
+  border: 3px solid var(--theme-modal-border);
+  border-top-color: var(--theme-page-text);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -114,7 +114,7 @@
 }
 
 .cropArea {
-  border: 2px solid #fff;
+  border: 2px solid var(--theme-page-text);
 }
 
 .controls {
@@ -141,7 +141,7 @@
   flex: 1;
   height: 6px;
   border-radius: 3px;
-  background: #333;
+  background: var(--theme-modal-border);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
@@ -153,24 +153,24 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--theme-page-text);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--theme-shadow-soft);
 }
 
 .slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--theme-page-text);
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--theme-shadow-soft);
 }
 
 .footer {
   padding: 16px 24px;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--theme-modal-border);
   display: flex;
   gap: 12px;
   justify-content: flex-end;
@@ -188,21 +188,21 @@
 }
 
 .cancelButton {
-  background: #333;
-  color: #fff;
+  background: var(--theme-surface-3);
+  color: var(--theme-page-text);
 }
 
 .cancelButton:hover:not(:disabled) {
-  background: #444;
+  background: var(--theme-surface-2);
 }
 
 .confirmButton {
-  background: #fff;
-  color: #000;
+  background: var(--theme-button-solid-bg);
+  color: var(--theme-button-solid-text);
 }
 
 .confirmButton:hover:not(:disabled) {
-  background: #f0f0f0;
+  filter: brightness(0.95);
 }
 
 .confirmButton:disabled,

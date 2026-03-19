@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TournamentSubnav from "../../../../../../TournamentSubnav";
-import StageSubnav from "../../../../StageSubnav";
-import RoundSubnav from "../../../RoundSubnav";
+
 import ManageGroupForm from "./ManageGroupForm";
 
 function getPlayerFullName(player: {
@@ -161,17 +160,7 @@ export default async function ManageGroupPage({
         tournamentId={group.stageRound.tournamentStage.tournament.id}
         active="groups"
       />
-      <StageSubnav
-        tournamentId={group.stageRound.tournamentStage.tournament.id}
-        stageId={group.stageRound.tournamentStage.id}
-        active="rounds"
-      />
-      <RoundSubnav
-        tournamentId={group.stageRound.tournamentStage.tournament.id}
-        stageId={group.stageRound.tournamentStage.id}
-        roundId={group.stageRound.id}
-        active="groups"
-      />
+
 
       <ManageGroupForm
         tournamentId={group.stageRound.tournamentStage.tournament.id}

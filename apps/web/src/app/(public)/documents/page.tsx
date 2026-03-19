@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { DocumentsGallery } from "./DocumentsGallery";
 import styles from "./DocumentsPage.module.css";
 
 export const dynamic = "force-dynamic";
@@ -23,19 +23,6 @@ function formatFileSize(sizeBytes: number | null) {
   }
 
   return `${value.toFixed(value >= 100 ? 0 : 1)} ${units[unitIndex]}`;
-}
-
-function getFileTypeBadgeLabel(fileName: string | null, mimeType: string | null) {
-  const lowerName = (fileName || "").toLowerCase();
-  const lowerMime = (mimeType || "").toLowerCase();
-
-  if (lowerMime.includes("pdf") || lowerName.endsWith(".pdf")) return "PDF";
-  if (lowerMime.includes("word") || lowerName.endsWith(".doc") || lowerName.endsWith(".docx")) return "DOC";
-  if (lowerMime.includes("excel") || lowerMime.includes("spreadsheet") || lowerName.endsWith(".xls") || lowerName.endsWith(".xlsx")) return "XLS";
-  if (lowerMime.includes("powerpoint") || lowerName.endsWith(".ppt") || lowerName.endsWith(".pptx")) return "PPT";
-  if (lowerMime.includes("text/plain") || lowerName.endsWith(".txt")) return "TXT";
-
-  return "FILE";
 }
 
 export default async function PublicDocumentsPage() {
@@ -67,32 +54,17 @@ export default async function PublicDocumentsPage() {
         {documents.length === 0 ? (
           <div className={styles.emptyState}>No documents available yet.</div>
         ) : (
-          <div className={styles.documentsList}>
-            {documents.map((document) => (
-              <Link
-                key={document.id}
-                href={document.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.documentRow}
-              >
-                <div className={styles.documentMeta}>
-                  <span className={styles.documentTitle}>{document.title}</span>
-                  <div className={styles.documentSubMeta}>
-                    <span className={styles.fileTypeBadge}>
-                      {getFileTypeBadgeLabel(document.fileName, document.mimeType)}
-                    </span>
-                    <span className={styles.fileDetailText}>{document.fileName || "Document"}</span>
-                    <span className={styles.fileDetailDivider}>•</span>
-                    <span className={styles.fileDetailText}>{formatFileSize(document.sizeBytes)}</span>
-                  </div>
-                </div>
-                <span className={styles.documentDate}>
-                  {new Date(document.updatedAt).toLocaleDateString()}
-                </span>
-              </Link>
-            ))}
-          </div>
+          <DocumentsGallery
+            documents={documents.map((document) => ({
+              id: document.id,
+              title: document.title,
+              fileUrl: document.fileUrl,
+              fileName: document.fileName,
+              mimeType: document.mimeType,
+              sizeLabel: formatFileSize(document.sizeBytes),
+              updatedAtLabel: new Date(document.updatedAt).toLocaleDateString(),
+            }))}
+          />
         )}
       </section>
     </main>

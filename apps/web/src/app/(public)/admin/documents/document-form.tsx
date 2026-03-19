@@ -274,10 +274,10 @@ export default function DocumentForm({ mode, documentId }: DocumentFormProps) {
 
             <div className="admin-form-field admin-form-field-full">
               <label className="admin-label">Upload Document</label>
-              <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+              <div className="admin-upload-panel">
                 <button
                   type="button"
-                  className="admin-player-form-button admin-player-form-button-secondary"
+                  className="admin-player-form-button admin-player-form-button-secondary admin-player-form-button-upload"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
                 >
@@ -291,7 +291,7 @@ export default function DocumentForm({ mode, documentId }: DocumentFormProps) {
                   className="hidden"
                   onChange={handleFileChange}
                 />
-                <div className="text-sm text-slate-500">
+                <div className="admin-upload-help">
                   {selectedFile
                     ? `${selectedFile.name} selected and ready to upload on save.`
                     : fileName

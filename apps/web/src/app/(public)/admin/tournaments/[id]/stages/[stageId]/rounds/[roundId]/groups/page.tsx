@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TournamentSubnav from "../../../../../TournamentSubnav";
-import StageSubnav from "../../../StageSubnav";
-import RoundSubnav from "../../RoundSubnav";
 import GroupsTable from "./groups-table";
 
 export const dynamic = "force-dynamic";
@@ -74,17 +72,7 @@ export default async function RoundGroupsPage({
         tournamentId={round.tournamentStage.tournament.id}
         active="groups"
       />
-      <StageSubnav
-        tournamentId={round.tournamentStage.tournament.id}
-        stageId={round.tournamentStage.id}
-        active="rounds"
-      />
-      <RoundSubnav
-        tournamentId={round.tournamentStage.tournament.id}
-        stageId={round.tournamentStage.id}
-        roundId={round.id}
-        active="groups"
-      />
+
 
       <GroupsTable
         tournamentId={round.tournamentStage.tournament.id}
