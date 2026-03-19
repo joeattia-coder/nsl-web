@@ -32,6 +32,12 @@ type AdminNavItem = {
   permissions?: string[];
 };
 
+type AdminTopLink = {
+  href: string;
+  label: string;
+  permissions?: string[];
+};
+
 const adminSidebarItems: AdminNavItem[] = [
   { href: "/admin", label: "Dashboard", icon: FiHome },
   { href: "/admin/leagues", label: "Leagues", icon: FiBarChart2 },
@@ -52,7 +58,7 @@ const adminSidebarItems: AdminNavItem[] = [
   },
 ];
 
-const adminTopLinks = [
+const adminTopLinks: AdminTopLink[] = [
   { href: "/", label: "Home" },
   { href: "/news", label: "News" },
   { href: "/documents", label: "Documents" },
