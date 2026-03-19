@@ -4,6 +4,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "National Snooker League",
   description: "Your professional snooker platform.",
+  icons: {
+    icon: "/images/favicon.png",
+  },
 };
 
 export default function RootLayout({
