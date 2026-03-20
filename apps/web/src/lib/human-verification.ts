@@ -82,7 +82,13 @@ export function validateHumanVerification(token: string, answer: string) {
     return "Human verification expired or invalid. Please try again.";
   }
 
-  const numericAnswer = Number.parseInt(String(answer ?? "").trim(), 10);
+  const normalizedAnswer = String(answer ?? "").trim();
+
+  if (!/^-?\d+$/.test(normalizedAnswer)) {
+    return "Human verification answer is incorrect.";
+  }
+
+  const numericAnswer = Number.parseInt(normalizedAnswer, 10);
 
   if (!Number.isFinite(numericAnswer) || numericAnswer !== parsed.answer) {
     return "Human verification answer is incorrect.";

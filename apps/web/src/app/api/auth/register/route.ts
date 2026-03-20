@@ -50,6 +50,30 @@ function getRequestOrigin(request: Request) {
 }
 
 export async function POST(request: Request) {
+  let createdUserId: string | null = null;
+
+  async function rollbackCreatedRegistration(userId: string) {
+    await prisma.$transaction(async (tx) => {
+      await tx.emailVerificationToken.deleteMany({
+        where: {
+          userId,
+        },
+      });
+
+      await tx.player.deleteMany({
+        where: {
+          userId,
+        },
+      });
+
+      await tx.user.deleteMany({
+        where: {
+          id: userId,
+        },
+      });
+    });
+  }
+
   try {
     const body = await request.json().catch(() => null);
 
@@ -159,16 +183,29 @@ export async function POST(request: Request) {
       return user;
     });
 
+    createdUserId = created.id;
+
     const verificationLink = `${getRequestOrigin(request)}/api/auth/verify-email?token=${encodeURIComponent(rawToken)}`;
     const emailConfigured = isEmailDeliveryConfigured();
 
     if (emailConfigured) {
-      await sendPlayerRegistrationVerificationEmail({
-        to: email,
-        verificationLink,
-        expiresAt,
-        firstName,
-      });
+      try {
+        await sendPlayerRegistrationVerificationEmail({
+          to: email,
+          verificationLink,
+          expiresAt,
+          firstName,
+        });
+      } catch (deliveryError) {
+        await rollbackCreatedRegistration(created.id);
+        createdUserId = null;
+
+        throw new Error(
+          deliveryError instanceof Error
+            ? deliveryError.message
+            : "Failed to deliver verification email."
+        );
+      }
     } else {
       console.info(`Registration verification link for ${email}: ${verificationLink}`);
     }
@@ -186,6 +223,14 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("POST /api/auth/register error:", error);
+
+    if (createdUserId) {
+      try {
+        await rollbackCreatedRegistration(createdUserId);
+      } catch (rollbackError) {
+        console.error("POST /api/auth/register rollback error:", rollbackError);
+      }
+    }
 
     return NextResponse.json(
       {

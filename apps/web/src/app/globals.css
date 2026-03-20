@@ -4168,6 +4168,53 @@ html[data-theme="light"] .group-pill.active:hover {
   font-size: 13px;
 }
 
+.admin-player-crop-panel {
+  margin-top: 14px;
+  border: 1px solid var(--theme-border-soft);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--theme-surface-2);
+}
+
+.admin-player-crop-title {
+  margin: 0 0 10px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--theme-page-ink);
+}
+
+.admin-player-cropper-wrap {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--theme-surface-4);
+}
+
+.admin-player-crop-controls {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-player-crop-zoom-label {
+  color: var(--theme-page-muted-2);
+  font-size: 13px;
+}
+
+.admin-player-crop-slider {
+  flex: 1;
+}
+
+.admin-player-crop-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .admin-player-country-cell {
   text-align: center;
   vertical-align: middle;

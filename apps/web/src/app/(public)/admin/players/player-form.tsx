@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Cropper, { type Area } from "react-easy-crop";
 import { FiArrowLeft, FiImage, FiMail, FiSave, FiScissors, FiUpload, FiUserPlus, FiX } from "react-icons/fi";
-import { PhotoCropModal } from "./PhotoCropModal";
-import { dataUrlToFile } from "@/lib/image-processing";
+import { blobToFile, cropAndResizeToWebP, dataUrlToFile } from "@/lib/image-processing";
 
 type PlayerFormMode = "create" | "edit";
 
@@ -70,9 +70,19 @@ export default function PlayerForm({
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string>("");
   const photoInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Crop modal state
-  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [isCropEditorOpen, setIsCropEditorOpen] = useState(false);
+  const [isCropping, setIsCropping] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isRemovingBackground, setIsRemovingBackground] = useState(false);
+
+  const handleCropAreaComplete = useCallback(
+    (_croppedArea: Area, croppedPixels: Area) => {
+      setCroppedAreaPixels(croppedPixels);
+    },
+    []
+  );
 
   useEffect(() => {
     if (!isEdit || !playerId) return;
@@ -168,7 +178,7 @@ export default function PlayerForm({
     }
 
     setError(null);
-    setIsCropModalOpen(false);
+    setIsCropEditorOpen(false);
     setPhotoFile(file);
   }
 
@@ -177,7 +187,9 @@ export default function PlayerForm({
     setPhotoFile(null);
     setPhotoPreviewUrl("");
     setPhotoUrl("");
-    setIsCropModalOpen(false);
+    setIsCropEditorOpen(false);
+    setCroppedAreaPixels(null);
+    setZoom(1);
 
     if (photoInputRef.current) {
       photoInputRef.current.value = "";
@@ -226,20 +238,41 @@ export default function PlayerForm({
     }
   }
 
-  function handleOpenCropModal() {
+  function handleOpenCropEditor() {
     if (!previewImage) {
       setError("Upload a photo before cropping.");
       return;
     }
 
     setError(null);
-    setIsCropModalOpen(true);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+    setIsCropEditorOpen(true);
   }
 
-  async function handleCropComplete(processedFile: File) {
-    // Update the photo file with the cropped, resized, WebP version.
-    setPhotoFile(processedFile);
+  async function handleApplyCrop() {
+    if (!previewImage || !croppedAreaPixels) {
+      setError("Adjust the crop area before applying.");
+      return;
+    }
+
+    setIsCropping(true);
     setError(null);
+
+    try {
+      const processedBlob = await cropAndResizeToWebP(previewImage, croppedAreaPixels, 600);
+      const processedFile = blobToFile(processedBlob, `player-photo-${Date.now()}.webp`);
+
+      setPhotoFile(processedFile);
+      setIsCropEditorOpen(false);
+      setCroppedAreaPixels(null);
+    } catch (cropError) {
+      console.error(cropError);
+      setError(cropError instanceof Error ? cropError.message : "Failed to crop photo.");
+    } finally {
+      setIsCropping(false);
+    }
   }
 
   async function uploadPhotoIfNeeded() {
@@ -381,13 +414,6 @@ export default function PlayerForm({
 
   return (
     <div className="admin-page">
-      <PhotoCropModal
-        imageDataUrl={previewImage}
-        isOpen={isCropModalOpen}
-        onClose={() => setIsCropModalOpen(false)}
-        onConfirm={handleCropComplete}
-      />
-
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">
@@ -523,7 +549,7 @@ export default function PlayerForm({
                 accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                 onChange={handlePhotoChange}
                 className="admin-player-file-input"
-                disabled={isRemovingBackground || isCropModalOpen}
+                disabled={isRemovingBackground || isCropEditorOpen || isCropping}
               />
 
               <p className="admin-player-file-help">
@@ -557,23 +583,78 @@ export default function PlayerForm({
 
                   <button
                     type="button"
-                    onClick={handleOpenCropModal}
-                    disabled={isRemovingBackground || saving || uploadingPhoto}
+                    onClick={handleOpenCropEditor}
+                    disabled={isRemovingBackground || saving || uploadingPhoto || isCropping}
                     className="admin-player-form-button admin-player-form-button-secondary"
                   >
                     <FiScissors />
-                    <span>Crop Photo</span>
+                    <span>{isCropEditorOpen ? "Cropper Open" : "Crop Photo"}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
-                    disabled={isRemovingBackground || saving || uploadingPhoto}
+                    disabled={isRemovingBackground || saving || uploadingPhoto || isCropping}
                     className="admin-player-form-button admin-player-form-button-danger"
                   >
                     <FiX />
                     <span>{photoFile ? "Remove Selected Photo" : "Remove Photo"}</span>
                   </button>
+                </div>
+              ) : null}
+
+              {previewImage && isCropEditorOpen ? (
+                <div className="admin-player-crop-panel">
+                  <p className="admin-player-crop-title">Crop Player Photo</p>
+                  <div className="admin-player-cropper-wrap">
+                    <Cropper
+                      image={previewImage}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1}
+                      cropShape="round"
+                      showGrid
+                      restrictPosition
+                      onCropChange={setCrop}
+                      onCropComplete={handleCropAreaComplete}
+                      onZoomChange={setZoom}
+                    />
+                  </div>
+
+                  <div className="admin-player-crop-controls">
+                    <label htmlFor="playerCropZoom" className="admin-player-crop-zoom-label">
+                      Zoom
+                    </label>
+                    <input
+                      id="playerCropZoom"
+                      type="range"
+                      min="1"
+                      max="3"
+                      step="0.1"
+                      value={zoom}
+                      onChange={(event) => setZoom(Number.parseFloat(event.target.value))}
+                      className="admin-player-crop-slider"
+                    />
+                  </div>
+
+                  <div className="admin-player-crop-actions">
+                    <button
+                      type="button"
+                      onClick={() => setIsCropEditorOpen(false)}
+                      className="admin-player-form-button admin-player-form-button-secondary"
+                      disabled={isCropping}
+                    >
+                      Cancel Crop
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleApplyCrop()}
+                      className="admin-player-form-button admin-player-form-button-primary"
+                      disabled={isCropping || !croppedAreaPixels}
+                    >
+                      {isCropping ? "Applying Crop..." : "Apply Crop"}
+                    </button>
+                  </div>
                 </div>
               ) : null}
             </div>
