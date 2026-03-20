@@ -66,11 +66,6 @@ export default function RegisterForm() {
     } finally {
       setIsLoadingChallenge(false);
     }
-          : "Failed to load human verification."
-      );
-    } finally {
-      setIsLoadingChallenge(false);
-    }
   }
 
   useEffect(() => {
