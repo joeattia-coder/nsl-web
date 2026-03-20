@@ -39,6 +39,7 @@ export default function RegisterForm() {
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -115,6 +116,7 @@ export default function RegisterForm() {
           lastName,
           dateOfBirth,
           phoneNumber,
+          username,
           email,
           password,
           verificationToken,
@@ -206,6 +208,18 @@ export default function RegisterForm() {
           value={phoneNumber}
           onChange={(event) => setPhoneNumber(event.target.value)}
           autoComplete="tel"
+        />
+      </label>
+
+      <label className="admin-form-field">
+        <span className="admin-label">Username</span>
+        <input
+          type="text"
+          className="admin-input"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          autoComplete="username"
+          required
         />
       </label>
 

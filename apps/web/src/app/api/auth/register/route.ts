@@ -102,6 +102,8 @@ export async function POST(request: Request) {
     const dateOfBirth = parseOptionalDate(body?.dateOfBirth);
     const rawDateOfBirth = parseString(body?.dateOfBirth);
     const phoneNumber = parseOptionalString(body?.phoneNumber);
+    const username = parseString(body?.username);
+    const normalizedUsername = username.toLowerCase();
     const email = normalizeEmail(parseString(body?.email));
     const password = String(body?.password ?? "");
     const verificationToken = parseString(body?.verificationToken);
@@ -112,9 +114,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Registration could not be completed." }, { status: 400 });
     }
 
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !username || !email || !password) {
       return NextResponse.json(
-        { error: "First name, last name, email, and password are required." },
+        { error: "First name, last name, username, email, and password are required." },
+        { status: 400 }
+      );
+    }
+
+    const usernamePattern = /^[a-zA-Z0-9._-]{3,30}$/;
+
+    if (!usernamePattern.test(username)) {
+      return NextResponse.json(
+        { error: "Username must be 3-30 characters and can only include letters, numbers, periods, underscores, and hyphens." },
         { status: 400 }
       );
     }
@@ -146,7 +157,7 @@ export async function POST(request: Request) {
 
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ email }, { normalizedEmail: email }],
+        OR: [{ email }, { normalizedEmail: email }, { normalizedUsername }],
       },
       select: {
         id: true,
@@ -181,7 +192,7 @@ export async function POST(request: Request) {
     const remainingUser = existingUser
       ? await prisma.user.findFirst({
           where: {
-            OR: [{ email }, { normalizedEmail: email }],
+            OR: [{ email }, { normalizedEmail: email }, { normalizedUsername }],
           },
           select: {
             id: true,
@@ -191,7 +202,7 @@ export async function POST(request: Request) {
 
     if (remainingUser) {
       return NextResponse.json(
-        { error: "An account with this email already exists. Try signing in instead." },
+        { error: "An account with this email or username already exists. Try signing in instead." },
         { status: 409 }
       );
     }
@@ -204,6 +215,8 @@ export async function POST(request: Request) {
     const created = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
+          username,
+          normalizedUsername,
           email,
           normalizedEmail: email,
           passwordHash,
