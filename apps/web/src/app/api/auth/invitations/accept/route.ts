@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { hashOpaqueToken } from "@/lib/auth-tokens";
-import { hashPassword } from "@/lib/passwords";
+import { hashPassword, validatePasswordStrength } from "@/lib/passwords";
 import { prisma } from "@/lib/prisma";
 
 function normalizeOptionalString(value: unknown) {
@@ -90,11 +90,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (password.length < 10) {
-      return NextResponse.json(
-        { error: "Use a password that is at least 10 characters long." },
-        { status: 400 }
-      );
+    const passwordError = validatePasswordStrength(password);
+
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     const invitation = await findPendingInvitationByToken(token);

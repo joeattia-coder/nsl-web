@@ -5,6 +5,23 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import PasswordField from "@/components/admin/PasswordField";
 
+function validatePasswordStrength(password: string) {
+  if (password.length < 10) {
+    return "Use a password that is at least 10 characters long.";
+  }
+
+  const hasLower = /[a-z]/.test(password);
+  const hasUpper = /[A-Z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSymbol = /[^A-Za-z\d]/.test(password);
+
+  if (!hasLower || !hasUpper || !hasDigit || !hasSymbol) {
+    return "Use at least one uppercase letter, one lowercase letter, one number, and one symbol.";
+  }
+
+  return null;
+}
+
 type InvitationPayload = {
   email: string;
   playerName: string | null;
@@ -21,11 +38,12 @@ export default function AcceptInvitationForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoadingInvitation, setIsLoadingInvitation] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [invitationError, setInvitationError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
-      setError("Invitation token is missing.");
+      setInvitationError("Invitation token is missing.");
       setIsLoadingInvitation(false);
       return;
     }
@@ -34,7 +52,7 @@ export default function AcceptInvitationForm() {
 
     const run = async () => {
       setIsLoadingInvitation(true);
-      setError(null);
+      setInvitationError(null);
 
       try {
         const response = await fetch(`/api/auth/invitations/accept?token=${encodeURIComponent(token)}`, {
@@ -59,7 +77,7 @@ export default function AcceptInvitationForm() {
           return;
         }
 
-        setError(loadError instanceof Error ? loadError.message : "Invalid invitation link.");
+        setInvitationError(loadError instanceof Error ? loadError.message : "Invalid invitation link.");
       } finally {
         if (!cancelled) {
           setIsLoadingInvitation(false);
@@ -76,15 +94,17 @@ export default function AcceptInvitationForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(null);
+    setSubmitError(null);
 
-    if (password.length < 10) {
-      setError("Use a password that is at least 10 characters long.");
+    const passwordError = validatePasswordStrength(password);
+
+    if (passwordError) {
+      setSubmitError(passwordError);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("The password confirmation does not match.");
+      setSubmitError("The password confirmation does not match.");
       return;
     }
 
@@ -110,7 +130,7 @@ export default function AcceptInvitationForm() {
       router.push("/login?invite=success");
       router.refresh();
     } catch (submitError) {
-      setError(
+      setSubmitError(
         submitError instanceof Error ? submitError.message : "Failed to accept invitation."
       );
     } finally {
@@ -122,11 +142,11 @@ export default function AcceptInvitationForm() {
     return <p className="login-form-status login-form-status-info">Validating invitation...</p>;
   }
 
-  if (error || !invitation) {
+  if (invitationError || !invitation) {
     return (
       <div className="login-form">
         <p className="login-form-status login-form-status-warning">
-          {error || "That invitation link is invalid or has expired."}
+          {invitationError || "That invitation link is invalid or has expired."}
         </p>
         <Link href="/login" className="admin-link-button">
           Back to sign in
@@ -170,7 +190,7 @@ export default function AcceptInvitationForm() {
         />
       </label>
 
-      {error ? <p className="admin-form-error">{error}</p> : null}
+      {submitError ? <p className="admin-form-error">{submitError}</p> : null}
 
       <div className="account-settings-actions">
         <button type="submit" className="admin-primary-button" disabled={isSubmitting}>

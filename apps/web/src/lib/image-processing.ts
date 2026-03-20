@@ -29,11 +29,34 @@ export async function cropAndResizeToWebP(
   crop: PixelCrop,
   targetSize: number = 600
 ): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
+  const shouldFetchSource =
+    imageSrc.startsWith("http://") || imageSrc.startsWith("https://");
 
-    image.onload = () => {
+  let workingSrc = imageSrc;
+  let temporaryObjectUrl: string | null = null;
+
+  if (shouldFetchSource) {
+    const sourceResponse = await fetch(imageSrc);
+
+    if (!sourceResponse.ok) {
+      throw new Error("Failed to load image source for cropping");
+    }
+
+    const sourceBlob = await sourceResponse.blob();
+    temporaryObjectUrl = URL.createObjectURL(sourceBlob);
+    workingSrc = temporaryObjectUrl;
+  }
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("Failed to load image"));
+      element.src = workingSrc;
+    });
+
+    return await new Promise((resolve, reject) => {
       try {
         // Create a square canvas at the target size
         const canvas = document.createElement("canvas");
@@ -62,8 +85,10 @@ export async function cropAndResizeToWebP(
         canvas.toBlob(
           (blob) => {
             if (!blob) {
-              throw new Error("Failed to create blob from canvas");
+              reject(new Error("Failed to create blob from canvas"));
+              return;
             }
+
             resolve(blob);
           },
           "image/webp",
@@ -72,14 +97,12 @@ export async function cropAndResizeToWebP(
       } catch (error) {
         reject(error);
       }
-    };
-
-    image.onerror = () => {
-      reject(new Error("Failed to load image"));
-    };
-
-    image.src = imageSrc;
-  });
+    });
+  } finally {
+    if (temporaryObjectUrl) {
+      URL.revokeObjectURL(temporaryObjectUrl);
+    }
+  }
 }
 
 /**

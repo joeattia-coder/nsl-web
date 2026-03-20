@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveCurrentUser } from "@/lib/admin-auth";
-import { hashPassword, verifyPassword } from "@/lib/passwords";
+import { hashPassword, validatePasswordStrength, verifyPassword } from "@/lib/passwords";
 import { prisma } from "@/lib/prisma";
 
 function readPassword(value: unknown) {
@@ -26,11 +26,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (nextPassword.length < 10) {
-      return NextResponse.json(
-        { error: "Use a password that is at least 10 characters long." },
-        { status: 400 }
-      );
+    const passwordError = validatePasswordStrength(nextPassword);
+
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({

@@ -1,6 +1,11 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import Image from "next/image";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FiUpload, FiX } from "react-icons/fi";
+
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 
 type ProfileFormProps = {
   initialData: {
@@ -37,13 +42,103 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
   const [country, setCountry] = useState(initialData.country ?? "");
   const [postalCode, setPostalCode] = useState(initialData.postalCode ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState(initialData.updatedAt);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   const updatedLabel = useMemo(() => {
     return new Date(updatedAt).toLocaleString();
   }, [updatedAt]);
+
+  useEffect(() => {
+    if (!photoFile) {
+      setPhotoPreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(photoFile);
+    setPhotoPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [photoFile]);
+
+  const previewImage = useMemo(() => {
+    if (photoPreviewUrl) {
+      return photoPreviewUrl;
+    }
+
+    return photoUrl.trim() || "";
+  }, [photoPreviewUrl, photoUrl]);
+
+  function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) {
+      setPhotoFile(null);
+      return;
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError("Only JPG, PNG, and WebP files are allowed.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setError("Photo is too large. Maximum size is 4 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setError(null);
+    setPhotoFile(file);
+  }
+
+  function handleRemovePhoto() {
+    setError(null);
+    setPhotoFile(null);
+    setPhotoPreviewUrl("");
+    setPhotoUrl("");
+
+    if (photoInputRef.current) {
+      photoInputRef.current.value = "";
+    }
+  }
+
+  async function uploadPhotoIfNeeded() {
+    if (!photoFile) {
+      return photoUrl.trim() || null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", photoFile);
+    setIsUploadingPhoto(true);
+
+    try {
+      const response = await fetch("/api/uploads/player-photo", {
+        method: "POST",
+        body: formData,
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; details?: string; url?: string }
+        | null;
+
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.details || payload?.error || "Failed to upload photo.");
+      }
+
+      return payload.url;
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -52,6 +147,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     setIsSubmitting(true);
 
     try {
+      const uploadedPhotoUrl = await uploadPhotoIfNeeded();
+
       const response = await fetch("/api/profile", {
         method: "PATCH",
         headers: {
@@ -64,7 +161,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           dateOfBirth,
           emailAddress,
           phoneNumber,
-          photoUrl,
+          photoUrl: uploadedPhotoUrl,
           addressLine1,
           addressLine2,
           city,
@@ -83,6 +180,11 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       }
 
       setSuccess("Profile updated successfully.");
+      setPhotoFile(null);
+
+      if (uploadedPhotoUrl) {
+        setPhotoUrl(uploadedPhotoUrl);
+      }
 
       if (payload?.player?.updatedAt) {
         setUpdatedAt(payload.player.updatedAt);
@@ -162,12 +264,61 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         </label>
 
         <label className="admin-form-field profile-form-grid-wide">
-          <span className="admin-label">Photo URL</span>
+          <span className="admin-label">Photo</span>
+
+          <div className="admin-player-photo-preview">
+            {previewImage ? (
+              <Image
+                src={previewImage}
+                alt="Profile photo preview"
+                width={88}
+                height={88}
+                className="admin-player-photo-preview-img"
+                unoptimized
+              />
+            ) : null}
+
+            <label
+              htmlFor="profilePhotoFile"
+              className="admin-player-form-button admin-player-form-button-secondary admin-player-upload-trigger"
+            >
+              <FiUpload />
+              <span>{photoFile ? "Change Photo" : "Upload Photo"}</span>
+            </label>
+
+            <input
+              ref={photoInputRef}
+              id="profilePhotoFile"
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+              onChange={handlePhotoChange}
+              className="admin-player-file-input"
+              disabled={isSubmitting || isUploadingPhoto}
+            />
+
+            {(photoFile || photoUrl.trim()) ? (
+              <button
+                type="button"
+                onClick={handleRemovePhoto}
+                className="admin-player-form-button admin-player-form-button-danger"
+                disabled={isSubmitting || isUploadingPhoto}
+              >
+                <FiX />
+                <span>{photoFile ? "Remove Selected Photo" : "Remove Photo"}</span>
+              </button>
+            ) : null}
+          </div>
+
+          <p className="admin-player-file-help">
+            JPG, PNG, or WebP. Maximum size: 4 MB.
+          </p>
+
           <input
             type="text"
             className="admin-input"
             value={photoUrl}
             onChange={(event) => setPhotoUrl(event.target.value)}
+            placeholder="Or paste a photo URL"
           />
         </label>
 
@@ -238,8 +389,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       {success ? <p className="login-form-status login-form-status-success">{success}</p> : null}
 
       <div className="account-settings-actions">
-        <button type="submit" className="admin-primary-button" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save profile"}
+        <button type="submit" className="admin-primary-button" disabled={isSubmitting || isUploadingPhoto}>
+          {isUploadingPhoto ? "Uploading photo..." : isSubmitting ? "Saving..." : "Save profile"}
         </button>
       </div>
     </form>
