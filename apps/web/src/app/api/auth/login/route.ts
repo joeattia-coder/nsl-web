@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import {
   buildAdminSessionCookieValue,
-  findAdminUserForLogin,
+  findUserForLogin,
   getAdminSessionCookieName,
   getAdminSessionCookieOptions,
+  getLoginSuccessPath,
 } from "@/lib/admin-auth";
 import { verifyPassword } from "@/lib/passwords";
 
@@ -12,6 +13,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const identifier = String(body.identifier ?? "").trim();
     const password = String(body.password ?? "");
+    const requestedNextPath = String(body.nextPath ?? "").trim();
 
     if (!identifier || !password) {
       return NextResponse.json(
@@ -20,7 +22,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await findAdminUserForLogin(identifier);
+    const user = await findUserForLogin(identifier);
 
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return NextResponse.json(
@@ -29,7 +31,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = NextResponse.json({ ok: true });
+    const response = NextResponse.json({
+      ok: true,
+      nextPath: getLoginSuccessPath(user.isAdmin, requestedNextPath),
+    });
     response.cookies.set(
       getAdminSessionCookieName(),
       buildAdminSessionCookieValue(user.id),

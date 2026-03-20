@@ -6,6 +6,7 @@ import { FormEvent, useState } from "react";
 import { FiPlusCircle, FiSave, FiTrash2, FiX } from "react-icons/fi";
 
 type StageRoundType = "GROUP" | "KNOCKOUT";
+type SnookerFormat = "REDS_6" | "REDS_10" | "REDS_15";
 
 type StageRoundFormProps = {
   mode: "create" | "edit";
@@ -19,6 +20,7 @@ type StageRoundFormProps = {
     sequence: number;
     matchesPerPairing: number;
     bestOfFrames: number;
+    snookerFormat: SnookerFormat;
     groupCount?: number | null;
     playersPerGroup?: number | null;
     advancePerGroup?: number | null;
@@ -31,6 +33,12 @@ const roundTypeOptions: Array<{
 }> = [
   { value: "GROUP", label: "Group" },
   { value: "KNOCKOUT", label: "Knockout" },
+];
+
+const snookerFormatOptions: Array<{ value: SnookerFormat; label: string }> = [
+  { value: "REDS_6", label: "6 Reds" },
+  { value: "REDS_10", label: "10 Reds" },
+  { value: "REDS_15", label: "15 Reds (Full Rack)" },
 ];
 
 export default function StageRoundForm({
@@ -53,6 +61,9 @@ export default function StageRoundForm({
   );
   const [bestOfFrames, setBestOfFrames] = useState(
     String(initialData.bestOfFrames)
+  );
+  const [snookerFormat, setSnookerFormat] = useState<SnookerFormat>(
+    initialData.snookerFormat
   );
   const [groupCount, setGroupCount] = useState(
     initialData.groupCount ? String(initialData.groupCount) : ""
@@ -160,6 +171,7 @@ export default function StageRoundForm({
         sequence: parsedSequence,
         matchesPerPairing: parsedMatchesPerPairing,
         bestOfFrames: parsedBestOfFrames,
+        snookerFormat,
         groupCount: isGroupRound ? parsedGroupCount : null,
         playersPerGroup: isGroupRound ? parsedPlayersPerGroup : null,
         advancePerGroup: isGroupRound ? parsedAdvancePerGroup : null,
@@ -328,6 +340,25 @@ export default function StageRoundForm({
               className="admin-input admin-player-form-input"
               required
             />
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="snookerFormat" className="admin-label">
+              Number of Reds
+            </label>
+            <select
+              id="snookerFormat"
+              value={snookerFormat}
+              onChange={(e) => setSnookerFormat(e.target.value as SnookerFormat)}
+              className="admin-select admin-player-form-input"
+              required
+            >
+              {snookerFormatOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {isGroupRound ? (

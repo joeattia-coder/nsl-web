@@ -68,6 +68,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const roundName = String(body.roundName ?? "").trim();
     const roundType = String(body.roundType ?? "").trim();
+    const snookerFormat = String(body.snookerFormat ?? "").trim();
     const sequence = Number(body.sequence);
     const matchesPerPairing = Number(body.matchesPerPairing);
     const bestOfFrames = Number(body.bestOfFrames);
@@ -100,6 +101,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (
       !roundName ||
       !roundType ||
+      !snookerFormat ||
       !Number.isInteger(sequence) ||
       sequence < 1 ||
       !Number.isInteger(matchesPerPairing) ||
@@ -120,6 +122,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (roundType !== "GROUP" && roundType !== "KNOCKOUT") {
       return NextResponse.json(
         { error: "Invalid round type." },
+        { status: 400 }
+      );
+    }
+
+    if (
+      snookerFormat !== "REDS_6" &&
+      snookerFormat !== "REDS_10" &&
+      snookerFormat !== "REDS_15"
+    ) {
+      return NextResponse.json(
+        { error: "Invalid snooker format." },
         { status: 400 }
       );
     }
@@ -201,6 +214,7 @@ export async function PATCH(request: Request, context: RouteContext) {
           sequence,
           matchesPerPairing,
           bestOfFrames,
+          snookerFormat: snookerFormat as "REDS_6" | "REDS_10" | "REDS_15",
           groupCount: roundType === "GROUP" ? groupCount : null,
           playersPerGroup: roundType === "GROUP" ? playersPerGroup : null,
           advancePerGroup: roundType === "GROUP" ? advancePerGroup : null,

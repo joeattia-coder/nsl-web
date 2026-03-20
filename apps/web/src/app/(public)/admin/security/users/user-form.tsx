@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { FiArrowLeft, FiSave, FiUserPlus } from "react-icons/fi";
+import { FiArrowLeft, FiMail, FiSave, FiUserPlus } from "react-icons/fi";
 import { notifyAdminAuthChanged } from "@/app/(public)/AdminAuthContext";
 import PasswordField from "@/components/admin/PasswordField";
 
@@ -63,7 +63,10 @@ export default function UserForm({
   const [loading, setLoading] = useState(isEdit);
   const [loadingPlayers, setLoadingPlayers] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [sendingInvite, setSendingInvite] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -232,6 +235,39 @@ export default function UserForm({
     }
   }
 
+  async function handleSendInvite() {
+    if (!isEdit || !userId) {
+      return;
+    }
+
+    try {
+      setSendingInvite(true);
+      setError(null);
+      setInviteMessage(null);
+      setInviteLink(null);
+
+      const response = await fetch(`/api/admin/users/${userId}/invite`, {
+        method: "POST",
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; details?: string; message?: string; inviteLink?: string | null }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(getErrorMessage(payload, "Failed to send invitation."));
+      }
+
+      setInviteMessage(payload?.message || "Invitation sent.");
+      setInviteLink(payload?.inviteLink ?? null);
+    } catch (inviteError) {
+      console.error(inviteError);
+      setError(inviteError instanceof Error ? inviteError.message : "Failed to send invitation.");
+    } finally {
+      setSendingInvite(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="admin-page">
@@ -266,6 +302,14 @@ export default function UserForm({
       <div className="admin-card">
         <form onSubmit={handleSubmit} className="admin-form">
           {error ? <p className="admin-form-error">{error}</p> : null}
+          {inviteMessage ? (
+            <p className="login-form-status login-form-status-success">{inviteMessage}</p>
+          ) : null}
+          {inviteLink ? (
+            <p className="login-form-status login-form-status-info">
+              Development invite link: <a href={inviteLink}>{inviteLink}</a>
+            </p>
+          ) : null}
 
           <div className="admin-form-grid">
             <div className="admin-form-field">
@@ -400,6 +444,17 @@ export default function UserForm({
               <FiArrowLeft />
               <span>Cancel</span>
             </Link>
+            {isEdit ? (
+              <button
+                type="button"
+                className="admin-player-form-button admin-player-form-button-secondary"
+                onClick={() => void handleSendInvite()}
+                disabled={sendingInvite || saving}
+              >
+                <FiMail />
+                <span>{sendingInvite ? "Sending invite..." : "Send Invite"}</span>
+              </button>
+            ) : null}
             <button
               type="submit"
               className={`admin-player-form-button ${

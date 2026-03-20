@@ -6,11 +6,11 @@ export default function LoginPage() {
     <section className="login-page-shell">
       <div className="login-page-card">
         <div className="login-page-copy">
-          <p className="login-page-kicker">Admin Access</p>
+          <p className="login-page-kicker">Account Access</p>
           <h1 className="login-page-title">Sign in</h1>
           <p className="login-page-subtitle">
-            Use your admin email or username to sign in with a password, request
-            a reset link, or continue with a linked Google or Facebook account.
+            Use your email or username to sign in with a password, request a
+            reset link, or continue with a linked Google or Facebook account.
           </p>
         </div>
 

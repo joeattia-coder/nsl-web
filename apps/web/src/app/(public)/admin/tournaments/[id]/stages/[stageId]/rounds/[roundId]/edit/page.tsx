@@ -19,6 +19,7 @@ export default async function EditStageRoundPage({
             select: {
               id: true,
               tournamentName: true,
+              snookerFormat: true,
             },
           },
         },
@@ -63,6 +64,10 @@ export default async function EditStageRoundPage({
           sequence: round.sequence,
           matchesPerPairing: round.matchesPerPairing,
           bestOfFrames: round.bestOfFrames ?? 5,
+          snookerFormat: (round.snookerFormat ?? round.tournamentStage.tournament.snookerFormat ?? "REDS_15") as
+            | "REDS_6"
+            | "REDS_10"
+            | "REDS_15",
           groupCount: round.groupCount ?? null,
           playersPerGroup: round.playersPerGroup ?? null,
           advancePerGroup: round.advancePerGroup ?? null,

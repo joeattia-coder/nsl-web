@@ -52,6 +52,7 @@ export type StageRoundMinAggregateOutputType = {
   sequence: number | null
   matchesPerPairing: number | null
   bestOfFrames: number | null
+  snookerFormat: $Enums.SnookerFormat | null
   createdAt: Date | null
   updatedAt: Date | null
   advancePerGroup: number | null
@@ -67,6 +68,7 @@ export type StageRoundMaxAggregateOutputType = {
   sequence: number | null
   matchesPerPairing: number | null
   bestOfFrames: number | null
+  snookerFormat: $Enums.SnookerFormat | null
   createdAt: Date | null
   updatedAt: Date | null
   advancePerGroup: number | null
@@ -82,6 +84,7 @@ export type StageRoundCountAggregateOutputType = {
   sequence: number
   matchesPerPairing: number
   bestOfFrames: number
+  snookerFormat: number
   createdAt: number
   updatedAt: number
   advancePerGroup: number
@@ -117,6 +120,7 @@ export type StageRoundMinAggregateInputType = {
   sequence?: true
   matchesPerPairing?: true
   bestOfFrames?: true
+  snookerFormat?: true
   createdAt?: true
   updatedAt?: true
   advancePerGroup?: true
@@ -132,6 +136,7 @@ export type StageRoundMaxAggregateInputType = {
   sequence?: true
   matchesPerPairing?: true
   bestOfFrames?: true
+  snookerFormat?: true
   createdAt?: true
   updatedAt?: true
   advancePerGroup?: true
@@ -147,6 +152,7 @@ export type StageRoundCountAggregateInputType = {
   sequence?: true
   matchesPerPairing?: true
   bestOfFrames?: true
+  snookerFormat?: true
   createdAt?: true
   updatedAt?: true
   advancePerGroup?: true
@@ -249,6 +255,7 @@ export type StageRoundGroupByOutputType = {
   sequence: number
   matchesPerPairing: number
   bestOfFrames: number | null
+  snookerFormat: $Enums.SnookerFormat | null
   createdAt: Date
   updatedAt: Date
   advancePerGroup: number | null
@@ -287,6 +294,7 @@ export type StageRoundWhereInput = {
   sequence?: Prisma.IntFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntFilter<"StageRound"> | number
   bestOfFrames?: Prisma.IntNullableFilter<"StageRound"> | number | null
+  snookerFormat?: Prisma.EnumSnookerFormatNullableFilter<"StageRound"> | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableFilter<"StageRound"> | number | null
@@ -305,6 +313,7 @@ export type StageRoundOrderByWithRelationInput = {
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
   bestOfFrames?: Prisma.SortOrderInput | Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -328,6 +337,7 @@ export type StageRoundWhereUniqueInput = Prisma.AtLeast<{
   sequence?: Prisma.IntFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntFilter<"StageRound"> | number
   bestOfFrames?: Prisma.IntNullableFilter<"StageRound"> | number | null
+  snookerFormat?: Prisma.EnumSnookerFormatNullableFilter<"StageRound"> | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableFilter<"StageRound"> | number | null
@@ -346,6 +356,7 @@ export type StageRoundOrderByWithAggregationInput = {
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
   bestOfFrames?: Prisma.SortOrderInput | Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -369,6 +380,7 @@ export type StageRoundScalarWhereWithAggregatesInput = {
   sequence?: Prisma.IntWithAggregatesFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntWithAggregatesFilter<"StageRound"> | number
   bestOfFrames?: Prisma.IntNullableWithAggregatesFilter<"StageRound"> | number | null
+  snookerFormat?: Prisma.EnumSnookerFormatNullableWithAggregatesFilter<"StageRound"> | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableWithAggregatesFilter<"StageRound"> | number | null
@@ -383,6 +395,7 @@ export type StageRoundCreateInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -401,6 +414,7 @@ export type StageRoundUncheckedCreateInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -417,6 +431,7 @@ export type StageRoundUpdateInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -435,6 +450,7 @@ export type StageRoundUncheckedUpdateInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -452,6 +468,7 @@ export type StageRoundCreateManyInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -466,6 +483,7 @@ export type StageRoundUpdateManyMutationInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -481,6 +499,7 @@ export type StageRoundUncheckedUpdateManyInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -516,6 +535,7 @@ export type StageRoundCountOrderByAggregateInput = {
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
   bestOfFrames?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
@@ -540,6 +560,7 @@ export type StageRoundMaxOrderByAggregateInput = {
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
   bestOfFrames?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
@@ -555,6 +576,7 @@ export type StageRoundMinOrderByAggregateInput = {
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
   bestOfFrames?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
@@ -665,6 +687,7 @@ export type StageRoundCreateWithoutTournamentStageInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -681,6 +704,7 @@ export type StageRoundUncheckedCreateWithoutTournamentStageInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -727,6 +751,7 @@ export type StageRoundScalarWhereInput = {
   sequence?: Prisma.IntFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntFilter<"StageRound"> | number
   bestOfFrames?: Prisma.IntNullableFilter<"StageRound"> | number | null
+  snookerFormat?: Prisma.EnumSnookerFormatNullableFilter<"StageRound"> | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableFilter<"StageRound"> | number | null
@@ -741,6 +766,7 @@ export type StageRoundCreateWithoutGroupsInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -758,6 +784,7 @@ export type StageRoundUncheckedCreateWithoutGroupsInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -789,6 +816,7 @@ export type StageRoundUpdateWithoutGroupsInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -806,6 +834,7 @@ export type StageRoundUncheckedUpdateWithoutGroupsInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -821,6 +850,7 @@ export type StageRoundCreateWithoutMatchesInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -838,6 +868,7 @@ export type StageRoundUncheckedCreateWithoutMatchesInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -869,6 +900,7 @@ export type StageRoundUpdateWithoutMatchesInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -886,6 +918,7 @@ export type StageRoundUncheckedUpdateWithoutMatchesInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -901,6 +934,7 @@ export type StageRoundCreateManyTournamentStageInput = {
   sequence: number
   matchesPerPairing?: number
   bestOfFrames?: number | null
+  snookerFormat?: $Enums.SnookerFormat | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -915,6 +949,7 @@ export type StageRoundUpdateWithoutTournamentStageInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -931,6 +966,7 @@ export type StageRoundUncheckedUpdateWithoutTournamentStageInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -947,6 +983,7 @@ export type StageRoundUncheckedUpdateManyWithoutTournamentStageInput = {
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
   bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1002,6 +1039,7 @@ export type StageRoundSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   sequence?: boolean
   matchesPerPairing?: boolean
   bestOfFrames?: boolean
+  snookerFormat?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -1021,6 +1059,7 @@ export type StageRoundSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   sequence?: boolean
   matchesPerPairing?: boolean
   bestOfFrames?: boolean
+  snookerFormat?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -1037,6 +1076,7 @@ export type StageRoundSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   sequence?: boolean
   matchesPerPairing?: boolean
   bestOfFrames?: boolean
+  snookerFormat?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -1053,6 +1093,7 @@ export type StageRoundSelectScalar = {
   sequence?: boolean
   matchesPerPairing?: boolean
   bestOfFrames?: boolean
+  snookerFormat?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -1060,7 +1101,7 @@ export type StageRoundSelectScalar = {
   playersPerGroup?: boolean
 }
 
-export type StageRoundOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentStageId" | "roundName" | "roundType" | "sequence" | "matchesPerPairing" | "bestOfFrames" | "createdAt" | "updatedAt" | "advancePerGroup" | "groupCount" | "playersPerGroup", ExtArgs["result"]["stageRound"]>
+export type StageRoundOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentStageId" | "roundName" | "roundType" | "sequence" | "matchesPerPairing" | "bestOfFrames" | "snookerFormat" | "createdAt" | "updatedAt" | "advancePerGroup" | "groupCount" | "playersPerGroup", ExtArgs["result"]["stageRound"]>
 export type StageRoundInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   matches?: boolean | Prisma.StageRound$matchesArgs<ExtArgs>
   tournamentStage?: boolean | Prisma.TournamentStageDefaultArgs<ExtArgs>
@@ -1089,6 +1130,7 @@ export type $StageRoundPayload<ExtArgs extends runtime.Types.Extensions.Internal
     sequence: number
     matchesPerPairing: number
     bestOfFrames: number | null
+    snookerFormat: $Enums.SnookerFormat | null
     createdAt: Date
     updatedAt: Date
     advancePerGroup: number | null
@@ -1527,6 +1569,7 @@ export interface StageRoundFieldRefs {
   readonly sequence: Prisma.FieldRef<"StageRound", 'Int'>
   readonly matchesPerPairing: Prisma.FieldRef<"StageRound", 'Int'>
   readonly bestOfFrames: Prisma.FieldRef<"StageRound", 'Int'>
+  readonly snookerFormat: Prisma.FieldRef<"StageRound", 'SnookerFormat'>
   readonly createdAt: Prisma.FieldRef<"StageRound", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"StageRound", 'DateTime'>
   readonly advancePerGroup: Prisma.FieldRef<"StageRound", 'Int'>

@@ -86,7 +86,7 @@ function LayoutChrome({
   const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const showAdminNavigation = isAdminRoute || Boolean(currentUser);
+  const showAdminNavigation = isAdminRoute || Boolean(currentUser?.isAdmin);
   const closeMenu = () => setMenuOpen(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -278,6 +278,16 @@ function LayoutChrome({
 
                 {menuOpen ? (
                   <div className="admin-user-menu-dropdown" role="menu">
+                    {currentUser.linkedPlayerId ? (
+                      <Link
+                        href="/my-matches"
+                        className="admin-user-menu-item"
+                        role="menuitem"
+                        onClick={closeMenu}
+                      >
+                        My matches
+                      </Link>
+                    ) : null}
                     <Link
                       href="/profile"
                       className="admin-user-menu-item"

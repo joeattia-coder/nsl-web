@@ -5,6 +5,7 @@ export type CurrentAdminUserSummary = {
   displayName: string;
   linkedPlayerId: string | null;
   isGlobalAdmin: boolean;
+  isAdmin: boolean;
   permissions: string[];
   source: "session";
 };

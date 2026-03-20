@@ -15,6 +15,7 @@ export default async function AdminPlayersPage() {
       phoneNumber: true,
       country: true,
       photoUrl: true,
+      userId: true,
     },
   });
 
@@ -27,6 +28,7 @@ export default async function AdminPlayersPage() {
     phoneNumber: player.phoneNumber ?? "",
     country: player.country ?? "",
     photoUrl: player.photoUrl ?? "",
+    linkedUserId: player.userId ?? null,
   }));
 
   return (

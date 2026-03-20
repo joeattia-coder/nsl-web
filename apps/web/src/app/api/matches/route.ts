@@ -131,6 +131,10 @@ export async function POST(request: Request) {
       body.bestOfFrames === null || body.bestOfFrames === undefined
         ? null
         : Number(body.bestOfFrames);
+    const snookerFormat =
+      body.snookerFormat === null || body.snookerFormat === undefined
+        ? null
+        : String(body.snookerFormat).trim();
 
     if (!tournamentId) {
       return NextResponse.json(
@@ -200,6 +204,18 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: "bestOfFrames must be an odd whole number greater than or equal to 1" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      snookerFormat !== null &&
+      snookerFormat !== "REDS_6" &&
+      snookerFormat !== "REDS_10" &&
+      snookerFormat !== "REDS_15"
+    ) {
+      return NextResponse.json(
+        { error: "snookerFormat must be REDS_6, REDS_10, or REDS_15" },
         { status: 400 }
       );
     }
@@ -412,6 +428,10 @@ export async function POST(request: Request) {
         awayScore: awayScore ?? null,
         internalNote: internalNote ?? null,
         publicNote: publicNote ?? null,
+        snookerFormat: (snookerFormat ?? round.snookerFormat ?? tournament.snookerFormat ?? "REDS_15") as
+          | "REDS_6"
+          | "REDS_10"
+          | "REDS_15",
         resultSubmittedAt: resultSubmittedAt
           ? new Date(resultSubmittedAt)
           : null,

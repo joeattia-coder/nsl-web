@@ -115,6 +115,7 @@ export async function POST(_request: Request, context: RouteContext) {
         stageRoundId: round.id,
         tournamentGroupId: group.id,
         bestOfFrames: round.bestOfFrames ?? 5,
+        snookerFormat: round.snookerFormat ?? "REDS_15",
         homeEntryId: pairing.homeEntryId,
         awayEntryId: pairing.awayEntryId,
       }));

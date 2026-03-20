@@ -8,6 +8,13 @@ type PasswordResetEmailInput = {
   expiresAt: Date;
 };
 
+type AccountInvitationEmailInput = {
+  to: string;
+  inviteLink: string;
+  expiresAt: Date;
+  playerName?: string | null;
+};
+
 type MailTransportConfig = {
   host: string;
   port: number;
@@ -121,6 +128,60 @@ export async function sendPasswordResetEmail({
         </p>
         <p>This link expires at ${expiryLabel}.</p>
         <p>If you did not request this, you can ignore this email.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendAccountInvitationEmail({
+  to,
+  inviteLink,
+  expiresAt,
+  playerName,
+}: AccountInvitationEmailInput) {
+  const config = getMailTransportConfig();
+
+  if (!config) {
+    throw new Error(
+      "SMTP is not configured. Set SMTP_HOST and SMTP_FROM_EMAIL to enable email delivery."
+    );
+  }
+
+  const transporter = createTransport(config);
+  const expiryLabel = formatExpiry(expiresAt);
+  const greetingTarget = playerName?.trim() || "there";
+
+  await transporter.sendMail({
+    from: `${config.fromName} <${config.fromEmail}>`,
+    to,
+    replyTo: config.replyTo ?? undefined,
+    subject: "You have been invited to create your NSL account",
+    text: [
+      `Hi ${greetingTarget},`,
+      "",
+      "You have been invited to register your National Snooker League player account.",
+      "",
+      `Use this link to complete your account setup: ${inviteLink}`,
+      "",
+      `This link expires at ${expiryLabel}.`,
+      "If you were not expecting this invitation, you can ignore this email.",
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
+        <p>Hi ${greetingTarget},</p>
+        <p>
+          You have been invited to register your National Snooker League player account.
+        </p>
+        <p>
+          <a
+            href="${inviteLink}"
+            style="display: inline-block; padding: 12px 18px; background: #111827; color: #ffffff; text-decoration: none;"
+          >
+            Complete account setup
+          </a>
+        </p>
+        <p>This link expires at ${expiryLabel}.</p>
+        <p>If you were not expecting this invitation, you can ignore this email.</p>
       </div>
     `,
   });

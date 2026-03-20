@@ -71,7 +71,7 @@ function getCookieName(provider: SocialProviderKey) {
 
 function normalizeNextPath(nextPath: string | null | undefined) {
   if (!nextPath || !nextPath.startsWith("/")) {
-    return "/admin";
+    return "/";
   }
 
   return nextPath;
@@ -213,27 +213,24 @@ async function loadSocialProfile(
   };
 }
 
-function getAdminUserWhere() {
-  return {
-    OR: [
-      {
-        roleAssignments: {
-          some: {
-            scopeType: "GLOBAL" as const,
-            scopeId: "",
-            role: { roleKey: "ADMINISTRATOR" },
-          },
-        },
-      },
-      {
-        userRoles: {
-          some: {
-            role: { roleKey: "ADMINISTRATOR" },
-          },
-        },
-      },
-    ],
-  };
+function isAdminUserRecord(user: {
+  roleAssignments: Array<{ scopeType: string; scopeId: string; role: { roleKey: string } }>;
+  userRoles: Array<{ role: { roleKey: string } }>;
+}) {
+  return Boolean(
+    user.roleAssignments.some(
+      (assignment) =>
+        assignment.scopeType === "GLOBAL" && assignment.scopeId === "" && assignment.role.roleKey === "ADMINISTRATOR"
+    ) || user.userRoles.some((userRole) => userRole.role.roleKey === "ADMINISTRATOR")
+  );
+}
+
+function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean) {
+  if (nextPath && nextPath.startsWith("/")) {
+    return nextPath;
+  }
+
+  return isAdmin ? "/admin" : "/profile";
 }
 
 export async function beginSocialAuth(provider: SocialProviderKey, request: Request) {
@@ -292,7 +289,7 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
     return {
       ok: false as const,
       error: "social_state_invalid",
-      nextPath: "/admin",
+      nextPath: "/",
     };
   }
 
@@ -310,7 +307,6 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
     where: {
       AND: [
         { isLoginEnabled: true },
-        getAdminUserWhere(),
         {
           authAccounts: {
             some: {
@@ -332,7 +328,6 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
       where: {
         AND: [
           { isLoginEnabled: true },
-          getAdminUserWhere(),
           {
             OR: [
               { email: normalizedEmail },
@@ -341,7 +336,9 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
           },
         ],
       },
-      select: { id: true },
+      select: {
+        id: true,
+      },
     });
 
     userId = matchedUser?.id ?? null;
@@ -373,14 +370,44 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
   if (!userId) {
     return {
       ok: false as const,
-      error: "social_no_admin_account",
+      error: "social_no_account",
       nextPath: parsedState.nextPath,
     };
   }
 
+  const resolvedUser = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      roleAssignments: {
+        select: {
+          scopeType: true,
+          scopeId: true,
+          role: {
+            select: {
+              roleKey: true,
+            },
+          },
+        },
+      },
+      userRoles: {
+        select: {
+          role: {
+            select: {
+              roleKey: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const isAdmin = resolvedUser ? isAdminUserRecord(resolvedUser) : false;
+
   return {
     ok: true as const,
-    nextPath: parsedState.nextPath,
+    nextPath: resolveNextPath(parsedState.nextPath, isAdmin),
     userId,
   };
 }

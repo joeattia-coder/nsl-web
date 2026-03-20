@@ -668,6 +668,59 @@ body {
   flex-wrap: wrap;
 }
 
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.profile-form-grid-wide {
+  grid-column: 1 / -1;
+}
+
+.my-matches-shell {
+  max-width: 860px;
+}
+
+.my-matches-list {
+  display: grid;
+  gap: 12px;
+}
+
+.my-match-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--theme-border-soft);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+}
+
+.my-match-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  color: var(--theme-page-muted-3);
+}
+
+.my-match-teams {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  color: var(--theme-page-text);
+  font-weight: 600;
+}
+
+.my-match-score {
+  min-width: 80px;
+  text-align: center;
+  color: var(--theme-accent-brand);
+  font-weight: 800;
+}
+
 .admin-current-user-chip {
   display: inline-flex;
   align-items: center;
@@ -1112,6 +1165,10 @@ body {
 
   .social-auth-actions,
   .account-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form-grid {
     grid-template-columns: 1fr;
   }
 

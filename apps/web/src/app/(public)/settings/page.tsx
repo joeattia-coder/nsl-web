@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { resolveCurrentAdminUser } from "@/lib/admin-auth";
+import { resolveCurrentUser } from "@/lib/admin-auth";
+import ChangePasswordForm from "./ChangePasswordForm";
 
 export default async function SettingsPage() {
-  const currentUser = await resolveCurrentAdminUser();
+  const currentUser = await resolveCurrentUser();
 
   if (!currentUser) {
     redirect("/login?next=/settings");
@@ -16,8 +17,7 @@ export default async function SettingsPage() {
           <p className="login-page-kicker">Settings</p>
           <h1 className="login-page-title">Account settings</h1>
           <p className="login-page-subtitle">
-            Review your current account access and use the password reset flow to
-            rotate your credentials when needed.
+            Review your account details and update your credentials.
           </p>
         </div>
 
@@ -39,7 +39,13 @@ export default async function SettingsPage() {
               </div>
               <div>
                 <dt>Account type</dt>
-                <dd>{currentUser.isGlobalAdmin ? "Global admin" : "Admin"}</dd>
+                <dd>
+                  {currentUser.isGlobalAdmin
+                    ? "Global admin"
+                    : currentUser.isAdmin
+                    ? "Admin"
+                    : "Player"}
+                </dd>
               </div>
             </dl>
           </section>
@@ -47,9 +53,10 @@ export default async function SettingsPage() {
           <section className="account-settings-panel">
             <h2>Password</h2>
             <p>
-              Use the reset flow to generate a fresh password link for this account.
-              When SMTP is configured, the reset link is delivered by email.
+              Change your password while signed in. You can still use reset links
+              if you ever lose account access.
             </p>
+            <ChangePasswordForm />
             <div className="account-settings-actions">
               <Link href="/reset-password" className="admin-link-button">
                 Reset password

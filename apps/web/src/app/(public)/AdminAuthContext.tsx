@@ -51,7 +51,7 @@ export function AdminAuthProvider({
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/admin/me", {
+      const response = await fetch("/api/auth/me", {
         cache: "no-store",
         signal,
       });

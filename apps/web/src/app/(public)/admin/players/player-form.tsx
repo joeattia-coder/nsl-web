@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { FiArrowLeft, FiImage, FiSave, FiScissors, FiUpload, FiUserPlus, FiX } from "react-icons/fi";
+import { FiArrowLeft, FiImage, FiMail, FiSave, FiScissors, FiUpload, FiUserPlus, FiX } from "react-icons/fi";
 import { PhotoCropModal } from "./PhotoCropModal";
 import { dataUrlToFile } from "@/lib/image-processing";
 
@@ -12,6 +12,7 @@ type PlayerFormMode = "create" | "edit";
 
 type Player = {
   id: string;
+  userId?: string | null;
   firstName?: string | null;
   middleInitial?: string | null;
   lastName?: string | null;
@@ -44,8 +45,11 @@ export default function PlayerForm({
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [sendingInvite, setSendingInvite] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
 
   const [firstName, setFirstName] = useState("");
   const [middleInitial, setMiddleInitial] = useState("");
@@ -60,6 +64,7 @@ export default function PlayerForm({
   const [country, setCountry] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [linkedUserId, setLinkedUserId] = useState<string | null>(null);
 
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string>("");
@@ -109,6 +114,7 @@ export default function PlayerForm({
         setCountry(player.country ?? "");
         setPostalCode(player.postalCode ?? "");
         setPhotoUrl(player.photoUrl ?? "");
+        setLinkedUserId(player.userId ?? null);
       } catch (err) {
         console.error(err);
         setError(err instanceof Error ? err.message : "Failed to load player.");
@@ -270,6 +276,8 @@ export default function PlayerForm({
     try {
       setSaving(true);
       setError(null);
+      setSuccess(null);
+      setInviteLink(null);
 
       const uploadedPhotoUrl = await uploadPhotoIfNeeded();
 
@@ -326,6 +334,41 @@ export default function PlayerForm({
     }
   }
 
+  async function handleSendInvite() {
+    if (!isEdit || !playerId) {
+      return;
+    }
+
+    try {
+      setSendingInvite(true);
+      setError(null);
+      setSuccess(null);
+      setInviteLink(null);
+
+      const response = await fetch(`/api/admin/players/${playerId}/invite`, {
+        method: "POST",
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; details?: string; message?: string; inviteLink?: string | null }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.details || payload?.error || "Failed to send invitation."
+        );
+      }
+
+      setSuccess(payload?.message || "Invitation sent.");
+      setInviteLink(payload?.inviteLink ?? null);
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Failed to send invitation.");
+    } finally {
+      setSendingInvite(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="admin-page">
@@ -369,6 +412,14 @@ export default function PlayerForm({
       <div className="admin-card admin-player-form-card">
         <form onSubmit={handleSubmit} className="admin-form">
           {error ? <p className="admin-form-error">{error}</p> : null}
+          {success ? (
+            <p className="login-form-status login-form-status-success">{success}</p>
+          ) : null}
+          {inviteLink ? (
+            <p className="login-form-status login-form-status-info">
+              Development invite link: <a href={inviteLink}>{inviteLink}</a>
+            </p>
+          ) : null}
 
           <div className="admin-form-grid">
             <div className="admin-form-field">
@@ -614,6 +665,31 @@ export default function PlayerForm({
               <FiX />
               <span>Cancel</span>
             </Link>
+
+            {isEdit ? (
+              <button
+                type="button"
+                className="admin-player-form-button admin-player-form-button-secondary"
+                onClick={() => void handleSendInvite()}
+                disabled={
+                  sendingInvite ||
+                  saving ||
+                  uploadingPhoto ||
+                  isRemovingBackground ||
+                  !emailAddress.trim()
+                }
+                title={
+                  emailAddress.trim()
+                    ? linkedUserId
+                      ? "Send invite to existing linked user"
+                      : "Send invite and create a user account on acceptance"
+                    : "Add an email address before sending invite"
+                }
+              >
+                <FiMail />
+                <span>{sendingInvite ? "Sending Invite..." : "Send Invite"}</span>
+              </button>
+            ) : null}
 
             <button
               type="submit"

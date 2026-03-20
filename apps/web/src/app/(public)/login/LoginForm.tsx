@@ -11,8 +11,8 @@ function getAuthMessage(errorCode: string | null) {
   switch (errorCode) {
     case "social_not_configured":
       return "That social login provider is not configured yet.";
-    case "social_no_admin_account":
-      return "That social account does not match an enabled admin account.";
+    case "social_no_account":
+      return "That social account does not match an enabled account.";
     case "social_auth_failed":
       return "The social login attempt failed. Please try again.";
     case "social_state_invalid":
@@ -34,9 +34,10 @@ export default function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const nextPath = searchParams.get("next") || "/admin";
+  const nextPath = searchParams.get("next") || "";
   const oauthError = getAuthMessage(searchParams.get("error"));
   const resetStatus = searchParams.get("reset") === "success";
+  const inviteStatus = searchParams.get("invite") === "success";
   const googleHref = `/api/auth/oauth/google?next=${encodeURIComponent(nextPath)}`;
   const facebookHref = `/api/auth/oauth/facebook?next=${encodeURIComponent(nextPath)}`;
 
@@ -51,7 +52,7 @@ export default function LoginForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ identifier, password, nextPath }),
       });
 
       const payload = await response.json().catch(() => null);
@@ -61,7 +62,7 @@ export default function LoginForm() {
       }
 
       await refreshCurrentUser();
-      router.push(nextPath);
+      router.push(payload?.nextPath ?? (nextPath || "/profile"));
       router.refresh();
     } catch (submitError) {
       setError(
@@ -77,6 +78,12 @@ export default function LoginForm() {
       {resetStatus ? (
         <p className="login-form-status login-form-status-success">
           Password updated. Sign in with your new password.
+        </p>
+      ) : null}
+
+      {inviteStatus ? (
+        <p className="login-form-status login-form-status-success">
+          Account setup complete. You can sign in with your password, or use Google/Facebook with the same email.
         </p>
       ) : null}
 

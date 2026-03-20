@@ -95,6 +95,7 @@ model StageRound {
   sequence          Int
   matchesPerPairing Int               @default(1)
   bestOfFrames      Int?
+  snookerFormat     SnookerFormat?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   advancePerGroup   Int?
@@ -411,6 +412,7 @@ model Match {
   awayEntryId       String
   winnerEntryId     String?
   bestOfFrames      Int?
+  snookerFormat     SnookerFormat?
   homeScore         Int?
   awayScore         Int?
   internalNote      String?

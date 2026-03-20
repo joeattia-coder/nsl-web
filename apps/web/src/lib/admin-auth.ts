@@ -15,6 +15,7 @@ const currentAdminSelect = {
   email: true,
   normalizedEmail: true,
   username: true,
+  isLoginEnabled: true,
   player: {
     select: {
       id: true,
@@ -203,14 +204,7 @@ async function findCurrentAdminCandidate() {
   if (sessionUserId) {
     const cookieUser = await loadAdminUserById(sessionUserId);
 
-    if (
-      cookieUser &&
-      (cookieUser.roleAssignments.some(
-        (assignment) =>
-          assignment.scopeType === "GLOBAL" && assignment.scopeId === "" && assignment.role.roleKey === "ADMINISTRATOR"
-      ) ||
-        cookieUser.userRoles.some((userRole) => userRole.role.roleKey === "ADMINISTRATOR"))
-    ) {
+    if (cookieUser && cookieUser.isLoginEnabled) {
       return {
         user: cookieUser,
         source: "session" as const,
@@ -221,7 +215,24 @@ async function findCurrentAdminCandidate() {
   return null;
 }
 
-export async function resolveCurrentAdminUser(): Promise<CurrentAdminUserSummary | null> {
+function isAdminUserRecord(user: NonNullable<LoadedAdminUser>) {
+  return Boolean(
+    user.roleAssignments.some(
+      (assignment) =>
+        assignment.scopeType === "GLOBAL" && assignment.scopeId === "" && assignment.role.roleKey === "ADMINISTRATOR"
+    ) || user.userRoles.some((userRole) => userRole.role.roleKey === "ADMINISTRATOR")
+  );
+}
+
+function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean) {
+  if (nextPath && nextPath.startsWith("/")) {
+    return nextPath;
+  }
+
+  return isAdmin ? "/admin" : "/profile";
+}
+
+export async function resolveCurrentUser(): Promise<CurrentAdminUserSummary | null> {
   const candidate = await findCurrentAdminCandidate();
 
   if (!candidate) {
@@ -235,19 +246,30 @@ export async function resolveCurrentAdminUser(): Promise<CurrentAdminUserSummary
     displayName: buildDisplayName(candidate.user),
     linkedPlayerId: candidate.user.player?.id ?? null,
     isGlobalAdmin: isGlobalAdminUserRecord(candidate.user),
+    isAdmin: isAdminUserRecord(candidate.user),
     permissions: resolvePermissions(candidate.user),
     source: candidate.source,
   };
 }
 
-export async function findAdminUserForLogin(identifier: string) {
+export async function resolveCurrentAdminUser(): Promise<CurrentAdminUserSummary | null> {
+  const currentUser = await resolveCurrentUser();
+
+  if (!currentUser?.isAdmin) {
+    return null;
+  }
+
+  return currentUser;
+}
+
+export async function findUserForLogin(identifier: string) {
   const normalized = identifier.trim().toLowerCase();
 
   if (!normalized) {
     return null;
   }
 
-  return prisma.user.findFirst({
+  const user = await prisma.user.findFirst({
     where: {
       AND: [
         { isLoginEnabled: true },
@@ -259,26 +281,6 @@ export async function findAdminUserForLogin(identifier: string) {
             { normalizedUsername: normalized },
           ],
         },
-        {
-          OR: [
-            {
-              roleAssignments: {
-                some: {
-                  scopeType: "GLOBAL",
-                  scopeId: "",
-                  role: { roleKey: "ADMINISTRATOR" },
-                },
-              },
-            },
-            {
-              userRoles: {
-                some: {
-                  role: { roleKey: "ADMINISTRATOR" },
-                },
-              },
-            },
-          ],
-        },
       ],
     },
     select: {
@@ -287,8 +289,60 @@ export async function findAdminUserForLogin(identifier: string) {
       username: true,
       passwordHash: true,
       isLoginEnabled: true,
+      roleAssignments: {
+        select: {
+          scopeType: true,
+          scopeId: true,
+          role: {
+            select: {
+              roleKey: true,
+            },
+          },
+        },
+      },
+      userRoles: {
+        select: {
+          role: {
+            select: {
+              roleKey: true,
+            },
+          },
+        },
+      },
     },
   });
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    passwordHash: user.passwordHash,
+    isLoginEnabled: user.isLoginEnabled,
+    isAdmin: Boolean(
+      user.roleAssignments.some(
+        (assignment) =>
+          assignment.scopeType === "GLOBAL" && assignment.scopeId === "" && assignment.role.roleKey === "ADMINISTRATOR"
+      ) || user.userRoles.some((userRole) => userRole.role.roleKey === "ADMINISTRATOR")
+    ),
+  };
+}
+
+export async function findAdminUserForLogin(identifier: string) {
+  const user = await findUserForLogin(identifier);
+
+  if (!user?.isAdmin) {
+    return null;
+  }
+
+  return user;
+}
+
+export function getLoginSuccessPath(isAdmin: boolean, nextPath: string | null | undefined) {
+  return resolveNextPath(nextPath, isAdmin);
 }
 
 export function buildAdminSessionCookieValue(userId: string) {

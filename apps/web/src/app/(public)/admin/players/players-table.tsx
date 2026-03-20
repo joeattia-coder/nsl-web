@@ -12,6 +12,7 @@ import {
   FiCheckSquare,
   FiDownload,
   FiEdit2,
+  FiMail,
   FiPlus,
   FiTrash2,
   FiUpload,
@@ -25,6 +26,7 @@ type PlayerRow = {
   phoneNumber: string;
   country: string;
   photoUrl: string;
+  linkedUserId: string | null;
 };
 
 type PlayersTableProps = {
@@ -43,7 +45,9 @@ export default function PlayersTable({ players }: PlayersTableProps) {
   const [playerToDelete, setPlayerToDelete] = useState<PlayerRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
   const [deletingBulk, setDeletingBulk] = useState(false);
+  const [invitingPlayerId, setInvitingPlayerId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const filteredPlayers = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -103,6 +107,7 @@ export default function PlayersTable({ players }: PlayersTableProps) {
     setBulkMode(true);
     setSelectedIds([]);
     setActionError(null);
+    setActionSuccess(null);
   };
 
   const cancelBulkMode = () => {
@@ -110,7 +115,41 @@ export default function PlayersTable({ players }: PlayersTableProps) {
     setSelectedIds([]);
     setShowBulkDeleteModal(false);
     setActionError(null);
+    setActionSuccess(null);
   };
+
+  async function handleSendInvite(player: PlayerRow) {
+    try {
+      setInvitingPlayerId(player.id);
+      setActionError(null);
+      setActionSuccess(null);
+
+      const response = await fetch(`/api/admin/players/${player.id}/invite`, {
+        method: "POST",
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; details?: string; message?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.details || payload?.error || "Failed to send invitation."
+        );
+      }
+
+      setActionSuccess(
+        payload?.message || `Invitation sent to ${player.email || player.fullName}.`
+      );
+    } catch (err) {
+      console.error(err);
+      setActionError(
+        err instanceof Error ? err.message : "Failed to send invitation."
+      );
+    } finally {
+      setInvitingPlayerId(null);
+    }
+  }
 
   const togglePlayerSelection = (playerId: string) => {
     setSelectedIds((current) =>
@@ -231,6 +270,12 @@ export default function PlayersTable({ players }: PlayersTableProps) {
         <div className="admin-form-error" style={{ marginBottom: "14px" }}>
           {actionError}
         </div>
+      ) : null}
+
+      {actionSuccess ? (
+        <p className="login-form-status login-form-status-success" style={{ marginBottom: "14px" }}>
+          {actionSuccess}
+        </p>
       ) : null}
 
       <div className="admin-players-toolbar">
@@ -376,6 +421,10 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                 filteredPlayers.map((player) => {
                   const isSelected = selectedIds.includes(player.id);
                   const countryCode = normalizeCountryCode(player.country);
+                  const canInvite = Boolean(player.email.trim());
+                  const inviteDisabledReason = canInvite
+                    ? null
+                    : "Add an email address before sending an invite.";
 
                   return (
                     <tr key={player.id}>
@@ -443,6 +492,17 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                           >
                             <FiEdit2 />
                           </Link>
+
+                          <button
+                            type="button"
+                            className="admin-icon-action admin-icon-action-edit"
+                            aria-label={`Send invite to ${player.fullName}`}
+                            title={inviteDisabledReason ?? "Send Invite"}
+                            onClick={() => void handleSendInvite(player)}
+                            disabled={!canInvite || invitingPlayerId === player.id}
+                          >
+                            <FiMail />
+                          </button>
 
                           <button
                             type="button"
