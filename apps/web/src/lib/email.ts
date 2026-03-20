@@ -15,6 +15,13 @@ type AccountInvitationEmailInput = {
   playerName?: string | null;
 };
 
+type PlayerRegistrationVerificationEmailInput = {
+  to: string;
+  verificationLink: string;
+  expiresAt: Date;
+  firstName?: string | null;
+};
+
 type MailTransportConfig = {
   host: string;
   port: number;
@@ -182,6 +189,58 @@ export async function sendAccountInvitationEmail({
         </p>
         <p>This link expires at ${expiryLabel}.</p>
         <p>If you were not expecting this invitation, you can ignore this email.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendPlayerRegistrationVerificationEmail({
+  to,
+  verificationLink,
+  expiresAt,
+  firstName,
+}: PlayerRegistrationVerificationEmailInput) {
+  const config = getMailTransportConfig();
+
+  if (!config) {
+    throw new Error(
+      "SMTP is not configured. Set SMTP_HOST and SMTP_FROM_EMAIL to enable email delivery."
+    );
+  }
+
+  const transporter = createTransport(config);
+  const expiryLabel = formatExpiry(expiresAt);
+  const greetingTarget = firstName?.trim() || "there";
+
+  await transporter.sendMail({
+    from: `${config.fromName} <${config.fromEmail}>`,
+    to,
+    replyTo: config.replyTo ?? undefined,
+    subject: "Verify your NSL player registration",
+    text: [
+      `Hi ${greetingTarget},`,
+      "",
+      "Thanks for registering as an NSL player.",
+      "",
+      `Verify your email to activate your account: ${verificationLink}`,
+      "",
+      `This link expires at ${expiryLabel}.`,
+      "If you did not start this registration, you can ignore this email.",
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
+        <p>Hi ${greetingTarget},</p>
+        <p>Thanks for registering as an NSL player.</p>
+        <p>
+          <a
+            href="${verificationLink}"
+            style="display: inline-block; padding: 12px 18px; background: #111827; color: #ffffff; text-decoration: none;"
+          >
+            Verify email
+          </a>
+        </p>
+        <p>This link expires at ${expiryLabel}.</p>
+        <p>If you did not start this registration, you can ignore this email.</p>
       </div>
     `,
   });

@@ -3,6 +3,7 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 
 export const PASSWORD_RESET_TOKEN_TTL_MS = 1000 * 60 * 60;
+export const EMAIL_VERIFICATION_TOKEN_TTL_MS = 1000 * 60 * 60 * 24;
 
 export function createOpaqueToken(byteLength = 32) {
   return randomBytes(byteLength).toString("base64url");

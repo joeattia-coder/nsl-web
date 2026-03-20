@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export type SocialProviderKey = "google" | "facebook";
+export type SocialAuthMode = "login" | "register";
 type DatabaseAuthProvider = "GOOGLE" | "FACEBOOK";
 
 const OAUTH_STATE_MAX_AGE = 60 * 10;
@@ -77,6 +78,10 @@ function normalizeNextPath(nextPath: string | null | undefined) {
   return nextPath;
 }
 
+function normalizeAuthMode(mode: string | null | undefined): SocialAuthMode {
+  return mode === "register" ? "register" : "login";
+}
+
 function getRequestOrigin(request: Request) {
   const explicitOrigin =
     process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? process.env.AUTH_ORIGIN;
@@ -96,11 +101,12 @@ function buildCallbackUrl(provider: SocialProviderKey, request: Request) {
   return `${getRequestOrigin(request)}/api/auth/oauth/${provider}/callback`;
 }
 
-function buildStatePayload(nextPath: string) {
+function buildStatePayload(nextPath: string, mode: SocialAuthMode) {
   return Buffer.from(
     JSON.stringify({
       nonce: randomBytes(24).toString("base64url"),
       nextPath,
+      mode,
     })
   ).toString("base64url");
 }
@@ -114,6 +120,7 @@ function parseStatePayload(payload: string | undefined) {
     const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as {
       nonce?: string;
       nextPath?: string;
+      mode?: string;
     };
 
     if (!parsed.nonce) {
@@ -123,10 +130,36 @@ function parseStatePayload(payload: string | undefined) {
     return {
       nonce: parsed.nonce,
       nextPath: normalizeNextPath(parsed.nextPath),
+      mode: normalizeAuthMode(parsed.mode),
     };
   } catch {
     return null;
   }
+}
+
+function splitDisplayName(displayName: string | null) {
+  const normalized = String(displayName ?? "").trim();
+
+  if (!normalized) {
+    return {
+      firstName: "Player",
+      lastName: "Member",
+    };
+  }
+
+  const parts = normalized.split(/\s+/).filter(Boolean);
+
+  if (parts.length === 1) {
+    return {
+      firstName: parts[0],
+      lastName: "Member",
+    };
+  }
+
+  return {
+    firstName: parts[0],
+    lastName: parts.slice(1).join(" "),
+  };
 }
 
 async function exchangeCodeForTokens(
@@ -235,17 +268,19 @@ function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean) 
 
 export async function beginSocialAuth(provider: SocialProviderKey, request: Request) {
   const config = getProviderConfig(provider);
+  const requestUrl = new URL(request.url);
+  const mode = normalizeAuthMode(requestUrl.searchParams.get("mode"));
 
   if (!config) {
+    const fallbackPath = mode === "register" ? "/register" : "/login";
     return {
       ok: false as const,
-      redirectUrl: new URL("/login?error=social_not_configured", request.url),
+      redirectUrl: new URL(`${fallbackPath}?error=social_not_configured`, request.url),
     };
   }
 
-  const requestUrl = new URL(request.url);
   const nextPath = normalizeNextPath(requestUrl.searchParams.get("next"));
-  const state = buildStatePayload(nextPath);
+  const state = buildStatePayload(nextPath, mode);
   const redirectUri = buildCallbackUrl(provider, request);
   const authUrl = new URL(config.authorizationUrl);
 
@@ -290,6 +325,7 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
       ok: false as const,
       error: "social_state_invalid",
       nextPath: "/",
+      authMode: "login" as SocialAuthMode,
     };
   }
 
@@ -300,6 +336,7 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
       ok: false as const,
       error: "social_profile_invalid",
       nextPath: parsedState.nextPath,
+      authMode: parsedState.mode,
     };
   }
 
@@ -322,8 +359,9 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
 
   let userId = existingLinkedUser?.id ?? null;
 
-  if (!userId && profile.email) {
-    const normalizedEmail = profile.email.toLowerCase();
+  const normalizedEmail = profile.email ? profile.email.toLowerCase() : null;
+
+  if (!userId && normalizedEmail) {
     const matchedUser = await prisma.user.findFirst({
       where: {
         AND: [
@@ -368,11 +406,116 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
   }
 
   if (!userId) {
+    if (parsedState.mode !== "register") {
+      return {
+        ok: false as const,
+        error: "social_no_account",
+        nextPath: parsedState.nextPath,
+        authMode: parsedState.mode,
+      };
+    }
+
+    if (!normalizedEmail) {
+      return {
+        ok: false as const,
+        error: "social_email_required",
+        nextPath: parsedState.nextPath,
+        authMode: parsedState.mode,
+      };
+    }
+
+    const existingUserByEmail = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: normalizedEmail }, { normalizedEmail }],
+      },
+      select: { id: true },
+    });
+
+    if (existingUserByEmail) {
+      return {
+        ok: false as const,
+        error: "social_account_exists",
+        nextPath: parsedState.nextPath,
+        authMode: parsedState.mode,
+      };
+    }
+
+    const nameParts = splitDisplayName(profile.displayName);
+    const now = new Date();
+
+    const createdUser = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: normalizedEmail,
+          normalizedEmail,
+          registrationStatus: "ACTIVE",
+          isLoginEnabled: true,
+          emailVerifiedAt: profile.emailVerified ? now : null,
+          authAccounts: {
+            create: {
+              provider: profile.provider,
+              providerAccountId: profile.providerAccountId,
+              providerEmail: profile.email,
+              providerEmailNormalized: normalizedEmail,
+            },
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      await tx.player.create({
+        data: {
+          userId: user.id,
+          firstName: nameParts.firstName,
+          lastName: nameParts.lastName,
+          emailAddress: normalizedEmail,
+        },
+      });
+
+      return user;
+    });
+
+    userId = createdUser.id;
+  }
+
+  if (!userId) {
     return {
       ok: false as const,
       error: "social_no_account",
       nextPath: parsedState.nextPath,
+      authMode: parsedState.mode,
     };
+  }
+
+  if (parsedState.mode === "register") {
+    const linkedPlayer = await prisma.player.findFirst({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!linkedPlayer) {
+      const nameParts = splitDisplayName(profile.displayName);
+
+      await prisma.player.create({
+        data: {
+          userId,
+          firstName: nameParts.firstName,
+          lastName: nameParts.lastName,
+          emailAddress: normalizedEmail,
+        },
+      });
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        registrationStatus: "ACTIVE",
+        isLoginEnabled: true,
+        emailVerifiedAt: profile.emailVerified ? new Date() : undefined,
+      },
+    });
   }
 
   const resolvedUser = await prisma.user.findUnique({
@@ -409,5 +552,6 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
     ok: true as const,
     nextPath: resolveNextPath(parsedState.nextPath, isAdmin),
     userId,
+    authMode: parsedState.mode,
   };
 }

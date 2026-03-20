@@ -10,7 +10,7 @@ export default function LoginPage() {
           <h1 className="login-page-title">Sign in</h1>
           <p className="login-page-subtitle">
             Use your email or username to sign in with a password, request a
-            reset link, or continue with a linked Google or Facebook account.
+            reset link, create a new player account, or continue with a linked Google or Facebook account.
           </p>
         </div>
 

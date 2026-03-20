@@ -12,7 +12,7 @@ function getAuthMessage(errorCode: string | null) {
     case "social_not_configured":
       return "That social login provider is not configured yet.";
     case "social_no_account":
-      return "That social account does not match an enabled account.";
+      return "That social account does not match an enabled account. You can register first.";
     case "social_auth_failed":
       return "The social login attempt failed. Please try again.";
     case "social_state_invalid":
@@ -38,6 +38,7 @@ export default function LoginForm() {
   const oauthError = getAuthMessage(searchParams.get("error"));
   const resetStatus = searchParams.get("reset") === "success";
   const inviteStatus = searchParams.get("invite") === "success";
+  const verifiedStatus = searchParams.get("verified");
   const googleHref = `/api/auth/oauth/google?next=${encodeURIComponent(nextPath)}`;
   const facebookHref = `/api/auth/oauth/facebook?next=${encodeURIComponent(nextPath)}`;
 
@@ -87,6 +88,18 @@ export default function LoginForm() {
         </p>
       ) : null}
 
+      {verifiedStatus === "success" ? (
+        <p className="login-form-status login-form-status-success">
+          Email verified. Your player account is now active.
+        </p>
+      ) : null}
+
+      {verifiedStatus === "invalid" ? (
+        <p className="login-form-status login-form-status-warning">
+          That verification link is invalid or expired.
+        </p>
+      ) : null}
+
       {oauthError ? (
         <p className="login-form-status login-form-status-warning">{oauthError}</p>
       ) : null}
@@ -121,6 +134,13 @@ export default function LoginForm() {
         </Link>
       </div>
 
+      <div className="login-form-row">
+        <span className="login-support-copy">New player?</span>
+        <Link href="/register" className="login-form-link">
+          Register
+        </Link>
+      </div>
+
       {error ? <p className="admin-form-error">{error}</p> : null}
 
       <button type="submit" className="admin-primary-button" disabled={isSubmitting}>
@@ -143,8 +163,7 @@ export default function LoginForm() {
       </div>
 
       <p className="login-support-copy">
-        Social sign-in only works for existing enabled admin accounts and links to the
-        matching email address on first use.
+        Social sign-in works for enabled accounts. New players can register from the Register page.
       </p>
     </form>
   );
