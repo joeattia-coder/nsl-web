@@ -152,6 +152,7 @@ export default function RegisterForm() {
     }
   };
 
+  // Inline registration form, not modal
   return (
     <form className="login-form" onSubmit={handleSubmit}>
       {oauthError ? (
@@ -168,6 +169,7 @@ export default function RegisterForm() {
         </p>
       ) : null}
 
+      {/* Inline fields, not modal */}
       <label className="admin-form-field">
         <span className="admin-label">First name</span>
         <input
