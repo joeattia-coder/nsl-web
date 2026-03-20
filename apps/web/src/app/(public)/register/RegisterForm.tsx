@@ -152,169 +152,165 @@ export default function RegisterForm() {
     }
   };
 
-  // Inline registration form, not modal
   return (
-    <form className="login-form" onSubmit={handleSubmit}>
-      {oauthError ? (
-        <p className="login-form-status login-form-status-warning">{oauthError}</p>
-      ) : null}
-
-      {success ? (
-        <p className="login-form-status login-form-status-success">{success}</p>
-      ) : null}
-
-      {verificationLink ? (
-        <p className="login-form-status login-form-status-info">
-          Development verification link: <a href={verificationLink}>{verificationLink}</a>
-        </p>
-      ) : null}
-
-      {/* Inline fields, not modal */}
-      <label className="admin-form-field">
-        <span className="admin-label">First name</span>
-        <input
-          type="text"
-          className="admin-input"
-          value={firstName}
-          onChange={(event) => setFirstName(event.target.value)}
-          required
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Last name</span>
-        <input
-          type="text"
-          className="admin-input"
-          value={lastName}
-          onChange={(event) => setLastName(event.target.value)}
-          required
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Date of birth (optional)</span>
-        <input
-          type="date"
-          className="admin-input"
-          value={dateOfBirth}
-          onChange={(event) => setDateOfBirth(event.target.value)}
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Phone number (optional)</span>
-        <input
-          type="text"
-          className="admin-input"
-          value={phoneNumber}
-          onChange={(event) => setPhoneNumber(event.target.value)}
-          autoComplete="tel"
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Username</span>
-        <input
-          type="text"
-          className="admin-input"
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-          autoComplete="username"
-          required
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Email</span>
-        <input
-          type="email"
-          className="admin-input"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          autoComplete="email"
-          required
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Password</span>
-        <PasswordField
-          className="admin-input"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          autoComplete="new-password"
-          required
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Confirm password</span>
-        <PasswordField
-          className="admin-input"
-          value={confirmPassword}
-          onChange={(event) => setConfirmPassword(event.target.value)}
-          autoComplete="new-password"
-          required
-        />
-      </label>
-
-      <label className="admin-form-field">
-        <span className="admin-label">Human verification</span>
-        <span className="login-support-copy">
-          {isLoadingChallenge ? "Loading challenge..." : verificationPrompt}
-        </span>
-        <input
-          type="text"
-          className="admin-input"
-          value={verificationAnswer}
-          onChange={(event) => setVerificationAnswer(event.target.value)}
-          required
-          disabled={isLoadingChallenge}
-        />
-      </label>
-
-      <label className="admin-form-field" style={{ display: "none" }} aria-hidden="true">
-        <span>Website</span>
-        <input
-          tabIndex={-1}
-          autoComplete="off"
-          type="text"
-          value={website}
-          onChange={(event) => setWebsite(event.target.value)}
-        />
-      </label>
-
-      {error ? <p className="admin-form-error">{error}</p> : null}
-
-      <button type="submit" className="admin-primary-button" disabled={isSubmitting || isLoadingChallenge}>
-        {isSubmitting ? "Registering..." : "Register"}
-      </button>
-
-      <div className="login-divider" aria-hidden="true">
-        <span>or register with</span>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Player Registration</h1>
+          <p className="admin-page-subtitle">
+            Register with the form and verify your email, or use Google/Facebook for instant account creation.
+          </p>
+        </div>
       </div>
+      <div className="admin-card admin-player-form-card">
+        <form onSubmit={handleSubmit} className="admin-form">
+          {oauthError ? (
+            <p className="login-form-status login-form-status-warning">{oauthError}</p>
+          ) : null}
 
-      <div className="social-auth-actions">
-        <a href={googleHref} className="social-auth-button social-auth-button-google">
-          <FaGoogle aria-hidden="true" />
-          <span>Google</span>
-        </a>
-        <a href={facebookHref} className="social-auth-button social-auth-button-facebook">
-          <FaFacebookF aria-hidden="true" />
-          <span>Facebook</span>
-        </a>
+          {success ? (
+            <p className="login-form-status login-form-status-success">{success}</p>
+          ) : null}
+
+          {verificationLink ? (
+            <p className="login-form-status login-form-status-info">
+              Development verification link: <a href={verificationLink}>{verificationLink}</a>
+            </p>
+          ) : null}
+
+          <div className="admin-form-grid">
+            <div className="admin-form-field">
+              <label className="admin-label">First name</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Last name</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Date of birth (optional)</label>
+              <input
+                type="date"
+                className="admin-input"
+                value={dateOfBirth}
+                onChange={(event) => setDateOfBirth(event.target.value)}
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Phone number (optional)</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
+                autoComplete="tel"
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Username</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                autoComplete="username"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Email</label>
+              <input
+                type="email"
+                className="admin-input"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Password</label>
+              <PasswordField
+                className="admin-input"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Confirm password</label>
+              <PasswordField
+                className="admin-input"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Human verification</label>
+              <span className="login-support-copy">
+                {isLoadingChallenge ? "Loading challenge..." : verificationPrompt}
+              </span>
+              <input
+                type="text"
+                className="admin-input"
+                value={verificationAnswer}
+                onChange={(event) => setVerificationAnswer(event.target.value)}
+                required
+                disabled={isLoadingChallenge}
+              />
+            </div>
+            <div className="admin-form-field" style={{ display: "none" }} aria-hidden="true">
+              <span>Website</span>
+              <input
+                tabIndex={-1}
+                autoComplete="off"
+                type="text"
+                value={website}
+                onChange={(event) => setWebsite(event.target.value)}
+              />
+            </div>
+          </div>
+          {error ? <p className="admin-form-error">{error}</p> : null}
+          <button type="submit" className="admin-primary-button" disabled={isSubmitting || isLoadingChallenge}>
+            {isSubmitting ? "Registering..." : "Register"}
+          </button>
+          <div className="login-divider" aria-hidden="true">
+            <span>or register with</span>
+          </div>
+          <div className="social-auth-actions">
+            <a href={googleHref} className="social-auth-button social-auth-button-google">
+              <FaGoogle aria-hidden="true" />
+              <span>Google</span>
+            </a>
+            <a href={facebookHref} className="social-auth-button social-auth-button-facebook">
+              <FaFacebookF aria-hidden="true" />
+              <span>Facebook</span>
+            </a>
+          </div>
+          <p className="login-support-copy">
+            Using social registration creates your player account immediately. Form registration requires email verification.
+          </p>
+          <div className="account-settings-actions">
+            <Link href="/login" className="admin-link-button">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </form>
       </div>
-
-      <p className="login-support-copy">
-        Using social registration creates your player account immediately. Form registration requires email verification.
-      </p>
-
-      <div className="account-settings-actions">
-        <Link href="/login" className="admin-link-button">
-          Already have an account? Sign in
-        </Link>
-      </div>
-    </form>
-  );
+    </div>
 }
