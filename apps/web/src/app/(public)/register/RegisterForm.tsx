@@ -102,22 +102,15 @@ export default function RegisterForm() {
         body: JSON.stringify({
           firstName,
           lastName,
-          try {
-            // Logic to load the challenge
-          } catch (challengeError) {
-            setError(
-              challengeError instanceof Error
-                ? challengeError.message
-                : "Failed to load human verification."
-            );
-          } finally {
-            setIsLoadingChallenge(false);
-          }
-          <h1 className="admin-page-title">Player Registration</h1>
-          <p className="admin-page-subtitle">
-            Register with the form and verify your email, or use Google/Facebook for instant account creation.
-          </p>
-        </div>
+          dateOfBirth,
+          phoneNumber,
+          username,
+          email,
+          password,
+          verificationToken,
+          verificationAnswer,
+          website,
+        }),
       </div>
       <div className="admin-card admin-player-form-card">
         <form onSubmit={handleSubmit} className="admin-form">
