@@ -111,12 +111,6 @@ export default function RegisterForm() {
           verificationAnswer,
           website,
         }),
-      </div>
-      <div className="admin-card admin-player-form-card">
-        <form onSubmit={handleSubmit} className="admin-form">
-          {oauthError ? (
-            <p className="login-form-status login-form-status-warning">{oauthError}</p>
-          ) : null}
 
           {success ? (
             <p className="login-form-status login-form-status-success">{success}</p>
