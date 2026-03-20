@@ -127,6 +127,10 @@ export async function POST(request: Request) {
       enteredByUserId,
       updatedByUserId,
     } = body;
+    const bestOfFrames =
+      body.bestOfFrames === null || body.bestOfFrames === undefined
+        ? null
+        : Number(body.bestOfFrames);
 
     if (!tournamentId) {
       return NextResponse.json(
@@ -186,6 +190,16 @@ export async function POST(request: Request) {
           error:
             "matchStatus must be one of SCHEDULED, IN_PROGRESS, COMPLETED, POSTPONED, CANCELLED, FORFEIT, ABANDONED",
         },
+        { status: 400 }
+      );
+    }
+
+    if (
+      bestOfFrames !== null &&
+      (!Number.isInteger(bestOfFrames) || bestOfFrames < 1 || bestOfFrames % 2 === 0)
+    ) {
+      return NextResponse.json(
+        { error: "bestOfFrames must be an odd whole number greater than or equal to 1" },
         { status: 400 }
       );
     }

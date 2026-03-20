@@ -46,6 +46,29 @@ function toDateTimeLocalFromDate(date: Date | null | undefined) {
   return date.toISOString().slice(0, 16);
 }
 
+function buildFrameHighBreaks(
+  frameCount: number,
+  frames: Array<{ frameNumber: number; homeHighBreak: number | null; awayHighBreak: number | null }>
+) {
+  const homeHighBreaks = Array.from({ length: frameCount }, () => "");
+  const awayHighBreaks = Array.from({ length: frameCount }, () => "");
+
+  for (const frame of frames) {
+    const index = frame.frameNumber - 1;
+    if (index < 0 || index >= frameCount) {
+      continue;
+    }
+
+    homeHighBreaks[index] = frame.homeHighBreak === null ? "" : String(frame.homeHighBreak);
+    awayHighBreaks[index] = frame.awayHighBreak === null ? "" : String(frame.awayHighBreak);
+  }
+
+  return {
+    homeHighBreaks,
+    awayHighBreaks,
+  };
+}
+
 export default async function EditTournamentMatchPage({
   params,
 }: {
@@ -60,6 +83,11 @@ export default async function EditTournamentMatchPage({
         select: {
           id: true,
           tournamentName: true,
+        },
+      },
+      stageRound: {
+        select: {
+          bestOfFrames: true,
         },
       },
       homeEntry: {
@@ -94,6 +122,14 @@ export default async function EditTournamentMatchPage({
           },
         },
       },
+      frames: {
+        select: {
+          frameNumber: true,
+          homeHighBreak: true,
+          awayHighBreak: true,
+        },
+        orderBy: { frameNumber: "asc" },
+      },
     },
   });
 
@@ -103,6 +139,8 @@ export default async function EditTournamentMatchPage({
 
   const homeLabel = formatParticipantTypeLabel(match.homeEntry);
   const awayLabel = formatParticipantTypeLabel(match.awayEntry);
+  const bestOfFrames = match.bestOfFrames ?? match.stageRound.bestOfFrames ?? 5;
+  const frameHighBreaks = buildFrameHighBreaks(bestOfFrames, match.frames);
 
   return (
     <section className="admin-page">
@@ -125,6 +163,9 @@ export default async function EditTournamentMatchPage({
           awayScore: match.awayScore,
           winnerEntryId: match.winnerEntryId,
           matchStatus: match.matchStatus,
+          bestOfFrames,
+          homeHighBreaks: frameHighBreaks.homeHighBreaks,
+          awayHighBreaks: frameHighBreaks.awayHighBreaks,
         }}
       />
     </section>

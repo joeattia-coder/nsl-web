@@ -77,6 +77,7 @@ export default async function EditTournamentPage({ params }: PageProps) {
           status: tournament.status,
           isPublished: tournament.isPublished,
           description: tournament.description ?? "",
+          snookerFormat: (tournament.snookerFormat as "REDS_6" | "REDS_10" | "REDS_15" | null) ?? null,
         }}
       />
     </section>

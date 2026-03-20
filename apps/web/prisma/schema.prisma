@@ -50,6 +50,7 @@ model Tournament {
   venueId         String?
   tournamentName  String
   participantType ParticipantType
+  snookerFormat   SnookerFormat?
   registrationDeadline DateTime?
   startDate       DateTime?
   endDate         DateTime?
@@ -93,6 +94,7 @@ model StageRound {
   roundType         StageRoundType
   sequence          Int
   matchesPerPairing Int               @default(1)
+  bestOfFrames      Int?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   advancePerGroup   Int?
@@ -408,6 +410,7 @@ model Match {
   homeEntryId       String
   awayEntryId       String
   winnerEntryId     String?
+  bestOfFrames      Int?
   homeScore         Int?
   awayScore         Int?
   internalNote      String?
@@ -452,6 +455,8 @@ model MatchFrame {
   winnerEntryId String?
   homePoints    Int?
   awayPoints    Int?
+  homeHighBreak Int?
+  awayHighBreak Int?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   match         Match            @relation(fields: [matchId], references: [id], onDelete: Cascade)
@@ -647,4 +652,10 @@ enum HomeNewsDisplayMode {
 enum VideoSourceType {
   YOUTUBE
   UPLOAD
+}
+
+enum SnookerFormat {
+  REDS_6
+  REDS_10
+  REDS_15
 }

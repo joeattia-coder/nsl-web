@@ -62,6 +62,7 @@ export default async function EditStageRoundPage({
           roundType: round.roundType,
           sequence: round.sequence,
           matchesPerPairing: round.matchesPerPairing,
+          bestOfFrames: round.bestOfFrames ?? 5,
           groupCount: round.groupCount ?? null,
           playersPerGroup: round.playersPerGroup ?? null,
           advancePerGroup: round.advancePerGroup ?? null,

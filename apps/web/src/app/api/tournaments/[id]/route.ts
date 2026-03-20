@@ -47,6 +47,7 @@ export async function PUT(request: Request, context: RouteContext) {
     const venueId = String(body.venueId ?? "").trim();
     const tournamentName = String(body.tournamentName ?? "").trim();
     const participantType = String(body.participantType ?? "").trim();
+    const snookerFormat = body.snookerFormat ? String(body.snookerFormat).trim() : null;
     const registrationDeadline = body.registrationDeadline
       ? String(body.registrationDeadline)
       : null;
@@ -88,6 +89,11 @@ export async function PUT(request: Request, context: RouteContext) {
           | "Doubles"
           | "Triples"
           | "Teams",
+        snookerFormat: (snookerFormat || null) as
+          | "REDS_6"
+          | "REDS_10"
+          | "REDS_15"
+          | null,
         registrationDeadline: registrationDeadline
           ? new Date(registrationDeadline)
           : null,

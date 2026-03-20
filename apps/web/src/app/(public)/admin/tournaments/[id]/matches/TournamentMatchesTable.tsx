@@ -19,6 +19,7 @@ type MatchRow = {
   homeName: string;
   awayName: string;
   winnerName: string;
+  bestOfFrames: number;
   homeScore: number | null;
   awayScore: number | null;
   matchDate: string;
@@ -69,6 +70,14 @@ function formatScore(homeScore: number | null, awayScore: number | null) {
   }
 
   return `${homeScore} - ${awayScore}`;
+}
+
+function formatBestOf(bestOfFrames: number | null | undefined) {
+  if (!bestOfFrames || bestOfFrames < 1) {
+    return "Bo5";
+  }
+
+  return `Bo${bestOfFrames}`;
 }
 
 export default function TournamentMatchesTable({
@@ -252,7 +261,14 @@ export default function TournamentMatchesTable({
                         {match.awayName}
                       </Link>
                     </td>
-                    <td>{formatScore(match.homeScore, match.awayScore)}</td>
+                    <td>
+                      <div className="match-score-cell">
+                        <span>{formatScore(match.homeScore, match.awayScore)}</span>
+                        <span className="match-best-of-badge">
+                          {formatBestOf(match.bestOfFrames)}
+                        </span>
+                      </div>
+                    </td>
                     <td>{match.winnerName || "—"}</td>
                     <td>{formatDate(match.matchDate)}</td>
                     <td>{match.matchTime || "—"}</td>

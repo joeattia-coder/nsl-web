@@ -2658,6 +2658,7 @@ export const TournamentScalarFieldEnum = {
   venueId: 'venueId',
   tournamentName: 'tournamentName',
   participantType: 'participantType',
+  snookerFormat: 'snookerFormat',
   registrationDeadline: 'registrationDeadline',
   startDate: 'startDate',
   endDate: 'endDate',
@@ -2691,6 +2692,7 @@ export const StageRoundScalarFieldEnum = {
   roundType: 'roundType',
   sequence: 'sequence',
   matchesPerPairing: 'matchesPerPairing',
+  bestOfFrames: 'bestOfFrames',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   advancePerGroup: 'advancePerGroup',
@@ -2938,6 +2940,7 @@ export const MatchScalarFieldEnum = {
   homeEntryId: 'homeEntryId',
   awayEntryId: 'awayEntryId',
   winnerEntryId: 'winnerEntryId',
+  bestOfFrames: 'bestOfFrames',
   homeScore: 'homeScore',
   awayScore: 'awayScore',
   internalNote: 'internalNote',
@@ -2961,6 +2964,8 @@ export const MatchFrameScalarFieldEnum = {
   winnerEntryId: 'winnerEntryId',
   homePoints: 'homePoints',
   awayPoints: 'awayPoints',
+  homeHighBreak: 'homeHighBreak',
+  awayHighBreak: 'awayHighBreak',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3149,6 +3154,20 @@ export type EnumParticipantTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'ParticipantType[]'
  */
 export type ListEnumParticipantTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ParticipantType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SnookerFormat'
+ */
+export type EnumSnookerFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SnookerFormat'>
+    
+
+
+/**
+ * Reference to a field of type 'SnookerFormat[]'
+ */
+export type ListEnumSnookerFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SnookerFormat[]'>
     
 
 

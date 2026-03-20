@@ -70,6 +70,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const roundType = String(body.roundType ?? "").trim();
     const sequence = Number(body.sequence);
     const matchesPerPairing = Number(body.matchesPerPairing);
+    const bestOfFrames = Number(body.bestOfFrames);
 
     const groupCountRaw = body.groupCount;
     const playersPerGroupRaw = body.playersPerGroup;
@@ -102,12 +103,15 @@ export async function PATCH(request: Request, context: RouteContext) {
       !Number.isInteger(sequence) ||
       sequence < 1 ||
       !Number.isInteger(matchesPerPairing) ||
-      matchesPerPairing < 1
+      matchesPerPairing < 1 ||
+      !Number.isInteger(bestOfFrames) ||
+      bestOfFrames < 1 ||
+      bestOfFrames % 2 === 0
     ) {
       return NextResponse.json(
         {
           error:
-            "Round name, round type, sequence, and matches per pairing are required.",
+            "Round name, round type, sequence, matches per pairing, and an odd best-of frame count are required.",
         },
         { status: 400 }
       );
@@ -196,6 +200,7 @@ export async function PATCH(request: Request, context: RouteContext) {
           roundType: roundType as "GROUP" | "KNOCKOUT",
           sequence,
           matchesPerPairing,
+          bestOfFrames,
           groupCount: roundType === "GROUP" ? groupCount : null,
           playersPerGroup: roundType === "GROUP" ? playersPerGroup : null,
           advancePerGroup: roundType === "GROUP" ? advancePerGroup : null,

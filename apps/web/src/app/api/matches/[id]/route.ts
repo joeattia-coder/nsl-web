@@ -13,6 +13,10 @@ const VALID_MATCH_STATUSES = [
 
 const VALID_SCHEDULE_STATUSES = ["TBC", "CONFIRMED"];
 
+function isNonNegativeWholeNumber(value: unknown) {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
 export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string }> }
@@ -170,6 +174,11 @@ export async function PATCH(
       body.updatedByUserId === null
         ? null
         : body.updatedByUserId ?? existingMatch.updatedByUserId;
+    const requestedBestOfFrames =
+      body.bestOfFrames === null || body.bestOfFrames === undefined
+        ? null
+        : Number(body.bestOfFrames);
+    const frameHighBreaks = body.frameHighBreaks;
 
     if (homeEntryId === awayEntryId) {
       return NextResponse.json(
@@ -223,6 +232,60 @@ export async function PATCH(
         { error: "Stage round does not belong to the supplied stage" },
         { status: 400 }
       );
+    }
+
+    const bestOfFrames =
+      requestedBestOfFrames ?? existingMatch.bestOfFrames ?? round.bestOfFrames ?? 5;
+
+    if (
+      !Number.isInteger(bestOfFrames) ||
+      bestOfFrames < 1 ||
+      bestOfFrames % 2 === 0
+    ) {
+      return NextResponse.json(
+        { error: "bestOfFrames must be an odd whole number greater than or equal to 1" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      frameHighBreaks !== undefined &&
+      (
+        !frameHighBreaks ||
+        !Array.isArray(frameHighBreaks.home) ||
+        !Array.isArray(frameHighBreaks.away)
+      )
+    ) {
+      return NextResponse.json(
+        { error: "frameHighBreaks must contain home and away arrays." },
+        { status: 400 }
+      );
+    }
+
+    if (frameHighBreaks) {
+      if (
+        frameHighBreaks.home.length !== bestOfFrames ||
+        frameHighBreaks.away.length !== bestOfFrames
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "frameHighBreaks arrays must match the number of frames in the match format.",
+          },
+          { status: 400 }
+        );
+      }
+
+      const invalidHighBreak = [...frameHighBreaks.home, ...frameHighBreaks.away].find(
+        (value) => value !== null && !isNonNegativeWholeNumber(value)
+      );
+
+      if (invalidHighBreak !== undefined) {
+        return NextResponse.json(
+          { error: "Each frame high break must be null or a whole number greater than or equal to 0." },
+          { status: 400 }
+        );
+      }
     }
 
     if (tournamentGroupId) {
@@ -371,104 +434,134 @@ export async function PATCH(
       }
     }
 
-    const match = await prisma.match.update({
-      where: { id },
-      data: {
-        tournamentId,
-        tournamentStageId,
-        stageRoundId,
-        tournamentGroupId,
-        venueId,
-        matchDate:
-          body.matchDate === null
-            ? null
-            : body.matchDate
-            ? new Date(body.matchDate)
-            : existingMatch.matchDate,
-        matchTime:
-          body.matchTime === null
-            ? null
-            : body.matchTime ?? existingMatch.matchTime,
-        scheduleStatus: body.scheduleStatus ?? existingMatch.scheduleStatus,
-        matchStatus: body.matchStatus ?? existingMatch.matchStatus,
-        homeEntryId,
-        awayEntryId,
-        winnerEntryId,
-        homeScore:
-          body.homeScore === null
-            ? null
-            : body.homeScore ?? existingMatch.homeScore,
-        awayScore:
-          body.awayScore === null
-            ? null
-            : body.awayScore ?? existingMatch.awayScore,
-        internalNote:
-          body.internalNote === null
-            ? null
-            : body.internalNote ?? existingMatch.internalNote,
-        publicNote:
-          body.publicNote === null
-            ? null
-            : body.publicNote ?? existingMatch.publicNote,
-        resultSubmittedAt:
-          body.resultSubmittedAt === null
-            ? null
-            : body.resultSubmittedAt
-            ? new Date(body.resultSubmittedAt)
-            : existingMatch.resultSubmittedAt,
-        approvedAt:
-          body.approvedAt === null
-            ? null
-            : body.approvedAt
-            ? new Date(body.approvedAt)
-            : existingMatch.approvedAt,
-        approvedByUserId,
-        enteredByUserId,
-        updatedByUserId,
-      },
-      include: {
-        tournament: true,
-        tournamentStage: true,
-        stageRound: true,
-        tournamentGroup: true,
-        venue: true,
-        homeEntry: {
-          include: {
-            members: {
-              include: {
-                player: true,
+    const match = await prisma.$transaction(async (tx) => {
+      const updated = await tx.match.update({
+        where: { id },
+        data: {
+          tournamentId,
+          tournamentStageId,
+          stageRoundId,
+          tournamentGroupId,
+          venueId,
+          matchDate:
+            body.matchDate === null
+              ? null
+              : body.matchDate
+              ? new Date(body.matchDate)
+              : existingMatch.matchDate,
+          matchTime:
+            body.matchTime === null
+              ? null
+              : body.matchTime ?? existingMatch.matchTime,
+          scheduleStatus: body.scheduleStatus ?? existingMatch.scheduleStatus,
+          matchStatus: body.matchStatus ?? existingMatch.matchStatus,
+          homeEntryId,
+          awayEntryId,
+          winnerEntryId,
+          bestOfFrames,
+          homeScore:
+            body.homeScore === null
+              ? null
+              : body.homeScore ?? existingMatch.homeScore,
+          awayScore:
+            body.awayScore === null
+              ? null
+              : body.awayScore ?? existingMatch.awayScore,
+          internalNote:
+            body.internalNote === null
+              ? null
+              : body.internalNote ?? existingMatch.internalNote,
+          publicNote:
+            body.publicNote === null
+              ? null
+              : body.publicNote ?? existingMatch.publicNote,
+          resultSubmittedAt:
+            body.resultSubmittedAt === null
+              ? null
+              : body.resultSubmittedAt
+              ? new Date(body.resultSubmittedAt)
+              : existingMatch.resultSubmittedAt,
+          approvedAt:
+            body.approvedAt === null
+              ? null
+              : body.approvedAt
+              ? new Date(body.approvedAt)
+              : existingMatch.approvedAt,
+          approvedByUserId,
+          enteredByUserId,
+          updatedByUserId,
+        },
+      });
+
+      if (frameHighBreaks) {
+        for (let index = 0; index < bestOfFrames; index += 1) {
+          await tx.matchFrame.upsert({
+            where: {
+              matchId_frameNumber: {
+                matchId: id,
+                frameNumber: index + 1,
               },
-              orderBy: { createdAt: "asc" },
+            },
+            create: {
+              matchId: id,
+              frameNumber: index + 1,
+              homeHighBreak: frameHighBreaks.home[index],
+              awayHighBreak: frameHighBreaks.away[index],
+            },
+            update: {
+              homeHighBreak: frameHighBreaks.home[index],
+              awayHighBreak: frameHighBreaks.away[index],
+            },
+          });
+        }
+      }
+
+      return tx.match.findUniqueOrThrow({
+        where: { id: updated.id },
+        include: {
+          tournament: true,
+          tournamentStage: true,
+          stageRound: true,
+          tournamentGroup: true,
+          venue: true,
+          homeEntry: {
+            include: {
+              members: {
+                include: {
+                  player: true,
+                },
+                orderBy: { createdAt: "asc" },
+              },
             },
           },
-        },
-        awayEntry: {
-          include: {
-            members: {
-              include: {
-                player: true,
+          awayEntry: {
+            include: {
+              members: {
+                include: {
+                  player: true,
+                },
+                orderBy: { createdAt: "asc" },
               },
-              orderBy: { createdAt: "asc" },
             },
           },
-        },
-        winnerEntry: {
-          include: {
-            members: {
-              include: {
-                player: true,
+          winnerEntry: {
+            include: {
+              members: {
+                include: {
+                  player: true,
+                },
+                orderBy: { createdAt: "asc" },
               },
-              orderBy: { createdAt: "asc" },
             },
           },
+          approvedByUser: true,
+          enteredByUser: true,
+          updatedByUser: true,
+          frames: {
+            orderBy: { frameNumber: "asc" },
+          },
         },
-        approvedByUser: true,
-        enteredByUser: true,
-        updatedByUser: true,
-        frames: {
-          orderBy: { frameNumber: "asc" },
-        },
-      },
+      });
     });
 
     return NextResponse.json(match);

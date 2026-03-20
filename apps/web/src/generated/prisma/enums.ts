@@ -153,3 +153,12 @@ export const VideoSourceType = {
 } as const
 
 export type VideoSourceType = (typeof VideoSourceType)[keyof typeof VideoSourceType]
+
+
+export const SnookerFormat = {
+  REDS_6: 'REDS_6',
+  REDS_10: 'REDS_10',
+  REDS_15: 'REDS_15'
+} as const
+
+export type SnookerFormat = (typeof SnookerFormat)[keyof typeof SnookerFormat]

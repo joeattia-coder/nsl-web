@@ -155,6 +155,13 @@ export type EnumParticipantTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumParticipantTypeFilter<$PrismaModel> | $Enums.ParticipantType
 }
 
+export type EnumSnookerFormatNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.SnookerFormat | Prisma.EnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSnookerFormatNullableFilter<$PrismaModel> | $Enums.SnookerFormat | null
+}
+
 export type EnumTournamentStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.TournamentStatus | Prisma.EnumTournamentStatusFieldRefInput<$PrismaModel>
   in?: $Enums.TournamentStatus[] | Prisma.ListEnumTournamentStatusFieldRefInput<$PrismaModel>
@@ -170,6 +177,16 @@ export type EnumParticipantTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumParticipantTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumParticipantTypeFilter<$PrismaModel>
+}
+
+export type EnumSnookerFormatNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SnookerFormat | Prisma.EnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSnookerFormatNullableWithAggregatesFilter<$PrismaModel> | $Enums.SnookerFormat | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSnookerFormatNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSnookerFormatNullableFilter<$PrismaModel>
 }
 
 export type EnumTournamentStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -679,6 +696,13 @@ export type NestedEnumParticipantTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumParticipantTypeFilter<$PrismaModel> | $Enums.ParticipantType
 }
 
+export type NestedEnumSnookerFormatNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.SnookerFormat | Prisma.EnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSnookerFormatNullableFilter<$PrismaModel> | $Enums.SnookerFormat | null
+}
+
 export type NestedEnumTournamentStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.TournamentStatus | Prisma.EnumTournamentStatusFieldRefInput<$PrismaModel>
   in?: $Enums.TournamentStatus[] | Prisma.ListEnumTournamentStatusFieldRefInput<$PrismaModel>
@@ -694,6 +718,16 @@ export type NestedEnumParticipantTypeWithAggregatesFilter<$PrismaModel = never> 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumParticipantTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumParticipantTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumSnookerFormatNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SnookerFormat | Prisma.EnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SnookerFormat[] | Prisma.ListEnumSnookerFormatFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSnookerFormatNullableWithAggregatesFilter<$PrismaModel> | $Enums.SnookerFormat | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSnookerFormatNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSnookerFormatNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumTournamentStatusWithAggregatesFilter<$PrismaModel = never> = {

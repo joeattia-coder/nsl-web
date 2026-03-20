@@ -27,6 +27,8 @@ type TournamentParticipantType =
   | "Triples"
   | "Teams";
 
+type SnookerFormat = "REDS_6" | "REDS_10" | "REDS_15" | null;
+
 type TournamentStatus =
   | "DRAFT"
   | "REGISTRATION_OPEN"
@@ -47,6 +49,7 @@ type TournamentFormData = {
   status: TournamentStatus;
   isPublished: boolean;
   description: string;
+  snookerFormat?: SnookerFormat;
 };
 
 type TournamentFormProps = {
@@ -114,6 +117,9 @@ export default function TournamentForm({
   const [description, setDescription] = useState(
     initialData?.description ?? ""
   );
+  const [snookerFormat, setSnookerFormat] = useState<SnookerFormat>(
+    initialData?.snookerFormat ?? null
+  );
 
   const sortedVenues = useMemo(
     () =>
@@ -160,6 +166,7 @@ export default function TournamentForm({
         status,
         isPublished,
         description: description.trim() || null,
+        snookerFormat: snookerFormat || null,
       };
 
       const res = await fetch(
@@ -316,6 +323,25 @@ export default function TournamentForm({
                     {venue.venueName}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            <div className="admin-form-field">
+              <label htmlFor="snookerFormat" className="admin-label">
+                Snooker Format
+              </label>
+              <select
+                id="snookerFormat"
+                value={snookerFormat ?? ""}
+                onChange={(e) =>
+                  setSnookerFormat((e.target.value || null) as SnookerFormat)
+                }
+                className="admin-select admin-player-form-input"
+              >
+                <option value="">Not specified</option>
+                <option value="REDS_6">6 Reds</option>
+                <option value="REDS_10">10 Reds</option>
+                <option value="REDS_15">15 Reds (Full Rack)</option>
               </select>
             </div>
 

@@ -17,6 +17,9 @@ type MatchResultFormProps = {
     awayScore: number | null;
     winnerEntryId: string | null;
     matchStatus: string;
+    bestOfFrames: number;
+    homeHighBreaks: string[];
+    awayHighBreaks: string[];
   };
 };
 
@@ -59,9 +62,57 @@ export default function MatchResultForm({
     initialData.winnerEntryId ?? ""
   );
   const [matchStatus, setMatchStatus] = useState(initialData.matchStatus);
+  const [autoPickWinner, setAutoPickWinner] = useState(true);
+  const [homeHighBreaks, setHomeHighBreaks] = useState(
+    initialData.homeHighBreaks
+  );
+  const [awayHighBreaks, setAwayHighBreaks] = useState(
+    initialData.awayHighBreaks
+  );
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const frameNumbers = Array.from(
+    { length: initialData.bestOfFrames },
+    (_, index) => index + 1
+  );
+  const framesNeededToWin = Math.floor(initialData.bestOfFrames / 2) + 1;
+
+  function updateHighBreak(
+    team: "home" | "away",
+    frameIndex: number,
+    value: string
+  ) {
+    if (team === "home") {
+      setHomeHighBreaks((prev) =>
+        prev.map((item, index) => (index === frameIndex ? value : item))
+      );
+      return;
+    }
+
+    setAwayHighBreaks((prev) =>
+      prev.map((item, index) => (index === frameIndex ? value : item))
+    );
+  }
+
+  function parseHighBreaks(values: string[], sideLabel: string) {
+    return values.map((value, index) => {
+      const trimmed = value.trim();
+      if (trimmed === "") {
+        return null;
+      }
+
+      const parsed = Number(trimmed);
+      if (!Number.isInteger(parsed) || parsed < 0) {
+        throw new Error(
+          `${sideLabel} high break for frame ${index + 1} must be a whole number greater than or equal to 0.`
+        );
+      }
+
+      return parsed;
+    });
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -94,6 +145,40 @@ export default function MatchResultForm({
       return;
     }
 
+    let parsedHomeHighBreaks: Array<number | null> = [];
+    let parsedAwayHighBreaks: Array<number | null> = [];
+    let effectiveWinnerEntryId = winnerEntryId || null;
+
+    try {
+      parsedHomeHighBreaks = parseHighBreaks(homeHighBreaks, homeEntry.label);
+      parsedAwayHighBreaks = parseHighBreaks(awayHighBreaks, awayEntry.label);
+    } catch (validationError) {
+      setError(
+        validationError instanceof Error
+          ? validationError.message
+          : "Invalid frame high break values."
+      );
+      return;
+    }
+
+    if (autoPickWinner) {
+      if (
+        parsedHomeScore !== null &&
+        parsedAwayScore !== null &&
+        parsedHomeScore >= framesNeededToWin &&
+        parsedHomeScore > parsedAwayScore
+      ) {
+        effectiveWinnerEntryId = homeEntry.id;
+      } else if (
+        parsedHomeScore !== null &&
+        parsedAwayScore !== null &&
+        parsedAwayScore >= framesNeededToWin &&
+        parsedAwayScore > parsedHomeScore
+      ) {
+        effectiveWinnerEntryId = awayEntry.id;
+      }
+    }
+
     try {
       setSaving(true);
       setError(null);
@@ -116,8 +201,13 @@ export default function MatchResultForm({
             endDateTime.trim() === "" ? null : new Date(endDateTime).toISOString(),
           homeScore: parsedHomeScore,
           awayScore: parsedAwayScore,
-          winnerEntryId: winnerEntryId || null,
+          winnerEntryId: effectiveWinnerEntryId,
           matchStatus,
+          bestOfFrames: initialData.bestOfFrames,
+          frameHighBreaks: {
+            home: parsedHomeHighBreaks,
+            away: parsedAwayHighBreaks,
+          },
         }),
       });
 
@@ -215,6 +305,9 @@ export default function MatchResultForm({
               <option value={homeEntry.id}>{homeEntry.label}</option>
               <option value={awayEntry.id}>{awayEntry.label}</option>
             </select>
+            <p className="admin-form-help-text">
+              First to {framesNeededToWin} frames wins (best of {initialData.bestOfFrames}).
+            </p>
           </div>
 
           <div className="admin-form-field">
@@ -234,6 +327,71 @@ export default function MatchResultForm({
               ))}
             </select>
           </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="autoPickWinner" className="admin-label">
+              Auto-set winner from score
+            </label>
+            <select
+              id="autoPickWinner"
+              className="admin-select admin-player-form-input"
+              value={autoPickWinner ? "true" : "false"}
+              onChange={(e) => setAutoPickWinner(e.target.value === "true")}
+            >
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="match-breaks-layout">
+          <section className="admin-card match-breaks-panel">
+            <h3 className="admin-page-subtitle match-breaks-title">
+              {homeEntry.label}
+            </h3>
+            <div className="match-breaks-list">
+              {frameNumbers.map((frameNumber, index) => (
+                <div className="admin-form-field" key={`home-frame-${frameNumber}`}>
+                  <label htmlFor={`homeHighBreak-${frameNumber}`} className="admin-label">
+                    Frame {frameNumber} high break
+                  </label>
+                  <input
+                    id={`homeHighBreak-${frameNumber}`}
+                    type="number"
+                    min={0}
+                    step={1}
+                    className="admin-input admin-player-form-input"
+                    value={homeHighBreaks[index] ?? ""}
+                    onChange={(e) => updateHighBreak("home", index, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="admin-card match-breaks-panel">
+            <h3 className="admin-page-subtitle match-breaks-title">
+              {awayEntry.label}
+            </h3>
+            <div className="match-breaks-list">
+              {frameNumbers.map((frameNumber, index) => (
+                <div className="admin-form-field" key={`away-frame-${frameNumber}`}>
+                  <label htmlFor={`awayHighBreak-${frameNumber}`} className="admin-label">
+                    Frame {frameNumber} high break
+                  </label>
+                  <input
+                    id={`awayHighBreak-${frameNumber}`}
+                    type="number"
+                    min={0}
+                    step={1}
+                    className="admin-input admin-player-form-input"
+                    value={awayHighBreaks[index] ?? ""}
+                    onChange={(e) => updateHighBreak("away", index, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
 
         <div className="admin-form-actions">

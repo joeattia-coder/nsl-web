@@ -30,6 +30,7 @@ export type TournamentMinAggregateOutputType = {
   venueId: string | null
   tournamentName: string | null
   participantType: $Enums.ParticipantType | null
+  snookerFormat: $Enums.SnookerFormat | null
   registrationDeadline: Date | null
   startDate: Date | null
   endDate: Date | null
@@ -46,6 +47,7 @@ export type TournamentMaxAggregateOutputType = {
   venueId: string | null
   tournamentName: string | null
   participantType: $Enums.ParticipantType | null
+  snookerFormat: $Enums.SnookerFormat | null
   registrationDeadline: Date | null
   startDate: Date | null
   endDate: Date | null
@@ -62,6 +64,7 @@ export type TournamentCountAggregateOutputType = {
   venueId: number
   tournamentName: number
   participantType: number
+  snookerFormat: number
   registrationDeadline: number
   startDate: number
   endDate: number
@@ -80,6 +83,7 @@ export type TournamentMinAggregateInputType = {
   venueId?: true
   tournamentName?: true
   participantType?: true
+  snookerFormat?: true
   registrationDeadline?: true
   startDate?: true
   endDate?: true
@@ -96,6 +100,7 @@ export type TournamentMaxAggregateInputType = {
   venueId?: true
   tournamentName?: true
   participantType?: true
+  snookerFormat?: true
   registrationDeadline?: true
   startDate?: true
   endDate?: true
@@ -112,6 +117,7 @@ export type TournamentCountAggregateInputType = {
   venueId?: true
   tournamentName?: true
   participantType?: true
+  snookerFormat?: true
   registrationDeadline?: true
   startDate?: true
   endDate?: true
@@ -201,6 +207,7 @@ export type TournamentGroupByOutputType = {
   venueId: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat: $Enums.SnookerFormat | null
   registrationDeadline: Date | null
   startDate: Date | null
   endDate: Date | null
@@ -238,6 +245,7 @@ export type TournamentWhereInput = {
   venueId?: Prisma.StringNullableFilter<"Tournament"> | string | null
   tournamentName?: Prisma.StringFilter<"Tournament"> | string
   participantType?: Prisma.EnumParticipantTypeFilter<"Tournament"> | $Enums.ParticipantType
+  snookerFormat?: Prisma.EnumSnookerFormatNullableFilter<"Tournament"> | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   startDate?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   endDate?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
@@ -259,6 +267,7 @@ export type TournamentOrderByWithRelationInput = {
   venueId?: Prisma.SortOrderInput | Prisma.SortOrder
   tournamentName?: Prisma.SortOrder
   participantType?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrderInput | Prisma.SortOrder
   registrationDeadline?: Prisma.SortOrderInput | Prisma.SortOrder
   startDate?: Prisma.SortOrderInput | Prisma.SortOrder
   endDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -283,6 +292,7 @@ export type TournamentWhereUniqueInput = Prisma.AtLeast<{
   venueId?: Prisma.StringNullableFilter<"Tournament"> | string | null
   tournamentName?: Prisma.StringFilter<"Tournament"> | string
   participantType?: Prisma.EnumParticipantTypeFilter<"Tournament"> | $Enums.ParticipantType
+  snookerFormat?: Prisma.EnumSnookerFormatNullableFilter<"Tournament"> | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   startDate?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   endDate?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
@@ -304,6 +314,7 @@ export type TournamentOrderByWithAggregationInput = {
   venueId?: Prisma.SortOrderInput | Prisma.SortOrder
   tournamentName?: Prisma.SortOrder
   participantType?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrderInput | Prisma.SortOrder
   registrationDeadline?: Prisma.SortOrderInput | Prisma.SortOrder
   startDate?: Prisma.SortOrderInput | Prisma.SortOrder
   endDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,6 +337,7 @@ export type TournamentScalarWhereWithAggregatesInput = {
   venueId?: Prisma.StringNullableWithAggregatesFilter<"Tournament"> | string | null
   tournamentName?: Prisma.StringWithAggregatesFilter<"Tournament"> | string
   participantType?: Prisma.EnumParticipantTypeWithAggregatesFilter<"Tournament"> | $Enums.ParticipantType
+  snookerFormat?: Prisma.EnumSnookerFormatNullableWithAggregatesFilter<"Tournament"> | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.DateTimeNullableWithAggregatesFilter<"Tournament"> | Date | string | null
   startDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Tournament"> | Date | string | null
   endDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Tournament"> | Date | string | null
@@ -340,6 +352,7 @@ export type TournamentCreateInput = {
   id?: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -361,6 +374,7 @@ export type TournamentUncheckedCreateInput = {
   venueId?: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -378,6 +392,7 @@ export type TournamentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -399,6 +414,7 @@ export type TournamentUncheckedUpdateInput = {
   venueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -418,6 +434,7 @@ export type TournamentCreateManyInput = {
   venueId?: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -432,6 +449,7 @@ export type TournamentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -448,6 +466,7 @@ export type TournamentUncheckedUpdateManyInput = {
   venueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -474,6 +493,7 @@ export type TournamentCountOrderByAggregateInput = {
   venueId?: Prisma.SortOrder
   tournamentName?: Prisma.SortOrder
   participantType?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrder
   registrationDeadline?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -490,6 +510,7 @@ export type TournamentMaxOrderByAggregateInput = {
   venueId?: Prisma.SortOrder
   tournamentName?: Prisma.SortOrder
   participantType?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrder
   registrationDeadline?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -506,6 +527,7 @@ export type TournamentMinOrderByAggregateInput = {
   venueId?: Prisma.SortOrder
   tournamentName?: Prisma.SortOrder
   participantType?: Prisma.SortOrder
+  snookerFormat?: Prisma.SortOrder
   registrationDeadline?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -609,6 +631,10 @@ export type EnumParticipantTypeFieldUpdateOperationsInput = {
   set?: $Enums.ParticipantType
 }
 
+export type NullableEnumSnookerFormatFieldUpdateOperationsInput = {
+  set?: $Enums.SnookerFormat | null
+}
+
 export type EnumTournamentStatusFieldUpdateOperationsInput = {
   set?: $Enums.TournamentStatus
 }
@@ -659,6 +685,7 @@ export type TournamentCreateWithoutVenueInput = {
   id?: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -678,6 +705,7 @@ export type TournamentUncheckedCreateWithoutVenueInput = {
   seasonId: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -726,6 +754,7 @@ export type TournamentScalarWhereInput = {
   venueId?: Prisma.StringNullableFilter<"Tournament"> | string | null
   tournamentName?: Prisma.StringFilter<"Tournament"> | string
   participantType?: Prisma.EnumParticipantTypeFilter<"Tournament"> | $Enums.ParticipantType
+  snookerFormat?: Prisma.EnumSnookerFormatNullableFilter<"Tournament"> | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   startDate?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   endDate?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
@@ -740,6 +769,7 @@ export type TournamentCreateWithoutSeasonInput = {
   id?: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -759,6 +789,7 @@ export type TournamentUncheckedCreateWithoutSeasonInput = {
   venueId?: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -802,6 +833,7 @@ export type TournamentCreateWithoutStagesInput = {
   id?: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -822,6 +854,7 @@ export type TournamentUncheckedCreateWithoutStagesInput = {
   venueId?: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -854,6 +887,7 @@ export type TournamentUpdateWithoutStagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -874,6 +908,7 @@ export type TournamentUncheckedUpdateWithoutStagesInput = {
   venueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -890,6 +925,7 @@ export type TournamentCreateWithoutEntriesInput = {
   id?: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -910,6 +946,7 @@ export type TournamentUncheckedCreateWithoutEntriesInput = {
   venueId?: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -942,6 +979,7 @@ export type TournamentUpdateWithoutEntriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -962,6 +1000,7 @@ export type TournamentUncheckedUpdateWithoutEntriesInput = {
   venueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -978,6 +1017,7 @@ export type TournamentCreateWithoutMatchesInput = {
   id?: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -998,6 +1038,7 @@ export type TournamentUncheckedCreateWithoutMatchesInput = {
   venueId?: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -1030,6 +1071,7 @@ export type TournamentUpdateWithoutMatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1050,6 +1092,7 @@ export type TournamentUncheckedUpdateWithoutMatchesInput = {
   venueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1067,6 +1110,7 @@ export type TournamentCreateManyVenueInput = {
   seasonId: string
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -1081,6 +1125,7 @@ export type TournamentUpdateWithoutVenueInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1100,6 +1145,7 @@ export type TournamentUncheckedUpdateWithoutVenueInput = {
   seasonId?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1118,6 +1164,7 @@ export type TournamentUncheckedUpdateManyWithoutVenueInput = {
   seasonId?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1133,6 +1180,7 @@ export type TournamentCreateManySeasonInput = {
   venueId?: string | null
   tournamentName: string
   participantType: $Enums.ParticipantType
+  snookerFormat?: $Enums.SnookerFormat | null
   registrationDeadline?: Date | string | null
   startDate?: Date | string | null
   endDate?: Date | string | null
@@ -1147,6 +1195,7 @@ export type TournamentUpdateWithoutSeasonInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1166,6 +1215,7 @@ export type TournamentUncheckedUpdateWithoutSeasonInput = {
   venueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1184,6 +1234,7 @@ export type TournamentUncheckedUpdateManyWithoutSeasonInput = {
   venueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tournamentName?: Prisma.StringFieldUpdateOperationsInput | string
   participantType?: Prisma.EnumParticipantTypeFieldUpdateOperationsInput | $Enums.ParticipantType
+  snookerFormat?: Prisma.NullableEnumSnookerFormatFieldUpdateOperationsInput | $Enums.SnookerFormat | null
   registrationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1249,6 +1300,7 @@ export type TournamentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   venueId?: boolean
   tournamentName?: boolean
   participantType?: boolean
+  snookerFormat?: boolean
   registrationDeadline?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -1271,6 +1323,7 @@ export type TournamentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   venueId?: boolean
   tournamentName?: boolean
   participantType?: boolean
+  snookerFormat?: boolean
   registrationDeadline?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -1289,6 +1342,7 @@ export type TournamentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   venueId?: boolean
   tournamentName?: boolean
   participantType?: boolean
+  snookerFormat?: boolean
   registrationDeadline?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -1307,6 +1361,7 @@ export type TournamentSelectScalar = {
   venueId?: boolean
   tournamentName?: boolean
   participantType?: boolean
+  snookerFormat?: boolean
   registrationDeadline?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -1317,7 +1372,7 @@ export type TournamentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "seasonId" | "venueId" | "tournamentName" | "participantType" | "registrationDeadline" | "startDate" | "endDate" | "status" | "isPublished" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
+export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "seasonId" | "venueId" | "tournamentName" | "participantType" | "snookerFormat" | "registrationDeadline" | "startDate" | "endDate" | "status" | "isPublished" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
 export type TournamentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   matches?: boolean | Prisma.Tournament$matchesArgs<ExtArgs>
   season?: boolean | Prisma.SeasonDefaultArgs<ExtArgs>
@@ -1350,6 +1405,7 @@ export type $TournamentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     venueId: string | null
     tournamentName: string
     participantType: $Enums.ParticipantType
+    snookerFormat: $Enums.SnookerFormat | null
     registrationDeadline: Date | null
     startDate: Date | null
     endDate: Date | null
@@ -1791,6 +1847,7 @@ export interface TournamentFieldRefs {
   readonly venueId: Prisma.FieldRef<"Tournament", 'String'>
   readonly tournamentName: Prisma.FieldRef<"Tournament", 'String'>
   readonly participantType: Prisma.FieldRef<"Tournament", 'ParticipantType'>
+  readonly snookerFormat: Prisma.FieldRef<"Tournament", 'SnookerFormat'>
   readonly registrationDeadline: Prisma.FieldRef<"Tournament", 'DateTime'>
   readonly startDate: Prisma.FieldRef<"Tournament", 'DateTime'>
   readonly endDate: Prisma.FieldRef<"Tournament", 'DateTime'>

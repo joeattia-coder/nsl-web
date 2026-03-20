@@ -18,6 +18,7 @@ type StageRoundFormProps = {
     roundType: StageRoundType;
     sequence: number;
     matchesPerPairing: number;
+    bestOfFrames: number;
     groupCount?: number | null;
     playersPerGroup?: number | null;
     advancePerGroup?: number | null;
@@ -50,6 +51,9 @@ export default function StageRoundForm({
   const [matchesPerPairing, setMatchesPerPairing] = useState(
     String(initialData.matchesPerPairing)
   );
+  const [bestOfFrames, setBestOfFrames] = useState(
+    String(initialData.bestOfFrames)
+  );
   const [groupCount, setGroupCount] = useState(
     initialData.groupCount ? String(initialData.groupCount) : ""
   );
@@ -72,6 +76,7 @@ export default function StageRoundForm({
     const trimmedRoundName = roundName.trim();
     const parsedSequence = Number(sequence);
     const parsedMatchesPerPairing = Number(matchesPerPairing);
+    const parsedBestOfFrames = Number(bestOfFrames);
 
     if (!trimmedRoundName) {
       setError("Round name is required.");
@@ -90,6 +95,15 @@ export default function StageRoundForm({
       setError(
         "Matches per pairing must be a whole number greater than or equal to 1."
       );
+      return;
+    }
+
+    if (
+      !Number.isInteger(parsedBestOfFrames) ||
+      parsedBestOfFrames < 1 ||
+      parsedBestOfFrames % 2 === 0
+    ) {
+      setError("Best of frames must be an odd whole number (for example 3, 5, or 7).");
       return;
     }
 
@@ -145,6 +159,7 @@ export default function StageRoundForm({
         roundType,
         sequence: parsedSequence,
         matchesPerPairing: parsedMatchesPerPairing,
+        bestOfFrames: parsedBestOfFrames,
         groupCount: isGroupRound ? parsedGroupCount : null,
         playersPerGroup: isGroupRound ? parsedPlayersPerGroup : null,
         advancePerGroup: isGroupRound ? parsedAdvancePerGroup : null,
@@ -294,6 +309,22 @@ export default function StageRoundForm({
               step={1}
               value={matchesPerPairing}
               onChange={(e) => setMatchesPerPairing(e.target.value)}
+              className="admin-input admin-player-form-input"
+              required
+            />
+          </div>
+
+          <div className="admin-form-field">
+            <label htmlFor="bestOfFrames" className="admin-label">
+              Match Format (Best Of)
+            </label>
+            <input
+              id="bestOfFrames"
+              type="number"
+              min={1}
+              step={2}
+              value={bestOfFrames}
+              onChange={(e) => setBestOfFrames(e.target.value)}
               className="admin-input admin-player-form-input"
               required
             />

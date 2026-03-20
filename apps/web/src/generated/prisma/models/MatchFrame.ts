@@ -30,12 +30,16 @@ export type MatchFrameAvgAggregateOutputType = {
   frameNumber: number | null
   homePoints: number | null
   awayPoints: number | null
+  homeHighBreak: number | null
+  awayHighBreak: number | null
 }
 
 export type MatchFrameSumAggregateOutputType = {
   frameNumber: number | null
   homePoints: number | null
   awayPoints: number | null
+  homeHighBreak: number | null
+  awayHighBreak: number | null
 }
 
 export type MatchFrameMinAggregateOutputType = {
@@ -45,6 +49,8 @@ export type MatchFrameMinAggregateOutputType = {
   winnerEntryId: string | null
   homePoints: number | null
   awayPoints: number | null
+  homeHighBreak: number | null
+  awayHighBreak: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +62,8 @@ export type MatchFrameMaxAggregateOutputType = {
   winnerEntryId: string | null
   homePoints: number | null
   awayPoints: number | null
+  homeHighBreak: number | null
+  awayHighBreak: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -67,6 +75,8 @@ export type MatchFrameCountAggregateOutputType = {
   winnerEntryId: number
   homePoints: number
   awayPoints: number
+  homeHighBreak: number
+  awayHighBreak: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -77,12 +87,16 @@ export type MatchFrameAvgAggregateInputType = {
   frameNumber?: true
   homePoints?: true
   awayPoints?: true
+  homeHighBreak?: true
+  awayHighBreak?: true
 }
 
 export type MatchFrameSumAggregateInputType = {
   frameNumber?: true
   homePoints?: true
   awayPoints?: true
+  homeHighBreak?: true
+  awayHighBreak?: true
 }
 
 export type MatchFrameMinAggregateInputType = {
@@ -92,6 +106,8 @@ export type MatchFrameMinAggregateInputType = {
   winnerEntryId?: true
   homePoints?: true
   awayPoints?: true
+  homeHighBreak?: true
+  awayHighBreak?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -103,6 +119,8 @@ export type MatchFrameMaxAggregateInputType = {
   winnerEntryId?: true
   homePoints?: true
   awayPoints?: true
+  homeHighBreak?: true
+  awayHighBreak?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -114,6 +132,8 @@ export type MatchFrameCountAggregateInputType = {
   winnerEntryId?: true
   homePoints?: true
   awayPoints?: true
+  homeHighBreak?: true
+  awayHighBreak?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -212,6 +232,8 @@ export type MatchFrameGroupByOutputType = {
   winnerEntryId: string | null
   homePoints: number | null
   awayPoints: number | null
+  homeHighBreak: number | null
+  awayHighBreak: number | null
   createdAt: Date
   updatedAt: Date
   _count: MatchFrameCountAggregateOutputType | null
@@ -246,6 +268,8 @@ export type MatchFrameWhereInput = {
   winnerEntryId?: Prisma.StringNullableFilter<"MatchFrame"> | string | null
   homePoints?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
   awayPoints?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
+  homeHighBreak?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
+  awayHighBreak?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
   createdAt?: Prisma.DateTimeFilter<"MatchFrame"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MatchFrame"> | Date | string
   match?: Prisma.XOR<Prisma.MatchScalarRelationFilter, Prisma.MatchWhereInput>
@@ -260,6 +284,8 @@ export type MatchFrameOrderByWithRelationInput = {
   winnerEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   homePoints?: Prisma.SortOrderInput | Prisma.SortOrder
   awayPoints?: Prisma.SortOrderInput | Prisma.SortOrder
+  homeHighBreak?: Prisma.SortOrderInput | Prisma.SortOrder
+  awayHighBreak?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   match?: Prisma.MatchOrderByWithRelationInput
@@ -278,6 +304,8 @@ export type MatchFrameWhereUniqueInput = Prisma.AtLeast<{
   winnerEntryId?: Prisma.StringNullableFilter<"MatchFrame"> | string | null
   homePoints?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
   awayPoints?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
+  homeHighBreak?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
+  awayHighBreak?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
   createdAt?: Prisma.DateTimeFilter<"MatchFrame"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MatchFrame"> | Date | string
   match?: Prisma.XOR<Prisma.MatchScalarRelationFilter, Prisma.MatchWhereInput>
@@ -292,6 +320,8 @@ export type MatchFrameOrderByWithAggregationInput = {
   winnerEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   homePoints?: Prisma.SortOrderInput | Prisma.SortOrder
   awayPoints?: Prisma.SortOrderInput | Prisma.SortOrder
+  homeHighBreak?: Prisma.SortOrderInput | Prisma.SortOrder
+  awayHighBreak?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MatchFrameCountOrderByAggregateInput
@@ -311,6 +341,8 @@ export type MatchFrameScalarWhereWithAggregatesInput = {
   winnerEntryId?: Prisma.StringNullableWithAggregatesFilter<"MatchFrame"> | string | null
   homePoints?: Prisma.IntNullableWithAggregatesFilter<"MatchFrame"> | number | null
   awayPoints?: Prisma.IntNullableWithAggregatesFilter<"MatchFrame"> | number | null
+  homeHighBreak?: Prisma.IntNullableWithAggregatesFilter<"MatchFrame"> | number | null
+  awayHighBreak?: Prisma.IntNullableWithAggregatesFilter<"MatchFrame"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MatchFrame"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MatchFrame"> | Date | string
 }
@@ -320,6 +352,8 @@ export type MatchFrameCreateInput = {
   frameNumber: number
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   match: Prisma.MatchCreateNestedOneWithoutFramesInput
@@ -334,6 +368,8 @@ export type MatchFrameUncheckedCreateInput = {
   winnerEntryId?: string | null
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutMatchFrameInput
@@ -344,6 +380,8 @@ export type MatchFrameUpdateInput = {
   frameNumber?: Prisma.IntFieldUpdateOperationsInput | number
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   match?: Prisma.MatchUpdateOneRequiredWithoutFramesNestedInput
@@ -358,6 +396,8 @@ export type MatchFrameUncheckedUpdateInput = {
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutMatchFrameNestedInput
@@ -370,6 +410,8 @@ export type MatchFrameCreateManyInput = {
   winnerEntryId?: string | null
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -379,6 +421,8 @@ export type MatchFrameUpdateManyMutationInput = {
   frameNumber?: Prisma.IntFieldUpdateOperationsInput | number
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -390,6 +434,8 @@ export type MatchFrameUncheckedUpdateManyInput = {
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -416,6 +462,8 @@ export type MatchFrameCountOrderByAggregateInput = {
   winnerEntryId?: Prisma.SortOrder
   homePoints?: Prisma.SortOrder
   awayPoints?: Prisma.SortOrder
+  homeHighBreak?: Prisma.SortOrder
+  awayHighBreak?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -424,6 +472,8 @@ export type MatchFrameAvgOrderByAggregateInput = {
   frameNumber?: Prisma.SortOrder
   homePoints?: Prisma.SortOrder
   awayPoints?: Prisma.SortOrder
+  homeHighBreak?: Prisma.SortOrder
+  awayHighBreak?: Prisma.SortOrder
 }
 
 export type MatchFrameMaxOrderByAggregateInput = {
@@ -433,6 +483,8 @@ export type MatchFrameMaxOrderByAggregateInput = {
   winnerEntryId?: Prisma.SortOrder
   homePoints?: Prisma.SortOrder
   awayPoints?: Prisma.SortOrder
+  homeHighBreak?: Prisma.SortOrder
+  awayHighBreak?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -444,6 +496,8 @@ export type MatchFrameMinOrderByAggregateInput = {
   winnerEntryId?: Prisma.SortOrder
   homePoints?: Prisma.SortOrder
   awayPoints?: Prisma.SortOrder
+  homeHighBreak?: Prisma.SortOrder
+  awayHighBreak?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -452,6 +506,8 @@ export type MatchFrameSumOrderByAggregateInput = {
   frameNumber?: Prisma.SortOrder
   homePoints?: Prisma.SortOrder
   awayPoints?: Prisma.SortOrder
+  homeHighBreak?: Prisma.SortOrder
+  awayHighBreak?: Prisma.SortOrder
 }
 
 export type MatchFrameScalarRelationFilter = {
@@ -562,6 +618,8 @@ export type MatchFrameCreateWithoutWinnerEntryInput = {
   frameNumber: number
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   match: Prisma.MatchCreateNestedOneWithoutFramesInput
@@ -574,6 +632,8 @@ export type MatchFrameUncheckedCreateWithoutWinnerEntryInput = {
   frameNumber: number
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutMatchFrameInput
@@ -615,6 +675,8 @@ export type MatchFrameScalarWhereInput = {
   winnerEntryId?: Prisma.StringNullableFilter<"MatchFrame"> | string | null
   homePoints?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
   awayPoints?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
+  homeHighBreak?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
+  awayHighBreak?: Prisma.IntNullableFilter<"MatchFrame"> | number | null
   createdAt?: Prisma.DateTimeFilter<"MatchFrame"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MatchFrame"> | Date | string
 }
@@ -624,6 +686,8 @@ export type MatchFrameCreateWithoutMatchInput = {
   frameNumber: number
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   winnerEntry?: Prisma.TournamentEntryCreateNestedOneWithoutMatchFramesInput
@@ -636,6 +700,8 @@ export type MatchFrameUncheckedCreateWithoutMatchInput = {
   winnerEntryId?: string | null
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutMatchFrameInput
@@ -672,6 +738,8 @@ export type MatchFrameCreateWithoutBreaksInput = {
   frameNumber: number
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   match: Prisma.MatchCreateNestedOneWithoutFramesInput
@@ -685,6 +753,8 @@ export type MatchFrameUncheckedCreateWithoutBreaksInput = {
   winnerEntryId?: string | null
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -710,6 +780,8 @@ export type MatchFrameUpdateWithoutBreaksInput = {
   frameNumber?: Prisma.IntFieldUpdateOperationsInput | number
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   match?: Prisma.MatchUpdateOneRequiredWithoutFramesNestedInput
@@ -723,6 +795,8 @@ export type MatchFrameUncheckedUpdateWithoutBreaksInput = {
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -733,6 +807,8 @@ export type MatchFrameCreateManyWinnerEntryInput = {
   frameNumber: number
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -742,6 +818,8 @@ export type MatchFrameUpdateWithoutWinnerEntryInput = {
   frameNumber?: Prisma.IntFieldUpdateOperationsInput | number
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   match?: Prisma.MatchUpdateOneRequiredWithoutFramesNestedInput
@@ -754,6 +832,8 @@ export type MatchFrameUncheckedUpdateWithoutWinnerEntryInput = {
   frameNumber?: Prisma.IntFieldUpdateOperationsInput | number
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutMatchFrameNestedInput
@@ -765,6 +845,8 @@ export type MatchFrameUncheckedUpdateManyWithoutWinnerEntryInput = {
   frameNumber?: Prisma.IntFieldUpdateOperationsInput | number
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -775,6 +857,8 @@ export type MatchFrameCreateManyMatchInput = {
   winnerEntryId?: string | null
   homePoints?: number | null
   awayPoints?: number | null
+  homeHighBreak?: number | null
+  awayHighBreak?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -784,6 +868,8 @@ export type MatchFrameUpdateWithoutMatchInput = {
   frameNumber?: Prisma.IntFieldUpdateOperationsInput | number
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   winnerEntry?: Prisma.TournamentEntryUpdateOneWithoutMatchFramesNestedInput
@@ -796,6 +882,8 @@ export type MatchFrameUncheckedUpdateWithoutMatchInput = {
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutMatchFrameNestedInput
@@ -807,6 +895,8 @@ export type MatchFrameUncheckedUpdateManyWithoutMatchInput = {
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   homePoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayPoints?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  homeHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  awayHighBreak?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -849,6 +939,8 @@ export type MatchFrameSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   winnerEntryId?: boolean
   homePoints?: boolean
   awayPoints?: boolean
+  homeHighBreak?: boolean
+  awayHighBreak?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   match?: boolean | Prisma.MatchDefaultArgs<ExtArgs>
@@ -864,6 +956,8 @@ export type MatchFrameSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   winnerEntryId?: boolean
   homePoints?: boolean
   awayPoints?: boolean
+  homeHighBreak?: boolean
+  awayHighBreak?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   match?: boolean | Prisma.MatchDefaultArgs<ExtArgs>
@@ -877,6 +971,8 @@ export type MatchFrameSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   winnerEntryId?: boolean
   homePoints?: boolean
   awayPoints?: boolean
+  homeHighBreak?: boolean
+  awayHighBreak?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   match?: boolean | Prisma.MatchDefaultArgs<ExtArgs>
@@ -890,11 +986,13 @@ export type MatchFrameSelectScalar = {
   winnerEntryId?: boolean
   homePoints?: boolean
   awayPoints?: boolean
+  homeHighBreak?: boolean
+  awayHighBreak?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MatchFrameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "matchId" | "frameNumber" | "winnerEntryId" | "homePoints" | "awayPoints" | "createdAt" | "updatedAt", ExtArgs["result"]["matchFrame"]>
+export type MatchFrameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "matchId" | "frameNumber" | "winnerEntryId" | "homePoints" | "awayPoints" | "homeHighBreak" | "awayHighBreak" | "createdAt" | "updatedAt", ExtArgs["result"]["matchFrame"]>
 export type MatchFrameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   match?: boolean | Prisma.MatchDefaultArgs<ExtArgs>
   winnerEntry?: boolean | Prisma.MatchFrame$winnerEntryArgs<ExtArgs>
@@ -924,6 +1022,8 @@ export type $MatchFramePayload<ExtArgs extends runtime.Types.Extensions.Internal
     winnerEntryId: string | null
     homePoints: number | null
     awayPoints: number | null
+    homeHighBreak: number | null
+    awayHighBreak: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["matchFrame"]>
@@ -1358,6 +1458,8 @@ export interface MatchFrameFieldRefs {
   readonly winnerEntryId: Prisma.FieldRef<"MatchFrame", 'String'>
   readonly homePoints: Prisma.FieldRef<"MatchFrame", 'Int'>
   readonly awayPoints: Prisma.FieldRef<"MatchFrame", 'Int'>
+  readonly homeHighBreak: Prisma.FieldRef<"MatchFrame", 'Int'>
+  readonly awayHighBreak: Prisma.FieldRef<"MatchFrame", 'Int'>
   readonly createdAt: Prisma.FieldRef<"MatchFrame", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MatchFrame", 'DateTime'>
 }

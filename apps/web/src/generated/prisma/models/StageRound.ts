@@ -29,6 +29,7 @@ export type AggregateStageRound = {
 export type StageRoundAvgAggregateOutputType = {
   sequence: number | null
   matchesPerPairing: number | null
+  bestOfFrames: number | null
   advancePerGroup: number | null
   groupCount: number | null
   playersPerGroup: number | null
@@ -37,6 +38,7 @@ export type StageRoundAvgAggregateOutputType = {
 export type StageRoundSumAggregateOutputType = {
   sequence: number | null
   matchesPerPairing: number | null
+  bestOfFrames: number | null
   advancePerGroup: number | null
   groupCount: number | null
   playersPerGroup: number | null
@@ -49,6 +51,7 @@ export type StageRoundMinAggregateOutputType = {
   roundType: $Enums.StageRoundType | null
   sequence: number | null
   matchesPerPairing: number | null
+  bestOfFrames: number | null
   createdAt: Date | null
   updatedAt: Date | null
   advancePerGroup: number | null
@@ -63,6 +66,7 @@ export type StageRoundMaxAggregateOutputType = {
   roundType: $Enums.StageRoundType | null
   sequence: number | null
   matchesPerPairing: number | null
+  bestOfFrames: number | null
   createdAt: Date | null
   updatedAt: Date | null
   advancePerGroup: number | null
@@ -77,6 +81,7 @@ export type StageRoundCountAggregateOutputType = {
   roundType: number
   sequence: number
   matchesPerPairing: number
+  bestOfFrames: number
   createdAt: number
   updatedAt: number
   advancePerGroup: number
@@ -89,6 +94,7 @@ export type StageRoundCountAggregateOutputType = {
 export type StageRoundAvgAggregateInputType = {
   sequence?: true
   matchesPerPairing?: true
+  bestOfFrames?: true
   advancePerGroup?: true
   groupCount?: true
   playersPerGroup?: true
@@ -97,6 +103,7 @@ export type StageRoundAvgAggregateInputType = {
 export type StageRoundSumAggregateInputType = {
   sequence?: true
   matchesPerPairing?: true
+  bestOfFrames?: true
   advancePerGroup?: true
   groupCount?: true
   playersPerGroup?: true
@@ -109,6 +116,7 @@ export type StageRoundMinAggregateInputType = {
   roundType?: true
   sequence?: true
   matchesPerPairing?: true
+  bestOfFrames?: true
   createdAt?: true
   updatedAt?: true
   advancePerGroup?: true
@@ -123,6 +131,7 @@ export type StageRoundMaxAggregateInputType = {
   roundType?: true
   sequence?: true
   matchesPerPairing?: true
+  bestOfFrames?: true
   createdAt?: true
   updatedAt?: true
   advancePerGroup?: true
@@ -137,6 +146,7 @@ export type StageRoundCountAggregateInputType = {
   roundType?: true
   sequence?: true
   matchesPerPairing?: true
+  bestOfFrames?: true
   createdAt?: true
   updatedAt?: true
   advancePerGroup?: true
@@ -238,6 +248,7 @@ export type StageRoundGroupByOutputType = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing: number
+  bestOfFrames: number | null
   createdAt: Date
   updatedAt: Date
   advancePerGroup: number | null
@@ -275,6 +286,7 @@ export type StageRoundWhereInput = {
   roundType?: Prisma.EnumStageRoundTypeFilter<"StageRound"> | $Enums.StageRoundType
   sequence?: Prisma.IntFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntFilter<"StageRound"> | number
+  bestOfFrames?: Prisma.IntNullableFilter<"StageRound"> | number | null
   createdAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableFilter<"StageRound"> | number | null
@@ -292,6 +304,7 @@ export type StageRoundOrderByWithRelationInput = {
   roundType?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -314,6 +327,7 @@ export type StageRoundWhereUniqueInput = Prisma.AtLeast<{
   roundType?: Prisma.EnumStageRoundTypeFilter<"StageRound"> | $Enums.StageRoundType
   sequence?: Prisma.IntFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntFilter<"StageRound"> | number
+  bestOfFrames?: Prisma.IntNullableFilter<"StageRound"> | number | null
   createdAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableFilter<"StageRound"> | number | null
@@ -331,6 +345,7 @@ export type StageRoundOrderByWithAggregationInput = {
   roundType?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -353,6 +368,7 @@ export type StageRoundScalarWhereWithAggregatesInput = {
   roundType?: Prisma.EnumStageRoundTypeWithAggregatesFilter<"StageRound"> | $Enums.StageRoundType
   sequence?: Prisma.IntWithAggregatesFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntWithAggregatesFilter<"StageRound"> | number
+  bestOfFrames?: Prisma.IntNullableWithAggregatesFilter<"StageRound"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableWithAggregatesFilter<"StageRound"> | number | null
@@ -366,6 +382,7 @@ export type StageRoundCreateInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -383,6 +400,7 @@ export type StageRoundUncheckedCreateInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -398,6 +416,7 @@ export type StageRoundUpdateInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -415,6 +434,7 @@ export type StageRoundUncheckedUpdateInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -431,6 +451,7 @@ export type StageRoundCreateManyInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -444,6 +465,7 @@ export type StageRoundUpdateManyMutationInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -458,6 +480,7 @@ export type StageRoundUncheckedUpdateManyInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -492,6 +515,7 @@ export type StageRoundCountOrderByAggregateInput = {
   roundType?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
@@ -502,6 +526,7 @@ export type StageRoundCountOrderByAggregateInput = {
 export type StageRoundAvgOrderByAggregateInput = {
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
   groupCount?: Prisma.SortOrder
   playersPerGroup?: Prisma.SortOrder
@@ -514,6 +539,7 @@ export type StageRoundMaxOrderByAggregateInput = {
   roundType?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
@@ -528,6 +554,7 @@ export type StageRoundMinOrderByAggregateInput = {
   roundType?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
@@ -538,6 +565,7 @@ export type StageRoundMinOrderByAggregateInput = {
 export type StageRoundSumOrderByAggregateInput = {
   sequence?: Prisma.SortOrder
   matchesPerPairing?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   advancePerGroup?: Prisma.SortOrder
   groupCount?: Prisma.SortOrder
   playersPerGroup?: Prisma.SortOrder
@@ -636,6 +664,7 @@ export type StageRoundCreateWithoutTournamentStageInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -651,6 +680,7 @@ export type StageRoundUncheckedCreateWithoutTournamentStageInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -696,6 +726,7 @@ export type StageRoundScalarWhereInput = {
   roundType?: Prisma.EnumStageRoundTypeFilter<"StageRound"> | $Enums.StageRoundType
   sequence?: Prisma.IntFilter<"StageRound"> | number
   matchesPerPairing?: Prisma.IntFilter<"StageRound"> | number
+  bestOfFrames?: Prisma.IntNullableFilter<"StageRound"> | number | null
   createdAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StageRound"> | Date | string
   advancePerGroup?: Prisma.IntNullableFilter<"StageRound"> | number | null
@@ -709,6 +740,7 @@ export type StageRoundCreateWithoutGroupsInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -725,6 +757,7 @@ export type StageRoundUncheckedCreateWithoutGroupsInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -755,6 +788,7 @@ export type StageRoundUpdateWithoutGroupsInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -771,6 +805,7 @@ export type StageRoundUncheckedUpdateWithoutGroupsInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -785,6 +820,7 @@ export type StageRoundCreateWithoutMatchesInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -801,6 +837,7 @@ export type StageRoundUncheckedCreateWithoutMatchesInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -831,6 +868,7 @@ export type StageRoundUpdateWithoutMatchesInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -847,6 +885,7 @@ export type StageRoundUncheckedUpdateWithoutMatchesInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -861,6 +900,7 @@ export type StageRoundCreateManyTournamentStageInput = {
   roundType: $Enums.StageRoundType
   sequence: number
   matchesPerPairing?: number
+  bestOfFrames?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   advancePerGroup?: number | null
@@ -874,6 +914,7 @@ export type StageRoundUpdateWithoutTournamentStageInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -889,6 +930,7 @@ export type StageRoundUncheckedUpdateWithoutTournamentStageInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -904,6 +946,7 @@ export type StageRoundUncheckedUpdateManyWithoutTournamentStageInput = {
   roundType?: Prisma.EnumStageRoundTypeFieldUpdateOperationsInput | $Enums.StageRoundType
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   matchesPerPairing?: Prisma.IntFieldUpdateOperationsInput | number
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   advancePerGroup?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -958,6 +1001,7 @@ export type StageRoundSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   roundType?: boolean
   sequence?: boolean
   matchesPerPairing?: boolean
+  bestOfFrames?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -976,6 +1020,7 @@ export type StageRoundSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   roundType?: boolean
   sequence?: boolean
   matchesPerPairing?: boolean
+  bestOfFrames?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -991,6 +1036,7 @@ export type StageRoundSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   roundType?: boolean
   sequence?: boolean
   matchesPerPairing?: boolean
+  bestOfFrames?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -1006,6 +1052,7 @@ export type StageRoundSelectScalar = {
   roundType?: boolean
   sequence?: boolean
   matchesPerPairing?: boolean
+  bestOfFrames?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   advancePerGroup?: boolean
@@ -1013,7 +1060,7 @@ export type StageRoundSelectScalar = {
   playersPerGroup?: boolean
 }
 
-export type StageRoundOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentStageId" | "roundName" | "roundType" | "sequence" | "matchesPerPairing" | "createdAt" | "updatedAt" | "advancePerGroup" | "groupCount" | "playersPerGroup", ExtArgs["result"]["stageRound"]>
+export type StageRoundOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentStageId" | "roundName" | "roundType" | "sequence" | "matchesPerPairing" | "bestOfFrames" | "createdAt" | "updatedAt" | "advancePerGroup" | "groupCount" | "playersPerGroup", ExtArgs["result"]["stageRound"]>
 export type StageRoundInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   matches?: boolean | Prisma.StageRound$matchesArgs<ExtArgs>
   tournamentStage?: boolean | Prisma.TournamentStageDefaultArgs<ExtArgs>
@@ -1041,6 +1088,7 @@ export type $StageRoundPayload<ExtArgs extends runtime.Types.Extensions.Internal
     roundType: $Enums.StageRoundType
     sequence: number
     matchesPerPairing: number
+    bestOfFrames: number | null
     createdAt: Date
     updatedAt: Date
     advancePerGroup: number | null
@@ -1478,6 +1526,7 @@ export interface StageRoundFieldRefs {
   readonly roundType: Prisma.FieldRef<"StageRound", 'StageRoundType'>
   readonly sequence: Prisma.FieldRef<"StageRound", 'Int'>
   readonly matchesPerPairing: Prisma.FieldRef<"StageRound", 'Int'>
+  readonly bestOfFrames: Prisma.FieldRef<"StageRound", 'Int'>
   readonly createdAt: Prisma.FieldRef<"StageRound", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"StageRound", 'DateTime'>
   readonly advancePerGroup: Prisma.FieldRef<"StageRound", 'Int'>

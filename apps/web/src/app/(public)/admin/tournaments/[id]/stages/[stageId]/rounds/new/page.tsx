@@ -54,6 +54,7 @@ export default async function NewStageRoundPage({
           roundType: stage.stageType,
           sequence: nextSequence,
           matchesPerPairing: 1,
+          bestOfFrames: 5,
           groupCount: stage.stageType === "GROUP" ? 1 : null,
           playersPerGroup: stage.stageType === "GROUP" ? 1 : null,
           advancePerGroup: null,

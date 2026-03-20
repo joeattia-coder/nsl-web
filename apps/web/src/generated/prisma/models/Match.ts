@@ -27,11 +27,13 @@ export type AggregateMatch = {
 }
 
 export type MatchAvgAggregateOutputType = {
+  bestOfFrames: number | null
   homeScore: number | null
   awayScore: number | null
 }
 
 export type MatchSumAggregateOutputType = {
+  bestOfFrames: number | null
   homeScore: number | null
   awayScore: number | null
 }
@@ -50,6 +52,7 @@ export type MatchMinAggregateOutputType = {
   homeEntryId: string | null
   awayEntryId: string | null
   winnerEntryId: string | null
+  bestOfFrames: number | null
   homeScore: number | null
   awayScore: number | null
   internalNote: string | null
@@ -77,6 +80,7 @@ export type MatchMaxAggregateOutputType = {
   homeEntryId: string | null
   awayEntryId: string | null
   winnerEntryId: string | null
+  bestOfFrames: number | null
   homeScore: number | null
   awayScore: number | null
   internalNote: string | null
@@ -104,6 +108,7 @@ export type MatchCountAggregateOutputType = {
   homeEntryId: number
   awayEntryId: number
   winnerEntryId: number
+  bestOfFrames: number
   homeScore: number
   awayScore: number
   internalNote: number
@@ -120,11 +125,13 @@ export type MatchCountAggregateOutputType = {
 
 
 export type MatchAvgAggregateInputType = {
+  bestOfFrames?: true
   homeScore?: true
   awayScore?: true
 }
 
 export type MatchSumAggregateInputType = {
+  bestOfFrames?: true
   homeScore?: true
   awayScore?: true
 }
@@ -143,6 +150,7 @@ export type MatchMinAggregateInputType = {
   homeEntryId?: true
   awayEntryId?: true
   winnerEntryId?: true
+  bestOfFrames?: true
   homeScore?: true
   awayScore?: true
   internalNote?: true
@@ -170,6 +178,7 @@ export type MatchMaxAggregateInputType = {
   homeEntryId?: true
   awayEntryId?: true
   winnerEntryId?: true
+  bestOfFrames?: true
   homeScore?: true
   awayScore?: true
   internalNote?: true
@@ -197,6 +206,7 @@ export type MatchCountAggregateInputType = {
   homeEntryId?: true
   awayEntryId?: true
   winnerEntryId?: true
+  bestOfFrames?: true
   homeScore?: true
   awayScore?: true
   internalNote?: true
@@ -311,6 +321,7 @@ export type MatchGroupByOutputType = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId: string | null
+  bestOfFrames: number | null
   homeScore: number | null
   awayScore: number | null
   internalNote: string | null
@@ -361,6 +372,7 @@ export type MatchWhereInput = {
   homeEntryId?: Prisma.StringFilter<"Match"> | string
   awayEntryId?: Prisma.StringFilter<"Match"> | string
   winnerEntryId?: Prisma.StringNullableFilter<"Match"> | string | null
+  bestOfFrames?: Prisma.IntNullableFilter<"Match"> | number | null
   homeScore?: Prisma.IntNullableFilter<"Match"> | number | null
   awayScore?: Prisma.IntNullableFilter<"Match"> | number | null
   internalNote?: Prisma.StringNullableFilter<"Match"> | string | null
@@ -400,6 +412,7 @@ export type MatchOrderByWithRelationInput = {
   homeEntryId?: Prisma.SortOrder
   awayEntryId?: Prisma.SortOrder
   winnerEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrderInput | Prisma.SortOrder
   homeScore?: Prisma.SortOrderInput | Prisma.SortOrder
   awayScore?: Prisma.SortOrderInput | Prisma.SortOrder
   internalNote?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -442,6 +455,7 @@ export type MatchWhereUniqueInput = Prisma.AtLeast<{
   homeEntryId?: Prisma.StringFilter<"Match"> | string
   awayEntryId?: Prisma.StringFilter<"Match"> | string
   winnerEntryId?: Prisma.StringNullableFilter<"Match"> | string | null
+  bestOfFrames?: Prisma.IntNullableFilter<"Match"> | number | null
   homeScore?: Prisma.IntNullableFilter<"Match"> | number | null
   awayScore?: Prisma.IntNullableFilter<"Match"> | number | null
   internalNote?: Prisma.StringNullableFilter<"Match"> | string | null
@@ -481,6 +495,7 @@ export type MatchOrderByWithAggregationInput = {
   homeEntryId?: Prisma.SortOrder
   awayEntryId?: Prisma.SortOrder
   winnerEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrderInput | Prisma.SortOrder
   homeScore?: Prisma.SortOrderInput | Prisma.SortOrder
   awayScore?: Prisma.SortOrderInput | Prisma.SortOrder
   internalNote?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -516,6 +531,7 @@ export type MatchScalarWhereWithAggregatesInput = {
   homeEntryId?: Prisma.StringWithAggregatesFilter<"Match"> | string
   awayEntryId?: Prisma.StringWithAggregatesFilter<"Match"> | string
   winnerEntryId?: Prisma.StringNullableWithAggregatesFilter<"Match"> | string | null
+  bestOfFrames?: Prisma.IntNullableWithAggregatesFilter<"Match"> | number | null
   homeScore?: Prisma.IntNullableWithAggregatesFilter<"Match"> | number | null
   awayScore?: Prisma.IntNullableWithAggregatesFilter<"Match"> | number | null
   internalNote?: Prisma.StringNullableWithAggregatesFilter<"Match"> | string | null
@@ -535,6 +551,7 @@ export type MatchCreateInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -571,6 +588,7 @@ export type MatchUncheckedCreateInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -591,6 +609,7 @@ export type MatchUpdateInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -627,6 +646,7 @@ export type MatchUncheckedUpdateInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -655,6 +675,7 @@ export type MatchCreateManyInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -674,6 +695,7 @@ export type MatchUpdateManyMutationInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -698,6 +720,7 @@ export type MatchUncheckedUpdateManyInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -735,6 +758,7 @@ export type MatchCountOrderByAggregateInput = {
   homeEntryId?: Prisma.SortOrder
   awayEntryId?: Prisma.SortOrder
   winnerEntryId?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   homeScore?: Prisma.SortOrder
   awayScore?: Prisma.SortOrder
   internalNote?: Prisma.SortOrder
@@ -749,6 +773,7 @@ export type MatchCountOrderByAggregateInput = {
 }
 
 export type MatchAvgOrderByAggregateInput = {
+  bestOfFrames?: Prisma.SortOrder
   homeScore?: Prisma.SortOrder
   awayScore?: Prisma.SortOrder
 }
@@ -767,6 +792,7 @@ export type MatchMaxOrderByAggregateInput = {
   homeEntryId?: Prisma.SortOrder
   awayEntryId?: Prisma.SortOrder
   winnerEntryId?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   homeScore?: Prisma.SortOrder
   awayScore?: Prisma.SortOrder
   internalNote?: Prisma.SortOrder
@@ -794,6 +820,7 @@ export type MatchMinOrderByAggregateInput = {
   homeEntryId?: Prisma.SortOrder
   awayEntryId?: Prisma.SortOrder
   winnerEntryId?: Prisma.SortOrder
+  bestOfFrames?: Prisma.SortOrder
   homeScore?: Prisma.SortOrder
   awayScore?: Prisma.SortOrder
   internalNote?: Prisma.SortOrder
@@ -808,6 +835,7 @@ export type MatchMinOrderByAggregateInput = {
 }
 
 export type MatchSumOrderByAggregateInput = {
+  bestOfFrames?: Prisma.SortOrder
   homeScore?: Prisma.SortOrder
   awayScore?: Prisma.SortOrder
 }
@@ -1307,6 +1335,7 @@ export type MatchCreateWithoutVenueInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1341,6 +1370,7 @@ export type MatchUncheckedCreateWithoutVenueInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1398,6 +1428,7 @@ export type MatchScalarWhereInput = {
   homeEntryId?: Prisma.StringFilter<"Match"> | string
   awayEntryId?: Prisma.StringFilter<"Match"> | string
   winnerEntryId?: Prisma.StringNullableFilter<"Match"> | string | null
+  bestOfFrames?: Prisma.IntNullableFilter<"Match"> | number | null
   homeScore?: Prisma.IntNullableFilter<"Match"> | number | null
   awayScore?: Prisma.IntNullableFilter<"Match"> | number | null
   internalNote?: Prisma.StringNullableFilter<"Match"> | string | null
@@ -1417,6 +1448,7 @@ export type MatchCreateWithoutTournamentInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1451,6 +1483,7 @@ export type MatchUncheckedCreateWithoutTournamentInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1497,6 +1530,7 @@ export type MatchCreateWithoutTournamentStageInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1531,6 +1565,7 @@ export type MatchUncheckedCreateWithoutTournamentStageInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1577,6 +1612,7 @@ export type MatchCreateWithoutStageRoundInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1611,6 +1647,7 @@ export type MatchUncheckedCreateWithoutStageRoundInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1657,6 +1694,7 @@ export type MatchCreateWithoutTournamentGroupInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1691,6 +1729,7 @@ export type MatchUncheckedCreateWithoutTournamentGroupInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1737,6 +1776,7 @@ export type MatchCreateWithoutApprovedByUserInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1772,6 +1812,7 @@ export type MatchUncheckedCreateWithoutApprovedByUserInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1801,6 +1842,7 @@ export type MatchCreateWithoutEnteredByUserInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1836,6 +1878,7 @@ export type MatchUncheckedCreateWithoutEnteredByUserInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1865,6 +1908,7 @@ export type MatchCreateWithoutUpdatedByUserInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1900,6 +1944,7 @@ export type MatchUncheckedCreateWithoutUpdatedByUserInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -1977,6 +2022,7 @@ export type MatchCreateWithoutAwayEntryInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2011,6 +2057,7 @@ export type MatchUncheckedCreateWithoutAwayEntryInput = {
   matchStatus?: $Enums.MatchStatus
   homeEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2041,6 +2088,7 @@ export type MatchCreateWithoutHomeEntryInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2075,6 +2123,7 @@ export type MatchUncheckedCreateWithoutHomeEntryInput = {
   matchStatus?: $Enums.MatchStatus
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2105,6 +2154,7 @@ export type MatchCreateWithoutWinnerEntryInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2139,6 +2189,7 @@ export type MatchUncheckedCreateWithoutWinnerEntryInput = {
   matchStatus?: $Enums.MatchStatus
   homeEntryId: string
   awayEntryId: string
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2217,6 +2268,7 @@ export type MatchCreateWithoutFramesInput = {
   matchTime?: string | null
   scheduleStatus?: $Enums.ScheduleStatus
   matchStatus?: $Enums.MatchStatus
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2252,6 +2304,7 @@ export type MatchUncheckedCreateWithoutFramesInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2287,6 +2340,7 @@ export type MatchUpdateWithoutFramesInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2322,6 +2376,7 @@ export type MatchUncheckedUpdateWithoutFramesInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2348,6 +2403,7 @@ export type MatchCreateManyVenueInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2367,6 +2423,7 @@ export type MatchUpdateWithoutVenueInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2401,6 +2458,7 @@ export type MatchUncheckedUpdateWithoutVenueInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2428,6 +2486,7 @@ export type MatchUncheckedUpdateManyWithoutVenueInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2454,6 +2513,7 @@ export type MatchCreateManyTournamentInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2473,6 +2533,7 @@ export type MatchUpdateWithoutTournamentInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2507,6 +2568,7 @@ export type MatchUncheckedUpdateWithoutTournamentInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2534,6 +2596,7 @@ export type MatchUncheckedUpdateManyWithoutTournamentInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2560,6 +2623,7 @@ export type MatchCreateManyTournamentStageInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2579,6 +2643,7 @@ export type MatchUpdateWithoutTournamentStageInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2613,6 +2678,7 @@ export type MatchUncheckedUpdateWithoutTournamentStageInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2640,6 +2706,7 @@ export type MatchUncheckedUpdateManyWithoutTournamentStageInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2666,6 +2733,7 @@ export type MatchCreateManyStageRoundInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2685,6 +2753,7 @@ export type MatchUpdateWithoutStageRoundInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2719,6 +2788,7 @@ export type MatchUncheckedUpdateWithoutStageRoundInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2746,6 +2816,7 @@ export type MatchUncheckedUpdateManyWithoutStageRoundInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2772,6 +2843,7 @@ export type MatchCreateManyTournamentGroupInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2791,6 +2863,7 @@ export type MatchUpdateWithoutTournamentGroupInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2825,6 +2898,7 @@ export type MatchUncheckedUpdateWithoutTournamentGroupInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2852,6 +2926,7 @@ export type MatchUncheckedUpdateManyWithoutTournamentGroupInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2879,6 +2954,7 @@ export type MatchCreateManyApprovedByUserInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2905,6 +2981,7 @@ export type MatchCreateManyEnteredByUserInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2931,6 +3008,7 @@ export type MatchCreateManyUpdatedByUserInput = {
   homeEntryId: string
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -2949,6 +3027,7 @@ export type MatchUpdateWithoutApprovedByUserInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2984,6 +3063,7 @@ export type MatchUncheckedUpdateWithoutApprovedByUserInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3011,6 +3091,7 @@ export type MatchUncheckedUpdateManyWithoutApprovedByUserInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3029,6 +3110,7 @@ export type MatchUpdateWithoutEnteredByUserInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3064,6 +3146,7 @@ export type MatchUncheckedUpdateWithoutEnteredByUserInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3091,6 +3174,7 @@ export type MatchUncheckedUpdateManyWithoutEnteredByUserInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3109,6 +3193,7 @@ export type MatchUpdateWithoutUpdatedByUserInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3144,6 +3229,7 @@ export type MatchUncheckedUpdateWithoutUpdatedByUserInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3171,6 +3257,7 @@ export type MatchUncheckedUpdateManyWithoutUpdatedByUserInput = {
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3196,6 +3283,7 @@ export type MatchCreateManyAwayEntryInput = {
   matchStatus?: $Enums.MatchStatus
   homeEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -3222,6 +3310,7 @@ export type MatchCreateManyHomeEntryInput = {
   matchStatus?: $Enums.MatchStatus
   awayEntryId: string
   winnerEntryId?: string | null
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -3248,6 +3337,7 @@ export type MatchCreateManyWinnerEntryInput = {
   matchStatus?: $Enums.MatchStatus
   homeEntryId: string
   awayEntryId: string
+  bestOfFrames?: number | null
   homeScore?: number | null
   awayScore?: number | null
   internalNote?: string | null
@@ -3267,6 +3357,7 @@ export type MatchUpdateWithoutAwayEntryInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3301,6 +3392,7 @@ export type MatchUncheckedUpdateWithoutAwayEntryInput = {
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3328,6 +3420,7 @@ export type MatchUncheckedUpdateManyWithoutAwayEntryInput = {
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3347,6 +3440,7 @@ export type MatchUpdateWithoutHomeEntryInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3381,6 +3475,7 @@ export type MatchUncheckedUpdateWithoutHomeEntryInput = {
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3408,6 +3503,7 @@ export type MatchUncheckedUpdateManyWithoutHomeEntryInput = {
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   winnerEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3427,6 +3523,7 @@ export type MatchUpdateWithoutWinnerEntryInput = {
   matchTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduleStatus?: Prisma.EnumScheduleStatusFieldUpdateOperationsInput | $Enums.ScheduleStatus
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3461,6 +3558,7 @@ export type MatchUncheckedUpdateWithoutWinnerEntryInput = {
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3488,6 +3586,7 @@ export type MatchUncheckedUpdateManyWithoutWinnerEntryInput = {
   matchStatus?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   homeEntryId?: Prisma.StringFieldUpdateOperationsInput | string
   awayEntryId?: Prisma.StringFieldUpdateOperationsInput | string
+  bestOfFrames?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   homeScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   awayScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3546,6 +3645,7 @@ export type MatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   homeEntryId?: boolean
   awayEntryId?: boolean
   winnerEntryId?: boolean
+  bestOfFrames?: boolean
   homeScore?: boolean
   awayScore?: boolean
   internalNote?: boolean
@@ -3586,6 +3686,7 @@ export type MatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   homeEntryId?: boolean
   awayEntryId?: boolean
   winnerEntryId?: boolean
+  bestOfFrames?: boolean
   homeScore?: boolean
   awayScore?: boolean
   internalNote?: boolean
@@ -3624,6 +3725,7 @@ export type MatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   homeEntryId?: boolean
   awayEntryId?: boolean
   winnerEntryId?: boolean
+  bestOfFrames?: boolean
   homeScore?: boolean
   awayScore?: boolean
   internalNote?: boolean
@@ -3662,6 +3764,7 @@ export type MatchSelectScalar = {
   homeEntryId?: boolean
   awayEntryId?: boolean
   winnerEntryId?: boolean
+  bestOfFrames?: boolean
   homeScore?: boolean
   awayScore?: boolean
   internalNote?: boolean
@@ -3675,7 +3778,7 @@ export type MatchSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "tournamentStageId" | "stageRoundId" | "tournamentGroupId" | "venueId" | "matchDate" | "matchTime" | "scheduleStatus" | "matchStatus" | "homeEntryId" | "awayEntryId" | "winnerEntryId" | "homeScore" | "awayScore" | "internalNote" | "publicNote" | "resultSubmittedAt" | "approvedAt" | "approvedByUserId" | "enteredByUserId" | "updatedByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["match"]>
+export type MatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "tournamentStageId" | "stageRoundId" | "tournamentGroupId" | "venueId" | "matchDate" | "matchTime" | "scheduleStatus" | "matchStatus" | "homeEntryId" | "awayEntryId" | "winnerEntryId" | "bestOfFrames" | "homeScore" | "awayScore" | "internalNote" | "publicNote" | "resultSubmittedAt" | "approvedAt" | "approvedByUserId" | "enteredByUserId" | "updatedByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["match"]>
 export type MatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   approvedByUser?: boolean | Prisma.Match$approvedByUserArgs<ExtArgs>
   awayEntry?: boolean | Prisma.TournamentEntryDefaultArgs<ExtArgs>
@@ -3748,6 +3851,7 @@ export type $MatchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     homeEntryId: string
     awayEntryId: string
     winnerEntryId: string | null
+    bestOfFrames: number | null
     homeScore: number | null
     awayScore: number | null
     internalNote: string | null
@@ -4207,6 +4311,7 @@ export interface MatchFieldRefs {
   readonly homeEntryId: Prisma.FieldRef<"Match", 'String'>
   readonly awayEntryId: Prisma.FieldRef<"Match", 'String'>
   readonly winnerEntryId: Prisma.FieldRef<"Match", 'String'>
+  readonly bestOfFrames: Prisma.FieldRef<"Match", 'Int'>
   readonly homeScore: Prisma.FieldRef<"Match", 'Int'>
   readonly awayScore: Prisma.FieldRef<"Match", 'Int'>
   readonly internalNote: Prisma.FieldRef<"Match", 'String'>

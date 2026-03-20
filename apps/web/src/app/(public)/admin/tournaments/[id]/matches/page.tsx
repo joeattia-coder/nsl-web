@@ -144,6 +144,7 @@ export default async function TournamentMatchesPage({
     homeName: formatParticipantTypeLabel(match.homeEntry),
     awayName: formatParticipantTypeLabel(match.awayEntry),
     winnerName: match.winnerEntry ? formatParticipantTypeLabel(match.winnerEntry) : "",
+    bestOfFrames: match.bestOfFrames ?? 5,
     homeScore: match.homeScore,
     awayScore: match.awayScore,
     matchDate: match.matchDate ? match.matchDate.toISOString() : "",
