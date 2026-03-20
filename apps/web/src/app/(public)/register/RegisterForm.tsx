@@ -180,48 +180,17 @@ export default function RegisterForm() {
         body: JSON.stringify({
           firstName,
           lastName,
-          dateOfBirth,
-          phoneNumber,
-          username,
-          email,
-          password,
-          verificationToken,
-          verificationAnswer,
-          website,
-        }),
-      });
-
-      const payload = (await response.json().catch(() => null)) as
-        | { error?: string; message?: string; verificationLink?: string | null }
-        | null;
-
-      if (!response.ok) {
-        throw new Error(payload?.error || "Failed to register account.");
-      }
-
-      setSuccess(
-        payload?.message || "Registration submitted. Check your email to verify your account."
-      );
-      setVerificationLink(payload?.verificationLink ?? null);
-      setPassword("");
-      setConfirmPassword("");
-      setVerificationAnswer("");
-      setWebsite("");
-      await loadChallenge();
-    } catch (submitError) {
-      setError(
-        submitError instanceof Error ? submitError.message : "Failed to register account."
-      );
-      await loadChallenge();
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="admin-page">
-      <div className="admin-page-header">
-        <div>
+          try {
+            // Logic to load the challenge
+          } catch (challengeError) {
+            setError(
+              challengeError instanceof Error
+                ? challengeError.message
+                : "Failed to load human verification."
+            );
+          } finally {
+            setIsLoadingChallenge(false);
+          }
           <h1 className="admin-page-title">Player Registration</h1>
           <p className="admin-page-subtitle">
             Register with the form and verify your email, or use Google/Facebook for instant account creation.
