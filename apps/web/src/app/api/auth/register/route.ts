@@ -49,6 +49,26 @@ function getRequestOrigin(request: Request) {
   return new URL(request.url).origin;
 }
 
+async function removeStaleRegistrationUser(userId: string) {
+  await prisma.$transaction(async (tx) => {
+    await tx.emailVerificationToken.deleteMany({
+      where: { userId },
+    });
+
+    await tx.passwordResetToken.deleteMany({
+      where: { userId },
+    });
+
+    await tx.player.deleteMany({
+      where: { userId },
+    });
+
+    await tx.user.delete({
+      where: { id: userId },
+    });
+  });
+}
+
 export async function POST(request: Request) {
   let createdUserId: string | null = null;
 
@@ -130,10 +150,46 @@ export async function POST(request: Request) {
       },
       select: {
         id: true,
+        isLoginEnabled: true,
+        registrationStatus: true,
+        emailVerifiedAt: true,
+        player: {
+          select: {
+            id: true,
+          },
+        },
+        authAccounts: {
+          select: {
+            id: true,
+          },
+          take: 1,
+        },
       },
     });
 
-    if (existingUser) {
+    if (
+      existingUser &&
+      !existingUser.player &&
+      !existingUser.isLoginEnabled &&
+      existingUser.registrationStatus === "INACTIVE" &&
+      !existingUser.emailVerifiedAt &&
+      existingUser.authAccounts.length === 0
+    ) {
+      await removeStaleRegistrationUser(existingUser.id);
+    }
+
+    const remainingUser = existingUser
+      ? await prisma.user.findFirst({
+          where: {
+            OR: [{ email }, { normalizedEmail: email }],
+          },
+          select: {
+            id: true,
+          },
+        })
+      : null;
+
+    if (remainingUser) {
       return NextResponse.json(
         { error: "An account with this email already exists. Try signing in instead." },
         { status: 409 }
