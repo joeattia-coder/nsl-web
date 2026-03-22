@@ -91,3 +91,79 @@ export async function POST(_request: Request, context: RouteContext) {
     );
   }
 }
+
+export async function DELETE(_request: Request, context: RouteContext) {
+  try {
+    const { roundId } = await context.params;
+
+    const round = await prisma.stageRound.findUnique({
+      where: { id: roundId },
+      include: {
+        groups: {
+          select: {
+            id: true,
+          },
+        },
+        matches: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!round) {
+      return NextResponse.json({ error: "Round not found." }, { status: 404 });
+    }
+
+    if (round.roundType !== "GROUP") {
+      return NextResponse.json(
+        { error: "Groups can only be deleted from group rounds." },
+        { status: 400 }
+      );
+    }
+
+    if (round.matches.length > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "This round still has generated matches. Delete the round matches first, then delete the groups.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const deleted = await tx.tournamentGroup.deleteMany({
+        where: {
+          stageRoundId: roundId,
+        },
+      });
+
+      await tx.stageRound.update({
+        where: { id: roundId },
+        data: {
+          groupCount: 0,
+        },
+      });
+
+      return deleted;
+    });
+
+    return NextResponse.json({
+      success: true,
+      deletedCount: result.count,
+      roundName: round.roundName,
+    });
+  } catch (error) {
+    console.error("Failed to delete groups:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to delete groups",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+}

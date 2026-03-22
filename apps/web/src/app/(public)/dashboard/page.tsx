@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { FiActivity, FiAward, FiBarChart2, FiClock, FiTarget, FiTrendingUp } from "react-icons/fi";
+import { FiAward, FiBarChart2, FiTarget, FiTrendingUp } from "react-icons/fi";
 import { resolveCurrentUser } from "@/lib/admin-auth";
 import { getPlayerDashboardData } from "@/lib/player-performance";
 import PlayerPortalHeader from "../PlayerPortalHeader";
@@ -23,10 +23,6 @@ function formatSignedValue(value: number) {
 
 function formatPercent(value: number) {
   return `${value}%`;
-}
-
-function formatMatchStatus(value: string) {
-  return value.toLowerCase().replaceAll("_", " ");
 }
 
 export default async function PlayerDashboardPage() {
@@ -187,37 +183,6 @@ export default async function PlayerDashboardPage() {
                       </strong>
                       <span>{entry.ratingBefore} to {entry.ratingAfter}</span>
                     </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="admin-dashboard-panel player-dashboard-panel-wide">
-            <header className="admin-dashboard-panel-header">
-              <h2 className="admin-dashboard-panel-title">Recent Matches</h2>
-              <p className="admin-dashboard-panel-subtitle">Your latest scheduled and completed fixtures.</p>
-            </header>
-            {dashboard.recentMatches.length === 0 ? (
-              <p className="admin-dashboard-panel-subtitle">No matches assigned yet.</p>
-            ) : (
-              <div className="player-dashboard-match-list">
-                {dashboard.recentMatches.map((match) => (
-                  <article key={match.id} className="player-dashboard-match-card">
-                    <div>
-                      <p className="player-dashboard-history-title">{match.tournamentName}</p>
-                      <p className="player-dashboard-history-meta">{match.roundName} • {formatDate(match.matchDate)}</p>
-                    </div>
-                    <p className="player-dashboard-match-line">
-                      {match.homeEntryName}
-                      <span className="player-dashboard-match-score">
-                        {match.homeScore ?? "-"} : {match.awayScore ?? "-"}
-                      </span>
-                      {match.awayEntryName}
-                    </p>
-                    <p className="player-dashboard-history-meta">
-                      <FiClock aria-hidden="true" /> {match.matchTime || "TBA"} • {formatMatchStatus(match.matchStatus)}
-                    </p>
                   </article>
                 ))}
               </div>

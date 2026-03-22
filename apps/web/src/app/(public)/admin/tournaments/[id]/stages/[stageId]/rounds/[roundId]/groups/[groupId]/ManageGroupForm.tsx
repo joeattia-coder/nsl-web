@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { setAdminFlashMessage } from "@/lib/admin-flash";
 import { FiSave, FiX } from "react-icons/fi";
 
 type EntryOption = {
@@ -34,7 +35,10 @@ export default function ManageGroupForm({
 }: ManageGroupFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
 
   const slotCount =
     typeof playersPerGroup === "number" && playersPerGroup > 0
@@ -61,13 +65,15 @@ export default function ManageGroupForm({
     const chosen = slots.filter(Boolean);
 
     if (new Set(chosen).size !== chosen.length) {
-      setError("The same entry cannot be selected more than once in this group.");
+      setFeedbackModal({
+        title: "Duplicate entry selected",
+        message: "The same entry cannot be selected more than once in this group.",
+      });
       return;
     }
 
     try {
       setSaving(true);
-      setError(null);
 
       const res = await fetch(`/api/tournaments/groups/${groupId}`, {
         method: "PUT",
@@ -87,15 +93,21 @@ export default function ManageGroupForm({
         );
       }
 
+      setAdminFlashMessage(`round-groups:${roundId}`, {
+        title: "Save Group Assignments Complete",
+        message: `Assignments for ${groupName} were saved successfully.`,
+      });
       router.push(
         `/admin/tournaments/${tournamentId}/stages/${stageId}/rounds/${roundId}/groups`
       );
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to save group assignments."
-      );
+      setFeedbackModal({
+        title: "Could not save assignments",
+        message:
+          err instanceof Error ? err.message : "Failed to save group assignments.",
+      });
     } finally {
       setSaving(false);
     }
@@ -104,8 +116,6 @@ export default function ManageGroupForm({
   return (
     <div className="admin-card admin-player-form-card">
       <form onSubmit={handleSubmit} className="admin-form">
-        {error ? <p className="admin-form-error">{error}</p> : null}
-
         <div className="admin-form-field admin-form-field-full">
           <label className="admin-label">{groupName}</label>
 
@@ -195,6 +205,38 @@ export default function ManageGroupForm({
           </button>
         </div>
       </form>
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setFeedbackModal(null)}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="manage-group-feedback-title"
+          >
+            <h2 id="manage-group-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => setFeedbackModal(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import {
   SortableHeader,
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { consumeAdminFlashMessage } from "@/lib/admin-flash";
 import { FiEdit2, FiPlus, FiTrash2, FiFolder } from "react-icons/fi";
 
 type StageRow = {
@@ -39,12 +41,25 @@ export default function TournamentStagesTable({
   tournamentName,
   stages,
 }: TournamentStagesTableProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("sequence");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [stageToDelete, setStageToDelete] = useState<StageRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
-  const [actionError, setActionError] = useState<string | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+    shouldRefresh?: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    const flashMessage = consumeAdminFlashMessage(`tournament-stages:${tournamentId}`);
+
+    if (flashMessage) {
+      setFeedbackModal(flashMessage);
+    }
+  }, [tournamentId]);
 
   const filteredStages = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -91,7 +106,6 @@ export default function TournamentStagesTable({
   };
 
   const openSingleDeleteModal = (stage: StageRow) => {
-    setActionError(null);
     setStageToDelete(stage);
   };
 
@@ -105,7 +119,6 @@ export default function TournamentStagesTable({
 
     try {
       setDeletingSingle(true);
-      setActionError(null);
 
       const res = await fetch(`/api/tournaments/stages/${stageToDelete.id}`, {
         method: "DELETE",
@@ -120,12 +133,18 @@ export default function TournamentStagesTable({
       }
 
       setStageToDelete(null);
-      window.location.reload();
+      setFeedbackModal({
+        title: "Delete Stage Complete",
+        message: `${stageToDelete.stageName} was deleted successfully.`,
+        shouldRefresh: true,
+      });
     } catch (err) {
       console.error(err);
-      setActionError(
-        err instanceof Error ? err.message : "Failed to delete tournament stage."
-      );
+      setStageToDelete(null);
+      setFeedbackModal({
+        title: "Could not delete stage",
+        message: err instanceof Error ? err.message : "Failed to delete tournament stage.",
+      });
     } finally {
       setDeletingSingle(false);
     }
@@ -133,12 +152,6 @@ export default function TournamentStagesTable({
 
   return (
     <>
-      {actionError ? (
-        <div className="admin-form-error" style={{ marginBottom: "14px" }}>
-          {actionError}
-        </div>
-      ) : null}
-
       <div className="admin-players-toolbar">
         <div className="admin-players-toolbar-left">
           <input
@@ -284,8 +297,17 @@ export default function TournamentStagesTable({
             </h2>
 
             <p className="admin-modal-text">
-              You are about to delete <strong>{stageToDelete.stageName}</strong>.
+              If you proceed, this will permanently delete <strong>{stageToDelete.stageName}</strong>
+              from this tournament.
+            </p>
+
+            <p className="admin-modal-text">
               This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This delete will only succeed after any related rounds and matches have
+              already been removed.
             </p>
 
             <div className="admin-modal-actions">
@@ -304,12 +326,56 @@ export default function TournamentStagesTable({
                 onClick={confirmSingleDelete}
                 disabled={deletingSingle}
               >
-                {deletingSingle ? "Deleting..." : "Delete"}
+                {deletingSingle ? "Deleting..." : "Delete Stage"}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => {
+            const shouldRefresh = feedbackModal.shouldRefresh;
+            setFeedbackModal(null);
+            if (shouldRefresh) {
+              router.refresh();
+            }
+          }}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="stages-feedback-title"
+          >
+            <h2 id="stages-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => {
+                  const shouldRefresh = feedbackModal.shouldRefresh;
+                  setFeedbackModal(null);
+                  if (shouldRefresh) {
+                    router.refresh();
+                  }
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

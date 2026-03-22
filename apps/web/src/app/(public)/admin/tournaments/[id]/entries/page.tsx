@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { normalizeCountryCode } from "@/lib/country";
 import { prisma } from "@/lib/prisma";
 import TournamentSubnav from "../TournamentSubnav";
 import TournamentEntriesManager from "./TournamentEntriesManager";
@@ -29,39 +30,6 @@ function getEntryDisplayName(entry: {
 
   const memberNames = entry.members.map(({ player }) => getPlayerFullName(player));
   return memberNames.join(" / ") || "Unnamed Entry";
-}
-
-function normalizeCountryCode(country: string | null) {
-  const normalized = country?.trim() ?? "";
-
-  if (!normalized) return "";
-
-  if (/^[a-zA-Z]{2}$/.test(normalized)) {
-    return normalized.toUpperCase();
-  }
-
-  const countryToCode: Record<string, string> = {
-    canada: "CA",
-    "united states": "US",
-    usa: "US",
-    us: "US",
-    mexico: "MX",
-    jamaica: "JM",
-    trinidad: "TT",
-    "trinidad and tobago": "TT",
-    guyana: "GY",
-    barbados: "BB",
-    england: "GB",
-    scotland: "GB",
-    wales: "GB",
-    ireland: "IE",
-    "northern ireland": "GB",
-    china: "CN",
-    india: "IN",
-    pakistan: "PK",
-  };
-
-  return countryToCode[normalized.toLowerCase()] ?? "";
 }
 
 function getEntryCountry(entry: {
@@ -180,6 +148,7 @@ export default async function TournamentEntriesPage({
 
       <TournamentEntriesManager
         tournamentId={tournament.id}
+        tournamentName={tournament.tournamentName}
         participantType={tournament.participantType}
         entries={formattedEntries}
         players={formattedPlayers}

@@ -1,0 +1,86 @@
+const COUNTRY_TO_CODE: Record<string, string> = {
+  canada: "CA",
+  "united states": "US",
+  usa: "US",
+  us: "US",
+  mexico: "MX",
+  jamaica: "JM",
+  trinidad: "TT",
+  "trinidad and tobago": "TT",
+  guyana: "GY",
+  barbados: "BB",
+  england: "GB",
+  scotland: "GB",
+  wales: "GB",
+  "united kingdom": "GB",
+  uk: "GB",
+  ireland: "IE",
+  "northern ireland": "GB",
+  france: "FR",
+  germany: "DE",
+  italy: "IT",
+  spain: "ES",
+  portugal: "PT",
+  netherlands: "NL",
+  belgium: "BE",
+  switzerland: "CH",
+  austria: "AT",
+  sweden: "SE",
+  norway: "NO",
+  denmark: "DK",
+  finland: "FI",
+  poland: "PL",
+  czechia: "CZ",
+  "czech republic": "CZ",
+  slovakia: "SK",
+  hungary: "HU",
+  romania: "RO",
+  bulgaria: "BG",
+  greece: "GR",
+  turkey: "TR",
+  cyprus: "CY",
+  india: "IN",
+  pakistan: "PK",
+  china: "CN",
+  japan: "JP",
+  "south korea": "KR",
+  korea: "KR",
+  taiwan: "TW",
+  thailand: "TH",
+  vietnam: "VN",
+  philippines: "PH",
+  malaysia: "MY",
+  singapore: "SG",
+  indonesia: "ID",
+  australia: "AU",
+  "new zealand": "NZ",
+  egypt: "EG",
+  morocco: "MA",
+  tunisia: "TN",
+  "south africa": "ZA",
+  nigeria: "NG",
+  kenya: "KE",
+  brazil: "BR",
+  argentina: "AR",
+  chile: "CL",
+  colombia: "CO",
+  peru: "PE",
+  uruguay: "UY",
+};
+
+export function normalizeCountryCode(country: string | null | undefined) {
+  const normalized = country?.trim() ?? "";
+
+  if (!normalized) return "";
+
+  if (/^[a-zA-Z]{2}$/.test(normalized)) {
+    return normalized.toUpperCase();
+  }
+
+  return COUNTRY_TO_CODE[normalized.toLowerCase()] || "";
+}
+
+export function getFlagCdnUrl(country: string | null | undefined, size: "w20" | "w40" | "w80" = "w40") {
+  const countryCode = normalizeCountryCode(country);
+  return countryCode ? `https://flagcdn.com/${size}/${countryCode.toLowerCase()}.png` : null;
+}

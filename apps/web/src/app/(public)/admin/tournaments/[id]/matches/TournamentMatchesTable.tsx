@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import {
   SortableHeader,
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
-import { FiEdit2 } from "react-icons/fi";
+import { consumeAdminFlashMessage } from "@/lib/admin-flash";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 type MatchRow = {
   id: string;
@@ -31,6 +33,7 @@ type MatchRow = {
 
 type TournamentMatchesTableProps = {
   tournamentId: string;
+  tournamentName: string;
   matches: MatchRow[];
 };
 
@@ -82,11 +85,28 @@ function formatBestOf(bestOfFrames: number | null | undefined) {
 
 export default function TournamentMatchesTable({
   tournamentId,
+  tournamentName,
   matches,
 }: TournamentMatchesTableProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("matchDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+    shouldRefresh?: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    const flashMessage = consumeAdminFlashMessage(`tournament-matches:${tournamentId}`);
+
+    if (flashMessage) {
+      setFeedbackModal(flashMessage);
+    }
+  }, [tournamentId]);
 
   const filteredMatches = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -148,6 +168,55 @@ export default function TournamentMatchesTable({
     setSortDirection("asc");
   };
 
+  function openDeleteModal() {
+    setIsDeleteModalOpen(true);
+  }
+
+  function closeDeleteModal() {
+    if (isDeletingAll) {
+      return;
+    }
+
+    setIsDeleteModalOpen(false);
+  }
+
+  async function handleDeleteAllMatches() {
+    try {
+      setIsDeletingAll(true);
+
+      const res = await fetch(`/api/tournaments/${tournamentId}/matches`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(
+          data?.details || data?.error || "Failed to delete tournament matches."
+        );
+      }
+
+      setIsDeleteModalOpen(false);
+      setFeedbackModal({
+        title: "Delete All Matches Complete",
+        message: `Deleted ${data?.deletedCount ?? 0} match${data?.deletedCount === 1 ? "" : "es"} from ${tournamentName}.`,
+        shouldRefresh: true,
+      });
+    } catch (error) {
+      console.error(error);
+      setIsDeleteModalOpen(false);
+      setFeedbackModal({
+        title: "Could not delete matches",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete tournament matches.",
+      });
+    } finally {
+      setIsDeletingAll(false);
+    }
+  }
+
   return (
     <>
       <div className="admin-players-toolbar">
@@ -159,6 +228,18 @@ export default function TournamentMatchesTable({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
+
+        <div className="admin-players-toolbar-right">
+          <button
+            type="button"
+            className="admin-toolbar-button admin-toolbar-button-danger"
+            onClick={openDeleteModal}
+            disabled={matches.length === 0 || isDeletingAll}
+          >
+            <FiTrash2 />
+            <span>Delete All Matches</span>
+          </button>
         </div>
       </div>
 
@@ -293,6 +374,104 @@ export default function TournamentMatchesTable({
           </table>
         </div>
       </div>
+
+      {isDeleteModalOpen ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-all-matches-title"
+          >
+            <h2 id="delete-all-matches-title" className="admin-modal-title">
+              Delete all tournament matches?
+            </h2>
+
+            <p className="admin-modal-text">
+              If you proceed, this will permanently delete all <strong>{matches.length}</strong>{" "}
+              generated match{matches.length === 1 ? "" : "es"} for <strong>{tournamentName}</strong>.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This will also delete related frame results and match history. Use this
+              before changing group assignments or removing entries from the tournament.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteModal}
+                disabled={isDeletingAll}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDeleteAllMatches}
+                disabled={isDeletingAll}
+              >
+                {isDeletingAll ? "Deleting..." : "Delete All Matches"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => {
+            const shouldRefresh = feedbackModal.shouldRefresh;
+            setFeedbackModal(null);
+            if (shouldRefresh) {
+              router.refresh();
+            }
+          }}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="matches-feedback-title"
+          >
+            <h2 id="matches-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => {
+                  const shouldRefresh = feedbackModal.shouldRefresh;
+                  setFeedbackModal(null);
+                  if (shouldRefresh) {
+                    router.refresh();
+                  }
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

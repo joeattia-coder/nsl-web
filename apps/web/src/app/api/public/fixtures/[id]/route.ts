@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { normalizeCountryCode } from "@/lib/country";
 import { publicApiJson, publicApiOptions } from "@/lib/public-api-response";
 
 type PlayerLike = {
@@ -67,82 +68,6 @@ function getEntryDisplayName(entry: EntryLike | null | undefined) {
   if (names.length === 1) return names[0];
 
   return names.join(" / ");
-}
-
-function normalizeCountryCode(country: string) {
-  const normalized = country.trim();
-
-  if (!normalized) return "";
-
-  if (/^[a-zA-Z]{2}$/.test(normalized)) {
-    return normalized.toUpperCase();
-  }
-
-  const countryToCode: Record<string, string> = {
-    canada: "CA",
-    "united states": "US",
-    usa: "US",
-    us: "US",
-    mexico: "MX",
-    england: "GB",
-    scotland: "GB",
-    wales: "GB",
-    "united kingdom": "GB",
-    uk: "GB",
-    ireland: "IE",
-    france: "FR",
-    germany: "DE",
-    italy: "IT",
-    spain: "ES",
-    portugal: "PT",
-    netherlands: "NL",
-    belgium: "BE",
-    switzerland: "CH",
-    austria: "AT",
-    sweden: "SE",
-    norway: "NO",
-    denmark: "DK",
-    finland: "FI",
-    poland: "PL",
-    czechia: "CZ",
-    "czech republic": "CZ",
-    slovakia: "SK",
-    hungary: "HU",
-    romania: "RO",
-    bulgaria: "BG",
-    greece: "GR",
-    turkey: "TR",
-    cyprus: "CY",
-    india: "IN",
-    pakistan: "PK",
-    china: "CN",
-    japan: "JP",
-    "south korea": "KR",
-    korea: "KR",
-    taiwan: "TW",
-    thailand: "TH",
-    vietnam: "VN",
-    philippines: "PH",
-    malaysia: "MY",
-    singapore: "SG",
-    indonesia: "ID",
-    australia: "AU",
-    "new zealand": "NZ",
-    egypt: "EG",
-    morocco: "MA",
-    tunisia: "TN",
-    "south africa": "ZA",
-    nigeria: "NG",
-    kenya: "KE",
-    brazil: "BR",
-    argentina: "AR",
-    chile: "CL",
-    colombia: "CO",
-    peru: "PE",
-    uruguay: "UY",
-  };
-
-  return countryToCode[normalized.toLowerCase()] || "";
 }
 
 function getEntryCountryCode(entry: EntryLike | null | undefined) {

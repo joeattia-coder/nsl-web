@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import {
   SortableHeader,
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { consumeAdminFlashMessage } from "@/lib/admin-flash";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type TournamentRow = {
@@ -70,13 +72,18 @@ export default function TournamentsTable({
   tournaments,
   seasons,
 }: TournamentsTableProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("tournamentName");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [tournamentToDelete, setTournamentToDelete] =
     useState<TournamentRow | null>(null);
   const [deletingSingle, setDeletingSingle] = useState(false);
-  const [actionError, setActionError] = useState<string | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+    shouldRefresh?: boolean;
+  } | null>(null);
 
   const defaultSeasonId = useMemo(() => {
     const today = new Date();
@@ -97,6 +104,14 @@ export default function TournamentsTable({
   }, [seasons]);
 
   const [selectedSeasonId, setSelectedSeasonId] = useState(defaultSeasonId);
+
+  useEffect(() => {
+    const flashMessage = consumeAdminFlashMessage("tournaments");
+
+    if (flashMessage) {
+      setFeedbackModal(flashMessage);
+    }
+  }, []);
 
   const filteredTournaments = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -168,7 +183,6 @@ export default function TournamentsTable({
   };
 
   const openSingleDeleteModal = (tournament: TournamentRow) => {
-    setActionError(null);
     setTournamentToDelete(tournament);
   };
 
@@ -182,7 +196,6 @@ export default function TournamentsTable({
 
     try {
       setDeletingSingle(true);
-      setActionError(null);
 
       const res = await fetch(`/api/tournaments/${tournamentToDelete.id}`, {
         method: "DELETE",
@@ -197,12 +210,18 @@ export default function TournamentsTable({
       }
 
       setTournamentToDelete(null);
-      window.location.reload();
+      setFeedbackModal({
+        title: "Delete Tournament Complete",
+        message: `${tournamentToDelete.tournamentName} was deleted successfully.`,
+        shouldRefresh: true,
+      });
     } catch (err) {
       console.error(err);
-      setActionError(
-        err instanceof Error ? err.message : "Failed to delete tournament."
-      );
+      setTournamentToDelete(null);
+      setFeedbackModal({
+        title: "Could not delete tournament",
+        message: err instanceof Error ? err.message : "Failed to delete tournament.",
+      });
     } finally {
       setDeletingSingle(false);
     }
@@ -210,12 +229,6 @@ export default function TournamentsTable({
 
   return (
     <>
-      {actionError ? (
-        <div className="admin-form-error" style={{ marginBottom: "14px" }}>
-          {actionError}
-        </div>
-      ) : null}
-
       <div className="admin-players-toolbar">
         <div className="admin-players-toolbar-left">
           <select
@@ -385,9 +398,12 @@ export default function TournamentsTable({
             </h2>
 
             <p className="admin-modal-text">
-              You are about to delete{" "}
-              <strong>{tournamentToDelete.tournamentName}</strong>. This action
-              cannot be undone.
+              If you proceed, this will permanently delete <strong>{tournamentToDelete.tournamentName}</strong>
+              and all related stages, rounds, groups, entries, matches, and match history.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
             </p>
 
             <div className="admin-modal-actions">
@@ -406,12 +422,56 @@ export default function TournamentsTable({
                 onClick={confirmSingleDelete}
                 disabled={deletingSingle}
               >
-                {deletingSingle ? "Deleting..." : "Delete"}
+                {deletingSingle ? "Deleting..." : "Delete Tournament"}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => {
+            const shouldRefresh = feedbackModal.shouldRefresh;
+            setFeedbackModal(null);
+            if (shouldRefresh) {
+              router.refresh();
+            }
+          }}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tournaments-feedback-title"
+          >
+            <h2 id="tournaments-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => {
+                  const shouldRefresh = feedbackModal.shouldRefresh;
+                  setFeedbackModal(null);
+                  if (shouldRefresh) {
+                    router.refresh();
+                  }
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

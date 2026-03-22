@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { setAdminFlashMessage } from "@/lib/admin-flash";
 import { FiPlusCircle, FiSave, FiTrash2, FiX } from "react-icons/fi";
 
 type TournamentStageType = "GROUP" | "KNOCKOUT";
@@ -43,7 +44,11 @@ export default function TournamentStageForm({
   const [sequence, setSequence] = useState(String(initialData.sequence));
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -52,18 +57,23 @@ export default function TournamentStageForm({
     const parsedSequence = Number(sequence);
 
     if (!trimmedStageName) {
-      setError("Stage name is required.");
+      setFeedbackModal({
+        title: "Stage name required",
+        message: "Stage name is required.",
+      });
       return;
     }
 
     if (!Number.isInteger(parsedSequence) || parsedSequence < 1) {
-      setError("Sequence must be a whole number greater than or equal to 1.");
+      setFeedbackModal({
+        title: "Invalid sequence",
+        message: "Sequence must be a whole number greater than or equal to 1.",
+      });
       return;
     }
 
     try {
       setSaving(true);
-      setError(null);
 
       const payload = {
         stageName: trimmedStageName,
@@ -96,34 +106,42 @@ export default function TournamentStageForm({
         );
       }
 
+      setAdminFlashMessage(`tournament-stages:${tournamentId}`, {
+        title: isEdit ? "Update Stage Complete" : "Create Stage Complete",
+        message: `${trimmedStageName} was ${isEdit ? "updated" : "created"} successfully.`,
+      });
       router.push(`/admin/tournaments/${tournamentId}/stages`);
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : isEdit
-            ? "Failed to update tournament stage."
-            : "Failed to create tournament stage."
-      );
+      setFeedbackModal({
+        title: isEdit ? "Could not update stage" : "Could not create stage",
+        message:
+          err instanceof Error
+            ? err.message
+            : isEdit
+              ? "Failed to update tournament stage."
+              : "Failed to create tournament stage.",
+      });
     } finally {
       setSaving(false);
     }
   }
 
+  function openDeleteModal() {
+    setShowDeleteModal(true);
+  }
+
+  function closeDeleteModal() {
+    if (deleting) return;
+    setShowDeleteModal(false);
+  }
+
   async function handleDelete() {
     if (!stageId) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this stage?"
-    );
-
-    if (!confirmed) return;
-
     try {
       setDeleting(true);
-      setError(null);
 
       const res = await fetch(`/api/tournaments/stages/${stageId}`, {
         method: "DELETE",
@@ -137,13 +155,19 @@ export default function TournamentStageForm({
         );
       }
 
+      setShowDeleteModal(false);
       router.push(`/admin/tournaments/${tournamentId}/stages`);
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to delete tournament stage."
-      );
+      setShowDeleteModal(false);
+      setFeedbackModal({
+        title: "Could not delete stage",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to delete tournament stage.",
+      });
     } finally {
       setDeleting(false);
     }
@@ -152,8 +176,6 @@ export default function TournamentStageForm({
   return (
     <div className="admin-card admin-player-form-card">
       <form onSubmit={handleSubmit} className="admin-form">
-        {error ? <p className="admin-form-error">{error}</p> : null}
-
         <div className="admin-form-grid">
           <div className="admin-form-field">
             <label htmlFor="stageName" className="admin-label">
@@ -219,7 +241,7 @@ export default function TournamentStageForm({
           {isEdit ? (
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={openDeleteModal}
               className="admin-player-form-button admin-toolbar-button-danger"
               disabled={deleting || saving}
             >
@@ -250,6 +272,92 @@ export default function TournamentStageForm({
           </button>
         </div>
       </form>
+
+      {showDeleteModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="stage-delete-title"
+          >
+            <h2 id="stage-delete-title" className="admin-modal-title">
+              Delete stage?
+            </h2>
+
+            <p className="admin-modal-text">
+              If you proceed, this will permanently delete <strong>{stageName}</strong>
+              from this tournament.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This delete will only succeed after any related rounds and matches have
+              already been removed.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteModal}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete Stage"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setFeedbackModal(null)}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="stage-feedback-title"
+          >
+            <h2 id="stage-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => setFeedbackModal(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

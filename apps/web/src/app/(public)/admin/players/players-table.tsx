@@ -8,6 +8,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { getFlagCdnUrl, normalizeCountryCode } from "@/lib/country";
 import {
   FiCheckSquare,
   FiDownload,
@@ -470,7 +471,7 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                       <td className="admin-player-country-cell">
                         {countryCode ? (
                           <Image
-                            src={`https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`}
+                            src={getFlagCdnUrl(countryCode, "w40") ?? ""}
                             alt={player.country || countryCode}
                             width={24}
                             height={18}
@@ -627,78 +628,3 @@ function getInitials(fullName: string) {
   return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("");
 }
 
-function normalizeCountryCode(country: string) {
-  const normalized = country.trim();
-
-  if (!normalized) return "";
-
-  if (/^[a-zA-Z]{2}$/.test(normalized)) {
-    return normalized.toUpperCase();
-  }
-
-  const countryToCode: Record<string, string> = {
-    canada: "CA",
-    "united states": "US",
-    usa: "US",
-    us: "US",
-    mexico: "MX",
-    england: "GB",
-    scotland: "GB",
-    wales: "GB",
-    "united kingdom": "GB",
-    uk: "GB",
-    ireland: "IE",
-    france: "FR",
-    germany: "DE",
-    italy: "IT",
-    spain: "ES",
-    portugal: "PT",
-    netherlands: "NL",
-    belgium: "BE",
-    switzerland: "CH",
-    austria: "AT",
-    sweden: "SE",
-    norway: "NO",
-    denmark: "DK",
-    finland: "FI",
-    poland: "PL",
-    czechia: "CZ",
-    "czech republic": "CZ",
-    slovakia: "SK",
-    hungary: "HU",
-    romania: "RO",
-    bulgaria: "BG",
-    greece: "GR",
-    turkey: "TR",
-    cyprus: "CY",
-    india: "IN",
-    pakistan: "PK",
-    china: "CN",
-    japan: "JP",
-    "south korea": "KR",
-    korea: "KR",
-    taiwan: "TW",
-    thailand: "TH",
-    vietnam: "VN",
-    philippines: "PH",
-    malaysia: "MY",
-    singapore: "SG",
-    indonesia: "ID",
-    australia: "AU",
-    "new zealand": "NZ",
-    egypt: "EG",
-    morocco: "MA",
-    tunisia: "TN",
-    "south africa": "ZA",
-    nigeria: "NG",
-    kenya: "KE",
-    brazil: "BR",
-    argentina: "AR",
-    chile: "CL",
-    colombia: "CO",
-    peru: "PE",
-    uruguay: "UY",
-  };
-
-  return countryToCode[normalized.toLowerCase()] || "";
-}

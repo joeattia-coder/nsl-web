@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { setAdminFlashMessage } from "@/lib/admin-flash";
 import { FiPlusCircle, FiSave, FiTrash2, FiX } from "react-icons/fi";
 
 type StageRoundType = "GROUP" | "KNOCKOUT";
@@ -77,7 +78,11 @@ export default function StageRoundForm({
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
 
   const isGroupRound = roundType === "GROUP";
 
@@ -90,12 +95,18 @@ export default function StageRoundForm({
     const parsedBestOfFrames = Number(bestOfFrames);
 
     if (!trimmedRoundName) {
-      setError("Round name is required.");
+      setFeedbackModal({
+        title: "Round name required",
+        message: "Round name is required.",
+      });
       return;
     }
 
     if (!Number.isInteger(parsedSequence) || parsedSequence < 1) {
-      setError("Sequence must be a whole number greater than or equal to 1.");
+      setFeedbackModal({
+        title: "Invalid sequence",
+        message: "Sequence must be a whole number greater than or equal to 1.",
+      });
       return;
     }
 
@@ -103,9 +114,11 @@ export default function StageRoundForm({
       !Number.isInteger(parsedMatchesPerPairing) ||
       parsedMatchesPerPairing < 1
     ) {
-      setError(
-        "Matches per pairing must be a whole number greater than or equal to 1."
-      );
+      setFeedbackModal({
+        title: "Invalid matches per pairing",
+        message:
+          "Matches per pairing must be a whole number greater than or equal to 1.",
+      });
       return;
     }
 
@@ -114,7 +127,11 @@ export default function StageRoundForm({
       parsedBestOfFrames < 1 ||
       parsedBestOfFrames % 2 === 0
     ) {
-      setError("Best of frames must be an odd whole number (for example 3, 5, or 7).");
+      setFeedbackModal({
+        title: "Invalid match format",
+        message:
+          "Best of frames must be an odd whole number (for example 3, 5, or 7).",
+      });
       return;
     }
 
@@ -127,7 +144,11 @@ export default function StageRoundForm({
       parsedPlayersPerGroup = Number(playersPerGroup);
 
       if (!Number.isInteger(parsedGroupCount) || parsedGroupCount < 1) {
-        setError("Number of groups must be a whole number greater than or equal to 1.");
+        setFeedbackModal({
+          title: "Invalid number of groups",
+          message:
+            "Number of groups must be a whole number greater than or equal to 1.",
+        });
         return;
       }
 
@@ -135,9 +156,11 @@ export default function StageRoundForm({
         !Number.isInteger(parsedPlayersPerGroup) ||
         parsedPlayersPerGroup < 1
       ) {
-        setError(
-          "Players per group must be a whole number greater than or equal to 1."
-        );
+        setFeedbackModal({
+          title: "Invalid players per group",
+          message:
+            "Players per group must be a whole number greater than or equal to 1.",
+        });
         return;
       }
 
@@ -148,14 +171,20 @@ export default function StageRoundForm({
           !Number.isInteger(parsedAdvancePerGroup) ||
           parsedAdvancePerGroup < 1
         ) {
-          setError(
-            "Advance per group must be a whole number greater than or equal to 1."
-          );
+          setFeedbackModal({
+            title: "Invalid advance per group",
+            message:
+              "Advance per group must be a whole number greater than or equal to 1.",
+          });
           return;
         }
 
         if (parsedAdvancePerGroup > parsedPlayersPerGroup) {
-          setError("Advance per group cannot be greater than players per group.");
+          setFeedbackModal({
+            title: "Invalid advancement rule",
+            message:
+              "Advance per group cannot be greater than players per group.",
+          });
           return;
         }
       }
@@ -163,7 +192,6 @@ export default function StageRoundForm({
 
     try {
       setSaving(true);
-      setError(null);
 
       const payload = {
         roundName: trimmedRoundName,
@@ -202,34 +230,42 @@ export default function StageRoundForm({
         );
       }
 
+      setAdminFlashMessage(`stage-rounds:${stageId}`, {
+        title: isEdit ? "Update Round Complete" : "Create Round Complete",
+        message: `${trimmedRoundName} was ${isEdit ? "updated" : "created"} successfully.`,
+      });
       router.push(`/admin/tournaments/${tournamentId}/stages/${stageId}/rounds`);
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : isEdit
-            ? "Failed to update stage round."
-            : "Failed to create stage round."
-      );
+      setFeedbackModal({
+        title: isEdit ? "Could not update round" : "Could not create round",
+        message:
+          err instanceof Error
+            ? err.message
+            : isEdit
+              ? "Failed to update stage round."
+              : "Failed to create stage round.",
+      });
     } finally {
       setSaving(false);
     }
   }
 
+  function openDeleteModal() {
+    setShowDeleteModal(true);
+  }
+
+  function closeDeleteModal() {
+    if (deleting) return;
+    setShowDeleteModal(false);
+  }
+
   async function handleDelete() {
     if (!roundId) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this round?"
-    );
-
-    if (!confirmed) return;
-
     try {
       setDeleting(true);
-      setError(null);
 
       const res = await fetch(`/api/tournaments/rounds/${roundId}`, {
         method: "DELETE",
@@ -243,13 +279,17 @@ export default function StageRoundForm({
         );
       }
 
+      setShowDeleteModal(false);
       router.push(`/admin/tournaments/${tournamentId}/stages/${stageId}/rounds`);
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to delete stage round."
-      );
+      setShowDeleteModal(false);
+      setFeedbackModal({
+        title: "Could not delete round",
+        message:
+          err instanceof Error ? err.message : "Failed to delete stage round.",
+      });
     } finally {
       setDeleting(false);
     }
@@ -258,8 +298,6 @@ export default function StageRoundForm({
   return (
     <div className="admin-card admin-player-form-card">
       <form onSubmit={handleSubmit} className="admin-form">
-        {error ? <p className="admin-form-error">{error}</p> : null}
-
         <div className="admin-form-grid">
           <div className="admin-form-field">
             <label htmlFor="roundName" className="admin-label">
@@ -425,7 +463,7 @@ export default function StageRoundForm({
           {isEdit ? (
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={openDeleteModal}
               className="admin-player-form-button admin-toolbar-button-danger"
               disabled={deleting || saving}
             >
@@ -456,6 +494,92 @@ export default function StageRoundForm({
           </button>
         </div>
       </form>
+
+      {showDeleteModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="round-delete-title"
+          >
+            <h2 id="round-delete-title" className="admin-modal-title">
+              Delete round?
+            </h2>
+
+            <p className="admin-modal-text">
+              If you proceed, this will permanently delete <strong>{roundName}</strong>
+              from this stage.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This delete will only succeed after any related groups and matches have
+              already been removed.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteModal}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete Round"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setFeedbackModal(null)}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="round-feedback-title"
+          >
+            <h2 id="round-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => setFeedbackModal(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiUser, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { getFlagCdnUrl } from "@/lib/country";
 
 type AnyObj = Record<string, unknown>;
 
@@ -633,7 +634,7 @@ export default function Page() {
                       {m.homeCountryCode ? (
                         <div className="player-flag-row">
                           <Image
-                            src={`https://flagcdn.com/w40/${m.homeCountryCode.toLowerCase()}.png`}
+                            src={getFlagCdnUrl(m.homeCountryCode, "w40") ?? ""}
                             alt={m.homeCountryCode}
                             width={40}
                             height={30}
@@ -656,7 +657,7 @@ export default function Page() {
                       {m.awayCountryCode ? (
                         <div className="player-flag-row player-flag-row-right">
                           <Image
-                            src={`https://flagcdn.com/w40/${m.awayCountryCode.toLowerCase()}.png`}
+                            src={getFlagCdnUrl(m.awayCountryCode, "w40") ?? ""}
                             alt={m.awayCountryCode}
                             width={40}
                             height={30}

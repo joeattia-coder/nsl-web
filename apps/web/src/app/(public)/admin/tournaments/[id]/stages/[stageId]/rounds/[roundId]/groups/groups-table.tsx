@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import {
   SortableHeader,
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { consumeAdminFlashMessage } from "@/lib/admin-flash";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type GroupRow = {
@@ -42,19 +44,32 @@ export default function GroupsTable({
   existingMatchCount,
   groups,
 }: GroupsTableProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("sequence");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [actionError, setActionError] = useState<string | null>(null);
   const [addingGroup, setAddingGroup] = useState(false);
   const [deletingGroupId, setDeletingGroupId] = useState<string | null>(null);
   const [generatingMatches, setGeneratingMatches] = useState(false);
+  const [deletingMatches, setDeletingMatches] = useState(false);
+  const [deletingGroups, setDeletingGroups] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<GroupRow | null>(null);
   const [showGenerateMatchesModal, setShowGenerateMatchesModal] = useState(false);
+  const [showDeleteMatchesModal, setShowDeleteMatchesModal] = useState(false);
+  const [showDeleteGroupsModal, setShowDeleteGroupsModal] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{
     title: string;
     message: string;
+    shouldRefresh?: boolean;
   } | null>(null);
+
+  useEffect(() => {
+    const flashMessage = consumeAdminFlashMessage(`round-groups:${roundId}`);
+
+    if (flashMessage) {
+      setFeedbackModal(flashMessage);
+    }
+  }, [roundId]);
 
   const filteredGroups = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -98,7 +113,6 @@ export default function GroupsTable({
   async function handleAddGroup() {
     try {
       setAddingGroup(true);
-      setActionError(null);
 
       const res = await fetch(`/api/tournaments/rounds/${roundId}/groups`, {
         method: "POST",
@@ -110,17 +124,23 @@ export default function GroupsTable({
         throw new Error(data?.details || data?.error || "Failed to add group.");
       }
 
-      window.location.reload();
+      setFeedbackModal({
+        title: "Add Group Complete",
+        message: `${data?.groupName ?? "The new group"} was added successfully to ${roundName}.`,
+        shouldRefresh: true,
+      });
     } catch (err) {
       console.error(err);
-      setActionError(err instanceof Error ? err.message : "Failed to add group.");
+      setFeedbackModal({
+        title: "Could not add group",
+        message: err instanceof Error ? err.message : "Failed to add group.",
+      });
     } finally {
       setAddingGroup(false);
     }
   }
 
   function openDeleteModal(group: GroupRow) {
-    setActionError(null);
     setGroupToDelete(group);
   }
 
@@ -134,7 +154,6 @@ export default function GroupsTable({
 
     try {
       setDeletingGroupId(groupToDelete.id);
-      setActionError(null);
 
       const res = await fetch(`/api/tournaments/groups/${groupToDelete.id}`, {
         method: "DELETE",
@@ -149,20 +168,24 @@ export default function GroupsTable({
       }
 
       setGroupToDelete(null);
-      window.location.reload();
+      setFeedbackModal({
+        title: "Delete Group Complete",
+        message: `${groupToDelete.groupName} was deleted successfully.`,
+        shouldRefresh: true,
+      });
     } catch (err) {
       console.error(err);
-      setActionError(
-        err instanceof Error ? err.message : "Failed to delete group."
-      );
+      setGroupToDelete(null);
+      setFeedbackModal({
+        title: "Could not delete group",
+        message: err instanceof Error ? err.message : "Failed to delete group.",
+      });
     } finally {
       setDeletingGroupId(null);
     }
   }
 
   function openGenerateMatchesModal() {
-    setActionError(null);
-
     if (existingMatchCount > 0) {
       setFeedbackModal({
         title: "Matches already generated",
@@ -179,10 +202,27 @@ export default function GroupsTable({
     setShowGenerateMatchesModal(false);
   }
 
+  function openDeleteMatchesModal() {
+    setShowDeleteMatchesModal(true);
+  }
+
+  function closeDeleteMatchesModal() {
+    if (deletingMatches) return;
+    setShowDeleteMatchesModal(false);
+  }
+
+  function openDeleteGroupsModal() {
+    setShowDeleteGroupsModal(true);
+  }
+
+  function closeDeleteGroupsModal() {
+    if (deletingGroups) return;
+    setShowDeleteGroupsModal(false);
+  }
+
   async function handleGenerateMatches() {
     try {
       setGeneratingMatches(true);
-      setActionError(null);
 
       const res = await fetch(
         `/api/tournaments/rounds/${roundId}/generate-group-matches`,
@@ -219,8 +259,9 @@ export default function GroupsTable({
 
       setShowGenerateMatchesModal(false);
       setFeedbackModal({
-        title: "Matches generated",
+        title: "Generate Matches Complete",
         message: `Generated ${data?.createdCount ?? 0} matches for ${roundName}.`,
+        shouldRefresh: true,
       });
     } catch (err) {
       setFeedbackModal({
@@ -233,14 +274,77 @@ export default function GroupsTable({
     }
   }
 
+  async function handleDeleteRoundMatches() {
+    try {
+      setDeletingMatches(true);
+
+      const res = await fetch(`/api/tournaments/rounds/${roundId}/matches`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(
+          data?.details || data?.error || "Failed to delete round matches."
+        );
+      }
+
+      setShowDeleteMatchesModal(false);
+      setFeedbackModal({
+        title: "Delete Matches Complete",
+        message: `Deleted ${data?.deletedCount ?? 0} match${data?.deletedCount === 1 ? "" : "es"} from ${roundName}.`,
+        shouldRefresh: true,
+      });
+    } catch (err) {
+      console.error(err);
+      setShowDeleteMatchesModal(false);
+      setFeedbackModal({
+        title: "Could not delete matches",
+        message:
+          err instanceof Error ? err.message : "Failed to delete round matches.",
+      });
+    } finally {
+      setDeletingMatches(false);
+    }
+  }
+
+  async function handleDeleteAllGroups() {
+    try {
+      setDeletingGroups(true);
+
+      const res = await fetch(`/api/tournaments/rounds/${roundId}/groups`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(
+          data?.details || data?.error || "Failed to delete groups."
+        );
+      }
+
+      setShowDeleteGroupsModal(false);
+      setFeedbackModal({
+        title: "Delete All Groups Complete",
+        message: `Deleted ${data?.deletedCount ?? 0} group${data?.deletedCount === 1 ? "" : "s"} from ${roundName}.`,
+        shouldRefresh: true,
+      });
+    } catch (err) {
+      console.error(err);
+      setShowDeleteGroupsModal(false);
+      setFeedbackModal({
+        title: "Could not delete groups",
+        message: err instanceof Error ? err.message : "Failed to delete groups.",
+      });
+    } finally {
+      setDeletingGroups(false);
+    }
+  }
+
   return (
     <>
-      {actionError ? (
-        <div className="admin-form-error" style={{ marginBottom: "14px" }}>
-          {actionError}
-        </div>
-      ) : null}
-
       <div className="admin-players-toolbar">
         <div className="admin-players-toolbar-left">
           <input
@@ -257,7 +361,7 @@ export default function GroupsTable({
             type="button"
             className="admin-toolbar-button admin-toolbar-button-add"
             onClick={handleAddGroup}
-            disabled={addingGroup || generatingMatches}
+            disabled={addingGroup || generatingMatches || deletingMatches || deletingGroups}
           >
             <FiPlus />
             <span>{addingGroup ? "Adding..." : "Add Group"}</span>
@@ -267,9 +371,29 @@ export default function GroupsTable({
             type="button"
             className="admin-toolbar-button admin-toolbar-button-import"
             onClick={openGenerateMatchesModal}
-            disabled={generatingMatches || addingGroup}
+            disabled={generatingMatches || addingGroup || deletingMatches || deletingGroups}
           >
             <span>{generatingMatches ? "Generating..." : "Generate Matches"}</span>
+          </button>
+
+          <button
+            type="button"
+            className="admin-toolbar-button admin-toolbar-button-danger"
+            onClick={openDeleteMatchesModal}
+            disabled={existingMatchCount === 0 || generatingMatches || addingGroup || deletingMatches || deletingGroups}
+          >
+            <FiTrash2 />
+            <span>{deletingMatches ? "Deleting..." : "Delete Matches"}</span>
+          </button>
+
+          <button
+            type="button"
+            className="admin-toolbar-button admin-toolbar-button-danger"
+            onClick={openDeleteGroupsModal}
+            disabled={groups.length === 0 || generatingMatches || addingGroup || deletingMatches || deletingGroups}
+          >
+            <FiTrash2 />
+            <span>{deletingGroups ? "Deleting..." : "Delete All Groups"}</span>
           </button>
         </div>
       </div>
@@ -343,7 +467,7 @@ export default function GroupsTable({
                           aria-label={`Delete ${group.groupName}`}
                           title="Delete"
                           onClick={() => openDeleteModal(group)}
-                          disabled={deletingGroupId === group.id || generatingMatches}
+                          disabled={deletingGroupId === group.id || generatingMatches || deletingMatches || deletingGroups}
                         >
                           <FiTrash2 />
                         </button>
@@ -375,8 +499,17 @@ export default function GroupsTable({
             </h2>
 
             <p className="admin-modal-text">
-              You are about to delete <strong>{groupToDelete.groupName}</strong>.
+              If you proceed, this will permanently delete <strong>{groupToDelete.groupName}</strong>
+              from <strong>{roundName}</strong>.
+            </p>
+
+            <p className="admin-modal-text">
               This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This delete will only succeed after assigned entries and generated matches
+              for this group have already been removed.
             </p>
 
             <div className="admin-modal-actions">
@@ -395,7 +528,7 @@ export default function GroupsTable({
                 onClick={handleDeleteGroup}
                 disabled={Boolean(deletingGroupId)}
               >
-                {deletingGroupId ? "Deleting..." : "Delete"}
+                {deletingGroupId ? "Deleting..." : "Delete Group"}
               </button>
             </div>
           </div>
@@ -416,11 +549,15 @@ export default function GroupsTable({
             aria-labelledby="generate-matches-title"
           >
             <h2 id="generate-matches-title" className="admin-modal-title">
-              Generate group matches?
+              Generate matches?
             </h2>
 
             <p className="admin-modal-text">
-              Generate all matches for <strong>{roundName}</strong> now?
+              If you proceed, this will generate all scheduled matches for <strong>{roundName}</strong>.
+            </p>
+
+            <p className="admin-modal-text">
+              Existing group assignments will be used to create the fixtures for this round.
             </p>
 
             <div className="admin-modal-actions">
@@ -439,7 +576,116 @@ export default function GroupsTable({
                 onClick={handleGenerateMatches}
                 disabled={generatingMatches}
               >
-                {generatingMatches ? "Generating..." : "Generate"}
+                {generatingMatches ? "Generating..." : "Generate Matches"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showDeleteMatchesModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteMatchesModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-round-matches-title"
+          >
+            <h2 id="delete-round-matches-title" className="admin-modal-title">
+              Delete round matches?
+            </h2>
+
+            <p className="admin-modal-text">
+              If you proceed, this will permanently delete all <strong>{existingMatchCount}</strong>{" "}
+              generated match{existingMatchCount === 1 ? "" : "es"} for <strong>{roundName}</strong>.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This will also delete related frame results and match history. Use this
+              before changing group assignments or deleting entries that are still
+              referenced by this round.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteMatchesModal}
+                disabled={deletingMatches}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDeleteRoundMatches}
+                disabled={deletingMatches}
+              >
+                {deletingMatches ? "Deleting..." : "Delete Matches"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showDeleteGroupsModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteGroupsModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-all-groups-title"
+          >
+            <h2 id="delete-all-groups-title" className="admin-modal-title">
+              Delete all groups?
+            </h2>
+
+            <p className="admin-modal-text">
+              If you proceed, this will permanently delete all <strong>{groups.length}</strong>{" "}
+              group{groups.length === 1 ? "" : "s"} from <strong>{roundName}</strong>.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This will also remove all group assignments in those groups. If generated
+              matches still exist for this round, delete those matches first.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteGroupsModal}
+                disabled={deletingGroups}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDeleteAllGroups}
+                disabled={deletingGroups}
+              >
+                {deletingGroups ? "Deleting..." : "Delete All Groups"}
               </button>
             </div>
           </div>
@@ -449,7 +695,13 @@ export default function GroupsTable({
       {feedbackModal ? (
         <div
           className="admin-modal-backdrop"
-          onClick={() => setFeedbackModal(null)}
+          onClick={() => {
+            const shouldRefresh = feedbackModal.shouldRefresh;
+            setFeedbackModal(null);
+            if (shouldRefresh) {
+              router.refresh();
+            }
+          }}
           role="presentation"
         >
           <div
@@ -470,10 +722,10 @@ export default function GroupsTable({
                 type="button"
                 className="admin-modal-button admin-modal-button-cancel"
                 onClick={() => {
-                  const shouldReload = feedbackModal.title === "Matches generated";
+                  const shouldRefresh = feedbackModal.shouldRefresh;
                   setFeedbackModal(null);
-                  if (shouldReload) {
-                    window.location.reload();
+                  if (shouldRefresh) {
+                    router.refresh();
                   }
                 }}
               >

@@ -8,6 +8,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { getFlagCdnUrl, normalizeCountryCode } from "@/lib/country";
 import { FiPlus, FiTrash2, FiUserPlus } from "react-icons/fi";
 
 type EntryRow = {
@@ -28,6 +29,7 @@ type PlayerOption = {
 
 type TournamentEntriesManagerProps = {
   tournamentId: string;
+  tournamentName: string;
   participantType: string;
   entries: EntryRow[];
   players: PlayerOption[];
@@ -35,41 +37,9 @@ type TournamentEntriesManagerProps = {
 
 type SortKey = "displayName" | "countryName" | "seedNumber";
 
-function normalizeCountryCode(country: string) {
-  const normalized = country.trim();
-
-  if (!normalized) return "";
-
-  if (/^[a-zA-Z]{2}$/.test(normalized)) {
-    return normalized.toUpperCase();
-  }
-
-  const countryToCode: Record<string, string> = {
-    canada: "CA",
-    "united states": "US",
-    usa: "US",
-    us: "US",
-    mexico: "MX",
-    jamaica: "JM",
-    trinidad: "TT",
-    "trinidad and tobago": "TT",
-    guyana: "GY",
-    barbados: "BB",
-    england: "GB",
-    scotland: "GB",
-    wales: "GB",
-    ireland: "IE",
-    "northern ireland": "GB",
-    china: "CN",
-    india: "IN",
-    pakistan: "PK",
-  };
-
-  return countryToCode[normalized.toLowerCase()] ?? "";
-}
-
 export default function TournamentEntriesManager({
   tournamentId,
+  tournamentName,
   participantType,
   entries,
   players,
@@ -79,12 +49,18 @@ export default function TournamentEntriesManager({
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("displayName");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [actionError, setActionError] = useState<string | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+    shouldRefresh?: boolean;
+  } | null>(null);
 
   const [addingExisting, setAddingExisting] = useState(false);
   const [creatingNew, setCreatingNew] = useState(false);
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
+  const [deletingAllEntries, setDeletingAllEntries] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<EntryRow | null>(null);
+  const [showDeleteAllEntriesModal, setShowDeleteAllEntriesModal] = useState(false);
 
   const [existingPlayerId, setExistingPlayerId] = useState("");
   const [existingEntryName, setExistingEntryName] = useState("");
@@ -154,13 +130,15 @@ export default function TournamentEntriesManager({
     e.preventDefault();
 
     if (!existingPlayerId) {
-      setActionError("Select a player to add.");
+      setFeedbackModal({
+        title: "Player required",
+        message: "Select a player before adding a tournament entry.",
+      });
       return;
     }
 
     try {
       setAddingExisting(true);
-      setActionError(null);
 
       const res = await fetch(`/api/tournaments/${tournamentId}/entries`, {
         method: "POST",
@@ -183,15 +161,26 @@ export default function TournamentEntriesManager({
         );
       }
 
+      const selectedPlayerName =
+        players.find((player) => player.id === existingPlayerId)?.fullName ??
+        "The tournament entry";
+      const entryLabel = existingEntryName.trim() || selectedPlayerName;
+
       setExistingPlayerId("");
       setExistingEntryName("");
       setExistingSeedNumber("");
-      router.refresh();
+      setFeedbackModal({
+        title: "Add Entry Complete",
+        message: `${entryLabel} was added successfully to ${tournamentName}.`,
+        shouldRefresh: true,
+      });
     } catch (err) {
       console.error(err);
-      setActionError(
-        err instanceof Error ? err.message : "Failed to add tournament entry."
-      );
+      setFeedbackModal({
+        title: "Could not add entry",
+        message:
+          err instanceof Error ? err.message : "Failed to add tournament entry.",
+      });
     } finally {
       setAddingExisting(false);
     }
@@ -201,13 +190,15 @@ export default function TournamentEntriesManager({
     e.preventDefault();
 
     if (!newFirstName.trim() || !newLastName.trim()) {
-      setActionError("First name and last name are required.");
+      setFeedbackModal({
+        title: "Player details required",
+        message: "First name and last name are required to create a player.",
+      });
       return;
     }
 
     try {
       setCreatingNew(true);
-      setActionError(null);
 
       const res = await fetch(`/api/tournaments/${tournamentId}/entries`, {
         method: "POST",
@@ -239,6 +230,15 @@ export default function TournamentEntriesManager({
         );
       }
 
+      const createdPlayerName = [
+        newFirstName.trim(),
+        newMiddleInitial.trim(),
+        newLastName.trim(),
+      ]
+        .filter(Boolean)
+        .join(" ");
+      const entryLabel = newEntryName.trim() || createdPlayerName || "The tournament entry";
+
       setNewFirstName("");
       setNewMiddleInitial("");
       setNewLastName("");
@@ -247,21 +247,26 @@ export default function TournamentEntriesManager({
       setNewCountry("");
       setNewEntryName("");
       setNewSeedNumber("");
-      router.refresh();
+      setFeedbackModal({
+        title: "Create Player and Register Complete",
+        message: `${entryLabel} was created and added successfully to ${tournamentName}.`,
+        shouldRefresh: true,
+      });
     } catch (err) {
       console.error(err);
-      setActionError(
-        err instanceof Error
-          ? err.message
-          : "Failed to create player and register entry."
-      );
+      setFeedbackModal({
+        title: "Could not create player",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to create player and register entry.",
+      });
     } finally {
       setCreatingNew(false);
     }
   }
 
   function openDeleteModal(entry: EntryRow) {
-    setActionError(null);
     setEntryToDelete(entry);
   }
 
@@ -270,11 +275,20 @@ export default function TournamentEntriesManager({
     setEntryToDelete(null);
   }
 
+  function openDeleteAllEntriesModal() {
+    setShowDeleteAllEntriesModal(true);
+  }
+
+  function closeDeleteAllEntriesModal() {
+    if (deletingAllEntries) return;
+    setShowDeleteAllEntriesModal(false);
+  }
+
   async function handleDeleteEntry(entryId: string) {
+    const entryName = entryToDelete?.displayName ?? "The tournament entry";
 
     try {
       setDeletingEntryId(entryId);
-      setActionError(null);
 
       const res = await fetch(`/api/tournament-entries/${entryId}`, {
         method: "DELETE",
@@ -289,25 +303,65 @@ export default function TournamentEntriesManager({
       }
 
       setEntryToDelete(null);
-      router.refresh();
+      setFeedbackModal({
+        title: "Delete Tournament Entry Complete",
+        message: `${entryName} was deleted successfully from ${tournamentName}.`,
+        shouldRefresh: true,
+      });
     } catch (err) {
       console.error(err);
-      setActionError(
-        err instanceof Error ? err.message : "Failed to delete tournament entry."
-      );
+      setEntryToDelete(null);
+      setFeedbackModal({
+        title: "Could not delete entry",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to delete tournament entry.",
+      });
     } finally {
       setDeletingEntryId(null);
     }
   }
 
+  async function handleDeleteAllEntries() {
+    try {
+      setDeletingAllEntries(true);
+
+      const res = await fetch(`/api/tournaments/${tournamentId}/entries`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(
+          data?.details || data?.error || "Failed to delete tournament entries."
+        );
+      }
+
+      setShowDeleteAllEntriesModal(false);
+      setFeedbackModal({
+        title: "Delete All Entries Complete",
+        message: `Deleted ${data?.deletedCount ?? 0} entr${data?.deletedCount === 1 ? "y" : "ies"} from ${tournamentName}.`,
+        shouldRefresh: true,
+      });
+    } catch (err) {
+      console.error(err);
+      setShowDeleteAllEntriesModal(false);
+      setFeedbackModal({
+        title: "Could not delete entries",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to delete tournament entries.",
+      });
+    } finally {
+      setDeletingAllEntries(false);
+    }
+  }
+
   return (
     <>
-      {actionError ? (
-        <div className="admin-form-error" style={{ marginBottom: "14px" }}>
-          {actionError}
-        </div>
-      ) : null}
-
       <div className="admin-tournament-entries-layout">
         <div className="admin-card admin-tournament-entries-list-card">
           <div className="admin-players-toolbar" style={{ marginBottom: "18px" }}>
@@ -319,6 +373,18 @@ export default function TournamentEntriesManager({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
+            </div>
+
+            <div className="admin-players-toolbar-right">
+              <button
+                type="button"
+                className="admin-toolbar-button admin-toolbar-button-danger"
+                onClick={openDeleteAllEntriesModal}
+                disabled={entries.length === 0 || deletingAllEntries || deletingEntryId !== null}
+              >
+                <FiTrash2 />
+                <span>Delete All Entries</span>
+              </button>
             </div>
           </div>
 
@@ -375,7 +441,7 @@ export default function TournamentEntriesManager({
                           <td className="admin-player-country-cell admin-tournament-entry-centered-cell">
                             {countryCode ? (
                               <Image
-                                src={`https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`}
+                                src={getFlagCdnUrl(countryCode, "w40") ?? ""}
                                 alt={entry.countryName || countryCode}
                                 width={40}
                                 height={30}
@@ -632,7 +698,17 @@ export default function TournamentEntriesManager({
             </h2>
 
             <p className="admin-modal-text">
-              You are about to remove <strong>{entryToDelete.displayName}</strong> from this tournament. This action cannot be undone.
+              If you proceed, this will permanently delete <strong>{entryToDelete.displayName}</strong>
+              from <strong>{tournamentName}</strong>.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This will also remove the entry&apos;s group assignments. If generated matches
+              still depend on this entry, delete the tournament matches first.
             </p>
 
             <div className="admin-modal-actions">
@@ -651,7 +727,105 @@ export default function TournamentEntriesManager({
                 onClick={() => handleDeleteEntry(entryToDelete.id)}
                 disabled={deletingEntryId === entryToDelete.id}
               >
-                {deletingEntryId === entryToDelete.id ? "Deleting..." : "Delete"}
+                {deletingEntryId === entryToDelete.id ? "Deleting..." : "Delete Entry"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showDeleteAllEntriesModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteAllEntriesModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="entries-delete-all-title"
+          >
+            <h2 id="entries-delete-all-title" className="admin-modal-title">
+              Delete all tournament entries?
+            </h2>
+
+            <p className="admin-modal-text">
+              If you proceed, this will permanently delete all <strong>{entries.length}</strong>{" "}
+              entr{entries.length === 1 ? "y" : "ies"} from <strong>{tournamentName}</strong>.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <p className="admin-modal-text">
+              This will also remove all group assignments for those entries. If
+              generated matches still exist, delete the tournament matches first.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteAllEntriesModal}
+                disabled={deletingAllEntries}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDeleteAllEntries}
+                disabled={deletingAllEntries}
+              >
+                {deletingAllEntries ? "Deleting..." : "Delete All Entries"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => {
+            const shouldRefresh = feedbackModal.shouldRefresh;
+            setFeedbackModal(null);
+            if (shouldRefresh) {
+              router.refresh();
+            }
+          }}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="entries-feedback-title"
+          >
+            <h2 id="entries-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => {
+                  const shouldRefresh = feedbackModal.shouldRefresh;
+                  setFeedbackModal(null);
+                  if (shouldRefresh) {
+                    router.refresh();
+                  }
+                }}
+              >
+                OK
               </button>
             </div>
           </div>

@@ -133,14 +133,38 @@ export async function DELETE(_request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
 
-    const existing = await prisma.tournament.findUnique({
-      where: { id },
-      include: {
-        stages: true,
-        entries: true,
-        matches: true,
-      },
-    });
+    const [existing, roundsCount, groupsCount] = await Promise.all([
+      prisma.tournament.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          tournamentName: true,
+          _count: {
+            select: {
+              stages: true,
+              entries: true,
+              matches: true,
+            },
+          },
+        },
+      }),
+      prisma.stageRound.count({
+        where: {
+          tournamentStage: {
+            tournamentId: id,
+          },
+        },
+      }),
+      prisma.tournamentGroup.count({
+        where: {
+          stageRound: {
+            tournamentStage: {
+              tournamentId: id,
+            },
+          },
+        },
+      }),
+    ]);
 
     if (!existing) {
       return NextResponse.json(
@@ -149,25 +173,21 @@ export async function DELETE(_request: Request, context: RouteContext) {
       );
     }
 
-    if (
-      existing.stages.length > 0 ||
-      existing.entries.length > 0 ||
-      existing.matches.length > 0
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Cannot delete tournament because it has related stages, entries, or matches.",
-        },
-        { status: 400 }
-      );
-    }
-
     await prisma.tournament.delete({
       where: { id },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      deleted: {
+        tournamentName: existing.tournamentName,
+        stages: existing._count.stages,
+        rounds: roundsCount,
+        groups: groupsCount,
+        entries: existing._count.entries,
+        matches: existing._count.matches,
+      },
+    });
   } catch (error) {
     console.error("Failed to delete tournament:", error);
 

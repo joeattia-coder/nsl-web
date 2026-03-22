@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { setAdminFlashMessage } from "@/lib/admin-flash";
 import { FiSave, FiX } from "react-icons/fi";
 
 type MatchResultFormProps = {
@@ -71,7 +72,10 @@ export default function MatchResultForm({
   );
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
 
   const frameNumbers = Array.from(
     { length: initialData.bestOfFrames },
@@ -124,7 +128,10 @@ export default function MatchResultForm({
       parsedHomeScore !== null &&
       (!Number.isInteger(parsedHomeScore) || parsedHomeScore < 0)
     ) {
-      setError("Home score must be a whole number greater than or equal to 0.");
+      setFeedbackModal({
+        title: "Invalid home score",
+        message: "Home score must be a whole number greater than or equal to 0.",
+      });
       return;
     }
 
@@ -132,7 +139,10 @@ export default function MatchResultForm({
       parsedAwayScore !== null &&
       (!Number.isInteger(parsedAwayScore) || parsedAwayScore < 0)
     ) {
-      setError("Away score must be a whole number greater than or equal to 0.");
+      setFeedbackModal({
+        title: "Invalid away score",
+        message: "Away score must be a whole number greater than or equal to 0.",
+      });
       return;
     }
 
@@ -141,7 +151,10 @@ export default function MatchResultForm({
       winnerEntryId !== homeEntry.id &&
       winnerEntryId !== awayEntry.id
     ) {
-      setError("Winner must be either the home or away entry.");
+      setFeedbackModal({
+        title: "Invalid winner",
+        message: "Winner must be either the home or away entry.",
+      });
       return;
     }
 
@@ -153,11 +166,13 @@ export default function MatchResultForm({
       parsedHomeHighBreaks = parseHighBreaks(homeHighBreaks, homeEntry.label);
       parsedAwayHighBreaks = parseHighBreaks(awayHighBreaks, awayEntry.label);
     } catch (validationError) {
-      setError(
-        validationError instanceof Error
-          ? validationError.message
-          : "Invalid frame high break values."
-      );
+      setFeedbackModal({
+        title: "Invalid high break values",
+        message:
+          validationError instanceof Error
+            ? validationError.message
+            : "Invalid frame high break values.",
+      });
       return;
     }
 
@@ -181,7 +196,6 @@ export default function MatchResultForm({
 
     try {
       setSaving(true);
-      setError(null);
 
       const res = await fetch(`/api/matches/${matchId}`, {
         method: "PATCH",
@@ -217,13 +231,19 @@ export default function MatchResultForm({
         throw new Error(data?.details || data?.error || "Failed to update match result.");
       }
 
+      setAdminFlashMessage(`tournament-matches:${tournamentId}`, {
+        title: "Update Match Result Complete",
+        message: `Match result for ${homeEntry.label} vs ${awayEntry.label} was updated successfully.`,
+      });
       router.push(`/admin/tournaments/${tournamentId}/matches`);
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to update match result."
-      );
+      setFeedbackModal({
+        title: "Could not update match result",
+        message:
+          err instanceof Error ? err.message : "Failed to update match result.",
+      });
     } finally {
       setSaving(false);
     }
@@ -232,8 +252,6 @@ export default function MatchResultForm({
   return (
     <div className="admin-card admin-player-form-card">
       <form onSubmit={handleSubmit} className="admin-form">
-        {error ? <p className="admin-form-error">{error}</p> : null}
-
         <div className="admin-form-grid">
           <div className="admin-form-field">
             <label htmlFor="startDateTime" className="admin-label">
@@ -413,6 +431,38 @@ export default function MatchResultForm({
           </button>
         </div>
       </form>
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setFeedbackModal(null)}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="match-result-feedback-title"
+          >
+            <h2 id="match-result-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => setFeedbackModal(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { setAdminFlashMessage } from "@/lib/admin-flash";
 import {
   FiArrowLeft,
   FiPlusCircle,
@@ -92,7 +93,11 @@ export default function TournamentForm({
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
 
   const [seasonId, setSeasonId] = useState(initialData?.seasonId ?? "");
   const [venueId, setVenueId] = useState(initialData?.venueId ?? "");
@@ -137,23 +142,31 @@ export default function TournamentForm({
     const trimmedTournamentName = tournamentName.trim();
 
     if (!seasonId) {
-      setError("Please select a season.");
+      setFeedbackModal({
+        title: "Season required",
+        message: "Please select a season.",
+      });
       return;
     }
 
     if (!trimmedTournamentName) {
-      setError("Tournament name is required.");
+      setFeedbackModal({
+        title: "Tournament name required",
+        message: "Tournament name is required.",
+      });
       return;
     }
 
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-      setError("End date must be the same as or later than the start date.");
+      setFeedbackModal({
+        title: "Invalid dates",
+        message: "End date must be the same as or later than the start date.",
+      });
       return;
     }
 
     try {
       setSaving(true);
-      setError(null);
 
       const payload = {
         seasonId,
@@ -192,34 +205,42 @@ export default function TournamentForm({
         );
       }
 
+      setAdminFlashMessage("tournaments", {
+        title: isEdit ? "Update Tournament Complete" : "Create Tournament Complete",
+        message: `${trimmedTournamentName} was ${isEdit ? "updated" : "created"} successfully.`,
+      });
       router.push("/admin/tournaments");
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : isEdit
-            ? "Failed to update tournament."
-            : "Failed to create tournament."
-      );
+      setFeedbackModal({
+        title: isEdit ? "Could not update tournament" : "Could not create tournament",
+        message:
+          err instanceof Error
+            ? err.message
+            : isEdit
+              ? "Failed to update tournament."
+              : "Failed to create tournament.",
+      });
     } finally {
       setSaving(false);
     }
   }
 
+  function openDeleteModal() {
+    setShowDeleteModal(true);
+  }
+
+  function closeDeleteModal() {
+    if (deleting) return;
+    setShowDeleteModal(false);
+  }
+
   async function handleDelete() {
     if (!initialData?.id) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this tournament?"
-    );
-
-    if (!confirmed) return;
-
     try {
       setDeleting(true);
-      setError(null);
 
       const res = await fetch(`/api/tournaments/${initialData.id}`, {
         method: "DELETE",
@@ -233,13 +254,17 @@ export default function TournamentForm({
         );
       }
 
+      setShowDeleteModal(false);
       router.push("/admin/tournaments");
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to delete tournament."
-      );
+      setShowDeleteModal(false);
+      setFeedbackModal({
+        title: "Could not delete tournament",
+        message:
+          err instanceof Error ? err.message : "Failed to delete tournament.",
+      });
     } finally {
       setDeleting(false);
     }
@@ -270,8 +295,6 @@ export default function TournamentForm({
 
       <div className="admin-card admin-player-form-card">
         <form onSubmit={handleSubmit} className="admin-form">
-          {error ? <p className="admin-form-error">{error}</p> : null}
-
           <div className="admin-form-grid">
             <div className="admin-form-field">
               <label htmlFor="tournamentName" className="admin-label">
@@ -466,7 +489,7 @@ export default function TournamentForm({
             {isEdit ? (
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={openDeleteModal}
                 className="admin-player-form-button admin-toolbar-button-danger"
                 disabled={deleting || saving}
               >
@@ -498,6 +521,87 @@ export default function TournamentForm({
           </div>
         </form>
       </div>
+
+      {showDeleteModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={closeDeleteModal}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tournament-delete-title"
+          >
+            <h2 id="tournament-delete-title" className="admin-modal-title">
+              Delete tournament?
+            </h2>
+
+            <p className="admin-modal-text">
+              If you proceed, this will permanently delete <strong>{tournamentName}</strong>
+              and all related stages, rounds, groups, entries, matches, and match history.
+            </p>
+
+            <p className="admin-modal-text">
+              This action cannot be undone.
+            </p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={closeDeleteModal}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-delete"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete Tournament"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {feedbackModal ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setFeedbackModal(null)}
+          role="presentation"
+        >
+          <div
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tournament-feedback-title"
+          >
+            <h2 id="tournament-feedback-title" className="admin-modal-title">
+              {feedbackModal.title}
+            </h2>
+
+            <p className="admin-modal-text">{feedbackModal.message}</p>
+
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-button admin-modal-button-cancel"
+                onClick={() => setFeedbackModal(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

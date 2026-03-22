@@ -86,6 +86,11 @@ export async function PUT(request: Request, context: RouteContext) {
     const group = await prisma.tournamentGroup.findUnique({
       where: { id: groupId },
       include: {
+        matches: {
+          select: {
+            id: true,
+          },
+        },
         stageRound: {
           include: {
             tournamentStage: {
@@ -109,6 +114,24 @@ export async function PUT(request: Request, context: RouteContext) {
       return NextResponse.json(
         {
           error: "Too many entries assigned for this group.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const currentEntryIds = group.participants
+      .map((participant) => participant.tournamentEntryId)
+      .sort();
+    const nextEntryIds = [...uniqueEntryIds].sort();
+    const assignmentsChanged =
+      currentEntryIds.length !== nextEntryIds.length ||
+      currentEntryIds.some((entryId, index) => entryId !== nextEntryIds[index]);
+
+    if (assignmentsChanged && group.matches.length > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "This group already has generated matches. Delete the tournament matches first, then update the group assignments.",
         },
         { status: 400 }
       );
@@ -215,7 +238,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
       return NextResponse.json(
         {
           error:
-            "Cannot delete this group because it already has assigned entries or matches.",
+            "This group still has assigned entries or generated matches. Delete the tournament matches first, remove the assigned entries from the group, and then delete the group.",
         },
         { status: 400 }
       );

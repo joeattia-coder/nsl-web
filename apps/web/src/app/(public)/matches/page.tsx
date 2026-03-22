@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { getFlagCdnUrl } from "@/lib/country";
 
 type AnyObj = Record<string, unknown>;
 
@@ -631,7 +632,7 @@ export default function MatchesPage() {
                       {m.homeCountryCode ? (
                         <div className="name-flag-row name-flag-row-left">
                           <Image
-                            src={`https://flagcdn.com/w40/${m.homeCountryCode.toLowerCase()}.png`}
+                            src={getFlagCdnUrl(m.homeCountryCode, "w40") ?? ""}
                             alt={m.homeCountryCode}
                             width={40}
                             height={30}
@@ -690,7 +691,7 @@ export default function MatchesPage() {
                       {m.roadCountryCode ? (
                         <div className="name-flag-row name-flag-row-right">
                           <Image
-                            src={`https://flagcdn.com/w40/${m.roadCountryCode.toLowerCase()}.png`}
+                            src={getFlagCdnUrl(m.roadCountryCode, "w40") ?? ""}
                             alt={m.roadCountryCode}
                             width={40}
                             height={30}
@@ -780,7 +781,7 @@ export default function MatchesPage() {
                                 </div>
                                 {slot.top.countryCode ? (
                                     <Image
-                                    src={`https://flagcdn.com/w40/${slot.top.countryCode.toLowerCase()}.png`}
+                                    src={getFlagCdnUrl(slot.top.countryCode, "w40") ?? ""}
                                     alt={slot.top.countryCode}
                                       width={40}
                                       height={30}
@@ -803,7 +804,7 @@ export default function MatchesPage() {
                                 </div>
                                 {slot.bottom.countryCode ? (
                                   <Image
-                                    src={`https://flagcdn.com/w40/${slot.bottom.countryCode.toLowerCase()}.png`}
+                                    src={getFlagCdnUrl(slot.bottom.countryCode, "w40") ?? ""}
                                     alt={slot.bottom.countryCode}
                                     width={40}
                                     height={30}

@@ -12,7 +12,6 @@ export async function DELETE(_request: Request, context: RouteContext) {
     const entry = await prisma.tournamentEntry.findUnique({
       where: { id: entryId },
       include: {
-        groupLinks: true,
         homeMatches: true,
         awayMatches: true,
         winnerMatches: true,
@@ -27,17 +26,17 @@ export async function DELETE(_request: Request, context: RouteContext) {
       );
     }
 
-    if (
-      entry.groupLinks.length > 0 ||
+    const hasMatchAssignments =
       entry.homeMatches.length > 0 ||
       entry.awayMatches.length > 0 ||
       entry.winnerMatches.length > 0 ||
-      entry.matchFrames.length > 0
-    ) {
+      entry.matchFrames.length > 0;
+
+    if (hasMatchAssignments) {
       return NextResponse.json(
         {
           error:
-            "Cannot delete this entry because it is already assigned to groups or matches.",
+            "This entry is still used by generated matches. Delete the tournament matches first, then try again.",
         },
         { status: 400 }
       );

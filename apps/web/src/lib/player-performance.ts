@@ -16,6 +16,8 @@ export type PlayerRankingRow = {
   highBreakCumulative: number;
   points: number;
   eloRating: number;
+  photoUrl?: string;
+  country?: string;
 };
 
 export function buildFullName(firstName: string, middleInitial: string | null, lastName: string) {
@@ -74,6 +76,8 @@ export async function getPlayerRankings() {
       middleInitial: true,
       lastName: true,
       eloRating: true,
+      photoUrl: true,
+      country: true,
     },
     orderBy: [{ firstName: "asc" }, { lastName: "asc" }],
   });
@@ -122,7 +126,6 @@ export async function getPlayerRankings() {
   const playerStats = new Map<string, PlayerRankingRow>(
     players.map((player) => {
       const fullName = buildFullName(player.firstName, player.middleInitial, player.lastName);
-
       return [
         player.id,
         {
@@ -141,6 +144,8 @@ export async function getPlayerRankings() {
           highBreakCumulative: 0,
           points: 0,
           eloRating: player.eloRating,
+          photoUrl: player.photoUrl ?? undefined,
+          country: player.country ?? undefined,
         },
       ];
     })
@@ -226,7 +231,7 @@ function formatEntryName(members: Array<{ player: { firstName: string; middleIni
 }
 
 export async function getPlayerDashboardData(playerId: string) {
-  const [player, rankings, eloHistory, recentMatches] = await Promise.all([
+  const [player, rankings, eloHistory] = await Promise.all([
     prisma.player.findUnique({
       where: { id: playerId },
       select: {
@@ -312,86 +317,6 @@ export async function getPlayerDashboardData(playerId: string) {
       orderBy: [{ matchDate: "desc" }, { createdAt: "desc" }],
       take: 12,
     }),
-    prisma.match.findMany({
-      where: {
-        OR: [
-          {
-            homeEntry: {
-              members: {
-                some: {
-                  playerId,
-                },
-              },
-            },
-          },
-          {
-            awayEntry: {
-              members: {
-                some: {
-                  playerId,
-                },
-              },
-            },
-          },
-        ],
-      },
-      select: {
-        id: true,
-        matchDate: true,
-        matchTime: true,
-        matchStatus: true,
-        homeScore: true,
-        awayScore: true,
-        tournament: {
-          select: {
-            tournamentName: true,
-          },
-        },
-        stageRound: {
-          select: {
-            roundName: true,
-          },
-        },
-        homeEntry: {
-          select: {
-            members: {
-              select: {
-                player: {
-                  select: {
-                    firstName: true,
-                    middleInitial: true,
-                    lastName: true,
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: "asc",
-              },
-            },
-          },
-        },
-        awayEntry: {
-          select: {
-            members: {
-              select: {
-                player: {
-                  select: {
-                    firstName: true,
-                    middleInitial: true,
-                    lastName: true,
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: "asc",
-              },
-            },
-          },
-        },
-      },
-      orderBy: [{ matchDate: "desc" }, { createdAt: "desc" }],
-      take: 6,
-    }),
   ]);
 
   if (!player) {
@@ -431,18 +356,6 @@ export async function getPlayerDashboardData(playerId: string) {
       awayScore: entry.match.awayScore,
       homeEntryName: formatEntryName(entry.match.homeEntry.members),
       awayEntryName: formatEntryName(entry.match.awayEntry.members),
-    })),
-    recentMatches: recentMatches.map((match) => ({
-      id: match.id,
-      matchDate: match.matchDate?.toISOString() ?? null,
-      matchTime: match.matchTime,
-      matchStatus: match.matchStatus,
-      homeScore: match.homeScore,
-      awayScore: match.awayScore,
-      tournamentName: match.tournament.tournamentName,
-      roundName: match.stageRound.roundName,
-      homeEntryName: formatEntryName(match.homeEntry.members),
-      awayEntryName: formatEntryName(match.awayEntry.members),
     })),
   };
 }

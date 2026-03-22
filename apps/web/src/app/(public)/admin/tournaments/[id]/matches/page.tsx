@@ -167,6 +167,7 @@ export default async function TournamentMatchesPage({
 
       <TournamentMatchesTable
         tournamentId={tournament.id}
+        tournamentName={tournament.tournamentName}
         matches={matches}
       />
     </section>
