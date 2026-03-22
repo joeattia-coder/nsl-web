@@ -1,20 +1,31 @@
 export type BracketPlayer = {
+  id: string;
   name: string;
-  score?: number | string | null;
+  seed?: number;
+  flagCode?: string;
+  score?: number | null;
   isWinner?: boolean;
-  isPlaceholder?: boolean;
 };
 
 export type BracketMatch = {
-  id?: string;
-  player1: BracketPlayer | string;
-  player2: BracketPlayer | string;
-  score1?: number | string | null;
-  score2?: number | string | null;
+  id: string;
+  matchNumber?: number;
+  scheduledAt?: string;
+  player1: BracketPlayer | null;
+  player2: BracketPlayer | null;
 };
 
-export type BracketRoundData = {
-  id?: string;
+export type BracketRound = {
+  id: string;
   name: string;
   matches: BracketMatch[];
+};
+
+export type KnockoutBracketProps = {
+  rounds: BracketRound[];
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  onMatchClick?: (match: BracketMatch) => void;
+  getMatchHref?: (match: BracketMatch) => string | undefined;
 };

@@ -2213,10 +2213,7 @@ html[data-theme="light"] .navbar {
 }
 
 .matches-page-shell {
-  background:
-    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
-    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
-    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
+  background: transparent;
   color: var(--theme-page-text);
 }
 
@@ -2430,7 +2427,7 @@ html[data-theme="light"] .navbar {
 .season-tab.active {
   background: var(--theme-accent-success);
   border-color: var(--theme-border-mid);
-  color: var(--theme-button-solid-text);
+  color: var(--theme-page-text);
 }
 
 /* ================================
@@ -2467,6 +2464,7 @@ html[data-theme="light"] .navbar {
   background: var(--theme-accent-danger);
   border: 1px solid var(--theme-border-soft);
   color: var(--theme-page-muted-2);
+  font-weight: 600;
   transition: background 0.15s ease, border-color 0.15s ease;
   white-space: nowrap;
   flex: 0 0 auto;
@@ -2569,6 +2567,7 @@ html[data-theme="light"] .group-pill.active:hover {
   flex-direction: column;
   line-height: 1.05;
   min-width: 0;
+  overflow: visible;
 }
 
 .name-stack.left {
@@ -2605,6 +2604,83 @@ html[data-theme="light"] .group-pill.active:hover {
 .name-flag-row {
   display: flex;
   margin-top: 8px;
+}
+
+.match-probability-row {
+  display: flex;
+  margin-top: 8px;
+}
+
+.match-probability-row-left {
+  justify-content: flex-end;
+}
+
+.match-probability-row-right {
+  justify-content: flex-start;
+}
+
+.match-probability-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 0 6px;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-brand) 14%, var(--theme-border-soft));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-accent-brand) 5%, var(--theme-surface-4));
+  color: var(--theme-page-muted-4);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+}
+
+.match-probability-tooltip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--theme-surface-5) 94%, black);
+  color: var(--theme-page-muted-1);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  box-shadow: var(--theme-shadow-soft);
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms ease;
+  z-index: 5;
+}
+
+.match-probability-tooltip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 1px);
+  width: 8px;
+  height: 8px;
+  background: color-mix(in srgb, var(--theme-surface-5) 94%, black);
+  transform: translateX(-50%) rotate(45deg);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.match-probability-chip:hover .match-probability-tooltip,
+.match-probability-chip:focus-visible .match-probability-tooltip {
+  display: block;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.match-probability-chip:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--theme-accent-brand) 30%, var(--theme-border-mid));
+  outline-offset: 2px;
 }
 
 .name-flag-row-left {
@@ -2805,7 +2881,7 @@ html[data-theme="light"] .group-pill.active:hover {
   margin: 0;
   border-radius: 0;
   font-weight: 600;
-  color: var(--theme-button-solid-text);
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

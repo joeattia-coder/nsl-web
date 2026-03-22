@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { KnockoutBracket } from "@/components/tournament-bracket/KnockoutBracket";
+import type { BracketRound } from "@/components/tournament-bracket/types";
 import { getFlagCdnUrl } from "@/lib/country";
 
 type AnyObj = Record<string, unknown>;
@@ -42,6 +44,8 @@ type UiMatch = {
   roadScore: string;
   homePlayerPhotoUrl: string;
   roadPlayerPhotoUrl: string;
+  homeWinProbability: number | null;
+  roadWinProbability: number | null;
 
   fixtureGroupDesc: string;
   roundDesc: string;
@@ -76,30 +80,12 @@ type StandingsApiResponse = {
   groups: StandingsGroup[];
 };
 
-type KnockoutEntrant = {
-  name: string;
-  countryCode: string;
-};
-
-type KnockoutSlot = {
-  id: string;
-  matchId: string | null;
-  top: KnockoutEntrant;
-  bottom: KnockoutEntrant;
-};
-
-type KnockoutRound = {
-  id: string;
-  label: string;
-  slots: KnockoutSlot[];
-};
-
 type KnockoutBracketResponse = {
   fixtureGroupIdentifier: string;
   entrantsCount: number;
   bracketSize: number;
   sourceRoundName: string;
-  rounds: KnockoutRound[];
+  rounds: BracketRound[];
 };
 
 function firstString(obj: AnyObj, keys: string[], fallback = ""): string {
@@ -109,6 +95,19 @@ function firstString(obj: AnyObj, keys: string[], fallback = ""): string {
     if (typeof v === "number") return String(v);
   }
   return fallback;
+}
+
+function firstNumber(obj: AnyObj, keys: string[]): number | null {
+  for (const k of keys) {
+    const v = obj?.[k];
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+  }
+  return null;
+}
+
+function formatWinProbability(probability: number | null) {
+  if (probability === null) return null;
+  return `${Math.round(probability * 100)}%`;
 }
 
 function splitName(full: string): NameParts {
@@ -122,17 +121,6 @@ function splitName(full: string): NameParts {
   const first = parts.slice(0, -1).join(" ");
   return { first, last };
 }
-
-function splitBracketName(full: string): NameParts {
-  const parts = splitName(full);
-
-  if (!parts.first && !parts.last) {
-    return { first: "", last: full || "TBD" };
-  }
-
-  return parts;
-}
-
 
 function parseLRDateTime(raw: string): Date | null {
   const s = (raw || "").trim();
@@ -205,6 +193,8 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
   const roadScore = roadScoreVal === null || roadScoreVal === undefined ? "" : String(roadScoreVal);
   const homePlayerPhotoUrl = firstString(fx, ["homePlayerPhotoUrl", "HomePlayerPhotoUrl"], "");
   const roadPlayerPhotoUrl = firstString(fx, ["roadPlayerPhotoUrl", "RoadPlayerPhotoUrl"], "");
+  const homeWinProbability = firstNumber(fx, ["homeWinProbability", "HomeWinProbability"]);
+  const roadWinProbability = firstNumber(fx, ["roadWinProbability", "RoadWinProbability"]);
 
   return {
     id,
@@ -221,6 +211,8 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     roadScore,
     homePlayerPhotoUrl,
     roadPlayerPhotoUrl,
+    homeWinProbability,
+    roadWinProbability,
     fixtureGroupDesc,
     roundDesc,
     fixtureGroupId,
@@ -629,6 +621,20 @@ export default function MatchesPage() {
                     <div className="name-stack left">
                       {!!m.homeParts.first && <div className="name-first">{m.homeParts.first}</div>}
                       <div className="name-last">{m.homeParts.last || m.homeName}</div>
+                      {m.homeWinProbability !== null ? (
+                        <div className="match-probability-row match-probability-row-left">
+                          <span
+                            className="match-probability-chip"
+                            aria-label="Elo-based win probability"
+                            tabIndex={0}
+                          >
+                            {formatWinProbability(m.homeWinProbability)}
+                            <span className="match-probability-tooltip" role="tooltip">
+                              Elo-based win probability
+                            </span>
+                          </span>
+                        </div>
+                      ) : null}
                       {m.homeCountryCode ? (
                         <div className="name-flag-row name-flag-row-left">
                           <Image
@@ -688,6 +694,20 @@ export default function MatchesPage() {
                     <div className="name-stack right">
                       {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}
                       <div className="name-last">{m.roadParts.last || m.roadName}</div>
+                      {m.roadWinProbability !== null ? (
+                        <div className="match-probability-row match-probability-row-right">
+                          <span
+                            className="match-probability-chip"
+                            aria-label="Elo-based win probability"
+                            tabIndex={0}
+                          >
+                            {formatWinProbability(m.roadWinProbability)}
+                            <span className="match-probability-tooltip" role="tooltip">
+                              Elo-based win probability
+                            </span>
+                          </span>
+                        </div>
+                      ) : null}
                       {m.roadCountryCode ? (
                         <div className="name-flag-row name-flag-row-right">
                           <Image
@@ -748,80 +768,16 @@ export default function MatchesPage() {
           ) : null}
 
           {!knockoutError && !knockoutLoading && knockoutBracket && knockoutBracket.rounds.length > 0 ? (
-            <div className="knockout-bracket-shell">
-              <div className="knockout-bracket">
-                {knockoutBracket.rounds.map((round, roundIndex) => {
-                  const isLastRound = roundIndex === knockoutBracket.rounds.length - 1;
-                  const slotGap = Math.max(20, 28 * (2 ** roundIndex - 1) + 20);
-                  const paddingTop = roundIndex === 0 ? 0 : 30 * 2 ** (roundIndex - 1);
-
-                  return (
-                    <div className="knockout-round" key={round.id}>
-                      <div className="knockout-round-title">{round.label}</div>
-
-                      <div
-                        className="knockout-round-slots"
-                        style={{ gap: `${slotGap}px`, paddingTop: `${paddingTop}px` }}
-                      >
-                        {round.slots.map((slot) => {
-                          const topParts = splitBracketName(slot.top.name);
-                          const bottomParts = splitBracketName(slot.bottom.name);
-
-                          return (
-                            <div
-                              key={slot.id}
-                              className={`knockout-slot ${isLastRound ? "is-last-round" : ""}`}
-                            >
-                              <div className="knockout-player-card">
-                                <div className="knockout-player-text">
-                                  {topParts.first ? (
-                                    <div className="knockout-player-first">{topParts.first}</div>
-                                  ) : null}
-                                  <div className="knockout-player-last">{topParts.last || slot.top.name}</div>
-                                </div>
-                                {slot.top.countryCode ? (
-                                    <Image
-                                    src={getFlagCdnUrl(slot.top.countryCode, "w40") ?? ""}
-                                    alt={slot.top.countryCode}
-                                      width={40}
-                                      height={30}
-                                    className="knockout-flag-img"
-                                    title={slot.top.countryCode}
-                                  />
-                                ) : null}
-                              </div>
-
-                              <div className="knockout-slot-divider" />
-
-                              <div className="knockout-player-card">
-                                <div className="knockout-player-text">
-                                  {bottomParts.first ? (
-                                    <div className="knockout-player-first">{bottomParts.first}</div>
-                                  ) : null}
-                                  <div className="knockout-player-last">
-                                    {bottomParts.last || slot.bottom.name}
-                                  </div>
-                                </div>
-                                {slot.bottom.countryCode ? (
-                                  <Image
-                                    src={getFlagCdnUrl(slot.bottom.countryCode, "w40") ?? ""}
-                                    alt={slot.bottom.countryCode}
-                                    width={40}
-                                    height={30}
-                                    className="knockout-flag-img"
-                                    title={slot.bottom.countryCode}
-                                  />
-                                ) : null}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <KnockoutBracket
+              rounds={knockoutBracket.rounds}
+              title={`${selectedGroupDesc} Knockout Bracket`}
+              subtitle={
+                knockoutBracket.sourceRoundName
+                  ? `Advancing positions are seeded from ${knockoutBracket.sourceRoundName} and displayed in broadcast bracket order.`
+                  : "Track every knockout matchup through each round in a premium bracket layout."
+              }
+              className="mt-2"
+            />
           ) : null}
 
           {!knockoutError &&

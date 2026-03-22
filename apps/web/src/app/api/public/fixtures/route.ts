@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeCountryCode } from "@/lib/country";
+import { calculateExpectedScore, INITIAL_ELO } from "@/lib/player-elo";
 import { publicApiJson, publicApiOptions } from "@/lib/public-api-response";
 
 type PlayerLike = {
@@ -8,6 +9,7 @@ type PlayerLike = {
   lastName: string;
   country?: string | null;
   photoUrl?: string | null;
+  eloRating?: number | null;
 };
 
 type EntryMemberLike = {
@@ -114,6 +116,15 @@ function getEntryPhotoUrl(entry: EntryLike | null | undefined) {
   );
 }
 
+function getEntryAverageElo(entry: EntryLike | null | undefined) {
+  if (!entry || entry.members.length === 0) {
+    return null;
+  }
+
+  const ratings = entry.members.map((member) => member.player.eloRating ?? INITIAL_ELO);
+  return ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+}
+
 export async function GET() {
   try {
     const matches = await prisma.match.findMany({
@@ -155,6 +166,7 @@ export async function GET() {
                     lastName: true,
                     country: true,
                     photoUrl: true,
+                    eloRating: true,
                   },
                 },
               },
@@ -174,6 +186,7 @@ export async function GET() {
                     lastName: true,
                     country: true,
                     photoUrl: true,
+                    eloRating: true,
                   },
                 },
               },
@@ -196,6 +209,13 @@ export async function GET() {
       const fixtureDate = toCompactDateTime(match.matchDate, match.matchTime);
       const fixtureDateTime = toIsoDateTime(match.matchDate, match.matchTime);
       const fixtureTime = toTimeString(match.matchDate, match.matchTime);
+      const homeAverageElo = getEntryAverageElo(match.homeEntry);
+      const awayAverageElo = getEntryAverageElo(match.awayEntry);
+      const homeWinProbability =
+        homeAverageElo !== null && awayAverageElo !== null
+          ? calculateExpectedScore(homeAverageElo, awayAverageElo)
+          : null;
+      const awayWinProbability = homeWinProbability === null ? null : 1 - homeWinProbability;
 
       return {
         id: match.id,
@@ -209,6 +229,8 @@ export async function GET() {
         roadCountryCode,
         homePlayerPhotoUrl: getEntryPhotoUrl(match.homeEntry),
         roadPlayerPhotoUrl: getEntryPhotoUrl(match.awayEntry),
+        homeWinProbability,
+        roadWinProbability: awayWinProbability,
         homeScore: match.homeScore,
         roadScore: match.awayScore,
         fixtureGroupIdentifier: match.tournament.id,

@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { normalizeCountryCode } from "@/lib/country";
 import { prisma } from "@/lib/prisma";
+import type { BracketMatch, BracketPlayer, BracketRound } from "@/components/tournament-bracket/types";
 
 type PlayerLike = {
+  id: string;
   firstName: string;
   middleInitial?: string | null;
   lastName: string;
@@ -68,9 +70,43 @@ function deriveRoundLabel(roundSize: number) {
 }
 
 function emptyEntrant() {
+  return null;
+}
+
+function toIsoDateTime(date: Date | null, matchTime?: string | null) {
+  if (!date) return undefined;
+
+  const nextDate = new Date(date);
+
+  if (matchTime && /^\d{1,2}:\d{2}$/.test(matchTime.trim())) {
+    const [hours, minutes] = matchTime.trim().split(":");
+    nextDate.setHours(Number(hours), Number(minutes), 0, 0);
+  }
+
+  return nextDate.toISOString();
+}
+
+function buildBracketPlayer(
+  entry: EntryLike | null | undefined,
+  score: number | null,
+  opponentScore: number | null,
+  fallbackId: string
+): BracketPlayer | null {
+  if (!entry) {
+    return null;
+  }
+
+  const name = getEntryDisplayName(entry);
+  const flagCode = getEntryCountryCode(entry) || undefined;
+  const isWinner =
+    typeof score === "number" && typeof opponentScore === "number" ? score > opponentScore : false;
+
   return {
-    name: "TBD",
-    countryCode: "",
+    id: entry.id || fallbackId,
+    name,
+    flagCode,
+    score,
+    isWinner,
   };
 }
 
@@ -184,7 +220,13 @@ export async function GET(req: Request) {
           roundType: "KNOCKOUT",
         },
       },
-      include: {
+      select: {
+        id: true,
+        matchDate: true,
+        matchTime: true,
+        homeScore: true,
+        awayScore: true,
+        createdAt: true,
         stageRound: {
           select: {
             id: true,
@@ -205,6 +247,7 @@ export async function GET(req: Request) {
               include: {
                 player: {
                   select: {
+                    id: true,
                     firstName: true,
                     middleInitial: true,
                     lastName: true,
@@ -226,6 +269,7 @@ export async function GET(req: Request) {
               include: {
                 player: {
                   select: {
+                    id: true,
                     firstName: true,
                     middleInitial: true,
                     lastName: true,
@@ -278,46 +322,51 @@ export async function GET(req: Request) {
             }))
           : [];
 
-      const slots = Array.from({ length: slotCount }, (_, slotIndex) => {
+      const matches: BracketMatch[] = Array.from({ length: slotCount }, (_, slotIndex) => {
         const match = roundMatches[slotIndex];
 
         if (match) {
           return {
-            id: `${roundMeta?.id ?? `round-${index}`}-slot-${slotIndex + 1}`,
-            matchId: match.id,
-            top: {
-              name: getEntryDisplayName(match.homeEntry),
-              countryCode: getEntryCountryCode(match.homeEntry),
-            },
-            bottom: {
-              name: getEntryDisplayName(match.awayEntry),
-              countryCode: getEntryCountryCode(match.awayEntry),
-            },
+            id: match.id,
+            matchNumber: slotIndex + 1,
+            scheduledAt: toIsoDateTime(match.matchDate, match.matchTime),
+            player1: buildBracketPlayer(
+              match.homeEntry,
+              match.homeScore,
+              match.awayScore,
+              `${match.id}-player1`
+            ),
+            player2: buildBracketPlayer(
+              match.awayEntry,
+              match.awayScore,
+              match.homeScore,
+              `${match.id}-player2`
+            ),
           };
         }
 
         if (index === 0) {
           return {
-            id: `${roundMeta?.id ?? `round-${index}`}-slot-${slotIndex + 1}`,
-            matchId: null,
-            top: seededSlots[slotIndex]?.top ?? emptyEntrant(),
-            bottom: seededSlots[slotIndex]?.bottom ?? emptyEntrant(),
+            id: `${roundMeta?.id ?? `round-${index}`}-match-${slotIndex + 1}`,
+            matchNumber: slotIndex + 1,
+            player1: seededSlots[slotIndex]?.top ?? emptyEntrant(),
+            player2: seededSlots[slotIndex]?.bottom ?? emptyEntrant(),
           };
         }
 
         return {
-          id: `${roundMeta?.id ?? `round-${index}`}-slot-${slotIndex + 1}`,
-          matchId: null,
-          top: emptyEntrant(),
-          bottom: emptyEntrant(),
+          id: `${roundMeta?.id ?? `round-${index}`}-match-${slotIndex + 1}`,
+          matchNumber: slotIndex + 1,
+          player1: emptyEntrant(),
+          player2: emptyEntrant(),
         };
       });
 
       return {
         id: roundMeta?.id ?? `knockout-round-${index + 1}`,
-        label: roundMeta?.roundName || deriveRoundLabel(entrantsInRound),
-        slots,
-      };
+        name: roundMeta?.roundName || deriveRoundLabel(entrantsInRound),
+        matches,
+      } satisfies BracketRound;
     });
 
     return NextResponse.json({

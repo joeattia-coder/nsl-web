@@ -6,7 +6,7 @@ const FRAME_SHARE_WEIGHT = 0.25;
 
 type EloClient = Pick<typeof prisma, "player" | "match" | "playerEloHistory">;
 
-function calculateExpectedScore(playerRating: number, opponentRating: number) {
+export function calculateExpectedScore(playerRating: number, opponentRating: number) {
   return 1 / (1 + 10 ** ((opponentRating - playerRating) / 400));
 }
 
