@@ -1,53 +1,58 @@
 .aboutPage {
   min-height: 100vh;
-  padding: 2rem 1rem 4rem;
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
     radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
     linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
+  color: var(--theme-page-text);
+  padding: 24px 24px 32px;
 }
 
 .aboutSection {
-  max-width: 980px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
 }
 
 .hero {
-  margin-bottom: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .eyebrow {
-  margin: 0 0 0.6rem;
-  color: var(--theme-accent-brand);
-  font-size: 0.82rem;
+  margin: 0;
+  color: var(--theme-page-muted-3);
+  font-size: 0.9rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 .title {
   margin: 0;
   color: var(--theme-page-text);
-  font-size: clamp(2.3rem, 5vw, 4.4rem);
-  line-height: 0.98;
-  letter-spacing: -0.05em;
-  max-width: 12ch;
+  font-size: clamp(1.75rem, 4vw, 1.95rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  max-width: none;
 }
 
 .subtitle {
-  margin: 1rem 0 0;
-  max-width: 42rem;
-  color: var(--theme-page-muted-3);
-  font-size: 1.05rem;
+  margin: 0;
+  max-width: 760px;
+  color: var(--theme-page-muted-2);
   line-height: 1.7;
 }
 
 .statementCard {
   position: relative;
   overflow: hidden;
-  padding: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1.75rem, 4vw, 3.25rem);
   border: 1px solid color-mix(in srgb, var(--theme-border-mid) 84%, transparent);
-  border-radius: 22px;
+  border-radius: 8px;
   background:
     radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--theme-accent-brand) 14%, transparent), transparent 24%),
     radial-gradient(circle at 72% 18%, color-mix(in srgb, var(--theme-accent-success) 10%, transparent), transparent 28%),
@@ -59,23 +64,77 @@
 .statement {
   position: relative;
   margin: 0;
-  max-width: 34rem;
+  width: 100%;
+  max-width: none;
   color: var(--theme-page-text);
-  font-size: clamp(1.35rem, 2.6vw, 2rem);
-  line-height: 1.5;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.8;
+  letter-spacing: -0.01em;
+}
+
+.statement :global(p),
+.statement :global(ul),
+.statement :global(ol),
+.statement :global(blockquote),
+.statement :global(h2),
+.statement :global(h3),
+.statement :global(h4) {
+  max-width: none;
+}
+
+.statement :global(h2),
+.statement :global(h3),
+.statement :global(h4) {
+  line-height: 1.25;
   letter-spacing: -0.02em;
+}
+
+.statement :global(h2) {
+  font-size: clamp(1.4rem, 2vw, 1.7rem);
+}
+
+.statement :global(h3) {
+  font-size: clamp(1.2rem, 1.7vw, 1.45rem);
+}
+
+.statement :global(h4) {
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+}
+
+.statement :global(ul),
+.statement :global(ol) {
+  padding-left: 1.25rem;
+}
+
+.statement :global(p:first-child) {
+  margin-top: 0;
+}
+
+.statement :global(p:last-child),
+.statement :global(ul:last-child),
+.statement :global(ol:last-child),
+.statement :global(blockquote:last-child) {
+  margin-bottom: 0;
 }
 
 @media (max-width: 720px) {
   .aboutPage {
-    padding-top: 1.5rem;
+    padding-top: 24px;
   }
 
   .statementCard {
-    border-radius: 18px;
+    border-radius: 8px;
   }
 
   .statement {
     max-width: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .aboutPage {
+    padding-top: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }

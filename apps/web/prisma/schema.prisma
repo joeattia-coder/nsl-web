@@ -554,6 +554,19 @@ model FaqItem {
   @@index([isPublished, sortOrder, updatedAt])
 }
 
+model AboutSectionVersion {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  contentHtml String
+  contentJson Json?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([publishedAt, createdAt])
+}
+
 model VideoHighlight {
   id                String          @id @default(cuid())
   title             String

@@ -255,12 +255,43 @@ html[data-theme="light"] body {
   left: 0;
   bottom: 0;
   height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 html[data-theme="light"] .sidebar {
   box-shadow: 12px 0 30px rgba(15, 23, 42, 0.06);
   backdrop-filter: blur(18px);
+}
+
+.sidebar-nav {
+  width: 100%;
+  flex: 1 1 auto;
+  align-self: stretch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 0 18px;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 16px,
+    #000 calc(100% - 18px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 16px,
+    #000 calc(100% - 18px),
+    transparent 100%
+  );
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .sidebar-nav ul {
@@ -743,6 +774,11 @@ html[data-theme="light"] .navbar {
   margin: 0 auto;
 }
 
+.player-dashboard-page .login-page-card,
+.player-profile-page .login-page-card {
+  border-radius: 8px;
+}
+
 .player-dashboard-card::before {
   content: "";
   position: absolute;
@@ -816,7 +852,7 @@ html[data-theme="light"] .navbar {
   min-height: 46px;
   padding: 0 22px;
   border: 1px solid color-mix(in srgb, var(--theme-accent-brand) 18%, var(--theme-border-soft));
-  border-radius: 999px;
+  border-radius: 8px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 92%, white) 0%, var(--theme-surface-2) 100%);
   color: var(--theme-page-muted-2);
   box-shadow: var(--theme-shadow-soft);
@@ -873,7 +909,7 @@ html[data-theme="light"] .navbar {
   min-height: 48px;
   padding: 0 16px;
   border: 1px solid var(--theme-border-soft);
-  border-radius: 14px;
+  border-radius: 8px;
   background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
   color: var(--theme-page-text);
   box-shadow: var(--theme-shadow-soft);
@@ -1135,7 +1171,7 @@ html[data-theme="light"] .navbar {
   padding: 6px 12px;
   border: 1px solid var(--theme-admin-chip-border);
   background: var(--theme-admin-chip-bg);
-  border-radius: 999px;
+  border-radius: 8px;
 }
 
 .admin-current-user-copy {
@@ -1179,6 +1215,7 @@ html[data-theme="light"] .navbar {
   background: var(--theme-surface-1);
   color: var(--theme-page-text);
   border: 1px solid var(--theme-border-soft);
+  border-radius: 8px;
   box-shadow: var(--theme-shadow-card);
   z-index: 30;
 }
@@ -1190,6 +1227,7 @@ html[data-theme="light"] .navbar {
   width: 100%;
   padding: 10px 12px;
   border: none;
+  border-radius: 8px;
   background: var(--theme-surface-1);
   color: var(--theme-page-text);
   text-decoration: none;

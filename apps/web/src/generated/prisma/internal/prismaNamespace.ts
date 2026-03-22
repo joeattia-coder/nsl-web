@@ -412,6 +412,7 @@ export const ModelName = {
   League: 'League',
   NewsArticle: 'NewsArticle',
   FaqItem: 'FaqItem',
+  AboutSectionVersion: 'AboutSectionVersion',
   VideoHighlight: 'VideoHighlight',
   Document: 'Document'
 } as const
@@ -429,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "videoHighlight" | "document"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "videoHighlight" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2505,6 +2506,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AboutSectionVersion: {
+      payload: Prisma.$AboutSectionVersionPayload<ExtArgs>
+      fields: Prisma.AboutSectionVersionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AboutSectionVersionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AboutSectionVersionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>
+        }
+        findFirst: {
+          args: Prisma.AboutSectionVersionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AboutSectionVersionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>
+        }
+        findMany: {
+          args: Prisma.AboutSectionVersionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>[]
+        }
+        create: {
+          args: Prisma.AboutSectionVersionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>
+        }
+        createMany: {
+          args: Prisma.AboutSectionVersionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AboutSectionVersionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>[]
+        }
+        delete: {
+          args: Prisma.AboutSectionVersionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>
+        }
+        update: {
+          args: Prisma.AboutSectionVersionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>
+        }
+        deleteMany: {
+          args: Prisma.AboutSectionVersionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AboutSectionVersionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AboutSectionVersionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>[]
+        }
+        upsert: {
+          args: Prisma.AboutSectionVersionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AboutSectionVersionPayload>
+        }
+        aggregate: {
+          args: Prisma.AboutSectionVersionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAboutSectionVersion>
+        }
+        groupBy: {
+          args: Prisma.AboutSectionVersionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AboutSectionVersionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AboutSectionVersionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AboutSectionVersionCountAggregateOutputType> | number
+        }
+      }
+    }
     VideoHighlight: {
       payload: Prisma.$VideoHighlightPayload<ExtArgs>
       fields: Prisma.VideoHighlightFieldRefs
@@ -3128,6 +3203,20 @@ export const FaqItemScalarFieldEnum = {
 export type FaqItemScalarFieldEnum = (typeof FaqItemScalarFieldEnum)[keyof typeof FaqItemScalarFieldEnum]
 
 
+export const AboutSectionVersionScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  subtitle: 'subtitle',
+  contentHtml: 'contentHtml',
+  contentJson: 'contentJson',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AboutSectionVersionScalarFieldEnum = (typeof AboutSectionVersionScalarFieldEnum)[keyof typeof AboutSectionVersionScalarFieldEnum]
+
+
 export const VideoHighlightScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -3641,6 +3730,7 @@ export type GlobalOmitConfig = {
   league?: Prisma.LeagueOmit
   newsArticle?: Prisma.NewsArticleOmit
   faqItem?: Prisma.FaqItemOmit
+  aboutSectionVersion?: Prisma.AboutSectionVersionOmit
   videoHighlight?: Prisma.VideoHighlightOmit
   document?: Prisma.DocumentOmit
 }

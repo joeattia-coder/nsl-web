@@ -158,6 +158,11 @@ export type NewsArticle = Prisma.NewsArticleModel
  */
 export type FaqItem = Prisma.FaqItemModel
 /**
+ * Model AboutSectionVersion
+ * 
+ */
+export type AboutSectionVersion = Prisma.AboutSectionVersionModel
+/**
  * Model VideoHighlight
  * 
  */
