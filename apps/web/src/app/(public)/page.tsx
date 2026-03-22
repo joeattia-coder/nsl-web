@@ -476,12 +476,12 @@ export default function Page() {
             <p>Your professional snooker platform.</p>
 
             <div className="hero-actions">
-              <a className="hero-btn primary" href="#">
+              <Link className="hero-btn primary" href="/matches">
                 View Matches
-              </a>
-              <a className="hero-btn ghost" href="#">
+              </Link>
+              <Link className="hero-btn ghost" href="/rankings">
                 Rankings
-              </a>
+              </Link>
             </div>
           </div>
         </div>
