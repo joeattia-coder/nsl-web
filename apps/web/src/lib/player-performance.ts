@@ -40,6 +40,17 @@ export function compareAlphabeticalPlayers(
 }
 
 export function compareRankingRows(left: PlayerRankingRow, right: PlayerRankingRow) {
+  const leftHasPlayed = left.matchesPlayed > 0;
+  const rightHasPlayed = right.matchesPlayed > 0;
+
+  if (leftHasPlayed !== rightHasPlayed) {
+    return leftHasPlayed ? -1 : 1;
+  }
+
+  if (!leftHasPlayed && !rightHasPlayed) {
+    return compareAlphabeticalPlayers(left, right);
+  }
+
   if (right.points !== left.points) {
     return right.points - left.points;
   }

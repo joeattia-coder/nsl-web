@@ -26,6 +26,24 @@ type Player = {
   country?: string | null;
   postalCode?: string | null;
   photoUrl?: string | null;
+  entryMemberships?: PlayerEntryMembership[];
+};
+
+type PlayerEntryMembership = {
+  id: string;
+  createdAt: string;
+  tournamentId: string;
+  tournamentName: string;
+  tournamentEntryId: string;
+  entryName: string;
+  memberNames: string[];
+};
+
+type PlayerMergeCandidate = {
+  id: string;
+  fullName: string;
+  emailAddress: string;
+  linkedUserId: string | null;
 };
 
 type PlayerFormProps = {
@@ -65,6 +83,10 @@ export default function PlayerForm({
   const [postalCode, setPostalCode] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [linkedUserId, setLinkedUserId] = useState<string | null>(null);
+  const [entryMemberships, setEntryMemberships] = useState<PlayerEntryMembership[]>([]);
+  const [mergeCandidates, setMergeCandidates] = useState<PlayerMergeCandidate[]>([]);
+  const [mergeTargetId, setMergeTargetId] = useState("");
+  const [mergingDuplicate, setMergingDuplicate] = useState(false);
 
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string>("");
@@ -92,18 +114,43 @@ export default function PlayerForm({
         setLoading(true);
         setError(null);
 
-        const res = await fetch(`/api/players/${playerId}`, {
-          cache: "no-store",
-        });
+        const [playerResponse, playersResponse] = await Promise.all([
+          fetch(`/api/players/${playerId}`, {
+            cache: "no-store",
+          }),
+          fetch("/api/players", {
+            cache: "no-store",
+          }),
+        ]);
 
         const data: Player | { error?: string; details?: string } | null =
-          await res.json().catch(() => null);
+          await playerResponse.json().catch(() => null);
 
-        if (!res.ok) {
+        if (!playerResponse.ok) {
           const message =
             (data as { details?: string; error?: string } | null)?.details ||
             (data as { error?: string } | null)?.error ||
             "Failed to fetch player.";
+          throw new Error(message);
+        }
+
+        const candidatesPayload = (await playersResponse.json().catch(() => null)) as
+          | Array<{
+              id: string;
+              firstName?: string | null;
+              middleInitial?: string | null;
+              lastName?: string | null;
+              emailAddress?: string | null;
+              userId?: string | null;
+            }>
+          | { error?: string; details?: string }
+          | null;
+
+        if (!playersResponse.ok) {
+          const message =
+            (candidatesPayload as { details?: string; error?: string } | null)?.details ||
+            (candidatesPayload as { error?: string } | null)?.error ||
+            "Failed to load player merge candidates.";
           throw new Error(message);
         }
 
@@ -125,6 +172,24 @@ export default function PlayerForm({
         setPostalCode(player.postalCode ?? "");
         setPhotoUrl(player.photoUrl ?? "");
         setLinkedUserId(player.userId ?? null);
+        setEntryMemberships(player.entryMemberships ?? []);
+        setMergeCandidates(
+          (Array.isArray(candidatesPayload) ? candidatesPayload : [])
+            .filter((candidate) => candidate.id !== playerId)
+            .map((candidate) => ({
+              id: candidate.id,
+              fullName: [candidate.firstName, candidate.middleInitial, candidate.lastName]
+                .filter(Boolean)
+                .join(" "),
+              emailAddress: candidate.emailAddress ?? "",
+              linkedUserId: candidate.userId ?? null,
+            }))
+            .sort((left, right) =>
+              left.fullName.localeCompare(right.fullName, undefined, {
+                sensitivity: "base",
+              })
+            )
+        );
       } catch (err) {
         console.error(err);
         setError(err instanceof Error ? err.message : "Failed to load player.");
@@ -154,6 +219,11 @@ export default function PlayerForm({
     if (photoPreviewUrl) return photoPreviewUrl;
     return photoUrl.trim() || "";
   }, [photoPreviewUrl, photoUrl]);
+
+  const selectedMergeCandidate = useMemo(
+    () => mergeCandidates.find((candidate) => candidate.id === mergeTargetId) ?? null,
+    [mergeCandidates, mergeTargetId]
+  );
 
   const hasSelectedPhoto = Boolean(photoFile);
 
@@ -399,6 +469,55 @@ export default function PlayerForm({
       setError(err instanceof Error ? err.message : "Failed to send invitation.");
     } finally {
       setSendingInvite(false);
+    }
+  }
+
+  async function handleMergeDuplicate() {
+    if (!isEdit || !playerId || !mergeTargetId) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "This will move tournament entries, player breaks, invitations, and recalculated Elo participation to the selected player, then delete this duplicate profile. Continue?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setMergingDuplicate(true);
+      setError(null);
+      setSuccess(null);
+      setInviteLink(null);
+
+      const response = await fetch(`/api/admin/players/${playerId}/merge`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          targetPlayerId: mergeTargetId,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; targetPlayerId?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(payload?.error || "Failed to merge duplicate player.");
+      }
+
+      router.push(`/admin/players/${payload?.targetPlayerId ?? mergeTargetId}/edit`);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error ? err.message : "Failed to merge duplicate player."
+      );
+    } finally {
+      setMergingDuplicate(false);
     }
   }
 
@@ -737,6 +856,116 @@ export default function PlayerForm({
               />
             </div>
           </div>
+
+          {isEdit ? (
+            <div className="admin-player-support-grid">
+              <section className="admin-player-support-panel">
+                <div className="admin-player-support-header">
+                  <div>
+                    <h2 className="admin-player-support-title">Tournament Entries</h2>
+                    <p className="admin-player-support-copy">
+                      Review which tournaments and entry lineups currently reference this player.
+                    </p>
+                  </div>
+                  <span className="admin-player-support-count">
+                    {entryMemberships.length} {entryMemberships.length === 1 ? "entry" : "entries"}
+                  </span>
+                </div>
+
+                {entryMemberships.length === 0 ? (
+                  <p className="admin-player-support-empty">
+                    This player is not currently entered in any tournaments.
+                  </p>
+                ) : (
+                  <div className="admin-player-entry-list">
+                    {entryMemberships.map((entry) => (
+                      <article key={entry.id} className="admin-player-entry-card">
+                        <div className="admin-player-entry-topline">
+                          <Link
+                            href={`/admin/tournaments/${entry.tournamentId}/entries`}
+                            className="admin-player-entry-link"
+                          >
+                            {entry.tournamentName}
+                          </Link>
+                          <span className="admin-player-entry-badge">Entry</span>
+                        </div>
+                        <p className="admin-player-entry-name">{entry.entryName}</p>
+                        <p className="admin-player-entry-members">
+                          Lineup: {entry.memberNames.join(" / ")}
+                        </p>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="admin-player-support-panel admin-player-support-panel-warning">
+                <div className="admin-player-support-header">
+                  <div>
+                    <h2 className="admin-player-support-title">Merge Duplicate Player</h2>
+                    <p className="admin-player-support-copy">
+                      Keep another player profile, move this player&apos;s linked records into it, then delete this duplicate profile.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="admin-form-field admin-form-field-full">
+                  <label htmlFor="mergeTargetId" className="admin-label">
+                    Player To Keep
+                  </label>
+                  <select
+                    id="mergeTargetId"
+                    value={mergeTargetId}
+                    onChange={(event) => setMergeTargetId(event.target.value)}
+                    className="admin-input admin-player-form-input"
+                    disabled={mergingDuplicate || saving}
+                  >
+                    <option value="">Select a player</option>
+                    {mergeCandidates.map((candidate) => (
+                      <option key={candidate.id} value={candidate.id}>
+                        {candidate.fullName}
+                        {candidate.emailAddress ? ` (${candidate.emailAddress})` : ""}
+                        {candidate.linkedUserId ? " - linked account" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <p className="admin-player-merge-note">
+                  Reassigned records: tournament entries, player breaks, invitations, and recalculated Elo history based on updated memberships.
+                </p>
+
+                {linkedUserId ? (
+                  <p className="admin-player-merge-note">
+                    This player has a linked user account. If the selected target also has one, the merge will be blocked until one linked account is removed or reassigned.
+                  </p>
+                ) : null}
+
+                {linkedUserId && selectedMergeCandidate?.linkedUserId ? (
+                  <p className="admin-form-error">
+                    Both players have linked user accounts. Pick another target or unlink one of the accounts before merging.
+                  </p>
+                ) : null}
+
+                <div className="admin-player-merge-actions">
+                  <button
+                    type="button"
+                    className="admin-player-form-button admin-player-form-button-danger"
+                    onClick={() => void handleMergeDuplicate()}
+                    disabled={
+                      !mergeTargetId ||
+                      mergingDuplicate ||
+                      saving ||
+                      (Boolean(linkedUserId) && Boolean(selectedMergeCandidate?.linkedUserId))
+                    }
+                  >
+                    <FiSave />
+                    <span>{mergingDuplicate ? "Merging Duplicate..." : "Merge Into Selected Player"}</span>
+                  </button>
+                </div>
+              </section>
+            </div>
+          ) : null}
 
           <div className="admin-form-actions admin-player-form-actions">
             <Link

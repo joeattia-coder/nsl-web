@@ -35,6 +35,17 @@ function compareAlphabetical(left: Player, right: Player) {
 }
 
 function compareRanking(left: Player, right: Player) {
+  const leftHasPlayed = left.matchesPlayed > 0;
+  const rightHasPlayed = right.matchesPlayed > 0;
+
+  if (leftHasPlayed !== rightHasPlayed) {
+    return leftHasPlayed ? -1 : 1;
+  }
+
+  if (!leftHasPlayed && !rightHasPlayed) {
+    return compareAlphabetical(left, right);
+  }
+
   if (right.points !== left.points) {
     return right.points - left.points;
   }
