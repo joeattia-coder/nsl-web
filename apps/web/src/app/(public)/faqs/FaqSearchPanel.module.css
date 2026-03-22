@@ -1,6 +1,9 @@
 .publicFaqMain {
   min-height: 100vh;
-  background: var(--theme-page-bg);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
   color: var(--theme-page-text);
   padding: 24px 24px 32px;
 }
@@ -81,12 +84,18 @@
   cursor: pointer;
   padding: 12px 16px;
   font-weight: 600;
-  background: var(--theme-surface-5);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-3) 100%);
+  border: 1px solid var(--theme-border-soft);
+  border-radius: 10px 10px 0 0;
+  box-shadow: var(--theme-shadow-soft);
 }
 
 .publicFaqAnswer {
   padding: 12px 16px;
-  background: var(--theme-surface-4);
+  background: linear-gradient(180deg, var(--theme-surface-2) 0%, var(--theme-surface-4) 100%);
+  border: 1px solid var(--theme-border-soft);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
 }
 
 .publicFaqAnswerContent {

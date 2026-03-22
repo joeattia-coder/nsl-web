@@ -73,6 +73,7 @@ export const ModelName = {
   TournamentEntryMember: 'TournamentEntryMember',
   GroupParticipant: 'GroupParticipant',
   Match: 'Match',
+  PlayerEloHistory: 'PlayerEloHistory',
   MatchFrame: 'MatchFrame',
   PlayerBreak: 'PlayerBreak',
   League: 'League',
@@ -222,6 +223,7 @@ export const PlayerScalarFieldEnum = {
   firstName: 'firstName',
   middleInitial: 'middleInitial',
   lastName: 'lastName',
+  eloRating: 'eloRating',
   dateOfBirth: 'dateOfBirth',
   emailAddress: 'emailAddress',
   phoneNumber: 'phoneNumber',
@@ -438,6 +440,24 @@ export const MatchScalarFieldEnum = {
 } as const
 
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
+
+
+export const PlayerEloHistoryScalarFieldEnum = {
+  id: 'id',
+  playerId: 'playerId',
+  matchId: 'matchId',
+  ratingBefore: 'ratingBefore',
+  ratingAfter: 'ratingAfter',
+  ratingChange: 'ratingChange',
+  matchesPlayed: 'matchesPlayed',
+  expectedScore: 'expectedScore',
+  actualScore: 'actualScore',
+  opponentAverage: 'opponentAverage',
+  matchDate: 'matchDate',
+  createdAt: 'createdAt'
+} as const
+
+export type PlayerEloHistoryScalarFieldEnum = (typeof PlayerEloHistoryScalarFieldEnum)[keyof typeof PlayerEloHistoryScalarFieldEnum]
 
 
 export const MatchFrameScalarFieldEnum = {

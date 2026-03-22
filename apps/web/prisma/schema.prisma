@@ -165,6 +165,7 @@ model Player {
   firstName     String
   middleInitial String?
   lastName      String
+  eloRating     Int                     @default(1500)
   dateOfBirth   DateTime?
   emailAddress  String?
   phoneNumber   String?
@@ -180,6 +181,7 @@ model Player {
   user          User?                   @relation(fields: [userId], references: [id])
   breaks        PlayerBreak[]
   entryMembers  TournamentEntryMember[]
+  eloHistory    PlayerEloHistory[]
   invitations   Invitation[]
 
   @@index([lastName, firstName])
@@ -436,6 +438,7 @@ model Match {
   venue             Venue?           @relation(fields: [venueId], references: [id])
   winnerEntry       TournamentEntry? @relation("MatchWinnerEntry", fields: [winnerEntryId], references: [id])
   frames            MatchFrame[]
+  playerEloHistory  PlayerEloHistory[]
 
   @@index([tournamentId])
   @@index([tournamentStageId])
@@ -448,6 +451,27 @@ model Match {
   @@index([approvedByUserId])
   @@index([enteredByUserId])
   @@index([updatedByUserId])
+}
+
+model PlayerEloHistory {
+  id                String   @id @default(cuid())
+  playerId          String
+  matchId           String
+  ratingBefore      Int
+  ratingAfter       Int
+  ratingChange      Int
+  matchesPlayed     Int
+  expectedScore     Float
+  actualScore       Float
+  opponentAverage   Float
+  matchDate         DateTime?
+  createdAt         DateTime @default(now())
+  match             Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player            Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, matchId])
+  @@index([playerId, matchDate])
+  @@index([matchId])
 }
 
 model MatchFrame {

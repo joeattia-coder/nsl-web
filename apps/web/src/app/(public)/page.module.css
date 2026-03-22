@@ -1,0 +1,118 @@
+.rankingsPage {
+  min-height: 100vh;
+  padding: 2rem 1rem 3rem;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 18%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 14%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 86%, var(--theme-surface-1)) 100%);
+}
+
+.rankingsSection {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.rankingsHeader {
+  margin-bottom: 1.5rem;
+}
+
+.rankingsTitle {
+  margin: 0;
+  color: var(--theme-page-text);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.rankingsIntro {
+  margin: 0.75rem 0 0;
+  max-width: 56rem;
+  color: var(--theme-page-muted-3);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.rankingsMeta {
+  margin: 0.75rem 0 0;
+  max-width: 60rem;
+  color: var(--theme-page-muted-4);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.rankingsCards {
+  margin-bottom: 2rem;
+}
+
+.rankingsCardRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.rankingsCardSelected {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--dashboard-metric-accent) 58%, var(--theme-border-mid));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--dashboard-metric-accent) 26%, transparent);
+}
+
+.rankingsTableWrap {
+  background: linear-gradient(180deg, var(--theme-surface-1), var(--theme-surface-2));
+  border-radius: 12px;
+  border: 1px solid var(--theme-border-soft);
+  box-shadow: var(--theme-shadow-soft);
+  padding: 2rem;
+}
+
+.rankingsTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  color: var(--theme-page-text);
+}
+
+.rankingsTable th, .rankingsTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--theme-border-soft);
+  text-align: left;
+  color: var(--theme-page-text);
+}
+
+.rankingsTable th {
+  background: color-mix(in srgb, var(--theme-surface-2) 78%, var(--theme-page-bg));
+  font-weight: 600;
+  color: var(--theme-page-muted-3);
+}
+
+.rankingsRow {
+  background: color-mix(in srgb, var(--theme-surface-1) 90%, transparent);
+}
+
+.rankingsRowAlt {
+  background: color-mix(in srgb, var(--theme-surface-2) 96%, transparent);
+}
+
+.rankingsStatus {
+  padding: 2rem;
+  text-align: center;
+  color: var(--theme-page-text);
+}
+
+.rankingsStatusError {
+  color: var(--theme-accent-rose);
+}
+
+@media (max-width: 900px) {
+  .rankingsCardRow {
+    grid-template-columns: 1fr;
+  }
+
+  .rankingsTableWrap {
+    padding: 1rem;
+    overflow-x: auto;
+  }
+}

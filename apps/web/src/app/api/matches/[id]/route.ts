@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recalculateAndPersistPlayerElo } from "@/lib/player-elo";
 
 const VALID_MATCH_STATUSES = [
   "SCHEDULED",
@@ -516,6 +517,8 @@ export async function PATCH(
         }
       }
 
+      await recalculateAndPersistPlayerElo(tx);
+
       return tx.match.findUniqueOrThrow({
         where: { id: updated.id },
         include: {
@@ -593,8 +596,12 @@ export async function DELETE(
       return NextResponse.json({ error: "Match not found" }, { status: 404 });
     }
 
-    await prisma.match.delete({
-      where: { id },
+    await prisma.$transaction(async (tx) => {
+      await tx.match.delete({
+        where: { id },
+      });
+
+      await recalculateAndPersistPlayerElo(tx);
     });
 
     return NextResponse.json({

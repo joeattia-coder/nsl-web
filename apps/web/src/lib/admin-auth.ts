@@ -224,12 +224,16 @@ function isAdminUserRecord(user: NonNullable<LoadedAdminUser>) {
   );
 }
 
-function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean) {
+function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean, hasLinkedPlayer: boolean) {
   if (nextPath && nextPath.startsWith("/")) {
     return nextPath;
   }
 
-  return isAdmin ? "/admin" : "/profile";
+  if (isAdmin) {
+    return "/admin";
+  }
+
+  return hasLinkedPlayer ? "/dashboard" : "/profile";
 }
 
 export async function resolveCurrentUser(): Promise<CurrentAdminUserSummary | null> {
@@ -289,6 +293,11 @@ export async function findUserForLogin(identifier: string) {
       username: true,
       passwordHash: true,
       isLoginEnabled: true,
+      player: {
+        select: {
+          id: true,
+        },
+      },
       roleAssignments: {
         select: {
           scopeType: true,
@@ -322,6 +331,7 @@ export async function findUserForLogin(identifier: string) {
     username: user.username,
     passwordHash: user.passwordHash,
     isLoginEnabled: user.isLoginEnabled,
+    linkedPlayerId: user.player?.id ?? null,
     isAdmin: Boolean(
       user.roleAssignments.some(
         (assignment) =>
@@ -341,8 +351,12 @@ export async function findAdminUserForLogin(identifier: string) {
   return user;
 }
 
-export function getLoginSuccessPath(isAdmin: boolean, nextPath: string | null | undefined) {
-  return resolveNextPath(nextPath, isAdmin);
+export function getLoginSuccessPath(
+  isAdmin: boolean,
+  nextPath: string | null | undefined,
+  hasLinkedPlayer: boolean
+) {
+  return resolveNextPath(nextPath, isAdmin, hasLinkedPlayer);
 }
 
 export function buildAdminSessionCookieValue(userId: string) {

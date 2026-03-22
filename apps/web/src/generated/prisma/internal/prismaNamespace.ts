@@ -406,6 +406,7 @@ export const ModelName = {
   TournamentEntryMember: 'TournamentEntryMember',
   GroupParticipant: 'GroupParticipant',
   Match: 'Match',
+  PlayerEloHistory: 'PlayerEloHistory',
   MatchFrame: 'MatchFrame',
   PlayerBreak: 'PlayerBreak',
   League: 'League',
@@ -428,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "videoHighlight" | "document"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "videoHighlight" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2060,6 +2061,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlayerEloHistory: {
+      payload: Prisma.$PlayerEloHistoryPayload<ExtArgs>
+      fields: Prisma.PlayerEloHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayerEloHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayerEloHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.PlayerEloHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayerEloHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.PlayerEloHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.PlayerEloHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.PlayerEloHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlayerEloHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.PlayerEloHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>
+        }
+        update: {
+          args: Prisma.PlayerEloHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayerEloHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayerEloHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlayerEloHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlayerEloHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerEloHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.PlayerEloHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayerEloHistory>
+        }
+        groupBy: {
+          args: Prisma.PlayerEloHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerEloHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayerEloHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerEloHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
     MatchFrame: {
       payload: Prisma.$MatchFramePayload<ExtArgs>
       fields: Prisma.MatchFrameFieldRefs
@@ -2741,6 +2816,7 @@ export const PlayerScalarFieldEnum = {
   firstName: 'firstName',
   middleInitial: 'middleInitial',
   lastName: 'lastName',
+  eloRating: 'eloRating',
   dateOfBirth: 'dateOfBirth',
   emailAddress: 'emailAddress',
   phoneNumber: 'phoneNumber',
@@ -2957,6 +3033,24 @@ export const MatchScalarFieldEnum = {
 } as const
 
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
+
+
+export const PlayerEloHistoryScalarFieldEnum = {
+  id: 'id',
+  playerId: 'playerId',
+  matchId: 'matchId',
+  ratingBefore: 'ratingBefore',
+  ratingAfter: 'ratingAfter',
+  ratingChange: 'ratingChange',
+  matchesPlayed: 'matchesPlayed',
+  expectedScore: 'expectedScore',
+  actualScore: 'actualScore',
+  opponentAverage: 'opponentAverage',
+  matchDate: 'matchDate',
+  createdAt: 'createdAt'
+} as const
+
+export type PlayerEloHistoryScalarFieldEnum = (typeof PlayerEloHistoryScalarFieldEnum)[keyof typeof PlayerEloHistoryScalarFieldEnum]
 
 
 export const MatchFrameScalarFieldEnum = {
@@ -3342,6 +3436,20 @@ export type ListEnumMatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -3408,20 +3516,6 @@ export type EnumVideoSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'VideoSourceType[]'
  */
 export type ListEnumVideoSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VideoSourceType[]'>
-    
-
-
-/**
- * Reference to a field of type 'Float'
- */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -3541,6 +3635,7 @@ export type GlobalOmitConfig = {
   tournamentEntryMember?: Prisma.TournamentEntryMemberOmit
   groupParticipant?: Prisma.GroupParticipantOmit
   match?: Prisma.MatchOmit
+  playerEloHistory?: Prisma.PlayerEloHistoryOmit
   matchFrame?: Prisma.MatchFrameOmit
   playerBreak?: Prisma.PlayerBreakOmit
   league?: Prisma.LeagueOmit

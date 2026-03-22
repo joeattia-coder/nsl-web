@@ -1,6 +1,9 @@
 .container {
   min-height: 100vh;
-  background: var(--theme-page-bg);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
   color: var(--theme-page-text);
   padding: 32px 24px;
 }
@@ -36,6 +39,7 @@
   background: var(--theme-surface-1);
   border: 1px solid var(--theme-border-soft);
   border-radius: 8px;
+  box-shadow: var(--theme-shadow-soft);
   max-width: 500px;
 }
 
@@ -79,10 +83,11 @@
 .competitionCard {
   display: flex;
   flex-direction: column;
-  background: var(--theme-surface-1);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
   border: 1px solid var(--theme-border-soft);
   border-radius: 8px;
   padding: 20px;
+  box-shadow: var(--theme-shadow-soft);
   transition: all 0.3s ease;
   text-decoration: none;
   color: inherit;

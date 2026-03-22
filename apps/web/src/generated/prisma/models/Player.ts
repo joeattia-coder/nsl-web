@@ -20,8 +20,18 @@ export type PlayerModel = runtime.Types.Result.DefaultSelection<Prisma.$PlayerPa
 
 export type AggregatePlayer = {
   _count: PlayerCountAggregateOutputType | null
+  _avg: PlayerAvgAggregateOutputType | null
+  _sum: PlayerSumAggregateOutputType | null
   _min: PlayerMinAggregateOutputType | null
   _max: PlayerMaxAggregateOutputType | null
+}
+
+export type PlayerAvgAggregateOutputType = {
+  eloRating: number | null
+}
+
+export type PlayerSumAggregateOutputType = {
+  eloRating: number | null
 }
 
 export type PlayerMinAggregateOutputType = {
@@ -30,6 +40,7 @@ export type PlayerMinAggregateOutputType = {
   firstName: string | null
   middleInitial: string | null
   lastName: string | null
+  eloRating: number | null
   dateOfBirth: Date | null
   emailAddress: string | null
   phoneNumber: string | null
@@ -50,6 +61,7 @@ export type PlayerMaxAggregateOutputType = {
   firstName: string | null
   middleInitial: string | null
   lastName: string | null
+  eloRating: number | null
   dateOfBirth: Date | null
   emailAddress: string | null
   phoneNumber: string | null
@@ -70,6 +82,7 @@ export type PlayerCountAggregateOutputType = {
   firstName: number
   middleInitial: number
   lastName: number
+  eloRating: number
   dateOfBirth: number
   emailAddress: number
   phoneNumber: number
@@ -86,12 +99,21 @@ export type PlayerCountAggregateOutputType = {
 }
 
 
+export type PlayerAvgAggregateInputType = {
+  eloRating?: true
+}
+
+export type PlayerSumAggregateInputType = {
+  eloRating?: true
+}
+
 export type PlayerMinAggregateInputType = {
   id?: true
   userId?: true
   firstName?: true
   middleInitial?: true
   lastName?: true
+  eloRating?: true
   dateOfBirth?: true
   emailAddress?: true
   phoneNumber?: true
@@ -112,6 +134,7 @@ export type PlayerMaxAggregateInputType = {
   firstName?: true
   middleInitial?: true
   lastName?: true
+  eloRating?: true
   dateOfBirth?: true
   emailAddress?: true
   phoneNumber?: true
@@ -132,6 +155,7 @@ export type PlayerCountAggregateInputType = {
   firstName?: true
   middleInitial?: true
   lastName?: true
+  eloRating?: true
   dateOfBirth?: true
   emailAddress?: true
   phoneNumber?: true
@@ -185,6 +209,18 @@ export type PlayerAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: PlayerAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: PlayerSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: PlayerMinAggregateInputType
@@ -215,6 +251,8 @@ export type PlayerGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: PlayerCountAggregateInputType | true
+  _avg?: PlayerAvgAggregateInputType
+  _sum?: PlayerSumAggregateInputType
   _min?: PlayerMinAggregateInputType
   _max?: PlayerMaxAggregateInputType
 }
@@ -225,6 +263,7 @@ export type PlayerGroupByOutputType = {
   firstName: string
   middleInitial: string | null
   lastName: string
+  eloRating: number
   dateOfBirth: Date | null
   emailAddress: string | null
   phoneNumber: string | null
@@ -238,6 +277,8 @@ export type PlayerGroupByOutputType = {
   updatedAt: Date
   photoUrl: string | null
   _count: PlayerCountAggregateOutputType | null
+  _avg: PlayerAvgAggregateOutputType | null
+  _sum: PlayerSumAggregateOutputType | null
   _min: PlayerMinAggregateOutputType | null
   _max: PlayerMaxAggregateOutputType | null
 }
@@ -266,6 +307,7 @@ export type PlayerWhereInput = {
   firstName?: Prisma.StringFilter<"Player"> | string
   middleInitial?: Prisma.StringNullableFilter<"Player"> | string | null
   lastName?: Prisma.StringFilter<"Player"> | string
+  eloRating?: Prisma.IntFilter<"Player"> | number
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Player"> | Date | string | null
   emailAddress?: Prisma.StringNullableFilter<"Player"> | string | null
   phoneNumber?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -281,6 +323,7 @@ export type PlayerWhereInput = {
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   breaks?: Prisma.PlayerBreakListRelationFilter
   entryMembers?: Prisma.TournamentEntryMemberListRelationFilter
+  eloHistory?: Prisma.PlayerEloHistoryListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
 }
 
@@ -290,6 +333,7 @@ export type PlayerOrderByWithRelationInput = {
   firstName?: Prisma.SortOrder
   middleInitial?: Prisma.SortOrderInput | Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  eloRating?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   emailAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -305,6 +349,7 @@ export type PlayerOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   breaks?: Prisma.PlayerBreakOrderByRelationAggregateInput
   entryMembers?: Prisma.TournamentEntryMemberOrderByRelationAggregateInput
+  eloHistory?: Prisma.PlayerEloHistoryOrderByRelationAggregateInput
   invitations?: Prisma.InvitationOrderByRelationAggregateInput
 }
 
@@ -317,6 +362,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   firstName?: Prisma.StringFilter<"Player"> | string
   middleInitial?: Prisma.StringNullableFilter<"Player"> | string | null
   lastName?: Prisma.StringFilter<"Player"> | string
+  eloRating?: Prisma.IntFilter<"Player"> | number
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Player"> | Date | string | null
   emailAddress?: Prisma.StringNullableFilter<"Player"> | string | null
   phoneNumber?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -332,6 +378,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   breaks?: Prisma.PlayerBreakListRelationFilter
   entryMembers?: Prisma.TournamentEntryMemberListRelationFilter
+  eloHistory?: Prisma.PlayerEloHistoryListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
 }, "id" | "userId">
 
@@ -341,6 +388,7 @@ export type PlayerOrderByWithAggregationInput = {
   firstName?: Prisma.SortOrder
   middleInitial?: Prisma.SortOrderInput | Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  eloRating?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   emailAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -354,8 +402,10 @@ export type PlayerOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PlayerCountOrderByAggregateInput
+  _avg?: Prisma.PlayerAvgOrderByAggregateInput
   _max?: Prisma.PlayerMaxOrderByAggregateInput
   _min?: Prisma.PlayerMinOrderByAggregateInput
+  _sum?: Prisma.PlayerSumOrderByAggregateInput
 }
 
 export type PlayerScalarWhereWithAggregatesInput = {
@@ -367,6 +417,7 @@ export type PlayerScalarWhereWithAggregatesInput = {
   firstName?: Prisma.StringWithAggregatesFilter<"Player"> | string
   middleInitial?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   lastName?: Prisma.StringWithAggregatesFilter<"Player"> | string
+  eloRating?: Prisma.IntWithAggregatesFilter<"Player"> | number
   dateOfBirth?: Prisma.DateTimeNullableWithAggregatesFilter<"Player"> | Date | string | null
   emailAddress?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   phoneNumber?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
@@ -386,6 +437,7 @@ export type PlayerCreateInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -401,6 +453,7 @@ export type PlayerCreateInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
@@ -410,6 +463,7 @@ export type PlayerUncheckedCreateInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -424,6 +478,7 @@ export type PlayerUncheckedCreateInput = {
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -432,6 +487,7 @@ export type PlayerUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -447,6 +503,7 @@ export type PlayerUpdateInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
@@ -456,6 +513,7 @@ export type PlayerUncheckedUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -470,6 +528,7 @@ export type PlayerUncheckedUpdateInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -479,6 +538,7 @@ export type PlayerCreateManyInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -498,6 +558,7 @@ export type PlayerUpdateManyMutationInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -518,6 +579,7 @@ export type PlayerUncheckedUpdateManyInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -543,6 +605,7 @@ export type PlayerCountOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   middleInitial?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  eloRating?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
@@ -557,12 +620,17 @@ export type PlayerCountOrderByAggregateInput = {
   photoUrl?: Prisma.SortOrder
 }
 
+export type PlayerAvgOrderByAggregateInput = {
+  eloRating?: Prisma.SortOrder
+}
+
 export type PlayerMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   middleInitial?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  eloRating?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
@@ -583,6 +651,7 @@ export type PlayerMinOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   middleInitial?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  eloRating?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
@@ -595,6 +664,10 @@ export type PlayerMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
+}
+
+export type PlayerSumOrderByAggregateInput = {
+  eloRating?: Prisma.SortOrder
 }
 
 export type PlayerScalarRelationFilter = {
@@ -664,6 +737,20 @@ export type PlayerUpdateOneRequiredWithoutEntryMembersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutEntryMembersInput, Prisma.PlayerUpdateWithoutEntryMembersInput>, Prisma.PlayerUncheckedUpdateWithoutEntryMembersInput>
 }
 
+export type PlayerCreateNestedOneWithoutEloHistoryInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutEloHistoryInput, Prisma.PlayerUncheckedCreateWithoutEloHistoryInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutEloHistoryInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutEloHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutEloHistoryInput, Prisma.PlayerUncheckedCreateWithoutEloHistoryInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutEloHistoryInput
+  upsert?: Prisma.PlayerUpsertWithoutEloHistoryInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutEloHistoryInput, Prisma.PlayerUpdateWithoutEloHistoryInput>, Prisma.PlayerUncheckedUpdateWithoutEloHistoryInput>
+}
+
 export type PlayerCreateNestedOneWithoutBreaksInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutBreaksInput, Prisma.PlayerUncheckedCreateWithoutBreaksInput>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutBreaksInput
@@ -683,6 +770,7 @@ export type PlayerCreateWithoutUserInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -697,6 +785,7 @@ export type PlayerCreateWithoutUserInput = {
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
@@ -705,6 +794,7 @@ export type PlayerUncheckedCreateWithoutUserInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -719,6 +809,7 @@ export type PlayerUncheckedCreateWithoutUserInput = {
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -743,6 +834,7 @@ export type PlayerUpdateWithoutUserInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -757,6 +849,7 @@ export type PlayerUpdateWithoutUserInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
@@ -765,6 +858,7 @@ export type PlayerUncheckedUpdateWithoutUserInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -779,6 +873,7 @@ export type PlayerUncheckedUpdateWithoutUserInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -787,6 +882,7 @@ export type PlayerCreateWithoutInvitationsInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -802,6 +898,7 @@ export type PlayerCreateWithoutInvitationsInput = {
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutInvitationsInput = {
@@ -810,6 +907,7 @@ export type PlayerUncheckedCreateWithoutInvitationsInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -824,6 +922,7 @@ export type PlayerUncheckedCreateWithoutInvitationsInput = {
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutInvitationsInput = {
@@ -847,6 +946,7 @@ export type PlayerUpdateWithoutInvitationsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -862,6 +962,7 @@ export type PlayerUpdateWithoutInvitationsInput = {
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutInvitationsInput = {
@@ -870,6 +971,7 @@ export type PlayerUncheckedUpdateWithoutInvitationsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -884,6 +986,7 @@ export type PlayerUncheckedUpdateWithoutInvitationsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutEntryMembersInput = {
@@ -891,6 +994,7 @@ export type PlayerCreateWithoutEntryMembersInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -905,6 +1009,7 @@ export type PlayerCreateWithoutEntryMembersInput = {
   photoUrl?: string | null
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
@@ -914,6 +1019,7 @@ export type PlayerUncheckedCreateWithoutEntryMembersInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -927,6 +1033,7 @@ export type PlayerUncheckedCreateWithoutEntryMembersInput = {
   updatedAt?: Date | string
   photoUrl?: string | null
   breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -951,6 +1058,7 @@ export type PlayerUpdateWithoutEntryMembersInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -965,6 +1073,7 @@ export type PlayerUpdateWithoutEntryMembersInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
@@ -974,6 +1083,7 @@ export type PlayerUncheckedUpdateWithoutEntryMembersInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -987,6 +1097,119 @@ export type PlayerUncheckedUpdateWithoutEntryMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutEloHistoryInput = {
+  id?: string
+  firstName: string
+  middleInitial?: string | null
+  lastName: string
+  eloRating?: number
+  dateOfBirth?: Date | string | null
+  emailAddress?: string | null
+  phoneNumber?: string | null
+  addressLine1?: string | null
+  addressLine2?: string | null
+  city?: string | null
+  stateProvince?: string | null
+  country?: string | null
+  postalCode?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  photoUrl?: string | null
+  user?: Prisma.UserCreateNestedOneWithoutPlayerInput
+  breaks?: Prisma.PlayerBreakCreateNestedManyWithoutPlayerInput
+  entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutEloHistoryInput = {
+  id?: string
+  userId?: string | null
+  firstName: string
+  middleInitial?: string | null
+  lastName: string
+  eloRating?: number
+  dateOfBirth?: Date | string | null
+  emailAddress?: string | null
+  phoneNumber?: string | null
+  addressLine1?: string | null
+  addressLine2?: string | null
+  city?: string | null
+  stateProvince?: string | null
+  country?: string | null
+  postalCode?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  photoUrl?: string | null
+  breaks?: Prisma.PlayerBreakUncheckedCreateNestedManyWithoutPlayerInput
+  entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutEloHistoryInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutEloHistoryInput, Prisma.PlayerUncheckedCreateWithoutEloHistoryInput>
+}
+
+export type PlayerUpsertWithoutEloHistoryInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutEloHistoryInput, Prisma.PlayerUncheckedUpdateWithoutEloHistoryInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutEloHistoryInput, Prisma.PlayerUncheckedCreateWithoutEloHistoryInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutEloHistoryInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutEloHistoryInput, Prisma.PlayerUncheckedUpdateWithoutEloHistoryInput>
+}
+
+export type PlayerUpdateWithoutEloHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stateProvince?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
+  breaks?: Prisma.PlayerBreakUpdateManyWithoutPlayerNestedInput
+  entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutEloHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine1?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressLine2?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stateProvince?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  breaks?: Prisma.PlayerBreakUncheckedUpdateManyWithoutPlayerNestedInput
+  entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -995,6 +1218,7 @@ export type PlayerCreateWithoutBreaksInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -1009,6 +1233,7 @@ export type PlayerCreateWithoutBreaksInput = {
   photoUrl?: string | null
   user?: Prisma.UserCreateNestedOneWithoutPlayerInput
   entryMembers?: Prisma.TournamentEntryMemberCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutPlayerInput
 }
 
@@ -1018,6 +1243,7 @@ export type PlayerUncheckedCreateWithoutBreaksInput = {
   firstName: string
   middleInitial?: string | null
   lastName: string
+  eloRating?: number
   dateOfBirth?: Date | string | null
   emailAddress?: string | null
   phoneNumber?: string | null
@@ -1031,6 +1257,7 @@ export type PlayerUncheckedCreateWithoutBreaksInput = {
   updatedAt?: Date | string
   photoUrl?: string | null
   entryMembers?: Prisma.TournamentEntryMemberUncheckedCreateNestedManyWithoutPlayerInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedCreateNestedManyWithoutPlayerInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -1055,6 +1282,7 @@ export type PlayerUpdateWithoutBreaksInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1069,6 +1297,7 @@ export type PlayerUpdateWithoutBreaksInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneWithoutPlayerNestedInput
   entryMembers?: Prisma.TournamentEntryMemberUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1078,6 +1307,7 @@ export type PlayerUncheckedUpdateWithoutBreaksInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   middleInitial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  eloRating?: Prisma.IntFieldUpdateOperationsInput | number
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1091,6 +1321,7 @@ export type PlayerUncheckedUpdateWithoutBreaksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entryMembers?: Prisma.TournamentEntryMemberUncheckedUpdateManyWithoutPlayerNestedInput
+  eloHistory?: Prisma.PlayerEloHistoryUncheckedUpdateManyWithoutPlayerNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1102,12 +1333,14 @@ export type PlayerUncheckedUpdateWithoutBreaksInput = {
 export type PlayerCountOutputType = {
   breaks: number
   entryMembers: number
+  eloHistory: number
   invitations: number
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   breaks?: boolean | PlayerCountOutputTypeCountBreaksArgs
   entryMembers?: boolean | PlayerCountOutputTypeCountEntryMembersArgs
+  eloHistory?: boolean | PlayerCountOutputTypeCountEloHistoryArgs
   invitations?: boolean | PlayerCountOutputTypeCountInvitationsArgs
 }
 
@@ -1138,6 +1371,13 @@ export type PlayerCountOutputTypeCountEntryMembersArgs<ExtArgs extends runtime.T
 /**
  * PlayerCountOutputType without action
  */
+export type PlayerCountOutputTypeCountEloHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlayerEloHistoryWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
 export type PlayerCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.InvitationWhereInput
 }
@@ -1149,6 +1389,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   firstName?: boolean
   middleInitial?: boolean
   lastName?: boolean
+  eloRating?: boolean
   dateOfBirth?: boolean
   emailAddress?: boolean
   phoneNumber?: boolean
@@ -1164,6 +1405,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   user?: boolean | Prisma.Player$userArgs<ExtArgs>
   breaks?: boolean | Prisma.Player$breaksArgs<ExtArgs>
   entryMembers?: boolean | Prisma.Player$entryMembersArgs<ExtArgs>
+  eloHistory?: boolean | Prisma.Player$eloHistoryArgs<ExtArgs>
   invitations?: boolean | Prisma.Player$invitationsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
@@ -1174,6 +1416,7 @@ export type PlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   firstName?: boolean
   middleInitial?: boolean
   lastName?: boolean
+  eloRating?: boolean
   dateOfBirth?: boolean
   emailAddress?: boolean
   phoneNumber?: boolean
@@ -1195,6 +1438,7 @@ export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   firstName?: boolean
   middleInitial?: boolean
   lastName?: boolean
+  eloRating?: boolean
   dateOfBirth?: boolean
   emailAddress?: boolean
   phoneNumber?: boolean
@@ -1216,6 +1460,7 @@ export type PlayerSelectScalar = {
   firstName?: boolean
   middleInitial?: boolean
   lastName?: boolean
+  eloRating?: boolean
   dateOfBirth?: boolean
   emailAddress?: boolean
   phoneNumber?: boolean
@@ -1230,11 +1475,12 @@ export type PlayerSelectScalar = {
   photoUrl?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "firstName" | "middleInitial" | "lastName" | "dateOfBirth" | "emailAddress" | "phoneNumber" | "addressLine1" | "addressLine2" | "city" | "stateProvince" | "country" | "postalCode" | "createdAt" | "updatedAt" | "photoUrl", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "firstName" | "middleInitial" | "lastName" | "eloRating" | "dateOfBirth" | "emailAddress" | "phoneNumber" | "addressLine1" | "addressLine2" | "city" | "stateProvince" | "country" | "postalCode" | "createdAt" | "updatedAt" | "photoUrl", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Player$userArgs<ExtArgs>
   breaks?: boolean | Prisma.Player$breaksArgs<ExtArgs>
   entryMembers?: boolean | Prisma.Player$entryMembersArgs<ExtArgs>
+  eloHistory?: boolean | Prisma.Player$eloHistoryArgs<ExtArgs>
   invitations?: boolean | Prisma.Player$invitationsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1251,6 +1497,7 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     user: Prisma.$UserPayload<ExtArgs> | null
     breaks: Prisma.$PlayerBreakPayload<ExtArgs>[]
     entryMembers: Prisma.$TournamentEntryMemberPayload<ExtArgs>[]
+    eloHistory: Prisma.$PlayerEloHistoryPayload<ExtArgs>[]
     invitations: Prisma.$InvitationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1259,6 +1506,7 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     firstName: string
     middleInitial: string | null
     lastName: string
+    eloRating: number
     dateOfBirth: Date | null
     emailAddress: string | null
     phoneNumber: string | null
@@ -1668,6 +1916,7 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   user<T extends Prisma.Player$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   breaks<T extends Prisma.Player$breaksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$breaksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerBreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   entryMembers<T extends Prisma.Player$entryMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$entryMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentEntryMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  eloHistory<T extends Prisma.Player$eloHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$eloHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerEloHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invitations<T extends Prisma.Player$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1703,6 +1952,7 @@ export interface PlayerFieldRefs {
   readonly firstName: Prisma.FieldRef<"Player", 'String'>
   readonly middleInitial: Prisma.FieldRef<"Player", 'String'>
   readonly lastName: Prisma.FieldRef<"Player", 'String'>
+  readonly eloRating: Prisma.FieldRef<"Player", 'Int'>
   readonly dateOfBirth: Prisma.FieldRef<"Player", 'DateTime'>
   readonly emailAddress: Prisma.FieldRef<"Player", 'String'>
   readonly phoneNumber: Prisma.FieldRef<"Player", 'String'>
@@ -2180,6 +2430,30 @@ export type Player$entryMembersArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.TournamentEntryMemberScalarFieldEnum | Prisma.TournamentEntryMemberScalarFieldEnum[]
+}
+
+/**
+ * Player.eloHistory
+ */
+export type Player$eloHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlayerEloHistory
+   */
+  select?: Prisma.PlayerEloHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlayerEloHistory
+   */
+  omit?: Prisma.PlayerEloHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlayerEloHistoryInclude<ExtArgs> | null
+  where?: Prisma.PlayerEloHistoryWhereInput
+  orderBy?: Prisma.PlayerEloHistoryOrderByWithRelationInput | Prisma.PlayerEloHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.PlayerEloHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlayerEloHistoryScalarFieldEnum | Prisma.PlayerEloHistoryScalarFieldEnum[]
 }
 
 /**

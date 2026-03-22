@@ -258,12 +258,16 @@ function isAdminUserRecord(user: {
   );
 }
 
-function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean) {
+function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean, hasLinkedPlayer: boolean) {
   if (nextPath && nextPath.startsWith("/")) {
     return nextPath;
   }
 
-  return isAdmin ? "/admin" : "/profile";
+  if (isAdmin) {
+    return "/admin";
+  }
+
+  return hasLinkedPlayer ? "/dashboard" : "/profile";
 }
 
 export async function beginSocialAuth(provider: SocialProviderKey, request: Request) {
@@ -523,6 +527,11 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
       id: userId,
     },
     select: {
+      player: {
+        select: {
+          id: true,
+        },
+      },
       roleAssignments: {
         select: {
           scopeType: true,
@@ -547,10 +556,11 @@ export async function completeSocialAuth(provider: SocialProviderKey, request: R
   });
 
   const isAdmin = resolvedUser ? isAdminUserRecord(resolvedUser) : false;
+  const hasLinkedPlayer = Boolean(resolvedUser?.player?.id);
 
   return {
     ok: true as const,
-    nextPath: resolveNextPath(parsedState.nextPath, isAdmin),
+    nextPath: resolveNextPath(parsedState.nextPath, isAdmin, hasLinkedPlayer),
     userId,
     authMode: parsedState.mode,
   };

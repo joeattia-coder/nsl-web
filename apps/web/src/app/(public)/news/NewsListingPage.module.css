@@ -1,6 +1,9 @@
 .newsPage {
   min-height: 100vh;
-  background: var(--theme-page-bg);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
   color: var(--theme-page-text);
   padding: 24px 24px 32px;
 }
@@ -54,13 +57,15 @@
   background: var(--theme-surface-1);
   border: 1px solid var(--theme-border-soft);
   border-radius: 8px;
+  box-shadow: var(--theme-shadow-soft);
   transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .newsCard:hover {
-  background: var(--theme-surface-2);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
   border-color: var(--theme-border-strong);
   transform: translateY(-2px);
+  box-shadow: var(--theme-shadow-card);
 }
 
 .newsCardImage {

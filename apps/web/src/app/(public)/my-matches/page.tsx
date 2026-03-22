@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { resolveCurrentUser } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import PlayerPortalHeader from "../PlayerPortalHeader";
 
 function formatMatchDate(date: Date | null) {
   if (!date) {
@@ -128,47 +129,48 @@ export default async function MyMatchesPage() {
   });
 
   return (
-    <section className="admin-page login-page-shell">
-      <div className="login-page-card my-matches-shell">
-        <div className="login-page-copy">
-          <p className="login-page-kicker">My Matches</p>
-          <h1 className="login-page-title">Your fixtures and results</h1>
-          <p className="login-page-subtitle">
-            Matches assigned to your player profile across all tournaments.
-          </p>
-        </div>
+    <section className="admin-page login-page-shell player-dashboard-page player-profile-page">
+      <div className="login-page-card player-portal-shell player-dashboard-card">
+        <PlayerPortalHeader
+          kicker="My Matches"
+          title="Your fixtures and results"
+          subtitle="Track upcoming fixtures and completed match results assigned to your player profile."
+          avatarLabel={currentUser.displayName ?? currentUser.username ?? "Matches"}
+        />
 
-        {matches.length === 0 ? (
-          <p className="login-form-status login-form-status-info">
-            No matches found yet for your player profile.
-          </p>
-        ) : (
-          <div className="my-matches-list">
-            {matches.map((match) => (
-              <article key={match.id} className="my-match-card">
-                <p className="my-match-meta">
-                  <strong>{match.tournament.tournamentName}</strong>
-                  <span>{match.stageRound.roundName}</span>
-                </p>
-                <p className="my-match-meta">
-                  <span>{formatMatchDate(match.matchDate)}</span>
-                  <span>{match.matchTime || "TBA"}</span>
-                  <span>{match.matchStatus.replaceAll("_", " ")}</span>
-                </p>
-                <p className="my-match-teams">
-                  {formatEntryName(match.homeEntry.members)}
-                  <span className="my-match-score">
-                    {match.homeScore ?? "-"} : {match.awayScore ?? "-"}
-                  </span>
-                  {formatEntryName(match.awayEntry.members)}
-                </p>
-                <Link href="/matches" className="login-form-link">
-                  View public match hub
-                </Link>
-              </article>
-            ))}
-          </div>
-        )}
+        <div className="player-portal-content player-portal-content-wide">
+          {matches.length === 0 ? (
+            <p className="login-form-status login-form-status-info">
+              No matches found yet for your player profile.
+            </p>
+          ) : (
+            <div className="my-matches-list">
+              {matches.map((match) => (
+                <article key={match.id} className="my-match-card">
+                  <p className="my-match-meta">
+                    <strong>{match.tournament.tournamentName}</strong>
+                    <span>{match.stageRound.roundName}</span>
+                  </p>
+                  <p className="my-match-meta">
+                    <span>{formatMatchDate(match.matchDate)}</span>
+                    <span>{match.matchTime || "TBA"}</span>
+                    <span>{match.matchStatus.replaceAll("_", " ")}</span>
+                  </p>
+                  <p className="my-match-teams">
+                    {formatEntryName(match.homeEntry.members)}
+                    <span className="my-match-score">
+                      {match.homeScore ?? "-"} : {match.awayScore ?? "-"}
+                    </span>
+                    {formatEntryName(match.awayEntry.members)}
+                  </p>
+                  <Link href="/matches" className="login-form-link">
+                    View public match hub
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

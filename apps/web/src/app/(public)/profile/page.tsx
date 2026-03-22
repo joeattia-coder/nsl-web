@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { resolveCurrentUser } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import PlayerPortalHeader from "../PlayerPortalHeader";
 import ProfileForm from "./ProfileForm";
 
 export default async function ProfilePage() {
@@ -12,7 +13,7 @@ export default async function ProfilePage() {
 
   if (!currentUser.linkedPlayerId) {
     return (
-      <section className="admin-page login-page-shell">
+      <section className="admin-page login-page-shell player-dashboard-page player-profile-page">
         <div className="login-page-card">
           <div className="login-page-copy">
             <p className="login-page-kicker">Profile</p>
@@ -51,7 +52,7 @@ export default async function ProfilePage() {
 
   if (!player) {
     return (
-      <section className="admin-page login-page-shell">
+      <section className="admin-page login-page-shell player-dashboard-page player-profile-page">
         <div className="login-page-card">
           <div className="login-page-copy">
             <p className="login-page-kicker">Profile</p>
@@ -66,37 +67,39 @@ export default async function ProfilePage() {
   }
 
   return (
-    <section className="admin-page login-page-shell">
-      <div className="login-page-card">
-        <div className="login-page-copy">
-          <p className="login-page-kicker">Profile</p>
-          <h1 className="login-page-title">{player.firstName} {player.lastName}</h1>
-          <p className="login-page-subtitle">
-            Signed in as {currentUser.email ?? currentUser.username ?? "User"}.
-          </p>
-        </div>
-
-        <ProfileForm
-          initialData={{
-            id: player.id,
-            firstName: player.firstName,
-            middleInitial: player.middleInitial,
-            lastName: player.lastName,
-            dateOfBirth: player.dateOfBirth
-              ? player.dateOfBirth.toISOString().slice(0, 10)
-              : null,
-            emailAddress: player.emailAddress,
-            phoneNumber: player.phoneNumber,
-            photoUrl: player.photoUrl,
-            addressLine1: player.addressLine1,
-            addressLine2: player.addressLine2,
-            city: player.city,
-            stateProvince: player.stateProvince,
-            country: player.country,
-            postalCode: player.postalCode,
-            updatedAt: player.updatedAt.toISOString(),
-          }}
+    <section className="admin-page login-page-shell player-dashboard-page player-profile-page">
+      <div className="login-page-card player-portal-shell player-dashboard-card">
+        <PlayerPortalHeader
+          kicker="Profile"
+          title={`${player.firstName} ${player.lastName}`}
+          subtitle={`Signed in as ${currentUser.email ?? currentUser.username ?? "User"}. Keep your contact details and player profile information current.`}
+          avatarLabel={`${player.firstName} ${player.lastName}`}
+          avatarUrl={player.photoUrl}
         />
+
+        <div className="player-portal-content player-portal-content-narrow">
+          <ProfileForm
+            initialData={{
+              id: player.id,
+              firstName: player.firstName,
+              middleInitial: player.middleInitial,
+              lastName: player.lastName,
+              dateOfBirth: player.dateOfBirth
+                ? player.dateOfBirth.toISOString().slice(0, 10)
+                : null,
+              emailAddress: player.emailAddress,
+              phoneNumber: player.phoneNumber,
+              photoUrl: player.photoUrl,
+              addressLine1: player.addressLine1,
+              addressLine2: player.addressLine2,
+              city: player.city,
+              stateProvince: player.stateProvince,
+              country: player.country,
+              postalCode: player.postalCode,
+              updatedAt: player.updatedAt.toISOString(),
+            }}
+          />
+        </div>
       </div>
     </section>
   );

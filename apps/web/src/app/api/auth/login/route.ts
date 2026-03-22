@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({
       ok: true,
-      nextPath: getLoginSuccessPath(user.isAdmin, requestedNextPath),
+      nextPath: getLoginSuccessPath(user.isAdmin, requestedNextPath, Boolean(user.linkedPlayerId)),
     });
     response.cookies.set(
       getAdminSessionCookieName(),

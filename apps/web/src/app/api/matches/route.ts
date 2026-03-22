@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recalculateAndPersistPlayerElo } from "@/lib/player-elo";
 
 const VALID_MATCH_STATUSES = [
   "SCHEDULED",
@@ -410,82 +411,90 @@ export async function POST(request: Request) {
       }
     }
 
-    const match = await prisma.match.create({
-      data: {
-        tournamentId,
-        tournamentStageId,
-        stageRoundId,
-        tournamentGroupId: tournamentGroupId ?? null,
-        venueId: venueId ?? null,
-        matchDate: matchDate ? new Date(matchDate) : null,
-        matchTime: matchTime ?? null,
-        scheduleStatus: scheduleStatus ?? "TBC",
-        matchStatus: matchStatus ?? "SCHEDULED",
-        homeEntryId,
-        awayEntryId,
-        winnerEntryId: winnerEntryId ?? null,
-        homeScore: homeScore ?? null,
-        awayScore: awayScore ?? null,
-        internalNote: internalNote ?? null,
-        publicNote: publicNote ?? null,
-        snookerFormat: (snookerFormat ?? round.snookerFormat ?? tournament.snookerFormat ?? "REDS_15") as
-          | "REDS_6"
-          | "REDS_10"
-          | "REDS_15",
-        resultSubmittedAt: resultSubmittedAt
-          ? new Date(resultSubmittedAt)
-          : null,
-        approvedAt: approvedAt ? new Date(approvedAt) : null,
-        approvedByUserId: approvedByUserId ?? null,
-        enteredByUserId: enteredByUserId ?? null,
-        updatedByUserId: updatedByUserId ?? null,
-      },
-      include: {
-        tournament: true,
-        tournamentStage: true,
-        stageRound: true,
-        tournamentGroup: true,
-        venue: true,
-        homeEntry: {
-          include: {
-            members: {
-              include: {
-                player: true,
-              },
-              orderBy: {
-                createdAt: "asc",
+    const match = await prisma.$transaction(async (tx) => {
+      const created = await tx.match.create({
+        data: {
+          tournamentId,
+          tournamentStageId,
+          stageRoundId,
+          tournamentGroupId: tournamentGroupId ?? null,
+          venueId: venueId ?? null,
+          matchDate: matchDate ? new Date(matchDate) : null,
+          matchTime: matchTime ?? null,
+          scheduleStatus: scheduleStatus ?? "TBC",
+          matchStatus: matchStatus ?? "SCHEDULED",
+          homeEntryId,
+          awayEntryId,
+          winnerEntryId: winnerEntryId ?? null,
+          homeScore: homeScore ?? null,
+          awayScore: awayScore ?? null,
+          internalNote: internalNote ?? null,
+          publicNote: publicNote ?? null,
+          snookerFormat: (snookerFormat ?? round.snookerFormat ?? tournament.snookerFormat ?? "REDS_15") as
+            | "REDS_6"
+            | "REDS_10"
+            | "REDS_15",
+          resultSubmittedAt: resultSubmittedAt
+            ? new Date(resultSubmittedAt)
+            : null,
+          approvedAt: approvedAt ? new Date(approvedAt) : null,
+          approvedByUserId: approvedByUserId ?? null,
+          enteredByUserId: enteredByUserId ?? null,
+          updatedByUserId: updatedByUserId ?? null,
+        },
+      });
+
+      await recalculateAndPersistPlayerElo(tx);
+
+      return tx.match.findUniqueOrThrow({
+        where: { id: created.id },
+        include: {
+          tournament: true,
+          tournamentStage: true,
+          stageRound: true,
+          tournamentGroup: true,
+          venue: true,
+          homeEntry: {
+            include: {
+              members: {
+                include: {
+                  player: true,
+                },
+                orderBy: {
+                  createdAt: "asc",
+                },
               },
             },
           },
-        },
-        awayEntry: {
-          include: {
-            members: {
-              include: {
-                player: true,
-              },
-              orderBy: {
-                createdAt: "asc",
-              },
-            },
-          },
-        },
-        winnerEntry: {
-          include: {
-            members: {
-              include: {
-                player: true,
-              },
-              orderBy: {
-                createdAt: "asc",
+          awayEntry: {
+            include: {
+              members: {
+                include: {
+                  player: true,
+                },
+                orderBy: {
+                  createdAt: "asc",
+                },
               },
             },
           },
+          winnerEntry: {
+            include: {
+              members: {
+                include: {
+                  player: true,
+                },
+                orderBy: {
+                  createdAt: "asc",
+                },
+              },
+            },
+          },
+          approvedByUser: true,
+          enteredByUser: true,
+          updatedByUser: true,
         },
-        approvedByUser: true,
-        enteredByUser: true,
-        updatedByUser: true,
-      },
+      });
     });
 
     return NextResponse.json(match, { status: 201 });

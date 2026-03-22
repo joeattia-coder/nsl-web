@@ -23,7 +23,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type AdminNavItem = {
   href: string;
@@ -41,11 +41,11 @@ type AdminTopLink = {
 const adminSidebarItems: AdminNavItem[] = [
   { href: "/admin", label: "Dashboard", icon: FiHome },
   { href: "/admin/leagues", label: "Leagues", icon: FiBarChart2 },
-  { href: "/admin/players", label: "Players", icon: FiUsers },
   { href: "/admin/seasons", label: "Seasons", icon: FiCalendar },
-  { href: "/admin/tournaments", label: "Tournaments", icon: FiAward },
-  { href: "/admin/matches", label: "Matches", icon: FiActivity },
   { href: "/admin/venues", label: "Venues", icon: FiMapPin },
+  { href: "/admin/tournaments", label: "Tournaments", icon: FiAward },
+  { href: "/admin/players", label: "Players", icon: FiUsers },
+  { href: "/admin/matches", label: "Matches", icon: FiActivity },
   { href: "/admin/news", label: "News", icon: FiFileText },
   { href: "/admin/documents", label: "Documents", icon: FiFileText },
   { href: "/admin/faqs", label: "FAQs", icon: FiHelpCircle },
@@ -86,6 +86,7 @@ function LayoutChrome({
   const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
   const showAdminNavigation = isAdminRoute || Boolean(currentUser?.isAdmin);
   const closeMenu = () => setMenuOpen(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -109,6 +110,44 @@ function LayoutChrome({
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname, mobileMenuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target;
+
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (userMenuRef.current?.contains(target)) {
+        return;
+      }
+
+      closeMenu();
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      closeMenu();
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -212,12 +251,12 @@ function LayoutChrome({
 
                 <li>
                   <Link
-                    href="/statistics"
+                    href="/rankings"
                     className="sidebar-item"
                     onClick={closeMobileMenu}
                   >
                     <FiBarChart2 className="sidebar-icon" />
-                    <span className="sidebar-label">Statistics</span>
+                    <span className="sidebar-label">Rankings</span>
                   </Link>
                 </li>
               </>
@@ -260,7 +299,7 @@ function LayoutChrome({
             </button>
 
             {currentUser ? (
-              <div className="admin-user-menu-shell">
+              <div className="admin-user-menu-shell" ref={userMenuRef}>
                 <button
                   type="button"
                   className="admin-current-user-chip admin-user-menu-trigger"
@@ -278,6 +317,16 @@ function LayoutChrome({
 
                 {menuOpen ? (
                   <div className="admin-user-menu-dropdown" role="menu">
+                    {currentUser.linkedPlayerId ? (
+                      <Link
+                        href="/dashboard"
+                        className="admin-user-menu-item"
+                        role="menuitem"
+                        onClick={closeMenu}
+                      >
+                        Dashboard
+                      </Link>
+                    ) : null}
                     {currentUser.linkedPlayerId ? (
                       <Link
                         href="/my-matches"
