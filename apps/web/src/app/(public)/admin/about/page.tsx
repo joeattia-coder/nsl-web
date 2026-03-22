@@ -74,14 +74,12 @@ export default async function AdminAboutPage() {
         </p>
       </div>
 
-      <div className="admin-venue-form-layout">
-        <AboutForm
-          initialTitle={latest?.title ?? DEFAULT_ABOUT_TITLE}
-          initialSubtitle={latest?.subtitle ?? DEFAULT_ABOUT_SUBTITLE}
-          initialContentHtml={latest?.contentHtml ?? DEFAULT_ABOUT_CONTENT_HTML}
-          initialContentJson={latest?.contentJson ?? null}
-        />
-      </div>
+      <AboutForm
+        initialTitle={latest?.title ?? DEFAULT_ABOUT_TITLE}
+        initialSubtitle={latest?.subtitle ?? DEFAULT_ABOUT_SUBTITLE}
+        initialContentHtml={latest?.contentHtml ?? DEFAULT_ABOUT_CONTENT_HTML}
+        initialContentJson={latest?.contentJson ?? null}
+      />
 
       <div className="mt-8">
         <div className="admin-players-header" style={{ marginBottom: "12px" }}>
