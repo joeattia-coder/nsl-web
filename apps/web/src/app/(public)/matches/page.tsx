@@ -506,7 +506,7 @@ export default function MatchesPage() {
   }, [standingsGroups]);
 
   return (
-    <main className="content">
+    <main className="content matches-page-shell">
       <div className="matches-page-header">
         <div>
           <h1 className="matches-page-title">Matches</h1>

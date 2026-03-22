@@ -61,6 +61,7 @@ const adminSidebarItems: AdminNavItem[] = [
 const adminTopLinks: AdminTopLink[] = [
   { href: "/", label: "Home" },
   { href: "/news", label: "News" },
+  { href: "/rankings", label: "Rankings" },
   { href: "/documents", label: "Documents" },
   { href: "/faqs", label: "FAQ" },
   { href: "/about", label: "About" },
@@ -280,6 +281,7 @@ function LayoutChrome({
               <>
                 <Link href="/">Home</Link>
                 <Link href="/news">News</Link>
+                <Link href="/rankings">Rankings</Link>
                 <Link href="/documents">Documents</Link>
                 <Link href="/faqs">FAQ</Link>
                 <Link href="/about">About</Link>

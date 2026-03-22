@@ -1,0 +1,121 @@
+.contactPage {
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
+}
+
+.contactSection {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.hero {
+  margin-bottom: 1.75rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.6rem;
+  color: var(--theme-accent-brand);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--theme-page-text);
+  font-size: clamp(2.2rem, 4.8vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  max-width: 13ch;
+}
+
+.subtitle {
+  margin: 1rem 0 0;
+  max-width: 44rem;
+  color: var(--theme-page-muted-3);
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+.formShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 22px;
+  border: 1px solid var(--theme-border-soft);
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--theme-accent-brand) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-surface-1), var(--theme-surface-2));
+  box-shadow: var(--theme-shadow-card);
+}
+
+.formIntro {
+  max-width: 38rem;
+}
+
+.formTitle {
+  margin: 0;
+  color: var(--theme-page-text);
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  letter-spacing: -0.03em;
+}
+
+.formCopy {
+  margin: 0.65rem 0 0;
+  color: var(--theme-page-muted-3);
+  line-height: 1.65;
+}
+
+.confirmationCard {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-success) 28%, var(--theme-border-soft));
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-success) 10%, transparent), transparent 28%),
+    linear-gradient(180deg, var(--theme-surface-1), var(--theme-surface-2));
+  box-shadow: var(--theme-shadow-soft);
+}
+
+.confirmationEyebrow {
+  margin: 0;
+  color: var(--theme-accent-success);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.confirmationTitle {
+  margin: 0;
+  color: var(--theme-page-text);
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  letter-spacing: -0.03em;
+}
+
+.confirmationCopy {
+  margin: 0;
+  color: var(--theme-page-muted-2);
+  line-height: 1.7;
+}
+
+.confirmationActions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+@media (max-width: 720px) {
+  .contactPage {
+    padding-top: 1.5rem;
+  }
+
+  .formShell {
+    border-radius: 18px;
+  }
+}

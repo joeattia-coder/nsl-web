@@ -2212,6 +2212,14 @@ html[data-theme="light"] .navbar {
   padding: 22px 0 10px;
 }
 
+.matches-page-shell {
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
+  color: var(--theme-page-text);
+}
+
 .matches-page-title {
   font-size: 34px;
   letter-spacing: -0.02em;

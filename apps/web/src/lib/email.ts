@@ -22,6 +22,18 @@ type PlayerRegistrationVerificationEmailInput = {
   firstName?: string | null;
 };
 
+type ContactEmailInput = {
+  to: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  subject: string;
+  details: string;
+  replyTo?: string | null;
+  accountEmail?: string | null;
+  accountUsername?: string | null;
+};
+
 type MailTransportConfig = {
   host: string;
   port: number;
@@ -87,6 +99,15 @@ function formatExpiry(expiresAt: Date) {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 export function isEmailDeliveryConfigured() {
@@ -241,6 +262,58 @@ export async function sendPlayerRegistrationVerificationEmail({
         </p>
         <p>This link expires at ${expiryLabel}.</p>
         <p>If you did not start this registration, you can ignore this email.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendContactEmail({
+  to,
+  firstName,
+  lastName,
+  email,
+  subject,
+  details,
+  replyTo,
+  accountEmail,
+  accountUsername,
+}: ContactEmailInput) {
+  const config = getMailTransportConfig();
+
+  if (!config) {
+    throw new Error(
+      "SMTP is not configured. Set SMTP_HOST and SMTP_FROM_EMAIL to enable email delivery."
+    );
+  }
+
+  const transporter = createTransport(config);
+  const senderName = `${firstName} ${lastName}`.trim();
+  const metadataLines = [
+    accountEmail ? `Signed-in email: ${accountEmail}` : null,
+    accountUsername ? `Signed-in username: ${accountUsername}` : null,
+  ].filter(Boolean) as string[];
+
+  await transporter.sendMail({
+    from: `${config.fromName} <${config.fromEmail}>`,
+    to,
+    replyTo: replyTo?.trim() || config.replyTo || undefined,
+    subject: `NSL Contact Form: ${subject}`,
+    text: [
+      `From: ${senderName}`,
+      `Email: ${email}`,
+      ...metadataLines,
+      "",
+      "Message details:",
+      details,
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
+        <p><strong>From:</strong> ${escapeHtml(senderName)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        ${metadataLines.map((line) => `<p><strong>${escapeHtml(line.split(":")[0])}:</strong> ${escapeHtml(line.split(":").slice(1).join(":").trim())}</p>`).join("")}
+        <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+        <p><strong>Message details:</strong></p>
+        <div style="white-space: pre-wrap;">${escapeHtml(details)}</div>
       </div>
     `,
   });

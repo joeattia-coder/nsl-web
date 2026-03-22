@@ -1,0 +1,81 @@
+.aboutPage {
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
+}
+
+.aboutSection {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.hero {
+  margin-bottom: 1.75rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.6rem;
+  color: var(--theme-accent-brand);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--theme-page-text);
+  font-size: clamp(2.3rem, 5vw, 4.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  max-width: 12ch;
+}
+
+.subtitle {
+  margin: 1rem 0 0;
+  max-width: 42rem;
+  color: var(--theme-page-muted-3);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.statementCard {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid color-mix(in srgb, var(--theme-border-mid) 84%, transparent);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--theme-accent-brand) 14%, transparent), transparent 24%),
+    radial-gradient(circle at 72% 18%, color-mix(in srgb, var(--theme-accent-success) 10%, transparent), transparent 28%),
+    linear-gradient(140deg, color-mix(in srgb, var(--theme-surface-1) 95%, transparent), color-mix(in srgb, var(--theme-surface-2) 94%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--theme-accent-brand) 12%, transparent), transparent 48%);
+  box-shadow: var(--theme-shadow-card);
+}
+
+.statement {
+  position: relative;
+  margin: 0;
+  max-width: 34rem;
+  color: var(--theme-page-text);
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 720px) {
+  .aboutPage {
+    padding-top: 1.5rem;
+  }
+
+  .statementCard {
+    border-radius: 18px;
+  }
+
+  .statement {
+    max-width: none;
+  }
+}
