@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { buildCurrentLeagueRegisteredPlayersWhere } from "@/lib/player-performance";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import {
@@ -113,6 +114,7 @@ function getDashboardMetricVisual(label: string): {
 export default async function AdminDashboardPage() {
   const now = new Date();
   const trendStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+  const currentLeagueRegisteredPlayersWhere = buildCurrentLeagueRegisteredPlayersWhere();
 
   const [
     playerCount,
@@ -138,9 +140,10 @@ export default async function AdminDashboardPage() {
     totalMatchesByTournament,
     completedMatchesByTournament,
   ] = await Promise.all([
-    prisma.player.count(),
+    prisma.player.count({ where: currentLeagueRegisteredPlayersWhere }),
     prisma.player.count({
       where: {
+        ...currentLeagueRegisteredPlayersWhere,
         userId: {
           not: null,
         },
@@ -226,11 +229,16 @@ export default async function AdminDashboardPage() {
     matchCount > 0 ? Math.round((confirmedMatchCount / matchCount) * 100) : 0;
 
   const snapshotMetrics = [
-    { label: "Players", value: playerCount, hint: "Total player records", href: "/admin/players" },
+    {
+      label: "Players",
+      value: playerCount,
+      hint: "Registered in tournaments for the current league",
+      href: "/admin/players",
+    },
     {
       label: "Player Accounts",
       value: playersWithAccountsCount,
-      hint: `${accountCoveragePercent}% linked to user logins`,
+      hint: `${accountCoveragePercent}% of current-league players linked to user logins`,
       href: "/admin/security/users",
     },
     { label: "Leagues", value: leagueCount, hint: "Configured league entities", href: "/admin/leagues" },

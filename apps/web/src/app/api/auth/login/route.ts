@@ -7,6 +7,8 @@ import {
   getLoginSuccessPath,
 } from "@/lib/admin-auth";
 import { verifyPassword } from "@/lib/passwords";
+import { prisma } from "@/lib/prisma";
+import { isTermsTableMissingError } from "@/lib/terms";
 
 export async function POST(request: Request) {
   try {
@@ -14,12 +16,32 @@ export async function POST(request: Request) {
     const identifier = String(body.identifier ?? "").trim();
     const password = String(body.password ?? "");
     const requestedNextPath = String(body.nextPath ?? "").trim();
+    const acceptedTermsVersionId =
+      typeof body.acceptedTermsVersionId === "string" ? body.acceptedTermsVersionId.trim() : "";
 
     if (!identifier || !password) {
       return NextResponse.json(
         { error: "Username or email and password are required." },
         { status: 400 }
       );
+    }
+
+    try {
+      const latestTermsVersion = await prisma.termsOfServiceVersion.findFirst({
+        orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+        select: { id: true },
+      });
+
+      if (latestTermsVersion && acceptedTermsVersionId !== latestTermsVersion.id) {
+        return NextResponse.json(
+          { error: "You must agree to the current Terms of Service before signing in." },
+          { status: 400 }
+        );
+      }
+    } catch (termsError) {
+      if (!isTermsTableMissingError(termsError)) {
+        throw termsError;
+      }
     }
 
     const user = await findUserForLogin(identifier);

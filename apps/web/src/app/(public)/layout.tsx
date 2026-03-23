@@ -27,6 +27,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import TermsFooterLink from "./TermsFooterLink";
 
 type AdminNavItem = {
   href: string;
@@ -58,6 +59,7 @@ const adminSidebarItems: AdminNavItem[] = [
   { href: "/admin/matches", label: "Matches", icon: FiActivity },
   { href: "/admin/news", label: "News", icon: FiFileText },
   { href: "/admin/about", label: "About", icon: FiInfo },
+  { href: "/admin/terms", label: "Terms", icon: FiFileText },
   { href: "/admin/documents", label: "Documents", icon: FiFileText },
   { href: "/admin/faqs", label: "FAQs", icon: FiHelpCircle },
   { href: "/admin/videos", label: "Videos", icon: FiFilm },
@@ -407,7 +409,23 @@ function LayoutChrome({
           </div>
         </nav>
 
-        {children}
+        <div className="main-content">{children}</div>
+
+        <footer className="site-footer">
+          <div className="site-footer-inner">
+            <div className="site-footer-copy">
+              <span className="site-footer-brand">National Snooker League</span>
+              <span className="site-footer-separator" aria-hidden="true">
+                /
+              </span>
+              <span className="site-footer-meta">Official league information and policies</span>
+            </div>
+
+            <div className="site-footer-links">
+              <TermsFooterLink />
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );

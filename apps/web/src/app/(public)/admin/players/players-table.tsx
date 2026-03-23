@@ -28,13 +28,17 @@ type PlayerRow = {
   country: string;
   photoUrl: string;
   linkedUserId: string | null;
+  tournaments: Array<{
+    id: string;
+    name: string;
+  }>;
 };
 
 type PlayersTableProps = {
   players: PlayerRow[];
 };
 
-type SortKey = "fullName" | "email" | "phoneNumber" | "country";
+type SortKey = "fullName" | "email" | "phoneNumber" | "country" | "tournaments";
 
 export default function PlayersTable({ players }: PlayersTableProps) {
   const [search, setSearch] = useState("");
@@ -60,7 +64,10 @@ export default function PlayersTable({ players }: PlayersTableProps) {
             player.fullName.toLowerCase().includes(term) ||
             player.email.toLowerCase().includes(term) ||
             player.phoneNumber.toLowerCase().includes(term) ||
-            player.country.toLowerCase().includes(term)
+            player.country.toLowerCase().includes(term) ||
+            player.tournaments.some((tournament) =>
+              tournament.name.toLowerCase().includes(term)
+            )
           );
         });
 
@@ -74,6 +81,8 @@ export default function PlayersTable({ players }: PlayersTableProps) {
             return player.phoneNumber;
           case "country":
             return player.country;
+          case "tournaments":
+            return player.tournaments.map((tournament) => tournament.name).join(", ");
           case "fullName":
           default:
             return player.fullName;
@@ -376,6 +385,7 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                     />
                   </th>
                 )}
+                <th className="admin-players-number-col">#</th>
                 <SortableHeader
                   label="Name"
                   columnKey="fullName"
@@ -404,6 +414,13 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
+                <SortableHeader
+                  label="Tournaments"
+                  columnKey="tournaments"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>
@@ -412,14 +429,14 @@ export default function PlayersTable({ players }: PlayersTableProps) {
               {filteredPlayers.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={bulkMode ? 6 : 5}
+                    colSpan={bulkMode ? 8 : 7}
                     className="admin-players-empty"
                   >
                     No players found.
                   </td>
                 </tr>
               ) : (
-                filteredPlayers.map((player) => {
+                filteredPlayers.map((player, index) => {
                   const isSelected = selectedIds.includes(player.id);
                   const countryCode = normalizeCountryCode(player.country);
                   const canInvite = Boolean(player.email.trim());
@@ -439,6 +456,8 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                           />
                         </td>
                       )}
+
+                      <td className="admin-players-number-cell">{index + 1}</td>
 
                       <td>
                         <div className="admin-player-name-cell">
@@ -478,6 +497,24 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                             className="admin-player-country-flag-img"
                             title={player.country || countryCode}
                           />
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+
+                      <td>
+                        {player.tournaments.length > 0 ? (
+                          <div className="admin-player-tournaments-cell">
+                            {player.tournaments.map((tournament) => (
+                              <Link
+                                key={tournament.id}
+                                href={`/admin/tournaments/${tournament.id}/entries`}
+                                className="admin-player-tournament-pill"
+                              >
+                                {tournament.name}
+                              </Link>
+                            ))}
+                          </div>
                         ) : (
                           "—"
                         )}

@@ -416,6 +416,7 @@ export const ModelName = {
   NewsArticle: 'NewsArticle',
   FaqItem: 'FaqItem',
   AboutSectionVersion: 'AboutSectionVersion',
+  TermsOfServiceVersion: 'TermsOfServiceVersion',
   VideoHighlight: 'VideoHighlight',
   Document: 'Document'
 } as const
@@ -433,7 +434,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "videoHighlight" | "document"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "termsOfServiceVersion" | "videoHighlight" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2805,6 +2806,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TermsOfServiceVersion: {
+      payload: Prisma.$TermsOfServiceVersionPayload<ExtArgs>
+      fields: Prisma.TermsOfServiceVersionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TermsOfServiceVersionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TermsOfServiceVersionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>
+        }
+        findFirst: {
+          args: Prisma.TermsOfServiceVersionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TermsOfServiceVersionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>
+        }
+        findMany: {
+          args: Prisma.TermsOfServiceVersionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>[]
+        }
+        create: {
+          args: Prisma.TermsOfServiceVersionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>
+        }
+        createMany: {
+          args: Prisma.TermsOfServiceVersionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TermsOfServiceVersionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>[]
+        }
+        delete: {
+          args: Prisma.TermsOfServiceVersionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>
+        }
+        update: {
+          args: Prisma.TermsOfServiceVersionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>
+        }
+        deleteMany: {
+          args: Prisma.TermsOfServiceVersionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TermsOfServiceVersionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TermsOfServiceVersionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>[]
+        }
+        upsert: {
+          args: Prisma.TermsOfServiceVersionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TermsOfServiceVersionPayload>
+        }
+        aggregate: {
+          args: Prisma.TermsOfServiceVersionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTermsOfServiceVersion>
+        }
+        groupBy: {
+          args: Prisma.TermsOfServiceVersionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TermsOfServiceVersionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TermsOfServiceVersionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TermsOfServiceVersionCountAggregateOutputType> | number
+        }
+      }
+    }
     VideoHighlight: {
       payload: Prisma.$VideoHighlightPayload<ExtArgs>
       fields: Prisma.VideoHighlightFieldRefs
@@ -3478,6 +3553,19 @@ export const AboutSectionVersionScalarFieldEnum = {
 export type AboutSectionVersionScalarFieldEnum = (typeof AboutSectionVersionScalarFieldEnum)[keyof typeof AboutSectionVersionScalarFieldEnum]
 
 
+export const TermsOfServiceVersionScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  contentHtml: 'contentHtml',
+  contentJson: 'contentJson',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TermsOfServiceVersionScalarFieldEnum = (typeof TermsOfServiceVersionScalarFieldEnum)[keyof typeof TermsOfServiceVersionScalarFieldEnum]
+
+
 export const VideoHighlightScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -3995,6 +4083,7 @@ export type GlobalOmitConfig = {
   newsArticle?: Prisma.NewsArticleOmit
   faqItem?: Prisma.FaqItemOmit
   aboutSectionVersion?: Prisma.AboutSectionVersionOmit
+  termsOfServiceVersion?: Prisma.TermsOfServiceVersionOmit
   videoHighlight?: Prisma.VideoHighlightOmit
   document?: Prisma.DocumentOmit
 }

@@ -1,0 +1,85 @@
+.termsPage {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 28%),
+    radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 22%),
+    linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 90%, var(--theme-surface-2)) 100%);
+  color: var(--theme-page-text);
+  padding: 24px 24px 32px;
+}
+
+.termsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--theme-page-muted-3);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--theme-page-text);
+  font-size: clamp(1.75rem, 4vw, 1.95rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 760px;
+  color: var(--theme-page-muted-2);
+  line-height: 1.7;
+}
+
+.statementCard {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.75rem, 4vw, 3.25rem);
+  border: 1px solid color-mix(in srgb, var(--theme-border-mid) 84%, transparent);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--theme-accent-brand) 14%, transparent), transparent 24%),
+    radial-gradient(circle at 72% 18%, color-mix(in srgb, var(--theme-accent-success) 10%, transparent), transparent 28%),
+    linear-gradient(140deg, color-mix(in srgb, var(--theme-surface-1) 95%, transparent), color-mix(in srgb, var(--theme-surface-2) 94%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--theme-accent-brand) 12%, transparent), transparent 48%);
+  box-shadow: var(--theme-shadow-card);
+}
+
+.statement {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  color: var(--theme-page-text);
+  font-size: clamp(1rem, 1.4vw, 1.05rem);
+  line-height: 1.8;
+}
+
+@media (max-width: 720px) {
+  .termsPage {
+    padding-top: 24px;
+  }
+}
+
+@media (min-width: 768px) {
+  .termsPage {
+    padding-top: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}

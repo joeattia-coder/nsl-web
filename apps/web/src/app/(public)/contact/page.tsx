@@ -54,7 +54,11 @@ export default async function ContactPage() {
           <h1 className={styles.title}>Get in touch with the league team</h1>
           <p className={styles.subtitle}>
             Send a message directly to the National Snooker League and we will forward it to
-            <strong> nationalsnookerleague@gmail.com</strong>.
+            {" "}
+            <strong>
+              <a href="mailto:info@nsl-tv.com">info@nsl-tv.com</a>
+            </strong>
+            .
           </p>
         </header>
 

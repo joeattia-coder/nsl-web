@@ -1,5 +1,37 @@
 import { prisma } from "@/lib/prisma";
 
+export function buildCurrentLeagueRegisteredPlayersWhere() {
+  return {
+    entryMembers: {
+      some: {
+        tournamentEntry: {
+          tournament: {
+            season: {
+              isActive: true,
+              League: {
+                isActive: true,
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+}
+
+function buildCurrentLeagueMatchesWhere() {
+  return {
+    tournament: {
+      season: {
+        isActive: true,
+        League: {
+          isActive: true,
+        },
+      },
+    },
+  };
+}
+
 export type PlayerRankingRow = {
   id: string;
   firstName: string;
@@ -70,6 +102,7 @@ export function compareRankingRows(left: PlayerRankingRow, right: PlayerRankingR
 
 export async function getPlayerRankings() {
   const players = await prisma.player.findMany({
+    where: buildCurrentLeagueRegisteredPlayersWhere(),
     select: {
       id: true,
       firstName: true,
@@ -83,6 +116,7 @@ export async function getPlayerRankings() {
   });
 
   const matches = await prisma.match.findMany({
+    where: buildCurrentLeagueMatchesWhere(),
     select: {
       id: true,
       matchStatus: true,

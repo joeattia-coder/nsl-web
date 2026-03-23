@@ -178,6 +178,11 @@ export type FaqItem = Prisma.FaqItemModel
  */
 export type AboutSectionVersion = Prisma.AboutSectionVersionModel
 /**
+ * Model TermsOfServiceVersion
+ * 
+ */
+export type TermsOfServiceVersion = Prisma.TermsOfServiceVersionModel
+/**
  * Model VideoHighlight
  * 
  */

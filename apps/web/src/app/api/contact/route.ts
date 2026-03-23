@@ -3,7 +3,7 @@ import { resolveCurrentUser } from "@/lib/admin-auth";
 import { sendContactEmail } from "@/lib/email";
 import { validateHumanVerification } from "@/lib/human-verification";
 
-const CONTACT_EMAIL = "nationalsnookerleague@gmail.com";
+const CONTACT_EMAIL = "info@nsl-tv.com";
 
 type ContactRequestBody = {
   firstName?: string;

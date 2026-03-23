@@ -2,28 +2,21 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { FaFacebookF, FaGoogle } from "react-icons/fa6";
+import { FormEvent, useEffect, useState } from "react";
 import PasswordField from "@/components/admin/PasswordField";
+import TermsFooterLink from "../TermsFooterLink";
 import { useAdminAuth } from "../AdminAuthContext";
 
-function getAuthMessage(errorCode: string | null) {
-  switch (errorCode) {
-    case "social_not_configured":
-      return "That social login provider is not configured yet.";
-    case "social_no_account":
-      return "That social account does not match an enabled account. You can register first.";
-    case "social_auth_failed":
-      return "The social login attempt failed. Please try again.";
-    case "social_state_invalid":
-      return "That social login session expired. Please try again.";
-    case "social_provider_invalid":
-    case "social_profile_invalid":
-      return "That social login provider response was invalid.";
-    default:
-      return null;
-  }
-}
+type TermsSnapshot = {
+  id: string | null;
+  title: string;
+  contentHtml: string;
+  publishedAt: string | null;
+  publishedAtLabel: string | null;
+  exists: boolean;
+};
+
+const ACCEPTED_TERMS_STORAGE_KEY = "nsl-accepted-terms-version";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -33,19 +26,83 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [latestTerms, setLatestTerms] = useState<TermsSnapshot | null>(null);
+  const [storedAcceptedTermsVersionId, setStoredAcceptedTermsVersionId] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const nextPath = searchParams.get("next") || "";
-  const oauthError = getAuthMessage(searchParams.get("error"));
   const resetStatus = searchParams.get("reset") === "success";
   const inviteStatus = searchParams.get("invite") === "success";
   const verifiedStatus = searchParams.get("verified");
-  const googleHref = `/api/auth/oauth/google?next=${encodeURIComponent(nextPath)}`;
-  const facebookHref = `/api/auth/oauth/facebook?next=${encodeURIComponent(nextPath)}`;
+  const latestTermsVersionId = latestTerms?.exists ? latestTerms.id : null;
+  const hasAcceptedCurrentTerms = Boolean(
+    latestTermsVersionId && storedAcceptedTermsVersionId === latestTermsVersionId
+  );
+  const requiresTermsAcceptance = Boolean(latestTermsVersionId) && !hasAcceptedCurrentTerms;
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    setStoredAcceptedTermsVersionId(window.localStorage.getItem(ACCEPTED_TERMS_STORAGE_KEY));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadLatestTerms() {
+      try {
+        const response = await fetch("/api/terms/latest", { cache: "no-store" });
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(payload?.details || payload?.error || "Failed to load Terms of Service.");
+        }
+
+        if (!cancelled) {
+          setLatestTerms(payload.version as TermsSnapshot);
+        }
+      } catch (loadError) {
+        console.error(loadError);
+        if (!cancelled) {
+          setLatestTerms({
+            id: null,
+            title: "Terms of Service",
+            contentHtml: "",
+            publishedAt: null,
+            publishedAtLabel: null,
+            exists: false,
+          });
+        }
+      }
+    }
+
+    void loadLatestTerms();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (requiresTermsAcceptance && !agreedToTerms) {
+      setError("You must agree to the current Terms of Service before signing in.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
+
+    const acceptedTermsVersionId = latestTermsVersionId
+      ? requiresTermsAcceptance
+        ? agreedToTerms
+          ? latestTermsVersionId
+          : null
+        : storedAcceptedTermsVersionId
+      : null;
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -53,13 +110,23 @@ export default function LoginForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ identifier, password, nextPath }),
+        body: JSON.stringify({
+          identifier,
+          password,
+          nextPath,
+          acceptedTermsVersionId,
+        }),
       });
 
       const payload = await response.json().catch(() => null);
 
       if (!response.ok) {
         throw new Error(payload?.error || "Failed to log in.");
+      }
+
+      if (latestTermsVersionId && typeof window !== "undefined") {
+        window.localStorage.setItem(ACCEPTED_TERMS_STORAGE_KEY, latestTermsVersionId);
+        setStoredAcceptedTermsVersionId(latestTermsVersionId);
       }
 
       await refreshCurrentUser();
@@ -84,7 +151,7 @@ export default function LoginForm() {
 
       {inviteStatus ? (
         <p className="login-form-status login-form-status-success">
-          Account setup complete. You can sign in with your password, or use Google/Facebook with the same email.
+          Account setup complete. You can now sign in with your password.
         </p>
       ) : null}
 
@@ -98,10 +165,6 @@ export default function LoginForm() {
         <p className="login-form-status login-form-status-warning">
           That verification link is invalid or expired.
         </p>
-      ) : null}
-
-      {oauthError ? (
-        <p className="login-form-status login-form-status-warning">{oauthError}</p>
       ) : null}
 
       <label className="admin-form-field">
@@ -141,30 +204,25 @@ export default function LoginForm() {
         </Link>
       </div>
 
+      {requiresTermsAcceptance ? (
+        <label className="admin-checkbox-inline login-terms-checkbox">
+          <input
+            type="checkbox"
+            checked={agreedToTerms}
+            onChange={(event) => setAgreedToTerms(event.target.checked)}
+            required
+          />
+          <span>
+            I agree to the <TermsFooterLink className="login-terms-link" label="Terms of Service" />.
+          </span>
+        </label>
+      ) : null}
+
       {error ? <p className="admin-form-error">{error}</p> : null}
 
       <button type="submit" className="admin-primary-button" disabled={isSubmitting}>
         {isSubmitting ? "Signing in..." : "Sign in"}
       </button>
-
-      <div className="login-divider" aria-hidden="true">
-        <span>or continue with</span>
-      </div>
-
-      <div className="social-auth-actions">
-        <a href={googleHref} className="social-auth-button social-auth-button-google">
-          <FaGoogle aria-hidden="true" />
-          <span>Google</span>
-        </a>
-        <a href={facebookHref} className="social-auth-button social-auth-button-facebook">
-          <FaFacebookF aria-hidden="true" />
-          <span>Facebook</span>
-        </a>
-      </div>
-
-      <p className="login-support-copy">
-        Social sign-in works for enabled accounts. New players can register from the Register page.
-      </p>
     </form>
   );
 }
