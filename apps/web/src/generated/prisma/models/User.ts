@@ -256,7 +256,9 @@ export type UserWhereInput = {
   acceptedInvitations?: Prisma.InvitationListRelationFilter
   userRoles?: Prisma.UserRoleListRelationFilter
   roleAssignments?: Prisma.UserRoleAssignmentListRelationFilter
+  accessGroupMemberships?: Prisma.AccessGroupMembershipListRelationFilter
   grantedRoleAssignments?: Prisma.UserRoleAssignmentListRelationFilter
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentListRelationFilter
   permissionOverrides?: Prisma.UserPermissionOverrideListRelationFilter
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideListRelationFilter
   emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
@@ -287,7 +289,9 @@ export type UserOrderByWithRelationInput = {
   acceptedInvitations?: Prisma.InvitationOrderByRelationAggregateInput
   userRoles?: Prisma.UserRoleOrderByRelationAggregateInput
   roleAssignments?: Prisma.UserRoleAssignmentOrderByRelationAggregateInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipOrderByRelationAggregateInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentOrderByRelationAggregateInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentOrderByRelationAggregateInput
   permissionOverrides?: Prisma.UserPermissionOverrideOrderByRelationAggregateInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideOrderByRelationAggregateInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenOrderByRelationAggregateInput
@@ -321,7 +325,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   acceptedInvitations?: Prisma.InvitationListRelationFilter
   userRoles?: Prisma.UserRoleListRelationFilter
   roleAssignments?: Prisma.UserRoleAssignmentListRelationFilter
+  accessGroupMemberships?: Prisma.AccessGroupMembershipListRelationFilter
   grantedRoleAssignments?: Prisma.UserRoleAssignmentListRelationFilter
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentListRelationFilter
   permissionOverrides?: Prisma.UserPermissionOverrideListRelationFilter
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideListRelationFilter
   emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
@@ -390,7 +396,9 @@ export type UserCreateInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -421,7 +429,9 @@ export type UserUncheckedCreateInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -452,7 +462,9 @@ export type UserUpdateInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -483,7 +495,9 @@ export type UserUncheckedUpdateInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -616,6 +630,20 @@ export type UserUpdateOneWithoutPlayerNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPlayerInput, Prisma.UserUpdateWithoutPlayerInput>, Prisma.UserUncheckedUpdateWithoutPlayerInput>
 }
 
+export type UserCreateNestedOneWithoutAccessGroupMembershipsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAccessGroupMembershipsInput, Prisma.UserUncheckedCreateWithoutAccessGroupMembershipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccessGroupMembershipsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAccessGroupMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAccessGroupMembershipsInput, Prisma.UserUncheckedCreateWithoutAccessGroupMembershipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccessGroupMembershipsInput
+  upsert?: Prisma.UserUpsertWithoutAccessGroupMembershipsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccessGroupMembershipsInput, Prisma.UserUpdateWithoutAccessGroupMembershipsInput>, Prisma.UserUncheckedUpdateWithoutAccessGroupMembershipsInput>
+}
+
 export type UserCreateNestedOneWithoutUserRolesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserRolesInput
@@ -718,6 +746,22 @@ export type UserUpdateOneRequiredWithoutPasswordResetTokensNestedInput = {
   upsert?: Prisma.UserUpsertWithoutPasswordResetTokensInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetTokensInput, Prisma.UserUpdateWithoutPasswordResetTokensInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+}
+
+export type UserCreateNestedOneWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGrantedAccessGroupRoleAssignmentsInput, Prisma.UserUncheckedCreateWithoutGrantedAccessGroupRoleAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGrantedAccessGroupRoleAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutGrantedAccessGroupRoleAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGrantedAccessGroupRoleAssignmentsInput, Prisma.UserUncheckedCreateWithoutGrantedAccessGroupRoleAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGrantedAccessGroupRoleAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutGrantedAccessGroupRoleAssignmentsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGrantedAccessGroupRoleAssignmentsInput, Prisma.UserUpdateWithoutGrantedAccessGroupRoleAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutGrantedAccessGroupRoleAssignmentsInput>
 }
 
 export type UserCreateNestedOneWithoutRoleAssignmentsInput = {
@@ -851,7 +895,9 @@ export type UserCreateWithoutPlayerInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -881,7 +927,9 @@ export type UserUncheckedCreateWithoutPlayerInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -927,7 +975,9 @@ export type UserUpdateWithoutPlayerInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -957,7 +1007,153 @@ export type UserUncheckedUpdateWithoutPlayerInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAccessGroupMembershipsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  player?: Prisma.PlayerCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAccessGroupMembershipsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAccessGroupMembershipsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAccessGroupMembershipsInput, Prisma.UserUncheckedCreateWithoutAccessGroupMembershipsInput>
+}
+
+export type UserUpsertWithoutAccessGroupMembershipsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAccessGroupMembershipsInput, Prisma.UserUncheckedUpdateWithoutAccessGroupMembershipsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAccessGroupMembershipsInput, Prisma.UserUncheckedCreateWithoutAccessGroupMembershipsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAccessGroupMembershipsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAccessGroupMembershipsInput, Prisma.UserUncheckedUpdateWithoutAccessGroupMembershipsInput>
+}
+
+export type UserUpdateWithoutAccessGroupMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAccessGroupMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -987,7 +1183,9 @@ export type UserCreateWithoutUserRolesInput = {
   createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -1017,7 +1215,9 @@ export type UserUncheckedCreateWithoutUserRolesInput = {
   createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1063,7 +1263,9 @@ export type UserUpdateWithoutUserRolesInput = {
   createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -1093,7 +1295,9 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
   createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1123,7 +1327,9 @@ export type UserCreateWithoutAuthAccountsInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -1153,7 +1359,9 @@ export type UserUncheckedCreateWithoutAuthAccountsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1199,7 +1407,9 @@ export type UserUpdateWithoutAuthAccountsInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -1229,7 +1439,9 @@ export type UserUncheckedUpdateWithoutAuthAccountsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1259,7 +1471,9 @@ export type UserCreateWithoutTargetInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -1289,7 +1503,9 @@ export type UserUncheckedCreateWithoutTargetInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1324,7 +1540,9 @@ export type UserCreateWithoutAcceptedInvitationsInput = {
   createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -1354,7 +1572,9 @@ export type UserUncheckedCreateWithoutAcceptedInvitationsInput = {
   createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1389,7 +1609,9 @@ export type UserCreateWithoutCreatedInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -1419,7 +1641,9 @@ export type UserUncheckedCreateWithoutCreatedInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1465,7 +1689,9 @@ export type UserUpdateWithoutTargetInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -1495,7 +1721,9 @@ export type UserUncheckedUpdateWithoutTargetInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1536,7 +1764,9 @@ export type UserUpdateWithoutAcceptedInvitationsInput = {
   createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -1566,7 +1796,9 @@ export type UserUncheckedUpdateWithoutAcceptedInvitationsInput = {
   createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1607,7 +1839,9 @@ export type UserUpdateWithoutCreatedInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -1637,7 +1871,9 @@ export type UserUncheckedUpdateWithoutCreatedInvitationsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1668,7 +1904,9 @@ export type UserCreateWithoutEmailVerificationTokensInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
@@ -1698,7 +1936,9 @@ export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1744,7 +1984,9 @@ export type UserUpdateWithoutEmailVerificationTokensInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
@@ -1774,7 +2016,9 @@ export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1804,7 +2048,9 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -1834,7 +2080,9 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1880,7 +2128,9 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -1910,10 +2160,156 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  player?: Prisma.PlayerCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutGrantedAccessGroupRoleAssignmentsInput, Prisma.UserUncheckedCreateWithoutGrantedAccessGroupRoleAssignmentsInput>
+}
+
+export type UserUpsertWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutGrantedAccessGroupRoleAssignmentsInput, Prisma.UserUncheckedUpdateWithoutGrantedAccessGroupRoleAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutGrantedAccessGroupRoleAssignmentsInput, Prisma.UserUncheckedCreateWithoutGrantedAccessGroupRoleAssignmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutGrantedAccessGroupRoleAssignmentsInput, Prisma.UserUncheckedUpdateWithoutGrantedAccessGroupRoleAssignmentsInput>
+}
+
+export type UserUpdateWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutGrantedAccessGroupRoleAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRoleAssignmentsInput = {
@@ -1939,7 +2335,9 @@ export type UserCreateWithoutRoleAssignmentsInput = {
   createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -1969,7 +2367,9 @@ export type UserUncheckedCreateWithoutRoleAssignmentsInput = {
   createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2005,6 +2405,8 @@ export type UserCreateWithoutGrantedRoleAssignmentsInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -2035,6 +2437,8 @@ export type UserUncheckedCreateWithoutGrantedRoleAssignmentsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2080,7 +2484,9 @@ export type UserUpdateWithoutRoleAssignmentsInput = {
   createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -2110,7 +2516,9 @@ export type UserUncheckedUpdateWithoutRoleAssignmentsInput = {
   createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2152,6 +2560,8 @@ export type UserUpdateWithoutGrantedRoleAssignmentsInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -2182,6 +2592,8 @@ export type UserUncheckedUpdateWithoutGrantedRoleAssignmentsInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2212,7 +2624,9 @@ export type UserCreateWithoutPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
@@ -2242,7 +2656,9 @@ export type UserUncheckedCreateWithoutPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2277,7 +2693,9 @@ export type UserCreateWithoutGrantedPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
@@ -2307,7 +2725,9 @@ export type UserUncheckedCreateWithoutGrantedPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2353,7 +2773,9 @@ export type UserUpdateWithoutPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
@@ -2383,7 +2805,9 @@ export type UserUncheckedUpdateWithoutPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2424,7 +2848,9 @@ export type UserUpdateWithoutGrantedPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
@@ -2454,7 +2880,9 @@ export type UserUncheckedUpdateWithoutGrantedPermissionOverridesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2483,7 +2911,9 @@ export type UserCreateWithoutApprovedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -2513,7 +2943,9 @@ export type UserUncheckedCreateWithoutApprovedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2548,7 +2980,9 @@ export type UserCreateWithoutEnteredMatchesInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -2578,7 +3012,9 @@ export type UserUncheckedCreateWithoutEnteredMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2613,7 +3049,9 @@ export type UserCreateWithoutUpdatedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
@@ -2643,7 +3081,9 @@ export type UserUncheckedCreateWithoutUpdatedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2689,7 +3129,9 @@ export type UserUpdateWithoutApprovedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -2719,7 +3161,9 @@ export type UserUncheckedUpdateWithoutApprovedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2760,7 +3204,9 @@ export type UserUpdateWithoutEnteredMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -2790,7 +3236,9 @@ export type UserUncheckedUpdateWithoutEnteredMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2831,7 +3279,9 @@ export type UserUpdateWithoutUpdatedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
@@ -2861,7 +3311,9 @@ export type UserUncheckedUpdateWithoutUpdatedMatchesInput = {
   acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
   grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
   permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
   grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2883,7 +3335,9 @@ export type UserCountOutputType = {
   acceptedInvitations: number
   userRoles: number
   roleAssignments: number
+  accessGroupMemberships: number
   grantedRoleAssignments: number
+  grantedAccessGroupRoleAssignments: number
   permissionOverrides: number
   grantedPermissionOverrides: number
   emailVerificationTokens: number
@@ -2900,7 +3354,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   acceptedInvitations?: boolean | UserCountOutputTypeCountAcceptedInvitationsArgs
   userRoles?: boolean | UserCountOutputTypeCountUserRolesArgs
   roleAssignments?: boolean | UserCountOutputTypeCountRoleAssignmentsArgs
+  accessGroupMemberships?: boolean | UserCountOutputTypeCountAccessGroupMembershipsArgs
   grantedRoleAssignments?: boolean | UserCountOutputTypeCountGrantedRoleAssignmentsArgs
+  grantedAccessGroupRoleAssignments?: boolean | UserCountOutputTypeCountGrantedAccessGroupRoleAssignmentsArgs
   permissionOverrides?: boolean | UserCountOutputTypeCountPermissionOverridesArgs
   grantedPermissionOverrides?: boolean | UserCountOutputTypeCountGrantedPermissionOverridesArgs
   emailVerificationTokens?: boolean | UserCountOutputTypeCountEmailVerificationTokensArgs
@@ -2983,8 +3439,22 @@ export type UserCountOutputTypeCountRoleAssignmentsArgs<ExtArgs extends runtime.
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountAccessGroupMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AccessGroupMembershipWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountGrantedRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.UserRoleAssignmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountGrantedAccessGroupRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AccessGroupRoleAssignmentWhereInput
 }
 
 /**
@@ -3040,7 +3510,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   acceptedInvitations?: boolean | Prisma.User$acceptedInvitationsArgs<ExtArgs>
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   roleAssignments?: boolean | Prisma.User$roleAssignmentsArgs<ExtArgs>
+  accessGroupMemberships?: boolean | Prisma.User$accessGroupMembershipsArgs<ExtArgs>
   grantedRoleAssignments?: boolean | Prisma.User$grantedRoleAssignmentsArgs<ExtArgs>
+  grantedAccessGroupRoleAssignments?: boolean | Prisma.User$grantedAccessGroupRoleAssignmentsArgs<ExtArgs>
   permissionOverrides?: boolean | Prisma.User$permissionOverridesArgs<ExtArgs>
   grantedPermissionOverrides?: boolean | Prisma.User$grantedPermissionOverridesArgs<ExtArgs>
   emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
@@ -3108,7 +3580,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   acceptedInvitations?: boolean | Prisma.User$acceptedInvitationsArgs<ExtArgs>
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   roleAssignments?: boolean | Prisma.User$roleAssignmentsArgs<ExtArgs>
+  accessGroupMemberships?: boolean | Prisma.User$accessGroupMembershipsArgs<ExtArgs>
   grantedRoleAssignments?: boolean | Prisma.User$grantedRoleAssignmentsArgs<ExtArgs>
+  grantedAccessGroupRoleAssignments?: boolean | Prisma.User$grantedAccessGroupRoleAssignmentsArgs<ExtArgs>
   permissionOverrides?: boolean | Prisma.User$permissionOverridesArgs<ExtArgs>
   grantedPermissionOverrides?: boolean | Prisma.User$grantedPermissionOverridesArgs<ExtArgs>
   emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
@@ -3131,7 +3605,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     acceptedInvitations: Prisma.$InvitationPayload<ExtArgs>[]
     userRoles: Prisma.$UserRolePayload<ExtArgs>[]
     roleAssignments: Prisma.$UserRoleAssignmentPayload<ExtArgs>[]
+    accessGroupMemberships: Prisma.$AccessGroupMembershipPayload<ExtArgs>[]
     grantedRoleAssignments: Prisma.$UserRoleAssignmentPayload<ExtArgs>[]
+    grantedAccessGroupRoleAssignments: Prisma.$AccessGroupRoleAssignmentPayload<ExtArgs>[]
     permissionOverrides: Prisma.$UserPermissionOverridePayload<ExtArgs>[]
     grantedPermissionOverrides: Prisma.$UserPermissionOverridePayload<ExtArgs>[]
     emailVerificationTokens: Prisma.$EmailVerificationTokenPayload<ExtArgs>[]
@@ -3555,7 +4031,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   acceptedInvitations<T extends Prisma.User$acceptedInvitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$acceptedInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   userRoles<T extends Prisma.User$userRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   roleAssignments<T extends Prisma.User$roleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$roleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  accessGroupMemberships<T extends Prisma.User$accessGroupMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accessGroupMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccessGroupMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   grantedRoleAssignments<T extends Prisma.User$grantedRoleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$grantedRoleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  grantedAccessGroupRoleAssignments<T extends Prisma.User$grantedAccessGroupRoleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$grantedAccessGroupRoleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccessGroupRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   permissionOverrides<T extends Prisma.User$permissionOverridesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$permissionOverridesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPermissionOverridePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   grantedPermissionOverrides<T extends Prisma.User$grantedPermissionOverridesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$grantedPermissionOverridesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPermissionOverridePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emailVerificationTokens<T extends Prisma.User$emailVerificationTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailVerificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailVerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4230,6 +4708,30 @@ export type User$roleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
+ * User.accessGroupMemberships
+ */
+export type User$accessGroupMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AccessGroupMembership
+   */
+  select?: Prisma.AccessGroupMembershipSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AccessGroupMembership
+   */
+  omit?: Prisma.AccessGroupMembershipOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccessGroupMembershipInclude<ExtArgs> | null
+  where?: Prisma.AccessGroupMembershipWhereInput
+  orderBy?: Prisma.AccessGroupMembershipOrderByWithRelationInput | Prisma.AccessGroupMembershipOrderByWithRelationInput[]
+  cursor?: Prisma.AccessGroupMembershipWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AccessGroupMembershipScalarFieldEnum | Prisma.AccessGroupMembershipScalarFieldEnum[]
+}
+
+/**
  * User.grantedRoleAssignments
  */
 export type User$grantedRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4251,6 +4753,30 @@ export type User$grantedRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.UserRoleAssignmentScalarFieldEnum | Prisma.UserRoleAssignmentScalarFieldEnum[]
+}
+
+/**
+ * User.grantedAccessGroupRoleAssignments
+ */
+export type User$grantedAccessGroupRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AccessGroupRoleAssignment
+   */
+  select?: Prisma.AccessGroupRoleAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AccessGroupRoleAssignment
+   */
+  omit?: Prisma.AccessGroupRoleAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccessGroupRoleAssignmentInclude<ExtArgs> | null
+  where?: Prisma.AccessGroupRoleAssignmentWhereInput
+  orderBy?: Prisma.AccessGroupRoleAssignmentOrderByWithRelationInput | Prisma.AccessGroupRoleAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AccessGroupRoleAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AccessGroupRoleAssignmentScalarFieldEnum | Prisma.AccessGroupRoleAssignmentScalarFieldEnum[]
 }
 
 /**

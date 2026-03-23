@@ -1,9 +1,16 @@
 import { prisma } from "@/lib/prisma";
+import {
+  buildLeagueAdminPermissionScopes,
+  hasAdminPermission,
+  hasScopedAdminPermission,
+  requireAnyScopedAdminPermission,
+} from "@/lib/admin-auth";
 import LeaguesTable from "./leagues-table";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminLeaguesPage() {
+  const currentUser = await requireAnyScopedAdminPermission("leagues.view");
   const leagues = await prisma.league.findMany({
     orderBy: [{ leagueName: "asc" }],
     select: {
@@ -56,10 +63,28 @@ export default async function AdminLeaguesPage() {
 
       return {
         ...league,
+        canEdit: hasScopedAdminPermission(
+          currentUser,
+          "leagues.edit",
+          buildLeagueAdminPermissionScopes(league.id)
+        ),
+        canDeletePermission: hasScopedAdminPermission(
+          currentUser,
+          "leagues.delete",
+          buildLeagueAdminPermissionScopes(league.id)
+        ),
         canDelete: dependencyParts.length === 0,
         dependencySummary: dependencyParts.join(", "),
       };
     })
+  );
+
+  const visibleLeagues = leaguesWithUsage.filter((league) =>
+    hasScopedAdminPermission(
+      currentUser,
+      "leagues.view",
+      buildLeagueAdminPermissionScopes(league.id)
+    )
   );
 
   return (
@@ -78,9 +103,13 @@ export default async function AdminLeaguesPage() {
         logoUrl: l.logoUrl ?? "",
         createdAt: l.createdAt.toISOString(),
         updatedAt: l.updatedAt.toISOString(),
+        canEdit: l.canEdit,
         canDelete: l.canDelete,
+        canDeletePermission: l.canDeletePermission,
         dependencySummary: l.dependencySummary,
-      }))} />
+      })).filter((league) => visibleLeagues.some((visibleLeague) => visibleLeague.id === league.id))}
+        canCreate={hasAdminPermission(currentUser, "leagues.create")}
+      />
     </section>
   );
 }

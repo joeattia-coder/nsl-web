@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  getGroupAdminPermissionScopes,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 
 type RouteContext = {
   params: Promise<{ groupId: string }>;
@@ -7,7 +12,22 @@ type RouteContext = {
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { groupId } = await context.params;
+    const permissionScopes = await getGroupAdminPermissionScopes(groupId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Group not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "groups.view", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const group = await prisma.tournamentGroup.findUnique({
       where: { id: groupId },
@@ -65,7 +85,23 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function PUT(request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { groupId } = await context.params;
+    const permissionScopes = await getGroupAdminPermissionScopes(groupId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Group not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "groups.edit", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const body = await request.json();
 
     const entryIdsRaw = Array.isArray(body.entryIds) ? body.entryIds : [];
@@ -214,7 +250,22 @@ export async function PUT(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { groupId } = await context.params;
+    const permissionScopes = await getGroupAdminPermissionScopes(groupId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Group not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "groups.delete", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const group = await prisma.tournamentGroup.findUnique({
       where: { id: groupId },

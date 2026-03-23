@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  getMatchAdminPermissionScopes,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 import { recalculateAndPersistPlayerElo } from "@/lib/player-elo";
 
 const VALID_MATCH_STATUSES = [
@@ -23,7 +28,22 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+    const permissionScopes = await getMatchAdminPermissionScopes(id);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Match not found" }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "matches.view", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const match = await prisma.match.findUnique({
       where: { id },
@@ -113,7 +133,23 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+    const permissionScopes = await getMatchAdminPermissionScopes(id);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Match not found" }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "matches.edit", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const body = await request.json();
 
     const existingMatch = await prisma.match.findUnique({
@@ -586,7 +622,22 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+    const permissionScopes = await getMatchAdminPermissionScopes(id);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Match not found" }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "matches.delete", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const existingMatch = await prisma.match.findUnique({
       where: { id },

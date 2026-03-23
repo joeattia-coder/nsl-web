@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { hasAdminPermission, resolveCurrentAdminUser } from "@/lib/admin-auth";
-import { GLOBAL_ADMIN_ROLE_KEY } from "@/lib/admin-user-access";
+import {
+  GLOBAL_ADMIN_ROLE_KEY,
+  isAccessGroupTablesMissingError,
+  isGlobalAdminUserRecord,
+} from "@/lib/admin-user-access";
 import { hashPassword } from "@/lib/passwords";
 import { prisma } from "@/lib/prisma";
 
@@ -24,6 +28,8 @@ const editableUserSelect = {
   },
   roleAssignments: {
     select: {
+      createdAt: true,
+      expiresAt: true,
       scopeType: true,
       scopeId: true,
       role: {
@@ -36,10 +42,124 @@ const editableUserSelect = {
   },
   userRoles: {
     select: {
+      createdAt: true,
       role: {
         select: {
           roleKey: true,
           roleName: true,
+        },
+      },
+    },
+  },
+  accessGroupMemberships: {
+    select: {
+      id: true,
+      createdAt: true,
+      group: {
+        select: {
+          id: true,
+          groupName: true,
+          description: true,
+          isActive: true,
+          roleAssignments: {
+            select: {
+              createdAt: true,
+              expiresAt: true,
+              scopeType: true,
+              scopeId: true,
+              role: {
+                select: {
+                  roleKey: true,
+                  roleName: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  permissionOverrides: {
+    select: {
+      createdAt: true,
+      expiresAt: true,
+      scopeType: true,
+      scopeId: true,
+      effect: true,
+      reason: true,
+      permission: {
+        select: {
+          permissionKey: true,
+          permissionName: true,
+        },
+      },
+    },
+  },
+  _count: {
+    select: {
+      approvedMatches: true,
+      enteredMatches: true,
+      updatedMatches: true,
+      createdInvitations: true,
+    },
+  },
+} as const;
+
+const legacyEditableUserSelect = {
+  id: true,
+  username: true,
+  email: true,
+  phoneNumber: true,
+  registrationStatus: true,
+  isLoginEnabled: true,
+  emailVerifiedAt: true,
+  passwordSetAt: true,
+  player: {
+    select: {
+      id: true,
+      firstName: true,
+      middleInitial: true,
+      lastName: true,
+      userId: true,
+    },
+  },
+  roleAssignments: {
+    select: {
+      createdAt: true,
+      expiresAt: true,
+      scopeType: true,
+      scopeId: true,
+      role: {
+        select: {
+          roleKey: true,
+          roleName: true,
+        },
+      },
+    },
+  },
+  userRoles: {
+    select: {
+      createdAt: true,
+      role: {
+        select: {
+          roleKey: true,
+          roleName: true,
+        },
+      },
+    },
+  },
+  permissionOverrides: {
+    select: {
+      createdAt: true,
+      expiresAt: true,
+      scopeType: true,
+      scopeId: true,
+      effect: true,
+      reason: true,
+      permission: {
+        select: {
+          permissionKey: true,
+          permissionName: true,
         },
       },
     },
@@ -70,15 +190,14 @@ function normalizeUsername(username: string | null) {
 function isGlobalAdminTarget(user: {
   roleAssignments: Array<{ scopeType: string; scopeId: string; role: { roleKey: string } }>;
   userRoles: Array<{ role: { roleKey: string } }>;
+  accessGroupMemberships?: Array<{
+    group: {
+      isActive?: boolean;
+      roleAssignments?: Array<{ scopeType: string; scopeId: string; role: { roleKey: string } }>;
+    };
+  }>;
 }) {
-  return (
-    user.roleAssignments.some(
-      (assignment) =>
-        assignment.scopeType === "GLOBAL" &&
-        assignment.scopeId === "" &&
-        assignment.role.roleKey === GLOBAL_ADMIN_ROLE_KEY
-    ) || user.userRoles.some((userRole) => userRole.role.roleKey === GLOBAL_ADMIN_ROLE_KEY)
-  );
+  return isGlobalAdminUserRecord(user);
 }
 
 async function findAdministratorRole() {
@@ -93,10 +212,128 @@ async function findAdministratorRole() {
 }
 
 async function loadEditableUser(id: string) {
-  return prisma.user.findUnique({
-    where: { id },
-    select: editableUserSelect,
+  try {
+    return await prisma.user.findUnique({
+      where: { id },
+      select: editableUserSelect,
+    });
+  } catch (error) {
+    if (!isAccessGroupTablesMissingError(error)) {
+      throw error;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: legacyEditableUserSelect,
+    });
+
+    return user
+      ? {
+          ...user,
+          accessGroupMemberships: [],
+        }
+      : null;
+  }
+}
+
+function buildEditableUserPayload(user: NonNullable<Awaited<ReturnType<typeof loadEditableUser>>>) {
+  const assignedRoles = [
+    ...user.roleAssignments.map((assignment) => ({
+      source: "DIRECT_ASSIGNMENT" as const,
+      sourceLabel: "Direct assignment",
+      sourceGroupName: null,
+      roleKey: assignment.role.roleKey,
+      roleName: assignment.role.roleName,
+      scopeType: assignment.scopeType,
+      scopeId: assignment.scopeId,
+      createdAt: assignment.createdAt,
+      expiresAt: assignment.expiresAt,
+    })),
+    ...user.userRoles.map((userRole) => ({
+      source: "LEGACY_LINK" as const,
+      sourceLabel: "Legacy direct role",
+      sourceGroupName: null,
+      roleKey: userRole.role.roleKey,
+      roleName: userRole.role.roleName,
+      scopeType: "GLOBAL",
+      scopeId: "",
+      createdAt: userRole.createdAt,
+      expiresAt: null,
+    })),
+    ...user.accessGroupMemberships.flatMap((membership) =>
+      membership.group.roleAssignments.map((assignment) => ({
+        source: "GROUP_INHERITED" as const,
+        sourceLabel: "Inherited from group",
+        sourceGroupName: membership.group.groupName,
+        roleKey: assignment.role.roleKey,
+        roleName: assignment.role.roleName,
+        scopeType: assignment.scopeType,
+        scopeId: assignment.scopeId,
+        createdAt: assignment.createdAt,
+        expiresAt: assignment.expiresAt,
+      }))
+    ),
+  ].sort((left, right) => {
+    if (left.roleName !== right.roleName) {
+      return left.roleName.localeCompare(right.roleName);
+    }
+
+    if (left.scopeType !== right.scopeType) {
+      return left.scopeType.localeCompare(right.scopeType);
+    }
+
+    return (left.sourceGroupName ?? "").localeCompare(right.sourceGroupName ?? "");
   });
+
+  const groupMemberships = user.accessGroupMemberships
+    .map((membership) => ({
+      id: membership.id,
+      groupId: membership.group.id,
+      groupName: membership.group.groupName,
+      description: membership.group.description,
+      isActive: membership.group.isActive,
+      joinedAt: membership.createdAt,
+      inheritedRoles: membership.group.roleAssignments
+        .map((assignment) => ({
+          roleKey: assignment.role.roleKey,
+          roleName: assignment.role.roleName,
+          scopeType: assignment.scopeType,
+          scopeId: assignment.scopeId,
+          createdAt: assignment.createdAt,
+          expiresAt: assignment.expiresAt,
+        }))
+        .sort((left, right) => left.roleName.localeCompare(right.roleName)),
+    }))
+    .sort((left, right) => left.groupName.localeCompare(right.groupName));
+
+  const permissionOverrides = user.permissionOverrides
+    .map((override) => ({
+      permissionKey: override.permission.permissionKey,
+      permissionName: override.permission.permissionName,
+      effect: override.effect,
+      scopeType: override.scopeType,
+      scopeId: override.scopeId,
+      reason: override.reason,
+      createdAt: override.createdAt,
+      expiresAt: override.expiresAt,
+    }))
+    .sort((left, right) => left.permissionKey.localeCompare(right.permissionKey));
+
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    phoneNumber: user.phoneNumber,
+    registrationStatus: user.registrationStatus,
+    isLoginEnabled: user.isLoginEnabled,
+    emailVerifiedAt: user.emailVerifiedAt,
+    passwordSetAt: user.passwordSetAt,
+    linkedPlayerId: user.player?.id ?? null,
+    isGlobalAdmin: isGlobalAdminTarget(user),
+    groupMemberships,
+    assignedRoles,
+    permissionOverrides,
+  };
 }
 
 export async function GET(
@@ -125,18 +362,7 @@ export async function GET(
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    return NextResponse.json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      registrationStatus: user.registrationStatus,
-      isLoginEnabled: user.isLoginEnabled,
-      emailVerifiedAt: user.emailVerifiedAt,
-      passwordSetAt: user.passwordSetAt,
-      linkedPlayerId: user.player?.id ?? null,
-      isGlobalAdmin: isGlobalAdminTarget(user),
-    });
+    return NextResponse.json(buildEditableUserPayload(user));
   } catch (error) {
     console.error("GET /api/admin/users/[id] error:", error);
 
@@ -371,18 +597,7 @@ export async function PATCH(
       });
     });
 
-    return NextResponse.json({
-      id: updatedUser?.id,
-      username: updatedUser?.username ?? null,
-      email: updatedUser?.email ?? null,
-      phoneNumber: updatedUser?.phoneNumber ?? null,
-      registrationStatus: updatedUser?.registrationStatus ?? "INACTIVE",
-      isLoginEnabled: updatedUser?.isLoginEnabled ?? false,
-      emailVerifiedAt: updatedUser?.emailVerifiedAt ?? null,
-      passwordSetAt: updatedUser?.passwordSetAt ?? null,
-      linkedPlayerId: updatedUser?.player?.id ?? null,
-      isGlobalAdmin: updatedUser ? isGlobalAdminTarget(updatedUser) : false,
-    });
+    return NextResponse.json(updatedUser ? buildEditableUserPayload(updatedUser) : null);
   } catch (error) {
     console.error("PATCH /api/admin/users/[id] error:", error);
 

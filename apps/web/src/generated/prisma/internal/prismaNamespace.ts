@@ -393,6 +393,8 @@ export const ModelName = {
   User: 'User',
   Player: 'Player',
   Role: 'Role',
+  AccessGroup: 'AccessGroup',
+  AccessGroupMembership: 'AccessGroupMembership',
   UserRole: 'UserRole',
   AuthAccount: 'AuthAccount',
   Invitation: 'Invitation',
@@ -400,6 +402,7 @@ export const ModelName = {
   PasswordResetToken: 'PasswordResetToken',
   Permission: 'Permission',
   RolePermission: 'RolePermission',
+  AccessGroupRoleAssignment: 'AccessGroupRoleAssignment',
   UserRoleAssignment: 'UserRoleAssignment',
   UserPermissionOverride: 'UserPermissionOverride',
   TournamentEntry: 'TournamentEntry',
@@ -430,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "videoHighlight" | "document"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "videoHighlight" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1100,6 +1103,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AccessGroup: {
+      payload: Prisma.$AccessGroupPayload<ExtArgs>
+      fields: Prisma.AccessGroupFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccessGroupFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccessGroupFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>
+        }
+        findFirst: {
+          args: Prisma.AccessGroupFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccessGroupFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>
+        }
+        findMany: {
+          args: Prisma.AccessGroupFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>[]
+        }
+        create: {
+          args: Prisma.AccessGroupCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>
+        }
+        createMany: {
+          args: Prisma.AccessGroupCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccessGroupCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>[]
+        }
+        delete: {
+          args: Prisma.AccessGroupDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>
+        }
+        update: {
+          args: Prisma.AccessGroupUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccessGroupDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccessGroupUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccessGroupUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccessGroupUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupPayload>
+        }
+        aggregate: {
+          args: Prisma.AccessGroupAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccessGroup>
+        }
+        groupBy: {
+          args: Prisma.AccessGroupGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessGroupGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccessGroupCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessGroupCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccessGroupMembership: {
+      payload: Prisma.$AccessGroupMembershipPayload<ExtArgs>
+      fields: Prisma.AccessGroupMembershipFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccessGroupMembershipFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccessGroupMembershipFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>
+        }
+        findFirst: {
+          args: Prisma.AccessGroupMembershipFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccessGroupMembershipFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>
+        }
+        findMany: {
+          args: Prisma.AccessGroupMembershipFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>[]
+        }
+        create: {
+          args: Prisma.AccessGroupMembershipCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>
+        }
+        createMany: {
+          args: Prisma.AccessGroupMembershipCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccessGroupMembershipCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>[]
+        }
+        delete: {
+          args: Prisma.AccessGroupMembershipDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>
+        }
+        update: {
+          args: Prisma.AccessGroupMembershipUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccessGroupMembershipDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccessGroupMembershipUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccessGroupMembershipUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccessGroupMembershipUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupMembershipPayload>
+        }
+        aggregate: {
+          args: Prisma.AccessGroupMembershipAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccessGroupMembership>
+        }
+        groupBy: {
+          args: Prisma.AccessGroupMembershipGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessGroupMembershipGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccessGroupMembershipCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessGroupMembershipCountAggregateOutputType> | number
+        }
+      }
+    }
     UserRole: {
       payload: Prisma.$UserRolePayload<ExtArgs>
       fields: Prisma.UserRoleFieldRefs
@@ -1615,6 +1766,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RolePermissionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RolePermissionCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccessGroupRoleAssignment: {
+      payload: Prisma.$AccessGroupRoleAssignmentPayload<ExtArgs>
+      fields: Prisma.AccessGroupRoleAssignmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccessGroupRoleAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccessGroupRoleAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>
+        }
+        findFirst: {
+          args: Prisma.AccessGroupRoleAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccessGroupRoleAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>
+        }
+        findMany: {
+          args: Prisma.AccessGroupRoleAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>[]
+        }
+        create: {
+          args: Prisma.AccessGroupRoleAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>
+        }
+        createMany: {
+          args: Prisma.AccessGroupRoleAssignmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccessGroupRoleAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>[]
+        }
+        delete: {
+          args: Prisma.AccessGroupRoleAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>
+        }
+        update: {
+          args: Prisma.AccessGroupRoleAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccessGroupRoleAssignmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccessGroupRoleAssignmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccessGroupRoleAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccessGroupRoleAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessGroupRoleAssignmentPayload>
+        }
+        aggregate: {
+          args: Prisma.AccessGroupRoleAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccessGroupRoleAssignment>
+        }
+        groupBy: {
+          args: Prisma.AccessGroupRoleAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessGroupRoleAssignmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccessGroupRoleAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessGroupRoleAssignmentCountAggregateOutputType> | number
         }
       }
     }
@@ -2922,6 +3147,28 @@ export const RoleScalarFieldEnum = {
 export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
 
 
+export const AccessGroupScalarFieldEnum = {
+  id: 'id',
+  groupName: 'groupName',
+  description: 'description',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccessGroupScalarFieldEnum = (typeof AccessGroupScalarFieldEnum)[keyof typeof AccessGroupScalarFieldEnum]
+
+
+export const AccessGroupMembershipScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type AccessGroupMembershipScalarFieldEnum = (typeof AccessGroupMembershipScalarFieldEnum)[keyof typeof AccessGroupMembershipScalarFieldEnum]
+
+
 export const UserRoleScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3014,6 +3261,20 @@ export const RolePermissionScalarFieldEnum = {
 } as const
 
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const AccessGroupRoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  roleId: 'roleId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  grantedByUserId: 'grantedByUserId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AccessGroupRoleAssignmentScalarFieldEnum = (typeof AccessGroupRoleAssignmentScalarFieldEnum)[keyof typeof AccessGroupRoleAssignmentScalarFieldEnum]
 
 
 export const UserRoleAssignmentScalarFieldEnum = {
@@ -3711,6 +3972,8 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   player?: Prisma.PlayerOmit
   role?: Prisma.RoleOmit
+  accessGroup?: Prisma.AccessGroupOmit
+  accessGroupMembership?: Prisma.AccessGroupMembershipOmit
   userRole?: Prisma.UserRoleOmit
   authAccount?: Prisma.AuthAccountOmit
   invitation?: Prisma.InvitationOmit
@@ -3718,6 +3981,7 @@ export type GlobalOmitConfig = {
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   permission?: Prisma.PermissionOmit
   rolePermission?: Prisma.RolePermissionOmit
+  accessGroupRoleAssignment?: Prisma.AccessGroupRoleAssignmentOmit
   userRoleAssignment?: Prisma.UserRoleAssignmentOmit
   userPermissionOverride?: Prisma.UserPermissionOverrideOmit
   tournamentEntry?: Prisma.TournamentEntryOmit

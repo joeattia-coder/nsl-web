@@ -26,6 +26,49 @@ type EditableUser = {
   passwordSetAt: string | null;
   linkedPlayerId: string | null;
   isGlobalAdmin: boolean;
+  groupMemberships: GroupMembershipSummary[];
+  assignedRoles: AssignedRoleSummary[];
+  permissionOverrides: PermissionOverrideSummary[];
+};
+
+type GroupMembershipSummary = {
+  id: string;
+  groupId: string;
+  groupName: string;
+  description: string | null;
+  isActive: boolean;
+  joinedAt: string;
+  inheritedRoles: Array<{
+    roleKey: string;
+    roleName: string;
+    scopeType: string;
+    scopeId: string;
+    createdAt: string;
+    expiresAt: string | null;
+  }>;
+};
+
+type AssignedRoleSummary = {
+  source: "DIRECT_ASSIGNMENT" | "LEGACY_LINK" | "GROUP_INHERITED";
+  sourceLabel: string;
+  sourceGroupName: string | null;
+  roleKey: string;
+  roleName: string;
+  scopeType: string;
+  scopeId: string;
+  createdAt: string;
+  expiresAt: string | null;
+};
+
+type PermissionOverrideSummary = {
+  permissionKey: string;
+  permissionName: string;
+  effect: "ALLOW" | "DENY";
+  scopeType: string;
+  scopeId: string;
+  reason: string | null;
+  createdAt: string;
+  expiresAt: string | null;
 };
 
 type PlayerOption = {
@@ -50,6 +93,53 @@ function getErrorMessage(payload: unknown, fallback: string) {
   }
 
   return fallback;
+}
+
+function formatScopeLabel(scopeType: string, scopeId: string) {
+  if (scopeType === "GLOBAL") {
+    return "Global";
+  }
+
+  return scopeId ? `${scopeType}: ${scopeId}` : scopeType;
+}
+
+function formatDateLabel(value: string | null) {
+  if (!value) {
+    return "-";
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return parsed.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatDateTimeLabel(value: string | null) {
+  if (!value) {
+    return "-";
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return `${parsed.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })} ${parsed.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  })}`;
 }
 
 export default function UserForm({
@@ -79,6 +169,9 @@ export default function UserForm({
   const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
   const [hasExistingPassword, setHasExistingPassword] = useState(false);
   const [players, setPlayers] = useState<PlayerOption[]>([]);
+  const [groupMemberships, setGroupMemberships] = useState<GroupMembershipSummary[]>([]);
+  const [assignedRoles, setAssignedRoles] = useState<AssignedRoleSummary[]>([]);
+  const [permissionOverrides, setPermissionOverrides] = useState<PermissionOverrideSummary[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -164,6 +257,11 @@ export default function UserForm({
         setLinkedPlayerId(payload.linkedPlayerId ?? "");
         setIsGlobalAdmin(payload.isGlobalAdmin);
         setHasExistingPassword(Boolean(payload.passwordSetAt));
+        setGroupMemberships(Array.isArray(payload.groupMemberships) ? payload.groupMemberships : []);
+        setAssignedRoles(Array.isArray(payload.assignedRoles) ? payload.assignedRoles : []);
+        setPermissionOverrides(
+          Array.isArray(payload.permissionOverrides) ? payload.permissionOverrides : []
+        );
       } catch (loadError) {
         console.error(loadError);
         if (!cancelled) {
@@ -285,7 +383,7 @@ export default function UserForm({
           <h1 className="admin-page-title">{isEdit ? "Edit User" : "Add User"}</h1>
           <p className="admin-page-subtitle">
             {isEdit
-              ? "Update login access, linked player details, and admin visibility."
+              ? "Update login access, linked player details, and review inherited security access."
               : "Create a new platform user account and optionally grant global admin access."}
           </p>
         </div>
@@ -472,6 +570,189 @@ export default function UserForm({
           </div>
         </form>
       </div>
+
+      {isEdit ? (
+        <div className="admin-security-stack">
+          <section className="admin-security-panel admin-table-card">
+            <div className="admin-security-panel-header">
+              <div>
+                <p className="admin-security-kicker">Groups</p>
+                <h2>Group Memberships</h2>
+                <p>Groups determine inherited role assignments for this user.</p>
+              </div>
+            </div>
+
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Group</th>
+                    <th>Status</th>
+                    <th>Inherited Roles</th>
+                    <th>Joined</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groupMemberships.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="admin-security-empty-cell">
+                        This user is not a member of any groups.
+                      </td>
+                    </tr>
+                  ) : (
+                    groupMemberships.map((membership) => (
+                      <tr key={membership.id}>
+                        <td>
+                          <div className="admin-security-cell-stack">
+                            <strong>{membership.groupName}</strong>
+                            <span className="admin-security-muted">
+                              {membership.description || "No description"}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <span
+                            className={`admin-security-badge ${
+                              membership.isActive
+                                ? "admin-security-badge-positive"
+                                : "admin-security-badge-warning"
+                            }`}
+                          >
+                            {membership.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td>
+                          {membership.inheritedRoles.length === 0
+                            ? "No inherited roles"
+                            : membership.inheritedRoles
+                                .map((role) => `${role.roleName} (${formatScopeLabel(role.scopeType, role.scopeId)})`)
+                                .join(", ")}
+                        </td>
+                        <td>{formatDateTimeLabel(membership.joinedAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="admin-security-panel admin-table-card">
+            <div className="admin-security-panel-header">
+              <div>
+                <p className="admin-security-kicker">Roles</p>
+                <h2>Assigned Roles</h2>
+                <p>Direct and inherited role grants are listed with their source and scope.</p>
+              </div>
+            </div>
+
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Role</th>
+                    <th>Source</th>
+                    <th>Scope</th>
+                    <th>Created</th>
+                    <th>Expires</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assignedRoles.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="admin-security-empty-cell">
+                        No roles are currently assigned to this user.
+                      </td>
+                    </tr>
+                  ) : (
+                    assignedRoles.map((role, index) => (
+                      <tr key={`${role.source}-${role.roleKey}-${role.scopeType}-${role.scopeId}-${index}`}>
+                        <td>
+                          <div className="admin-security-cell-stack">
+                            <strong>{role.roleName}</strong>
+                            <span className="admin-security-muted">{role.roleKey}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="admin-security-cell-stack">
+                            <span>{role.sourceLabel}</span>
+                            {role.sourceGroupName ? (
+                              <span className="admin-security-muted">{role.sourceGroupName}</span>
+                            ) : null}
+                          </div>
+                        </td>
+                        <td>{formatScopeLabel(role.scopeType, role.scopeId)}</td>
+                        <td>{formatDateTimeLabel(role.createdAt)}</td>
+                        <td>{formatDateLabel(role.expiresAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="admin-security-panel admin-table-card">
+            <div className="admin-security-panel-header">
+              <div>
+                <p className="admin-security-kicker">Overrides</p>
+                <h2>Scoped Permissions</h2>
+                <p>Per-user permission overrides remain explicit and auditable here.</p>
+              </div>
+            </div>
+
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Permission</th>
+                    <th>Effect</th>
+                    <th>Scope</th>
+                    <th>Reason</th>
+                    <th>Expires</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {permissionOverrides.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="admin-security-empty-cell">
+                        No scoped permission overrides are configured.
+                      </td>
+                    </tr>
+                  ) : (
+                    permissionOverrides.map((override) => (
+                      <tr
+                        key={`${override.permissionKey}-${override.scopeType}-${override.scopeId}-${override.effect}`}
+                      >
+                        <td>
+                          <div className="admin-security-cell-stack">
+                            <strong>{override.permissionName}</strong>
+                            <span className="admin-security-muted">{override.permissionKey}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span
+                            className={`admin-security-badge ${
+                              override.effect === "ALLOW"
+                                ? "admin-security-badge-positive"
+                                : "admin-security-badge-warning"
+                            }`}
+                          >
+                            {override.effect}
+                          </span>
+                        </td>
+                        <td>{formatScopeLabel(override.scopeType, override.scopeId)}</td>
+                        <td>{override.reason || "-"}</td>
+                        <td>{formatDateLabel(override.expiresAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -14,8 +14,8 @@ export default async function SecurityLayout({
         <div>
           <h1 className="admin-page-title">Security</h1>
           <p className="admin-page-subtitle">
-            Manage user identities, role bundles, permission definitions, and
-            scoped access assignments.
+            Manage users, access groups, role bundles, permission definitions,
+            assignments, and per-user overrides in one section.
           </p>
         </div>
       </div>

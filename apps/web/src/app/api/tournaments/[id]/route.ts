@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  buildSeasonAdminPermissionScopes,
+  getTournamentAdminPermissionScopes,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -7,7 +13,25 @@ type RouteContext = {
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+    const permissionScopes = await getTournamentAdminPermissionScopes(id);
+
+    if (!permissionScopes) {
+      return NextResponse.json(
+        { error: "Tournament not found" },
+        { status: 404 }
+      );
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "tournaments.view", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const tournament = await prisma.tournament.findUnique({
       where: { id },
@@ -40,7 +64,26 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function PUT(request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+    const permissionScopes = await getTournamentAdminPermissionScopes(id);
+
+    if (!permissionScopes) {
+      return NextResponse.json(
+        { error: "Tournament not found" },
+        { status: 404 }
+      );
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "tournaments.edit", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const body = await request.json();
 
     const seasonId = String(body.seasonId ?? "").trim();
@@ -68,7 +111,7 @@ export async function PUT(request: Request, context: RouteContext) {
 
     const existing = await prisma.tournament.findUnique({
       where: { id },
-      select: { id: true },
+      select: { id: true, seasonId: true },
     });
 
     if (!existing) {
@@ -76,6 +119,33 @@ export async function PUT(request: Request, context: RouteContext) {
         { error: "Tournament not found" },
         { status: 404 }
       );
+    }
+
+    if (seasonId !== existing.seasonId) {
+      const targetSeason = await prisma.season.findUnique({
+        where: { id: seasonId },
+        select: {
+          id: true,
+          leagueId: true,
+        },
+      });
+
+      if (!targetSeason) {
+        return NextResponse.json(
+          { error: "Season not found" },
+          { status: 404 }
+        );
+      }
+
+      if (
+        !hasScopedAdminPermission(
+          currentUser,
+          "tournaments.create",
+          buildSeasonAdminPermissionScopes(targetSeason.id, targetSeason.leagueId)
+        )
+      ) {
+        return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+      }
     }
 
     const tournament = await prisma.tournament.update({
@@ -131,7 +201,25 @@ export async function PUT(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+    const permissionScopes = await getTournamentAdminPermissionScopes(id);
+
+    if (!permissionScopes) {
+      return NextResponse.json(
+        { error: "Tournament not found" },
+        { status: 404 }
+      );
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "tournaments.delete", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const [existing, roundsCount, groupsCount] = await Promise.all([
       prisma.tournament.findUnique({

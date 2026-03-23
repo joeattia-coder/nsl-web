@@ -1,14 +1,39 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  buildLeagueAdminPermissionScopes,
+  hasAnyAdminPermission,
+  hasAdminPermission,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 import cuid from "cuid";
 
 export async function GET() {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    if (!hasAnyAdminPermission(currentUser, "leagues.view")) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const leagues = await prisma.league.findMany({
       orderBy: [{ leagueName: "asc" }],
     });
 
-    return NextResponse.json(leagues);
+    return NextResponse.json(
+      leagues.filter((league) =>
+        hasScopedAdminPermission(
+          currentUser,
+          "leagues.view",
+          buildLeagueAdminPermissionScopes(league.id)
+        )
+      )
+    );
   } catch (error) {
     console.error("GET /api/leagues error:", error);
 
@@ -24,6 +49,16 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    if (!hasAdminPermission(currentUser, "leagues.create")) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const data = await req.json();
 
     const leagueName = String(data.leagueName ?? "").trim();

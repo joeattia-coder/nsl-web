@@ -1,44 +1,167 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdminPermission } from "@/lib/admin-auth";
+import { isAccessGroupTablesMissingError } from "@/lib/admin-user-access";
 import SecurityMetricCards from "../SecurityMetricCards";
 import { compactList } from "../security-utils";
+import RolesManager from "./roles-manager";
+
+type RoleRecord = {
+  id: string;
+  roleKey: string;
+  roleName: string;
+  description: string | null;
+  isSystemRole: boolean;
+  rolePermissions: Array<{
+    permission: {
+      id: string;
+      category: string;
+      permissionKey: string;
+    };
+  }>;
+  _count: {
+    accessGroupRoleAssignments: number;
+    userRoleAssignments: number;
+    userRoles: number;
+  };
+};
+
+type PermissionOption = {
+  id: string;
+  permissionKey: string;
+  permissionName: string;
+  category: string;
+};
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSecurityRolesPage() {
-  await requireAdminPermission("roles.view");
+  const currentUser = await requireAdminPermission("roles.view");
+  let accessGroupsAvailable = true;
+  let roles: RoleRecord[] = [];
+  let permissions: PermissionOption[] = [];
+  let roleCount = 0;
+  let systemRoleCount = 0;
+  let assignmentCount = 0;
 
-  const [roles, roleCount, systemRoleCount, assignmentCount] = await Promise.all([
-    prisma.role.findMany({
-      orderBy: [{ isSystemRole: "desc" }, { roleName: "asc" }],
-      select: {
-        id: true,
-        roleKey: true,
-        roleName: true,
-        description: true,
-        isSystemRole: true,
-        rolePermissions: {
-          select: {
-            permission: {
-              select: {
-                category: true,
-                permissionKey: true,
+  try {
+    [roles, permissions, roleCount, systemRoleCount, assignmentCount] = await Promise.all([
+      prisma.role.findMany({
+        orderBy: [{ isSystemRole: "desc" }, { roleName: "asc" }],
+        select: {
+          id: true,
+          roleKey: true,
+          roleName: true,
+          description: true,
+          isSystemRole: true,
+          rolePermissions: {
+            select: {
+              permission: {
+                select: {
+                  id: true,
+                  category: true,
+                  permissionKey: true,
+                },
               },
             },
           },
-        },
-        _count: {
-          select: {
-            userRoleAssignments: true,
-            userRoles: true,
+          _count: {
+            select: {
+              accessGroupRoleAssignments: true,
+              userRoleAssignments: true,
+              userRoles: true,
+            },
           },
         },
+      }),
+      prisma.permission.findMany({
+        orderBy: [{ category: "asc" }, { permissionKey: "asc" }],
+        select: {
+          id: true,
+          permissionKey: true,
+          permissionName: true,
+          category: true,
+        },
+      }),
+      prisma.role.count(),
+      prisma.role.count({ where: { isSystemRole: true } }),
+      prisma.userRoleAssignment.count(),
+    ]);
+  } catch (error) {
+    if (!isAccessGroupTablesMissingError(error)) {
+      throw error;
+    }
+
+    accessGroupsAvailable = false;
+
+    const [legacyRoles, nextPermissions, nextRoleCount, nextSystemRoleCount, nextAssignmentCount] =
+      await Promise.all([
+        prisma.role.findMany({
+          orderBy: [{ isSystemRole: "desc" }, { roleName: "asc" }],
+          select: {
+            id: true,
+            roleKey: true,
+            roleName: true,
+            description: true,
+            isSystemRole: true,
+            rolePermissions: {
+              select: {
+                permission: {
+                  select: {
+                    id: true,
+                    category: true,
+                    permissionKey: true,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                userRoleAssignments: true,
+                userRoles: true,
+              },
+            },
+          },
+        }),
+        prisma.permission.findMany({
+          orderBy: [{ category: "asc" }, { permissionKey: "asc" }],
+          select: {
+            id: true,
+            permissionKey: true,
+            permissionName: true,
+            category: true,
+          },
+        }),
+        prisma.role.count(),
+        prisma.role.count({ where: { isSystemRole: true } }),
+        prisma.userRoleAssignment.count(),
+      ]);
+
+    roles = legacyRoles.map((role) => ({
+      ...role,
+      _count: {
+        ...role._count,
+        accessGroupRoleAssignments: 0,
       },
-    }),
-    prisma.role.count(),
-    prisma.role.count({ where: { isSystemRole: true } }),
-    prisma.userRoleAssignment.count(),
-  ]);
+    }));
+    permissions = nextPermissions;
+    roleCount = nextRoleCount;
+    systemRoleCount = nextSystemRoleCount;
+    assignmentCount = nextAssignmentCount;
+  }
+
+  const roleRows = roles.map((role) => ({
+    id: role.id,
+    roleKey: role.roleKey,
+    roleName: role.roleName,
+    description: role.description,
+    isSystemRole: role.isSystemRole,
+    permissionIds: role.rolePermissions.map((rolePermission) => rolePermission.permission.id),
+    usageSummary: [
+      `${role._count.userRoleAssignments} scoped assignments`,
+      `${role._count.userRoles} legacy user-role links`,
+      `${role._count.accessGroupRoleAssignments} group grants`,
+    ],
+  }));
 
   return (
     <div className="admin-security-stack">
@@ -67,83 +190,26 @@ export default async function AdminSecurityRolesPage() {
         ]}
       />
 
-      <section className="admin-security-panel admin-table-card">
-        <div className="admin-security-panel-header">
-          <div>
-            <p className="admin-security-kicker">Roles</p>
-            <h2>Role Bundles</h2>
-            <p>
-              Review role definitions, how many permissions they bundle, and
-              how widely they are assigned.
-            </p>
+      <RolesManager
+        roles={roleRows}
+        permissions={permissions}
+        canManage={currentUser.permissions.includes("roles.manage")}
+      />
+
+      {!accessGroupsAvailable ? (
+        <section className="admin-security-panel admin-table-card">
+          <div className="admin-security-panel-header">
+            <div>
+              <p className="admin-security-kicker">Migration Required</p>
+              <h2>Group Grants Unavailable</h2>
+              <p>
+                This database has not applied the additive access-group migration yet.
+                Role data is available, but group grant counts are temporarily hidden.
+              </p>
+            </div>
           </div>
-        </div>
-
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Role</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Categories</th>
-                <th>Permissions</th>
-                <th>Usage</th>
-              </tr>
-            </thead>
-            <tbody>
-              {roles.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="admin-security-empty-cell">
-                    No roles found.
-                  </td>
-                </tr>
-              ) : (
-                roles.map((role) => {
-                  const categories = Array.from(
-                    new Set(
-                      role.rolePermissions.map(
-                        (rolePermission) => rolePermission.permission.category
-                      )
-                    )
-                  );
-
-                  return (
-                    <tr key={role.id}>
-                      <td>
-                        <div className="admin-security-cell-stack">
-                          <strong>{role.roleName}</strong>
-                          <span className="admin-security-muted">{role.roleKey}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <span
-                          className={`admin-security-badge ${
-                            role.isSystemRole
-                              ? "admin-security-badge-positive"
-                              : "admin-security-badge-muted"
-                          }`}
-                        >
-                          {role.isSystemRole ? "System" : "Custom"}
-                        </span>
-                      </td>
-                      <td>{role.description ?? "No description"}</td>
-                      <td>{compactList(categories)}</td>
-                      <td>{role.rolePermissions.length}</td>
-                      <td>
-                        <div className="admin-security-cell-stack">
-                          <span>{role._count.userRoleAssignments} scoped assignments</span>
-                          <span>{role._count.userRoles} legacy user-role links</span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+        </section>
+      ) : null}
     </div>
   );
 }

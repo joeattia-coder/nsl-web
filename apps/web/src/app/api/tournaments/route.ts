@@ -1,17 +1,52 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  buildSeasonAdminPermissionScopes,
+  buildTournamentAdminPermissionScopes,
+  hasAnyAdminPermission,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 
 export async function GET() {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    if (!hasAnyAdminPermission(currentUser, "tournaments.view")) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const tournaments = await prisma.tournament.findMany({
       include: {
-        season: true,
+        season: {
+          select: {
+            id: true,
+            seasonName: true,
+            leagueId: true,
+          },
+        },
         venue: true,
       },
       orderBy: [{ createdAt: "desc" }],
     });
 
-    return NextResponse.json(tournaments);
+    return NextResponse.json(
+      tournaments.filter((tournament) =>
+        hasScopedAdminPermission(
+          currentUser,
+          "tournaments.view",
+          buildTournamentAdminPermissionScopes(
+            tournament.id,
+            tournament.seasonId,
+            tournament.season.leagueId
+          )
+        )
+      )
+    );
   } catch (error) {
     console.error("Failed to fetch tournaments:", error);
     return NextResponse.json(
@@ -26,6 +61,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const body = await request.json();
 
     const seasonId = String(body.seasonId ?? "").trim();
@@ -49,6 +90,31 @@ export async function POST(request: Request) {
         },
         { status: 400 }
       );
+    }
+
+    const season = await prisma.season.findUnique({
+      where: { id: seasonId },
+      select: {
+        id: true,
+        leagueId: true,
+      },
+    });
+
+    if (!season) {
+      return NextResponse.json(
+        { error: "Season not found." },
+        { status: 404 }
+      );
+    }
+
+    if (
+      !hasScopedAdminPermission(
+        currentUser,
+        "tournaments.create",
+        buildSeasonAdminPermissionScopes(season.id, season.leagueId)
+      )
+    ) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
     }
 
     const tournament = await prisma.tournament.create({

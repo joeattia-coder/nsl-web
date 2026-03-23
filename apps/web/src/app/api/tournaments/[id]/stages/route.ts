@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  getTournamentAdminPermissionScopes,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -7,7 +12,22 @@ type RouteContext = {
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id: tournamentId } = await context.params;
+    const permissionScopes = await getTournamentAdminPermissionScopes(tournamentId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Tournament not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "stages.view", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const stages = await prisma.tournamentStage.findMany({
       where: { tournamentId },
@@ -38,7 +58,23 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function POST(request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id: tournamentId } = await context.params;
+    const permissionScopes = await getTournamentAdminPermissionScopes(tournamentId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Tournament not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "stages.create", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const body = await request.json();
 
     const stageName = String(body.stageName ?? "").trim();

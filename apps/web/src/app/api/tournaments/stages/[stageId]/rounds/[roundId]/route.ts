@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  getRoundAdminPermissionScopes,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 
 type RouteContext = {
   params: Promise<{ roundId: string }>;
@@ -7,7 +12,22 @@ type RouteContext = {
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { roundId } = await context.params;
+    const permissionScopes = await getRoundAdminPermissionScopes(roundId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Round not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "rounds.view", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const round = await prisma.stageRound.findUnique({
       where: { id: roundId },
@@ -45,7 +65,23 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { roundId } = await context.params;
+    const permissionScopes = await getRoundAdminPermissionScopes(roundId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Round not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "rounds.edit", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const body = await request.json();
 
     const roundName = String(body.roundName ?? "").trim();
@@ -105,7 +141,22 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { roundId } = await context.params;
+    const permissionScopes = await getRoundAdminPermissionScopes(roundId);
+
+    if (!permissionScopes) {
+      return NextResponse.json({ error: "Round not found." }, { status: 404 });
+    }
+
+    if (!hasScopedAdminPermission(currentUser, "rounds.delete", permissionScopes)) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const existing = await prisma.stageRound.findUnique({
       where: { id: roundId },

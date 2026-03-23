@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import SecurityMetricCards from "../SecurityMetricCards";
+import PermissionsManager from "./permissions-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSecurityPermissionsPage() {
-  await requireAdminPermission("permissions.view");
+  const currentUser = await requireAdminPermission("permissions.view");
 
   const permissions = await prisma.permission.findMany({
     orderBy: [{ category: "asc" }, { permissionKey: "asc" }],
@@ -63,62 +64,18 @@ export default async function AdminSecurityPermissionsPage() {
         ]}
       />
 
-      <section className="admin-security-panel admin-table-card">
-        <div className="admin-security-panel-header">
-          <div>
-            <p className="admin-security-kicker">Permissions</p>
-            <h2>Permission Catalog</h2>
-            <p>
-              Audit the action catalog, how it is grouped, and where it is
-              already linked into roles or user-specific overrides.
-            </p>
-          </div>
-        </div>
-
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Permission</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Role Links</th>
-                <th>Overrides</th>
-              </tr>
-            </thead>
-            <tbody>
-              {permissions.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="admin-security-empty-cell">
-                    No permissions found.
-                  </td>
-                </tr>
-              ) : (
-                permissions.map((permission) => (
-                  <tr key={permission.id}>
-                    <td>
-                      <div className="admin-security-cell-stack">
-                        <strong>{permission.permissionName}</strong>
-                        <span className="admin-security-muted">
-                          {permission.permissionKey}
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="admin-security-badge admin-security-badge-muted">
-                        {permission.category}
-                      </span>
-                    </td>
-                    <td>{permission.description ?? "No description"}</td>
-                    <td>{permission._count.rolePermissions}</td>
-                    <td>{permission._count.userPermissionOverrides}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <PermissionsManager
+        permissions={permissions.map((permission) => ({
+          id: permission.id,
+          permissionKey: permission.permissionKey,
+          permissionName: permission.permissionName,
+          category: permission.category,
+          description: permission.description,
+          roleLinkCount: permission._count.rolePermissions,
+          overrideCount: permission._count.userPermissionOverrides,
+        }))}
+        canManage={currentUser.permissions.includes("permissions.manage")}
+      />
     </div>
   );
 }

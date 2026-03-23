@@ -60,6 +60,8 @@ export const ModelName = {
   User: 'User',
   Player: 'Player',
   Role: 'Role',
+  AccessGroup: 'AccessGroup',
+  AccessGroupMembership: 'AccessGroupMembership',
   UserRole: 'UserRole',
   AuthAccount: 'AuthAccount',
   Invitation: 'Invitation',
@@ -67,6 +69,7 @@ export const ModelName = {
   PasswordResetToken: 'PasswordResetToken',
   Permission: 'Permission',
   RolePermission: 'RolePermission',
+  AccessGroupRoleAssignment: 'AccessGroupRoleAssignment',
   UserRoleAssignment: 'UserRoleAssignment',
   UserPermissionOverride: 'UserPermissionOverride',
   TournamentEntry: 'TournamentEntry',
@@ -255,6 +258,28 @@ export const RoleScalarFieldEnum = {
 export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
 
 
+export const AccessGroupScalarFieldEnum = {
+  id: 'id',
+  groupName: 'groupName',
+  description: 'description',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccessGroupScalarFieldEnum = (typeof AccessGroupScalarFieldEnum)[keyof typeof AccessGroupScalarFieldEnum]
+
+
+export const AccessGroupMembershipScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type AccessGroupMembershipScalarFieldEnum = (typeof AccessGroupMembershipScalarFieldEnum)[keyof typeof AccessGroupMembershipScalarFieldEnum]
+
+
 export const UserRoleScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -347,6 +372,20 @@ export const RolePermissionScalarFieldEnum = {
 } as const
 
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const AccessGroupRoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  roleId: 'roleId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  grantedByUserId: 'grantedByUserId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AccessGroupRoleAssignmentScalarFieldEnum = (typeof AccessGroupRoleAssignmentScalarFieldEnum)[keyof typeof AccessGroupRoleAssignmentScalarFieldEnum]
 
 
 export const UserRoleAssignmentScalarFieldEnum = {

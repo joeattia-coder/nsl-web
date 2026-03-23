@@ -521,10 +521,6 @@ export type UserRoleAssignmentUncheckedUpdateManyWithoutRoleNestedInput = {
   deleteMany?: Prisma.UserRoleAssignmentScalarWhereInput | Prisma.UserRoleAssignmentScalarWhereInput[]
 }
 
-export type EnumAssignmentScopeTypeFieldUpdateOperationsInput = {
-  set?: $Enums.AssignmentScopeType
-}
-
 export type UserRoleAssignmentCreateWithoutUserInput = {
   id?: string
   scopeType: $Enums.AssignmentScopeType

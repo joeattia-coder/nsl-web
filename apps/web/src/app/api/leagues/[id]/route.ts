@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  buildLeagueAdminPermissionScopes,
+  hasScopedAdminPermission,
+  resolveCurrentAdminUser,
+} from "@/lib/admin-auth";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -46,7 +51,18 @@ async function getLeagueDependencySummary(id: string) {
 
 export async function GET(_req: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+
+    if (!hasScopedAdminPermission(currentUser, "leagues.view", buildLeagueAdminPermissionScopes(id))) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const league = await prisma.league.findUnique({
       where: { id },
     });
@@ -70,7 +86,18 @@ export async function GET(_req: Request, context: RouteContext) {
 
 export async function PUT(req: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+
+    if (!hasScopedAdminPermission(currentUser, "leagues.edit", buildLeagueAdminPermissionScopes(id))) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
     const data = await req.json();
 
     const league = await prisma.league.update({
@@ -99,7 +126,17 @@ export async function PUT(req: Request, context: RouteContext) {
 
 export async function DELETE(_req: Request, context: RouteContext) {
   try {
+    const currentUser = await resolveCurrentAdminUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const { id } = await context.params;
+
+    if (!hasScopedAdminPermission(currentUser, "leagues.delete", buildLeagueAdminPermissionScopes(id))) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
 
     const dependencySummary = await getLeagueDependencySummary(id);
 

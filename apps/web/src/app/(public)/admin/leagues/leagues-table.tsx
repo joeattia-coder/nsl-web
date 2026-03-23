@@ -17,17 +17,20 @@ export type LeagueRow = {
   logoUrl: string;
   createdAt: string;
   updatedAt: string;
+  canEdit: boolean;
   canDelete: boolean;
+  canDeletePermission: boolean;
   dependencySummary: string;
 };
 
 export type LeaguesTableProps = {
   leagues: LeagueRow[];
+  canCreate: boolean;
 };
 
 type SortKey = "leagueName" | "description" | "isActive";
 
-export default function LeaguesTable({ leagues }: LeaguesTableProps) {
+export default function LeaguesTable({ leagues, canCreate }: LeaguesTableProps) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("leagueName");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -129,10 +132,12 @@ export default function LeaguesTable({ leagues }: LeaguesTableProps) {
           />
         </div>
         <div className="admin-players-toolbar-right">
-          <Link href="/admin/leagues/new" className="admin-toolbar-button admin-toolbar-button-add">
-            <FiPlus />
-            <span>Add League</span>
-          </Link>
+          {canCreate ? (
+            <Link href="/admin/leagues/new" className="admin-toolbar-button admin-toolbar-button-add">
+              <FiPlus />
+              <span>Add League</span>
+            </Link>
+          ) : null}
         </div>
       </div>
       <div className="admin-players-table-shell">
@@ -181,24 +186,28 @@ export default function LeaguesTable({ leagues }: LeaguesTableProps) {
                     <td>{l.isActive ? "Active" : "Inactive"}</td>
                     <td>
                       <div className="admin-player-row-actions">
-                        <Link
-                          href={`/admin/leagues/${l.id}`}
-                          className="admin-icon-action admin-icon-action-edit"
-                          aria-label={`Edit ${l.leagueName}`}
-                          title="Edit"
-                        >
-                          <FiEdit2 />
-                        </Link>
-                        <button
-                          type="button"
-                          className="admin-icon-action admin-icon-action-delete"
-                          aria-label={`Delete ${l.leagueName}`}
-                          title="Delete"
-                          onClick={() => openDeleteModal(l)}
-                          disabled={deleting}
-                        >
-                          <FiTrash2 />
-                        </button>
+                        {l.canEdit ? (
+                          <Link
+                            href={`/admin/leagues/${l.id}`}
+                            className="admin-icon-action admin-icon-action-edit"
+                            aria-label={`Edit ${l.leagueName}`}
+                            title="Edit"
+                          >
+                            <FiEdit2 />
+                          </Link>
+                        ) : null}
+                        {l.canDeletePermission ? (
+                          <button
+                            type="button"
+                            className="admin-icon-action admin-icon-action-delete"
+                            aria-label={`Delete ${l.leagueName}`}
+                            title="Delete"
+                            onClick={() => openDeleteModal(l)}
+                            disabled={deleting}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        ) : null}
                       </div>
                     </td>
                   </tr>

@@ -63,6 +63,16 @@ export type Player = Prisma.PlayerModel
  */
 export type Role = Prisma.RoleModel
 /**
+ * Model AccessGroup
+ * 
+ */
+export type AccessGroup = Prisma.AccessGroupModel
+/**
+ * Model AccessGroupMembership
+ * 
+ */
+export type AccessGroupMembership = Prisma.AccessGroupMembershipModel
+/**
  * Model UserRole
  * 
  */
@@ -97,6 +107,11 @@ export type Permission = Prisma.PermissionModel
  * 
  */
 export type RolePermission = Prisma.RolePermissionModel
+/**
+ * Model AccessGroupRoleAssignment
+ * 
+ */
+export type AccessGroupRoleAssignment = Prisma.AccessGroupRoleAssignmentModel
 /**
  * Model UserRoleAssignment
  * 

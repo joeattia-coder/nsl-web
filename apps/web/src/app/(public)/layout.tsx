@@ -20,6 +20,7 @@ import {
   FiMenu,
   FiX,
   FiCalendar,
+  FiSettings,
 } from "react-icons/fi";
 import Link from "next/link";
 import Image from "next/image";
@@ -37,6 +38,13 @@ type AdminTopLink = {
   href: string;
   label: string;
   permissions?: string[];
+};
+
+type UserNavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  requiresLinkedPlayer?: boolean;
 };
 
 const adminSidebarItems: AdminNavItem[] = [
@@ -68,6 +76,13 @@ const adminTopLinks: AdminTopLink[] = [
   { href: "/faqs", label: "FAQ" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
+];
+
+const loggedInUserNavItems: UserNavItem[] = [
+  { href: "/dashboard", label: "Dashboard", icon: FiHome, requiresLinkedPlayer: true },
+  { href: "/my-matches", label: "My matches", icon: FiActivity, requiresLinkedPlayer: true },
+  { href: "/profile", label: "Profile", icon: FiUser },
+  { href: "/settings", label: "Settings", icon: FiSettings },
 ];
 
 function LayoutChrome({
@@ -109,6 +124,12 @@ function LayoutChrome({
 
     return item.permissions.some((permission) => hasPermission(permission));
   });
+
+  const visibleDropdownUserNavItems = currentUser
+    ? loggedInUserNavItems.filter((item) => !item.requiresLinkedPlayer || Boolean(currentUser.linkedPlayerId))
+    : [];
+
+  const visibleSidebarUserNavItems = currentUser?.isPlayer ? visibleDropdownUserNavItems : [];
 
   useEffect(() => {
     setMenuOpen(false);
@@ -216,6 +237,23 @@ function LayoutChrome({
                     </li>
                   );
                 })}
+
+                {visibleSidebarUserNavItems.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className="sidebar-item"
+                        onClick={closeMobileMenu}
+                      >
+                        <Icon className="sidebar-icon" />
+                        <span className="sidebar-label">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </>
             ) : (
               <>
@@ -262,6 +300,23 @@ function LayoutChrome({
                     <span className="sidebar-label">Rankings</span>
                   </Link>
                 </li>
+
+                {visibleSidebarUserNavItems.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className="sidebar-item"
+                        onClick={closeMobileMenu}
+                      >
+                        <Icon className="sidebar-icon" />
+                        <span className="sidebar-label">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </>
             )}
           </ul>
@@ -321,42 +376,17 @@ function LayoutChrome({
 
                 {menuOpen ? (
                   <div className="admin-user-menu-dropdown" role="menu">
-                    {currentUser.linkedPlayerId ? (
+                    {visibleDropdownUserNavItems.map((item) => (
                       <Link
-                        href="/dashboard"
+                        key={item.href}
+                        href={item.href}
                         className="admin-user-menu-item"
                         role="menuitem"
                         onClick={closeMenu}
                       >
-                        Dashboard
+                        {item.label}
                       </Link>
-                    ) : null}
-                    {currentUser.linkedPlayerId ? (
-                      <Link
-                        href="/my-matches"
-                        className="admin-user-menu-item"
-                        role="menuitem"
-                        onClick={closeMenu}
-                      >
-                        My matches
-                      </Link>
-                    ) : null}
-                    <Link
-                      href="/profile"
-                      className="admin-user-menu-item"
-                      role="menuitem"
-                      onClick={closeMenu}
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="admin-user-menu-item"
-                      role="menuitem"
-                      onClick={closeMenu}
-                    >
-                      Settings
-                    </Link>
+                    ))}
                     <button
                       type="button"
                       className="admin-user-menu-item admin-user-menu-item-danger"

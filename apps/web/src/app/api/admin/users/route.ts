@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { hasAdminPermission, resolveCurrentAdminUser } from "@/lib/admin-auth";
-import { GLOBAL_ADMIN_ROLE_KEY } from "@/lib/admin-user-access";
+import { GLOBAL_ADMIN_ROLE_KEY, isGlobalAdminUserRecord } from "@/lib/admin-user-access";
 import { hashPassword } from "@/lib/passwords";
 import { prisma } from "@/lib/prisma";
 
@@ -57,14 +57,7 @@ function isGlobalAdminTarget(user: {
   roleAssignments: Array<{ scopeType: string; scopeId: string; role: { roleKey: string } }>;
   userRoles: Array<{ role: { roleKey: string } }>;
 }) {
-  return (
-    user.roleAssignments.some(
-      (assignment) =>
-        assignment.scopeType === "GLOBAL" &&
-        assignment.scopeId === "" &&
-        assignment.role.roleKey === GLOBAL_ADMIN_ROLE_KEY
-    ) || user.userRoles.some((userRole) => userRole.role.roleKey === GLOBAL_ADMIN_ROLE_KEY)
-  );
+  return isGlobalAdminUserRecord(user);
 }
 
 async function findAdministratorRole() {

@@ -304,6 +304,10 @@ html[data-theme="light"] .sidebar {
   margin: 20px 0;
 }
 
+.sidebar-nav[aria-label="Admin navigation"] ul li {
+  margin: 10px 0;
+}
+
 .sidebar-item {
   display: flex;
   flex-direction: row;
@@ -317,6 +321,10 @@ html[data-theme="light"] .sidebar {
   margin-bottom: 18px;
   cursor: pointer;
   transition: 0.2s ease;
+}
+
+.sidebar-nav[aria-label="Admin navigation"] .sidebar-item {
+  margin-bottom: 8px;
 }
 
 .sidebar-icon {
@@ -2052,7 +2060,7 @@ html[data-theme="light"] .navbar {
   border-radius: 4px;
   border: 1px solid var(--theme-border-mid);
   background: var(--theme-accent-danger);
-  color: var(--theme-button-solid-text);
+   color: #ffffff;
   cursor: pointer;
   transition: 0.2s ease;
   margin-top: auto;
@@ -5525,6 +5533,144 @@ html[data-theme="light"] .group-pill.active:hover {
   line-height: 1.6;
 }
 
+.admin-security-form-card {
+  margin: 0 22px 22px;
+}
+
+.admin-security-panel-toolbar {
+  padding: 0 22px 18px;
+}
+
+.admin-security-checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  max-height: 240px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--theme-border-soft);
+  background: var(--theme-surface-1);
+}
+
+.admin-security-checklist-item {
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-border-soft);
+  background: var(--theme-surface-2);
+}
+
+.admin-security-picker {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--theme-border-soft);
+  background: var(--theme-surface-1);
+}
+
+.admin-security-picker-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-security-picker-search {
+  max-width: none;
+}
+
+.admin-security-picker-selected {
+  gap: 10px;
+}
+
+.admin-security-picker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--theme-border-soft);
+  background: var(--theme-surface-2);
+  color: var(--theme-page-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.admin-security-picker-chip:hover {
+  border-color: var(--theme-border-mid);
+}
+
+.admin-security-multiselect {
+  min-height: 260px;
+  padding: 8px;
+}
+
+.admin-security-multiselect option {
+  padding: 10px 12px;
+}
+
+.admin-security-picker-empty {
+  padding: 12px;
+  border: 1px dashed var(--theme-border-soft);
+  background: var(--theme-surface-2);
+}
+
+.admin-security-section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-security-repeater {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-security-repeater-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 12px;
+  border: 1px solid var(--theme-border-soft);
+  background: var(--theme-surface-1);
+}
+
+.admin-security-repeater-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-security-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.admin-security-compact-list {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-security-category-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-security-category-card {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-security-category-card h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--theme-page-text);
+}
+
 
 
 .admin-group-slots {
@@ -5551,6 +5697,37 @@ html[data-theme="light"] .group-pill.active:hover {
   margin: 0;
   font-size: 13px;
   color: var(--theme-page-muted-4);
+}
+
+@media (max-width: 960px) {
+  .admin-security-repeater-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-security-form-card,
+  .admin-security-panel-toolbar {
+    margin-left: 16px;
+    margin-right: 16px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .admin-security-repeater-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-security-section-heading-row,
+  .admin-security-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-security-picker-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 

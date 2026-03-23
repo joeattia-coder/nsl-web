@@ -7,6 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "audit:security-migration": "tsx scripts/audit-security-migration.ts",
+    "backfill:security-groups": "tsx scripts/backfill-security-groups.ts",
     "seed": "tsx prisma/seed.ts",
     "sync:elo": "tsx prisma/recalculate-player-elo.ts"
   },

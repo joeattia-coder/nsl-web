@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { getVisibleUsersWhere, isGlobalAdminUserRecord } from "@/lib/admin-user-access";
+import {
+  getVisibleUsersWhere,
+  isAccessGroupTablesMissingError,
+  isGlobalAdminUserRecord,
+} from "@/lib/admin-user-access";
 import SecurityMetricCards from "../SecurityMetricCards";
 import UsersTable from "./users-table";
 import {
@@ -10,71 +14,222 @@ import {
   formatUserDisplayName,
 } from "../security-utils";
 
+type DirectoryUserSummary = {
+  id: string;
+  username: string | null;
+  email: string | null;
+  registrationStatus: string;
+  isLoginEnabled: boolean;
+  emailVerifiedAt: Date | null;
+  createdAt: Date;
+  player: {
+    firstName: string;
+    middleInitial: string | null;
+    lastName: string;
+  } | null;
+  authAccounts: Array<{
+    provider: string;
+  }>;
+  roleAssignments: Array<{
+    role: {
+      roleKey: string;
+      roleName: string;
+    };
+    scopeType: string;
+    scopeId: string;
+  }>;
+  userRoles: Array<{
+    role: {
+      roleKey: string;
+    };
+  }>;
+  accessGroupMemberships: Array<{
+    group: {
+      isActive: boolean;
+      roleAssignments: Array<{
+        scopeType: string;
+        scopeId: string;
+        role: {
+          roleKey: string;
+        };
+      }>;
+    };
+  }>;
+  _count: {
+    targetInvitations: number;
+    permissionOverrides: number;
+  };
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminSecurityUsersPage() {
   const currentUser = await requireAdminPermission("users.view");
-  const visibleUsersWhere = getVisibleUsersWhere(currentUser);
+  let accessGroupsAvailable = true;
+  let visibleUsersWhere = getVisibleUsersWhere(currentUser);
+  let users: DirectoryUserSummary[] = [];
+  let userCount = 0;
+  let linkedPlayerCount = 0;
+  let enabledLoginCount = 0;
+  let pendingInvites = 0;
 
-  const [users, userCount, linkedPlayerCount, enabledLoginCount, pendingInvites] =
-    await Promise.all([
-      prisma.user.findMany({
-        where: visibleUsersWhere,
-        orderBy: [{ createdAt: "desc" }],
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          registrationStatus: true,
-          isLoginEnabled: true,
-          emailVerifiedAt: true,
-          createdAt: true,
-          player: {
-            select: {
-              firstName: true,
-              middleInitial: true,
-              lastName: true,
-            },
-          },
-          authAccounts: {
-            select: {
-              provider: true,
-            },
-          },
-          roleAssignments: {
-            select: {
-              role: {
-                select: {
-                  roleKey: true,
-                  roleName: true,
-                },
-              },
-              scopeType: true,
-              scopeId: true,
-            },
-          },
-          userRoles: {
-            select: {
-              role: {
-                select: {
-                  roleKey: true,
-                },
+  try {
+    [users, userCount, linkedPlayerCount, enabledLoginCount, pendingInvites] =
+      await Promise.all([
+        prisma.user.findMany({
+          where: visibleUsersWhere,
+          orderBy: [{ createdAt: "desc" }],
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            registrationStatus: true,
+            isLoginEnabled: true,
+            emailVerifiedAt: true,
+            createdAt: true,
+            player: {
+              select: {
+                firstName: true,
+                middleInitial: true,
+                lastName: true,
               },
             },
-          },
-          _count: {
-            select: {
-              targetInvitations: true,
-              permissionOverrides: true,
+            authAccounts: {
+              select: {
+                provider: true,
+              },
+            },
+            roleAssignments: {
+              select: {
+                role: {
+                  select: {
+                    roleKey: true,
+                    roleName: true,
+                  },
+                },
+                scopeType: true,
+                scopeId: true,
+              },
+            },
+            userRoles: {
+              select: {
+                role: {
+                  select: {
+                    roleKey: true,
+                  },
+                },
+              },
+            },
+            accessGroupMemberships: {
+              select: {
+                group: {
+                  select: {
+                    isActive: true,
+                    roleAssignments: {
+                      select: {
+                        scopeType: true,
+                        scopeId: true,
+                        role: {
+                          select: {
+                            roleKey: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                targetInvitations: true,
+                permissionOverrides: true,
+              },
             },
           },
-        },
-      }),
-      prisma.user.count({ where: visibleUsersWhere }),
-      prisma.user.count({ where: { ...visibleUsersWhere, player: { isNot: null } } }),
-      prisma.user.count({ where: { ...visibleUsersWhere, isLoginEnabled: true } }),
-      prisma.invitation.count({ where: { status: "PENDING" } }),
-    ]);
+        }),
+        prisma.user.count({ where: visibleUsersWhere }),
+        prisma.user.count({ where: { ...visibleUsersWhere, player: { isNot: null } } }),
+        prisma.user.count({ where: { ...visibleUsersWhere, isLoginEnabled: true } }),
+        prisma.invitation.count({ where: { status: "PENDING" } }),
+      ]);
+  } catch (error) {
+    if (!isAccessGroupTablesMissingError(error)) {
+      throw error;
+    }
+
+    accessGroupsAvailable = false;
+    visibleUsersWhere = getVisibleUsersWhere(currentUser, { includeAccessGroups: false });
+
+    const [legacyUsers, nextUserCount, nextLinkedPlayerCount, nextEnabledLoginCount, nextPendingInvites] =
+      await Promise.all([
+        prisma.user.findMany({
+          where: visibleUsersWhere,
+          orderBy: [{ createdAt: "desc" }],
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            registrationStatus: true,
+            isLoginEnabled: true,
+            emailVerifiedAt: true,
+            createdAt: true,
+            player: {
+              select: {
+                firstName: true,
+                middleInitial: true,
+                lastName: true,
+              },
+            },
+            authAccounts: {
+              select: {
+                provider: true,
+              },
+            },
+            roleAssignments: {
+              select: {
+                role: {
+                  select: {
+                    roleKey: true,
+                    roleName: true,
+                  },
+                },
+                scopeType: true,
+                scopeId: true,
+              },
+            },
+            userRoles: {
+              select: {
+                role: {
+                  select: {
+                    roleKey: true,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                targetInvitations: true,
+                permissionOverrides: true,
+              },
+            },
+          },
+        }),
+        prisma.user.count({ where: visibleUsersWhere }),
+        prisma.user.count({ where: { ...visibleUsersWhere, player: { isNot: null } } }),
+        prisma.user.count({ where: { ...visibleUsersWhere, isLoginEnabled: true } }),
+        prisma.invitation.count({ where: { status: "PENDING" } }),
+      ]);
+
+    users = legacyUsers.map((user) => ({
+      ...user,
+      accessGroupMemberships: [],
+    }));
+    userCount = nextUserCount;
+    linkedPlayerCount = nextLinkedPlayerCount;
+    enabledLoginCount = nextEnabledLoginCount;
+    pendingInvites = nextPendingInvites;
+  }
 
   const userRows = users.map((user) => {
     const providerLabels = Array.from(
@@ -143,6 +298,12 @@ export default async function AdminSecurityUsersPage() {
               Manage identities, linked profiles, auth providers, and assigned
               access. Global admin accounts are only visible to global admins.
             </p>
+            {!accessGroupsAvailable ? (
+              <p>
+                Access groups are unavailable on this database until the additive
+                security migration is applied. This view is using legacy-safe data.
+              </p>
+            ) : null}
           </div>
         </div>
 

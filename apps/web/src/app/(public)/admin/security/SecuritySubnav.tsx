@@ -11,6 +11,11 @@ const links = [
     permissions: ["users.view"],
   },
   {
+    label: "Groups",
+    href: "/admin/security/groups",
+    permissions: ["users.view", "roles.view"],
+  },
+  {
     label: "Roles",
     href: "/admin/security/roles",
     permissions: ["roles.view"],
@@ -24,6 +29,11 @@ const links = [
     label: "Assignments",
     href: "/admin/security/assignments",
     permissions: ["users.view", "roles.view"],
+  },
+  {
+    label: "Overrides",
+    href: "/admin/security/overrides",
+    permissions: ["users.view", "permissions.view"],
   },
 ];
 

@@ -1,4 +1,10 @@
 import { notFound } from "next/navigation";
+import {
+  buildSeasonAdminPermissionScopes,
+  getTournamentAdminPermissionScopes,
+  hasScopedAdminPermission,
+  requireScopedAdminPermission,
+} from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import TournamentForm from "../../TournamentForm";
 import TournamentSubnav from "../TournamentSubnav";
@@ -22,6 +28,13 @@ type PageProps = {
 
 export default async function EditTournamentPage({ params }: PageProps) {
   const { id } = await params;
+  const permissionScopes = await getTournamentAdminPermissionScopes(id);
+
+  if (!permissionScopes) {
+    notFound();
+  }
+
+  const currentUser = await requireScopedAdminPermission("tournaments.edit", permissionScopes);
 
   const [tournament, seasons, venues] = await Promise.all([
     prisma.tournament.findUnique({
@@ -32,6 +45,7 @@ export default async function EditTournamentPage({ params }: PageProps) {
       select: {
         id: true,
         seasonName: true,
+        leagueId: true,
       },
     }),
     prisma.venue.findMany({
@@ -48,6 +62,16 @@ export default async function EditTournamentPage({ params }: PageProps) {
     notFound();
   }
 
+  const visibleSeasons = seasons.filter(
+    (season) =>
+      season.id === tournament.seasonId ||
+      hasScopedAdminPermission(
+        currentUser,
+        "tournaments.create",
+        buildSeasonAdminPermissionScopes(season.id, season.leagueId)
+      )
+  );
+
   return (
     <section className="admin-page">
       <div className="admin-players-header">
@@ -61,7 +85,7 @@ export default async function EditTournamentPage({ params }: PageProps) {
 
       <TournamentForm
         mode="edit"
-        seasons={seasons}
+        seasons={visibleSeasons}
         venues={venues}
         initialData={{
           id: tournament.id,

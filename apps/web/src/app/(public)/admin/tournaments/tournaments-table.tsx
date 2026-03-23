@@ -14,6 +14,7 @@ import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 type TournamentRow = {
   id: string;
   seasonId: string;
+  leagueId: string;
   tournamentName: string;
   seasonName: string;
   venueName: string;
@@ -25,6 +26,8 @@ type TournamentRow = {
   endDate: string;
   entriesCount: number;
   matchesCount: number;
+  canEdit: boolean;
+  canDelete: boolean;
 };
 
 type SeasonOption = {
@@ -37,6 +40,7 @@ type SeasonOption = {
 type TournamentsTableProps = {
   tournaments: TournamentRow[];
   seasons: SeasonOption[];
+  canCreate: boolean;
 };
 
 type SortKey =
@@ -71,6 +75,7 @@ function formatDateTime(value: string) {
 export default function TournamentsTable({
   tournaments,
   seasons,
+  canCreate,
 }: TournamentsTableProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -255,13 +260,15 @@ export default function TournamentsTable({
         </div>
 
         <div className="admin-players-toolbar-right">
-          <Link
-            href="/admin/tournaments/new"
-            className="admin-toolbar-button admin-toolbar-button-add"
-          >
-            <FiPlus />
-            <span>Add Tournament</span>
-          </Link>
+          {canCreate ? (
+            <Link
+              href="/admin/tournaments/new"
+              className="admin-toolbar-button admin-toolbar-button-add"
+            >
+              <FiPlus />
+              <span>Add Tournament</span>
+            </Link>
+          ) : null}
         </div>
       </div>
 
@@ -352,24 +359,28 @@ export default function TournamentsTable({
 
                     <td>
                       <div className="admin-player-row-actions">
-                        <Link
-                          href={`/admin/tournaments/${tournament.id}/edit`}
-                          className="admin-icon-action admin-icon-action-edit"
-                          aria-label={`Edit ${tournament.tournamentName}`}
-                          title="Edit"
-                        >
-                          <FiEdit2 />
-                        </Link>
+                        {tournament.canEdit ? (
+                          <Link
+                            href={`/admin/tournaments/${tournament.id}/edit`}
+                            className="admin-icon-action admin-icon-action-edit"
+                            aria-label={`Edit ${tournament.tournamentName}`}
+                            title="Edit"
+                          >
+                            <FiEdit2 />
+                          </Link>
+                        ) : null}
 
-                        <button
-                          type="button"
-                          className="admin-icon-action admin-icon-action-delete"
-                          aria-label={`Delete ${tournament.tournamentName}`}
-                          title="Delete"
-                          onClick={() => openSingleDeleteModal(tournament)}
-                        >
-                          <FiTrash2 />
-                        </button>
+                        {tournament.canDelete ? (
+                          <button
+                            type="button"
+                            className="admin-icon-action admin-icon-action-delete"
+                            aria-label={`Delete ${tournament.tournamentName}`}
+                            title="Delete"
+                            onClick={() => openSingleDeleteModal(tournament)}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        ) : null}
                       </div>
                     </td>
                   </tr>
