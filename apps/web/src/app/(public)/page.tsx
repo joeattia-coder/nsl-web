@@ -24,6 +24,8 @@ type UiMatch = {
   ctaHref?: string;
 };
 
+const HOMEPAGE_MATCH_LIMIT = 12;
+
 type HomeVideoHighlight = {
   id: string;
   title: string;
@@ -189,6 +191,99 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
   };
 }
 
+function getFixtureMatchStatus(fx: AnyObj): string {
+  return firstString(fx, ["matchStatus", "MatchStatus"], "").toUpperCase();
+}
+
+function getFixtureTournamentKey(fx: AnyObj, idx: number): string {
+  return (
+    firstString(fx, ["fixtureGroupIdentifier", "FixtureGroupIdentifier", "tournamentId"], "") ||
+    firstString(fx, ["fixtureGroupDesc", "FixtureGroupDesc", "tournamentName"], "") ||
+    `tournament-${idx}`
+  );
+}
+
+function getFixtureDateTimestamp(fx: AnyObj): number | null {
+  const rawDateTime = firstString(
+    fx,
+    ["FixtureDateTime", "fixtureDateTime", "StartDateTime", "startDateTime", "DateTime", "dateTime"],
+    ""
+  );
+
+  if (rawDateTime) {
+    const parsedDateTime = new Date(rawDateTime);
+    if (!Number.isNaN(parsedDateTime.getTime())) {
+      return parsedDateTime.getTime();
+    }
+  }
+
+  const rawDate = firstString(
+    fx,
+    ["FixtureDate", "fixtureDate", "Date", "date", "StartDate", "startDate"],
+    ""
+  );
+
+  if (!rawDate) {
+    return null;
+  }
+
+  const parsedDate = new Date(rawDate);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate.getTime();
+  }
+
+  return null;
+}
+
+function isScheduledFixture(fx: AnyObj): boolean {
+  return getFixtureMatchStatus(fx) === "SCHEDULED";
+}
+
+function shuffleFixtures(fixtures: Array<{ fixture: AnyObj; index: number }>) {
+  const shuffled = [...fixtures];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled;
+}
+
+function pickRandomFixturesFromDifferentTournaments(fixtures: Array<{ fixture: AnyObj; index: number }>) {
+  const shuffled = shuffleFixtures(fixtures);
+  const tournamentKeys = new Set<string>();
+  const selected: Array<{ fixture: AnyObj; index: number }> = [];
+
+  for (const entry of shuffled) {
+    const tournamentKey = getFixtureTournamentKey(entry.fixture, entry.index);
+    if (tournamentKeys.has(tournamentKey)) {
+      continue;
+    }
+
+    tournamentKeys.add(tournamentKey);
+    selected.push(entry);
+
+    if (selected.length >= HOMEPAGE_MATCH_LIMIT) {
+      return selected;
+    }
+  }
+
+  for (const entry of shuffled) {
+    if (selected.some((selectedEntry) => selectedEntry.index === entry.index)) {
+      continue;
+    }
+
+    selected.push(entry);
+
+    if (selected.length >= HOMEPAGE_MATCH_LIMIT) {
+      break;
+    }
+  }
+
+  return selected;
+}
+
 export default function Page() {
   const newsRowRef = useRef<HTMLDivElement | null>(null);
   const videoRowRef = useRef<HTMLDivElement | null>(null);
@@ -289,9 +384,26 @@ export default function Page() {
   }, [featuredVideos.length]);
 
   const matches: UiMatch[] = useMemo(() => {
-    const arr = fixturesRaw ?? [];
-    // Pick a reasonable number to show in the carousel
-    return arr.slice(0, 12).map(toUiMatch);
+    const scheduledFixtures = (fixturesRaw ?? [])
+      .map((fixture, index) => ({ fixture, index }))
+      .filter(({ fixture }) => isScheduledFixture(fixture));
+
+    const scheduledFixturesWithDates = scheduledFixtures
+      .map((entry) => ({
+        ...entry,
+        timestamp: getFixtureDateTimestamp(entry.fixture),
+      }))
+      .filter((entry): entry is typeof entry & { timestamp: number } => entry.timestamp !== null)
+      .sort((left, right) => left.timestamp - right.timestamp);
+
+    if (scheduledFixturesWithDates.length > 0) {
+      return scheduledFixturesWithDates
+        .slice(0, HOMEPAGE_MATCH_LIMIT)
+        .map(({ fixture, index }) => toUiMatch(fixture, index));
+    }
+
+    return pickRandomFixturesFromDifferentTournaments(scheduledFixtures)
+      .map(({ fixture, index }) => toUiMatch(fixture, index));
   }, [fixturesRaw]);
 
   // FEATURED NEWS CAROUSEL ARROWS
@@ -547,10 +659,10 @@ export default function Page() {
         </section>
       ) : null}
 
-      {/* Live & Upcoming Matches */}
+      {/* Upcoming Matches */}
       <section className="matches-section">
         <div className="section-header">
-          <h2 className="section-heading">Live and Upcoming Matches</h2>
+          <h2 className="section-heading">Upcoming Matches</h2>
 
           <Link href="/matches" className="view-all-link">
             View All Matches →
