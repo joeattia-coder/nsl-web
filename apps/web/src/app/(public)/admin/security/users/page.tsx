@@ -46,11 +46,13 @@ type DirectoryUserSummary = {
   accessGroupMemberships: Array<{
     group: {
       isActive: boolean;
+      groupName: string;
       roleAssignments: Array<{
         scopeType: string;
         scopeId: string;
         role: {
           roleKey: string;
+          roleName: string;
         };
       }>;
     };
@@ -125,6 +127,7 @@ export default async function AdminSecurityUsersPage() {
                 group: {
                   select: {
                     isActive: true,
+                    groupName: true,
                     roleAssignments: {
                       select: {
                         scopeType: true,
@@ -132,6 +135,7 @@ export default async function AdminSecurityUsersPage() {
                         role: {
                           select: {
                             roleKey: true,
+                            roleName: true,
                           },
                         },
                       },
@@ -235,11 +239,23 @@ export default async function AdminSecurityUsersPage() {
     const providerLabels = Array.from(
       new Set(user.authAccounts.map((account) => account.provider))
     );
-    const assignmentLabels = user.roleAssignments.map(
-      (assignment) =>
-        assignment.scopeType === "GLOBAL"
-          ? assignment.role.roleName
-          : `${assignment.role.roleName} (${assignment.scopeType})`
+    const assignmentLabels = Array.from(
+      new Set([
+        ...user.roleAssignments.map((assignment) =>
+          assignment.scopeType === "GLOBAL"
+            ? assignment.role.roleName
+            : `${assignment.role.roleName} (${assignment.scopeType})`
+        ),
+        ...user.accessGroupMemberships
+          .filter((membership) => membership.group.isActive)
+          .flatMap((membership) =>
+            membership.group.roleAssignments.map((assignment) =>
+              assignment.scopeType === "GLOBAL"
+                ? `${assignment.role.roleName} via ${membership.group.groupName}`
+                : `${assignment.role.roleName} via ${membership.group.groupName} (${assignment.scopeType})`
+            )
+          ),
+      ])
     );
 
     return {

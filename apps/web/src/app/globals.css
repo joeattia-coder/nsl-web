@@ -4434,12 +4434,20 @@ html[data-theme="light"] .group-pill.active:hover {
   background: var(--theme-page-muted-4);
 }
 
+.admin-modal-button-primary {
+  background: var(--theme-accent);
+}
+
 .admin-modal-button-delete {
   background: var(--theme-accent-danger);
 }
 
 .admin-modal-button:hover {
   opacity: 0.92;
+}
+
+.admin-session-expired-modal {
+  max-width: 460px;
 }
 
 

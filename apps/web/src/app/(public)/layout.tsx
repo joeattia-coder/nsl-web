@@ -2,6 +2,7 @@
 
 import "../globals.css";
 import { AdminAuthProvider, useAdminAuth } from "./AdminAuthContext";
+import AdminIdleSessionManager from "./AdminIdleSessionManager";
 import {
   FiActivity,
   FiAward,
@@ -444,6 +445,7 @@ export default function PublicLayout({
 
   return (
     <AdminAuthProvider enabled>
+      <AdminIdleSessionManager />
       <LayoutChrome
         isAdminRoute={isAdminRoute}
         mobileMenuOpen={mobileMenuOpen}
