@@ -49,6 +49,8 @@ type UserNavItem = {
   requiresLinkedPlayer?: boolean;
 };
 
+type NavigationMode = "admin" | "personal" | "public";
+
 const adminSidebarItems: AdminNavItem[] = [
   { href: "/admin", label: "Dashboard", icon: FiHome },
   { href: "/admin/leagues", label: "Leagues", icon: FiBarChart2 },
@@ -83,10 +85,42 @@ const adminTopLinks: AdminTopLink[] = [
 
 const loggedInUserNavItems: UserNavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: FiHome, requiresLinkedPlayer: true },
+  { href: "/my-tournaments", label: "My Tournaments", icon: FiAward, requiresLinkedPlayer: true },
   { href: "/my-matches", label: "My matches", icon: FiActivity, requiresLinkedPlayer: true },
   { href: "/profile", label: "Profile", icon: FiUser },
-  { href: "/settings", label: "Settings", icon: FiSettings },
+  { href: "/settings", label: "Change Password", icon: FiSettings },
 ];
+
+const publicSidebarItems: Array<{
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}> = [
+  { href: "/matches", label: "Match Hub", icon: FiActivity },
+  { href: "/competitions", label: "Competitions", icon: FiAward },
+  { href: "/venues", label: "Venues", icon: FiMapPin },
+  { href: "/rankings", label: "Rankings", icon: FiBarChart2 },
+];
+
+function resolveNavigationMode(
+  isAdminRoute: boolean,
+  isAdmin: boolean,
+  hasPersonalNavigation: boolean
+): NavigationMode {
+  if (isAdminRoute) {
+    return "admin";
+  }
+
+  if (hasPersonalNavigation) {
+    return "personal";
+  }
+
+  if (isAdmin) {
+    return "admin";
+  }
+
+  return "public";
+}
 
 function LayoutChrome({
   children,
@@ -108,7 +142,7 @@ function LayoutChrome({
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
-  const showAdminNavigation = isAdminRoute || Boolean(currentUser?.isAdmin);
+  const isAdminUser = Boolean(currentUser?.isAdmin);
   const closeMenu = () => setMenuOpen(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -132,7 +166,19 @@ function LayoutChrome({
     ? loggedInUserNavItems.filter((item) => !item.requiresLinkedPlayer || Boolean(currentUser.linkedPlayerId))
     : [];
 
-  const visibleSidebarUserNavItems = currentUser?.isPlayer ? visibleDropdownUserNavItems : [];
+  const hasPersonalNavigation = Boolean(currentUser) && visibleDropdownUserNavItems.length > 0;
+  const canSwitchNavigationMode = isAdminUser && hasPersonalNavigation;
+  const navigationMode = resolveNavigationMode(isAdminRoute, isAdminUser, hasPersonalNavigation);
+  const showAdminNavigation = navigationMode === "admin";
+  const playerHomeHref = currentUser?.linkedPlayerId ? "/dashboard" : "/profile";
+  const navigationModeLabel =
+    canSwitchNavigationMode && navigationMode === "admin"
+      ? "Admin mode"
+      : canSwitchNavigationMode && navigationMode === "personal"
+        ? "Personal mode"
+        : "Logged in";
+
+  const visibleSidebarUserNavItems = hasPersonalNavigation ? visibleDropdownUserNavItems : [];
 
   useEffect(() => {
     setMenuOpen(false);
@@ -205,7 +251,7 @@ function LayoutChrome({
 
       <aside className={`sidebar${mobileMenuOpen ? " sidebar-open" : ""}`}>
         <div className="sidebar-logo">
-          <Link href={isAdminRoute ? "/admin" : "/"} onClick={closeMobileMenu}>
+          <Link href={showAdminNavigation ? "/admin" : "/"} onClick={closeMobileMenu}>
             <Image
               src="/images/nsl-logo.svg"
               alt="National Snooker League Logo"
@@ -217,9 +263,30 @@ function LayoutChrome({
           </Link>
         </div>
 
+        {canSwitchNavigationMode ? (
+          <div className="sidebar-mode-switcher" role="group" aria-label="Navigation mode">
+            <Link
+              href="/admin"
+              className={`sidebar-mode-button${navigationMode === "admin" ? " sidebar-mode-button-active" : ""}`}
+              onClick={closeMobileMenu}
+            >
+              Admin
+            </Link>
+            <Link
+              href={playerHomeHref}
+              className={`sidebar-mode-button${navigationMode === "personal" ? " sidebar-mode-button-active" : ""}`}
+              onClick={closeMobileMenu}
+            >
+              Personal
+            </Link>
+          </div>
+        ) : null}
+
         <nav
           className="sidebar-nav"
-          aria-label={showAdminNavigation ? "Admin navigation" : "Sidebar navigation"}
+          aria-label={
+            showAdminNavigation ? "Admin navigation" : hasPersonalNavigation ? "Personal navigation" : "Sidebar navigation"
+          }
         >
           <ul>
             {showAdminNavigation ? (
@@ -240,71 +307,10 @@ function LayoutChrome({
                     </li>
                   );
                 })}
-
-                {visibleSidebarUserNavItems.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className="sidebar-item"
-                        onClick={closeMobileMenu}
-                      >
-                        <Icon className="sidebar-icon" />
-                        <span className="sidebar-label">{item.label}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
               </>
             ) : (
               <>
-                <li>
-                  <Link
-                    href="/matches"
-                    className="sidebar-item"
-                    onClick={closeMobileMenu}
-                  >
-                    <FiActivity className="sidebar-icon" />
-                    <span className="sidebar-label">Match Hub</span>
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    href="/competitions"
-                    className="sidebar-item"
-                    onClick={closeMobileMenu}
-                  >
-                    <FiAward className="sidebar-icon" />
-                    <span className="sidebar-label">Competitions</span>
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    href="/venues"
-                    className="sidebar-item"
-                    onClick={closeMobileMenu}
-                  >
-                    <FiMapPin className="sidebar-icon" />
-                    <span className="sidebar-label">Venues</span>
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    href="/rankings"
-                    className="sidebar-item"
-                    onClick={closeMobileMenu}
-                  >
-                    <FiBarChart2 className="sidebar-icon" />
-                    <span className="sidebar-label">Rankings</span>
-                  </Link>
-                </li>
-
-                {visibleSidebarUserNavItems.map((item) => {
+                {publicSidebarItems.map((item) => {
                   const Icon = item.icon;
 
                   return (
@@ -320,6 +326,28 @@ function LayoutChrome({
                     </li>
                   );
                 })}
+
+                {visibleSidebarUserNavItems.length > 0 ? (
+                  <>
+                    <li className="sidebar-nav-header">My account</li>
+                    {visibleSidebarUserNavItems.map((item) => {
+                      const Icon = item.icon;
+
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            className="sidebar-item"
+                            onClick={closeMobileMenu}
+                          >
+                            <Icon className="sidebar-icon" />
+                            <span className="sidebar-label">{item.label}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </>
+                ) : null}
               </>
             )}
           </ul>
@@ -372,13 +400,36 @@ function LayoutChrome({
                   <FiLogOut size={18} className="login-icon" />
                   <div className="admin-current-user-copy">
                     <span className="admin-current-user-name">{currentUser.displayName}</span>
-                    <span className="admin-current-user-meta">Logged in</span>
+                    <span className="admin-current-user-meta">{navigationModeLabel}</span>
                   </div>
                   <FiChevronDown className="admin-user-menu-chevron" />
                 </button>
 
                 {menuOpen ? (
                   <div className="admin-user-menu-dropdown" role="menu">
+                    {canSwitchNavigationMode ? (
+                      <>
+                        <span className="admin-user-menu-section-label">Switch view</span>
+                        <Link
+                          href="/admin"
+                          className="admin-user-menu-item"
+                          role="menuitem"
+                          onClick={closeMenu}
+                        >
+                          Open admin navigation
+                        </Link>
+                        <Link
+                          href={playerHomeHref}
+                          className="admin-user-menu-item"
+                          role="menuitem"
+                          onClick={closeMenu}
+                        >
+                          Open personal area
+                        </Link>
+                        <div className="admin-user-menu-separator" />
+                      </>
+                    ) : null}
+
                     {visibleDropdownUserNavItems.map((item) => (
                       <Link
                         key={item.href}

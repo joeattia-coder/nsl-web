@@ -10,9 +10,11 @@ function serializeBigInt(data: unknown) {
   );
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const rankings = await getPlayerRankings();
+    const { searchParams } = new URL(request.url);
+    const tournamentId = searchParams.get("tournamentId");
+    const rankings = await getPlayerRankings(tournamentId);
 
     return NextResponse.json({ players: serializeBigInt(rankings) });
   } catch (error) {

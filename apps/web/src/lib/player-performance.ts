@@ -19,6 +19,18 @@ export function buildCurrentLeagueRegisteredPlayersWhere() {
   };
 }
 
+function buildTournamentRegisteredPlayersWhere(tournamentId: string) {
+  return {
+    entryMembers: {
+      some: {
+        tournamentEntry: {
+          tournamentId,
+        },
+      },
+    },
+  };
+}
+
 function buildCurrentLeagueMatchesWhere() {
   return {
     tournament: {
@@ -29,6 +41,12 @@ function buildCurrentLeagueMatchesWhere() {
         },
       },
     },
+  };
+}
+
+function buildTournamentMatchesWhere(tournamentId: string) {
+  return {
+    tournamentId,
   };
 }
 
@@ -100,9 +118,13 @@ export function compareRankingRows(left: PlayerRankingRow, right: PlayerRankingR
   return compareAlphabeticalPlayers(left, right);
 }
 
-export async function getPlayerRankings() {
+export async function getPlayerRankings(tournamentId?: string | null) {
+  const normalizedTournamentId = tournamentId?.trim() || null;
+
   const players = await prisma.player.findMany({
-    where: buildCurrentLeagueRegisteredPlayersWhere(),
+    where: normalizedTournamentId
+      ? buildTournamentRegisteredPlayersWhere(normalizedTournamentId)
+      : buildCurrentLeagueRegisteredPlayersWhere(),
     select: {
       id: true,
       firstName: true,
@@ -116,7 +138,9 @@ export async function getPlayerRankings() {
   });
 
   const matches = await prisma.match.findMany({
-    where: buildCurrentLeagueMatchesWhere(),
+    where: normalizedTournamentId
+      ? buildTournamentMatchesWhere(normalizedTournamentId)
+      : buildCurrentLeagueMatchesWhere(),
     select: {
       id: true,
       matchStatus: true,

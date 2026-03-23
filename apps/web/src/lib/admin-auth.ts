@@ -19,6 +19,11 @@ const ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 const GLOBAL_ADMIN_ROLE_KEY = "ADMINISTRATOR";
 const PLAYER_ROLE_KEY = "PLAYER";
 const GLOBAL_SCOPE: AdminPermissionScope = { scopeType: "GLOBAL", scopeId: "" };
+const ACTIVE_PLAYER_TOURNAMENT_STATUSES = [
+  "REGISTRATION_OPEN",
+  "REGISTRATION_CLOSED",
+  "IN_PROGRESS",
+] as const;
 
 const currentAdminSelect = {
   id: true,
@@ -32,6 +37,19 @@ const currentAdminSelect = {
       firstName: true,
       middleInitial: true,
       lastName: true,
+      entryMembers: {
+        select: {
+          tournamentEntry: {
+            select: {
+              tournament: {
+                select: {
+                  status: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
   roleAssignments: {
@@ -132,6 +150,19 @@ const legacyCurrentAdminSelect = {
       firstName: true,
       middleInitial: true,
       lastName: true,
+      entryMembers: {
+        select: {
+          tournamentEntry: {
+            select: {
+              tournament: {
+                select: {
+                  status: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
   roleAssignments: {
@@ -201,6 +232,19 @@ const loginUserSelect = {
       firstName: true,
       middleInitial: true,
       lastName: true,
+      entryMembers: {
+        select: {
+          tournamentEntry: {
+            select: {
+              tournament: {
+                select: {
+                  status: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
   roleAssignments: {
@@ -300,6 +344,19 @@ const legacyLoginUserSelect = {
       firstName: true,
       middleInitial: true,
       lastName: true,
+      entryMembers: {
+        select: {
+          tournamentEntry: {
+            select: {
+              tournament: {
+                select: {
+                  status: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
   roleAssignments: {
@@ -920,8 +977,18 @@ function isAdminUserRecord(user: NonNullable<LoadedAdminUser>) {
   return hasAnyAdminCapability(user);
 }
 
+function hasActiveTournamentRegistration(user: NonNullable<LoadedAdminUser>) {
+  return (
+    user.player?.entryMembers.some((entryMember) => {
+      const tournamentStatus = entryMember.tournamentEntry.tournament.status;
+
+      return ACTIVE_PLAYER_TOURNAMENT_STATUSES.some((status) => status === tournamentStatus);
+    }) ?? false
+  );
+}
+
 function isPlayerUserRecord(user: NonNullable<LoadedAdminUser>) {
-  return hasRoleKey(user, PLAYER_ROLE_KEY, true);
+  return hasRoleKey(user, PLAYER_ROLE_KEY, true) || hasActiveTournamentRegistration(user);
 }
 
 function resolveNextPath(nextPath: string | null | undefined, isAdmin: boolean, hasLinkedPlayer: boolean) {

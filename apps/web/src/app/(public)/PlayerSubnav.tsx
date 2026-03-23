@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FiActivity, FiCalendar, FiSettings, FiUser } from "react-icons/fi";
+import { FiActivity, FiAward, FiCalendar, FiSettings, FiUser } from "react-icons/fi";
 
 const playerLinks = [
   {
@@ -11,9 +11,9 @@ const playerLinks = [
     icon: FiActivity,
   },
   {
-    label: "Profile",
-    href: "/profile",
-    icon: FiUser,
+    label: "My Tournaments",
+    href: "/my-tournaments",
+    icon: FiAward,
   },
   {
     label: "My Matches",
@@ -21,7 +21,12 @@ const playerLinks = [
     icon: FiCalendar,
   },
   {
-    label: "Settings",
+    label: "Profile",
+    href: "/profile",
+    icon: FiUser,
+  },
+  {
+    label: "Change Password",
     href: "/settings",
     icon: FiSettings,
   },

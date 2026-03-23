@@ -127,9 +127,9 @@ export default async function AdminDashboardPage() {
     publishedTournamentCount,
     activeTournamentCount,
     completedMatchCount,
+    scheduledMatchCount,
     inProgressMatchCount,
     confirmedMatchCount,
-    matchStatusGroups,
     recentMatches,
     recentMatchCreates,
     draftTournamentCount,
@@ -157,30 +157,38 @@ export default async function AdminDashboardPage() {
     prisma.tournament.count({ where: { isPublished: true } }),
     prisma.tournament.count({ where: { status: "IN_PROGRESS" } }),
     prisma.match.count({ where: { matchStatus: "COMPLETED" } }),
+    prisma.match.count({ where: { matchStatus: "SCHEDULED" } }),
     prisma.match.count({ where: { matchStatus: "IN_PROGRESS" } }),
     prisma.match.count({ where: { scheduleStatus: "CONFIRMED" } }),
-    prisma.match.groupBy({
-      by: ["matchStatus"],
-      _count: {
-        _all: true,
-      },
-    }),
     prisma.match.findMany({
+      where: {
+        matchStatus: "COMPLETED",
+      },
       select: {
         id: true,
-        createdAt: true,
         matchDate: true,
         matchTime: true,
         matchStatus: true,
+        resultSubmittedAt: true,
+        approvedAt: true,
+        updatedAt: true,
         tournament: {
           select: {
             tournamentName: true,
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        {
+          approvedAt: "desc",
+        },
+        {
+          resultSubmittedAt: "desc",
+        },
+        {
+          updatedAt: "desc",
+        },
+      ],
       take: 5,
     }),
     prisma.match.findMany({
@@ -305,14 +313,27 @@ export default async function AdminDashboardPage() {
     },
   ];
 
-  const matchStatusRows = matchStatusGroups
-    .map((group) => ({
-      label: formatStatusLabel(group.matchStatus),
-      value: group._count._all,
-    }))
-    .sort((a, b) => b.value - a.value);
-
-  const maxMatchStatusValue = Math.max(1, ...matchStatusRows.map((item) => item.value));
+  const scheduledCompletedTotal = scheduledMatchCount + completedMatchCount;
+  const completedMatchPercent =
+    scheduledCompletedTotal > 0 ? Math.round((completedMatchCount / scheduledCompletedTotal) * 100) : 0;
+  const donutRadius = 78;
+  const donutCircumference = 2 * Math.PI * donutRadius;
+  const completedStrokeLength =
+    scheduledCompletedTotal > 0 ? (completedMatchCount / scheduledCompletedTotal) * donutCircumference : 0;
+  const scheduledStrokeLength =
+    scheduledCompletedTotal > 0 ? (scheduledMatchCount / scheduledCompletedTotal) * donutCircumference : 0;
+  const matchBreakdownRows = [
+    {
+      label: "Completed",
+      value: completedMatchCount,
+      accentClassName: "admin-dashboard-donut-legend-completed",
+    },
+    {
+      label: "Scheduled",
+      value: scheduledMatchCount,
+      accentClassName: "admin-dashboard-donut-legend-scheduled",
+    },
+  ];
 
   const totalMatchMap = new Map(totalMatchesByTournament.map((row) => [row.tournamentId, row._count._all]));
   const completedMatchMap = new Map(
@@ -398,7 +419,7 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="admin-dashboard-panel">
+        <section className="admin-dashboard-panel admin-dashboard-panel-actions">
           <div className="admin-dashboard-panel-header">
             <h2 className="admin-dashboard-panel-title">Action Center</h2>
             <p className="admin-dashboard-panel-subtitle">Priority items that usually need admin follow-up</p>
@@ -443,31 +464,89 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="admin-dashboard-panel">
+        <section className="admin-dashboard-panel admin-dashboard-panel-match-status">
           <div className="admin-dashboard-panel-header">
             <h2 className="admin-dashboard-panel-title">Match Status Breakdown</h2>
-            <p className="admin-dashboard-panel-subtitle">Distribution by current match status</p>
+            <p className="admin-dashboard-panel-subtitle">Scheduled versus completed matches</p>
           </div>
 
-          <div className="admin-dashboard-bars">
-            {matchStatusRows.map((row) => (
-              <div className="admin-dashboard-bar-row" key={row.label}>
-                <div className="admin-dashboard-bar-label-row">
-                  <span>{row.label}</span>
-                  <span>{formatCount(row.value)}</span>
-                </div>
-                <div className="admin-dashboard-bar-track">
-                  <div
-                    className="admin-dashboard-bar-fill"
-                    style={{ width: `${Math.max(8, (row.value / maxMatchStatusValue) * 100)}%` }}
+          <div className="admin-dashboard-match-status-layout">
+            <div className="admin-dashboard-match-status-chart-wrap">
+              <div className="admin-dashboard-match-status-ring">
+                <svg
+                  className="admin-dashboard-match-status-svg"
+                  viewBox="0 0 200 200"
+                  role="img"
+                  aria-label={`Match status breakdown: ${formatCount(completedMatchCount)} completed and ${formatCount(scheduledMatchCount)} scheduled matches.`}
+                >
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r={donutRadius}
+                    fill="none"
+                    stroke="var(--theme-border-soft)"
+                    strokeWidth="18"
                   />
+                  {completedStrokeLength > 0 ? (
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r={donutRadius}
+                      fill="none"
+                      stroke="var(--theme-accent-success)"
+                      strokeWidth="18"
+                      strokeLinecap="round"
+                      strokeDasharray={`${completedStrokeLength} ${donutCircumference}`}
+                      strokeDashoffset="0"
+                    />
+                  ) : null}
+                  {scheduledStrokeLength > 0 ? (
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r={donutRadius}
+                      fill="none"
+                      stroke="var(--theme-accent-orange)"
+                      strokeWidth="18"
+                      strokeLinecap="round"
+                      strokeDasharray={`${scheduledStrokeLength} ${donutCircumference}`}
+                      strokeDashoffset={`${-completedStrokeLength}`}
+                    />
+                  ) : null}
+                </svg>
+
+                <div className="admin-dashboard-match-status-center">
+                  <span className="admin-dashboard-gauge-percent">{completedMatchPercent}%</span>
+                  <span className="admin-dashboard-gauge-label">Completed</span>
                 </div>
               </div>
-            ))}
+
+              <p className="admin-dashboard-gauge-meta">
+                {formatCount(completedMatchCount)} completed of {formatCount(scheduledCompletedTotal)} tracked matches.
+              </p>
+            </div>
+
+            <div className="admin-dashboard-donut-legend admin-dashboard-donut-legend-compact" role="list" aria-label="Scheduled and completed matches">
+              {matchBreakdownRows.map((row) => {
+                const percent =
+                  scheduledCompletedTotal > 0 ? Math.round((row.value / scheduledCompletedTotal) * 100) : 0;
+
+                return (
+                  <div className="admin-dashboard-donut-legend-item" key={row.label} role="listitem">
+                    <span className={`admin-dashboard-donut-legend-swatch ${row.accentClassName}`} aria-hidden="true" />
+                    <div className="admin-dashboard-donut-legend-copy">
+                      <span className="admin-dashboard-donut-legend-label">{row.label}</span>
+                      <strong className="admin-dashboard-donut-legend-value">{formatCount(row.value)}</strong>
+                    </div>
+                    <span className="admin-dashboard-donut-legend-percent">{percent}%</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <section className="admin-dashboard-panel">
+        <section className="admin-dashboard-panel admin-dashboard-panel-gauge">
           <div className="admin-dashboard-panel-header">
             <h2 className="admin-dashboard-panel-title">Tournament Progress</h2>
             <p className="admin-dashboard-panel-subtitle">Completed matches versus total matches in each tournament</p>
@@ -524,12 +603,12 @@ export default async function AdminDashboardPage() {
         <section className="admin-dashboard-panel">
           <div className="admin-dashboard-panel-header">
             <h2 className="admin-dashboard-panel-title">Recent Match Activity</h2>
-            <p className="admin-dashboard-panel-subtitle">Latest records created in the system</p>
+            <p className="admin-dashboard-panel-subtitle">Most recently completed matches</p>
           </div>
 
           <div className="admin-dashboard-activity-list">
             {recentMatches.length === 0 ? (
-              <p className="admin-dashboard-empty">No matches found.</p>
+              <p className="admin-dashboard-empty">No completed matches found.</p>
             ) : (
               recentMatches.map((match) => (
                 <article className="admin-dashboard-activity-item" key={match.id}>
@@ -542,7 +621,7 @@ export default async function AdminDashboardPage() {
                     </p>
                   </div>
                   <span className="admin-dashboard-activity-created">
-                    {match.createdAt.toLocaleDateString("en-CA")}
+                    {(match.approvedAt ?? match.resultSubmittedAt ?? match.updatedAt).toLocaleDateString("en-CA")}
                   </span>
                 </article>
               ))

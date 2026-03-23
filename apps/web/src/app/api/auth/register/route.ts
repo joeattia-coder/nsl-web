@@ -10,6 +10,8 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, validatePasswordStrength } from "@/lib/passwords";
 import { validateHumanVerification } from "@/lib/human-verification";
 
+const PLAYER_ROLE_KEY = "PLAYER";
+
 function parseString(value: unknown) {
   return String(value ?? "").trim();
 }
@@ -213,6 +215,15 @@ export async function POST(request: Request) {
     const passwordHash = hashPassword(password);
 
     const created = await prisma.$transaction(async (tx) => {
+      const playerRole = await tx.role.findUnique({
+        where: { roleKey: PLAYER_ROLE_KEY },
+        select: { id: true },
+      });
+
+      if (!playerRole) {
+        throw new Error("The Player role is not configured.");
+      }
+
       const user = await tx.user.create({
         data: {
           username,
@@ -236,6 +247,13 @@ export async function POST(request: Request) {
           dateOfBirth,
           phoneNumber,
           emailAddress: email,
+        },
+      });
+
+      await tx.userRole.create({
+        data: {
+          userId: user.id,
+          roleId: playerRole.id,
         },
       });
 
