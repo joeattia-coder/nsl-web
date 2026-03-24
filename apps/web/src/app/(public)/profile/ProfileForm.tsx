@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FiUpload, FiX } from "react-icons/fi";
+import PlayerPortalPortrait from "../PlayerPortalPortrait";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
@@ -267,16 +267,11 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           <span className="admin-label">Photo</span>
 
           <div className="admin-player-photo-preview">
-            {previewImage ? (
-              <Image
-                src={previewImage}
-                alt="Profile photo preview"
-                width={88}
-                height={88}
-                className="admin-player-photo-preview-img"
-                unoptimized
-              />
-            ) : null}
+            <PlayerPortalPortrait
+              photoUrl={previewImage}
+              alt="Profile photo preview"
+              className="admin-player-photo-preview-frame"
+            />
 
             <label
               htmlFor="profilePhotoFile"

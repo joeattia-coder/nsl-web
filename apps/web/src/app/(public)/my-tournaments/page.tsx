@@ -123,6 +123,21 @@ export default async function MyTournamentsPage() {
     ).values()
   ).sort(sortTournamentRows);
 
+  const linkedPlayer = await prisma.player.findUnique({
+    where: {
+      id: currentUser.linkedPlayerId,
+    },
+    select: {
+      firstName: true,
+      lastName: true,
+      photoUrl: true,
+    },
+  });
+
+  const playerName = linkedPlayer
+    ? `${linkedPlayer.firstName} ${linkedPlayer.lastName}`.trim()
+    : currentUser.displayName ?? currentUser.username ?? currentUser.email ?? "Tournaments";
+
   return (
     <section className="admin-page login-page-shell player-dashboard-page player-profile-page">
       <div className="login-page-card player-portal-shell player-dashboard-card">
@@ -130,7 +145,8 @@ export default async function MyTournamentsPage() {
           kicker="My Tournaments"
           title="Your tournament registrations"
           subtitle="Review every tournament you are registered in and switch the standings view to one selected tournament at a time."
-          avatarLabel={currentUser.displayName ?? currentUser.username ?? currentUser.email ?? "Tournaments"}
+          avatarLabel={playerName}
+          avatarUrl={linkedPlayer?.photoUrl}
         />
 
         <div className="player-portal-content player-portal-content-wide">

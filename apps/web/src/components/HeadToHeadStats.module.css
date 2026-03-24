@@ -254,25 +254,56 @@
     gap: 0.95rem;
   }
 
-  .playerVisual {
-    width: min(100%, 180px);
-    height: 168px;
-  }
-
-  .playerShell {
-    height: 104px;
-  }
-
-  .playerImage {
-    height: 168px;
+  .hero {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: 0.55rem;
+    width: 100%;
   }
 
   .playerBlock {
-    gap: 0.55rem;
+    width: 100%;
+    max-width: none;
+    gap: 0.45rem;
+  }
+
+  .playerVisual {
+    width: min(100%, 112px);
+    height: 112px;
+  }
+
+  .playerShell {
+    height: 68px;
+  }
+
+  .playerImage {
+    height: 112px;
+  }
+
+  .playerLabel {
+    font-size: 0.92rem;
+  }
+
+  .playerLabelRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .playerLabel {
+    order: 1;
+  }
+
+  .playerFlag {
+    order: 2;
+    width: 20px;
+    height: 15px;
   }
 
   .scoreCluster {
+    order: 0;
     gap: 0.7rem;
+    padding: 0 0 0.15rem;
   }
 
   .headToHead {

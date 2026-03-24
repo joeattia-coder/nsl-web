@@ -117,6 +117,21 @@ export default async function MyMatchesPage() {
     orderBy: [{ matchDate: "asc" }, { createdAt: "asc" }],
   });
 
+  const linkedPlayer = await prisma.player.findUnique({
+    where: {
+      id: currentUser.linkedPlayerId,
+    },
+    select: {
+      firstName: true,
+      lastName: true,
+      photoUrl: true,
+    },
+  });
+
+  const playerName = linkedPlayer
+    ? `${linkedPlayer.firstName} ${linkedPlayer.lastName}`.trim()
+    : currentUser.displayName ?? currentUser.username ?? "Matches";
+
   return (
     <section className="admin-page login-page-shell player-dashboard-page player-profile-page">
       <div className="login-page-card player-portal-shell player-dashboard-card">
@@ -124,7 +139,8 @@ export default async function MyMatchesPage() {
           kicker="My Matches"
           title="Your fixtures and results"
           subtitle="Track upcoming fixtures and completed match results assigned to your player profile."
-          avatarLabel={currentUser.displayName ?? currentUser.username ?? "Matches"}
+          avatarLabel={playerName}
+          avatarUrl={linkedPlayer?.photoUrl}
         />
 
         <div className="player-portal-content player-portal-content-wide">

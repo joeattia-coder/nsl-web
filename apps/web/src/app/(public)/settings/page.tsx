@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { resolveCurrentUser } from "@/lib/admin-auth";
+import { prisma } from "@/lib/prisma";
 import PlayerPortalHeader from "../PlayerPortalHeader";
 import ChangePasswordForm from "./ChangePasswordForm";
 
@@ -11,6 +12,23 @@ export default async function SettingsPage() {
     redirect("/login?next=/settings");
   }
 
+  const linkedPlayer = currentUser.linkedPlayerId
+    ? await prisma.player.findUnique({
+        where: {
+          id: currentUser.linkedPlayerId,
+        },
+        select: {
+          firstName: true,
+          lastName: true,
+          photoUrl: true,
+        },
+      })
+    : null;
+
+  const playerName = linkedPlayer
+    ? `${linkedPlayer.firstName} ${linkedPlayer.lastName}`.trim()
+    : currentUser.displayName ?? currentUser.username ?? currentUser.email ?? "Settings";
+
   return (
     <section className="admin-page login-page-shell player-dashboard-page player-profile-page">
       <div className="login-page-card player-portal-shell player-dashboard-card">
@@ -18,7 +36,8 @@ export default async function SettingsPage() {
           kicker="Settings"
           title="Account settings"
           subtitle="Review your account details, manage password changes, and keep your player account secure."
-          avatarLabel={currentUser.displayName ?? currentUser.username ?? currentUser.email ?? "Settings"}
+          avatarLabel={playerName}
+          avatarUrl={linkedPlayer?.photoUrl}
         />
 
         <div className="player-portal-content player-portal-content-medium">
