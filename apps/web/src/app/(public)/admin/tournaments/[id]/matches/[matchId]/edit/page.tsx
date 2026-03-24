@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { formatDateTimeLocalValue, formatStoredMatchDateTimeLocalValue } from "@/lib/timezone";
 import TournamentSubnav from "../../../TournamentSubnav";
 import MatchResultForm from "./MatchResultForm";
 
@@ -27,24 +28,6 @@ function formatParticipantTypeLabel(entry: {
 }
 
 export const dynamic = "force-dynamic";
-
-function toDateTimeLocal(date: Date | null | undefined, time?: string | null) {
-  if (!date) {
-    return "";
-  }
-
-  const isoDate = date.toISOString().slice(0, 10);
-  const normalizedTime = time?.slice(0, 5) ?? "00:00";
-  return `${isoDate}T${normalizedTime}`;
-}
-
-function toDateTimeLocalFromDate(date: Date | null | undefined) {
-  if (!date) {
-    return "";
-  }
-
-  return date.toISOString().slice(0, 16);
-}
 
 function buildFrameHighBreaks(
   frameCount: number,
@@ -157,8 +140,8 @@ export default async function EditTournamentMatchPage({
         homeEntry={{ id: match.homeEntry.id, label: homeLabel }}
         awayEntry={{ id: match.awayEntry.id, label: awayLabel }}
         initialData={{
-          startDateTime: toDateTimeLocal(match.matchDate, match.matchTime),
-          endDateTime: toDateTimeLocalFromDate(match.resultSubmittedAt),
+          startDateTime: formatStoredMatchDateTimeLocalValue(match.matchDate, match.matchTime),
+          endDateTime: formatDateTimeLocalValue(match.resultSubmittedAt),
           homeScore: match.homeScore,
           awayScore: match.awayScore,
           winnerEntryId: match.winnerEntryId,

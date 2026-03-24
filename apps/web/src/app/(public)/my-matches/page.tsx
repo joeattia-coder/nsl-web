@@ -1,21 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import LocalTimeText from "@/components/LocalTimeText";
 import { resolveCurrentUser } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import { parseStoredMatchDateTime } from "@/lib/timezone";
 import PlayerPortalHeader from "../PlayerPortalHeader";
-
-function formatMatchDate(date: Date | null) {
-  if (!date) {
-    return "TBC";
-  }
-
-  return date.toLocaleDateString(undefined, {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
 
 function formatEntryName(members: Array<{ player: { firstName: string; lastName: string } }>) {
   const names = members.map((member) => `${member.player.firstName} ${member.player.lastName}`.trim());
@@ -147,13 +136,30 @@ export default async function MyMatchesPage() {
             <div className="my-matches-list">
               {matches.map((match) => (
                 <article key={match.id} className="my-match-card">
+                  {(() => {
+                    const scheduledAt = parseStoredMatchDateTime(match.matchDate, match.matchTime)?.toISOString() ?? null;
+
+                    return (
+                      <>
                   <p className="my-match-meta">
                     <strong>{match.tournament.tournamentName}</strong>
                     <span>{match.stageRound.roundName}</span>
                   </p>
                   <p className="my-match-meta">
-                    <span>{formatMatchDate(match.matchDate)}</span>
-                    <span>{match.matchTime || "TBA"}</span>
+                    <span>
+                      <LocalTimeText
+                        value={scheduledAt}
+                        fallback="TBC"
+                        options={{ weekday: "short", year: "numeric", month: "short", day: "numeric" }}
+                      />
+                    </span>
+                    <span>
+                      <LocalTimeText
+                        value={scheduledAt}
+                        fallback="TBA"
+                        options={{ hour: "numeric", minute: "2-digit" }}
+                      />
+                    </span>
                     <span>{match.matchStatus.replaceAll("_", " ")}</span>
                   </p>
                   <p className="my-match-teams">
@@ -166,6 +172,9 @@ export default async function MyMatchesPage() {
                   <Link href="/matches" className="login-form-link">
                     View public match hub
                   </Link>
+                      </>
+                    );
+                  })()}
                 </article>
               ))}
             </div>

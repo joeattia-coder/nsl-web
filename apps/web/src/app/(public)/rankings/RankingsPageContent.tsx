@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FiBarChart2, FiStar, FiTrendingUp } from "react-icons/fi";
 import { getFlagCdnUrl } from "@/lib/country";
@@ -97,7 +98,9 @@ function renderPlayerCell(player: Player) {
           {player.fullName?.[0] ?? "?"}
         </div>
       )}
-      <span className={styles.rankingsPlayerName}>{player.fullName}</span>
+      <Link href={`/players/${player.id}`} className={`${styles.rankingsPlayerName} public-player-link`}>
+        {player.fullName}
+      </Link>
     </div>
   );
 }

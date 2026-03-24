@@ -1,0 +1,161 @@
+.page {
+  display: grid;
+  gap: 1.5rem;
+  padding-top: 1.6rem;
+  padding-bottom: 2.5rem;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--theme-border-soft);
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 55%),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--theme-accent-cyan) 12%, transparent), transparent 48%),
+    linear-gradient(180deg, var(--theme-surface-1), var(--theme-surface-2));
+  padding: 1.35rem 1.35rem 1.2rem;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, color-mix(in srgb, white 4%, transparent), transparent 36%);
+  pointer-events: none;
+}
+
+.heroInner {
+  position: relative;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--theme-page-muted-4);
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.backButton {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-brand) 18%, var(--theme-border-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 92%, white) 0%, var(--theme-surface-2) 100%);
+  color: var(--theme-page-muted-2);
+  font-size: 0.94rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--theme-shadow-soft);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.backButton:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--theme-accent-brand) 34%, var(--theme-border-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-accent-brand) 8%, var(--theme-surface-1)) 0%, var(--theme-surface-2) 100%);
+  color: var(--theme-page-text);
+}
+
+.title {
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--theme-page-text);
+}
+
+.subTitle {
+  color: var(--theme-page-muted-3);
+  font-size: 0.96rem;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.4rem;
+}
+
+.metaCard {
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 80%, transparent);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+  padding: 0.9rem 1rem;
+}
+
+.metaLabel {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--theme-page-muted-4);
+}
+
+.metaValue {
+  display: block;
+  color: var(--theme-page-text);
+  font-weight: 700;
+}
+
+.notePanel {
+  border: 1px solid var(--theme-border-soft);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+  padding: 1rem 1.1rem;
+}
+
+.noteTitle {
+  margin-bottom: 0.45rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--theme-page-muted-4);
+}
+
+.noteBody {
+  color: var(--theme-page-muted-2);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .metaGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    gap: 1rem;
+    padding-top: 1rem;
+  }
+
+  .hero {
+    padding: 1rem;
+  }
+
+  .backButton {
+    width: 100%;
+  }
+
+  .metaGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -6,13 +6,6 @@ import {
   isTermsTableMissingError,
 } from "@/lib/terms";
 
-const termsDateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  timeZone: "UTC",
-});
-
 export async function GET() {
   try {
     const latest = await prisma.termsOfServiceVersion.findFirst({
@@ -44,7 +37,7 @@ export async function GET() {
         title: latest.title,
         contentHtml: latest.contentHtml,
         publishedAt: latest.publishedAt.toISOString(),
-        publishedAtLabel: termsDateFormatter.format(latest.publishedAt),
+        publishedAtLabel: null,
         exists: true,
       },
     });

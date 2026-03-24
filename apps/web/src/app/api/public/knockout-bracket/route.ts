@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { normalizeCountryCode } from "@/lib/country";
 import { prisma } from "@/lib/prisma";
 import type { BracketMatch, BracketPlayer, BracketRound } from "@/components/tournament-bracket/types";
+import { parseStoredMatchDateTime } from "@/lib/timezone";
 
 type PlayerLike = {
   id: string;
@@ -74,16 +75,7 @@ function emptyEntrant() {
 }
 
 function toIsoDateTime(date: Date | null, matchTime?: string | null) {
-  if (!date) return undefined;
-
-  const nextDate = new Date(date);
-
-  if (matchTime && /^\d{1,2}:\d{2}$/.test(matchTime.trim())) {
-    const [hours, minutes] = matchTime.trim().split(":");
-    nextDate.setHours(Number(hours), Number(minutes), 0, 0);
-  }
-
-  return nextDate.toISOString();
+  return parseStoredMatchDateTime(date, matchTime)?.toISOString();
 }
 
 function buildBracketPlayer(

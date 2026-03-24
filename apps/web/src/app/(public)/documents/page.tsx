@@ -62,7 +62,7 @@ export default async function PublicDocumentsPage() {
               fileName: document.fileName,
               mimeType: document.mimeType,
               sizeLabel: formatFileSize(document.sizeBytes),
-              updatedAtLabel: new Date(document.updatedAt).toLocaleDateString(),
+              updatedAt: document.updatedAt.toISOString(),
             }))}
           />
         )}

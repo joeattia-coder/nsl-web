@@ -4,16 +4,10 @@ import {
   DEFAULT_TERMS_TITLE,
   isTermsTableMissingError,
 } from "@/lib/terms";
+import LocalTimeText from "@/components/LocalTimeText";
 import styles from "./TermsPage.module.css";
 
 export const dynamic = "force-dynamic";
-
-const publicTermsDateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  timeZone: "UTC",
-});
 
 export default async function TermsPage() {
   let latest: {
@@ -39,7 +33,6 @@ export default async function TermsPage() {
 
   const title = latest?.title ?? DEFAULT_TERMS_TITLE;
   const contentHtml = latest?.contentHtml ?? DEFAULT_TERMS_CONTENT_HTML;
-  const lastUpdatedLabel = latest ? publicTermsDateFormatter.format(latest.publishedAt) : null;
 
   return (
     <main className={styles.termsPage}>
@@ -48,9 +41,13 @@ export default async function TermsPage() {
           <p className={styles.eyebrow}>Legal</p>
           <h1 className={styles.title}>{title}</h1>
           <p className={styles.subtitle}>
-            {lastUpdatedLabel
-              ? `Last updated ${lastUpdatedLabel}.`
-              : "The current Terms of Service will appear here once published."}
+            {latest?.publishedAt ? (
+              <>
+                Last updated <LocalTimeText value={latest.publishedAt.toISOString()} options={{ year: "numeric", month: "long", day: "numeric" }} />.
+              </>
+            ) : (
+              "The current Terms of Service will appear here once published."
+            )}
           </p>
         </header>
 

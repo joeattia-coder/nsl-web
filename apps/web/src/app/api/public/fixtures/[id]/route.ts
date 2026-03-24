@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeCountryCode } from "@/lib/country";
 import { publicApiJson, publicApiOptions } from "@/lib/public-api-response";
+import { parseStoredMatchDateTime } from "@/lib/timezone";
 
 type PlayerLike = {
+  id?: string;
   firstName: string;
   middleInitial?: string | null;
   lastName: string;
@@ -19,6 +21,15 @@ type EntryLike = {
   members: EntryMemberLike[];
 };
 
+function getEntryPrimaryPlayerId(entry: EntryLike | null | undefined) {
+  if (!entry || entry.members.length !== 1) {
+    return null;
+  }
+
+  const playerId = entry.members[0]?.player.id;
+  return typeof playerId === "string" && playerId.trim() ? playerId : null;
+}
+
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
@@ -32,16 +43,7 @@ function pad2(value: number) {
 }
 
 function toIsoDateTime(date: Date | null, matchTime?: string | null) {
-  if (!date) return "";
-
-  const nextDate = new Date(date);
-
-  if (matchTime && /^\d{1,2}:\d{2}$/.test(matchTime.trim())) {
-    const [hours, minutes] = matchTime.trim().split(":");
-    nextDate.setHours(Number(hours), Number(minutes), 0, 0);
-  }
-
-  return nextDate.toISOString();
+  return parseStoredMatchDateTime(date, matchTime)?.toISOString() ?? "";
 }
 
 function toTimeString(date: Date | null, matchTime?: string | null) {
@@ -176,6 +178,7 @@ export async function GET(_request: Request, context: RouteContext) {
               include: {
                 player: {
                   select: {
+                    id: true,
                     firstName: true,
                     middleInitial: true,
                     lastName: true,
@@ -194,6 +197,7 @@ export async function GET(_request: Request, context: RouteContext) {
               include: {
                 player: {
                   select: {
+                    id: true,
                     firstName: true,
                     middleInitial: true,
                     lastName: true,
@@ -222,6 +226,8 @@ export async function GET(_request: Request, context: RouteContext) {
         roadTeamName: getEntryDisplayName(match.awayEntry),
         homeCountryCode: getEntryCountryCode(match.homeEntry),
         roadCountryCode: getEntryCountryCode(match.awayEntry),
+        homePlayerId: getEntryPrimaryPlayerId(match.homeEntry),
+        roadPlayerId: getEntryPrimaryPlayerId(match.awayEntry),
         homePlayerPhotoUrl: getEntryPhotoUrl(match.homeEntry),
         roadPlayerPhotoUrl: getEntryPhotoUrl(match.awayEntry),
         homeScore: match.homeScore,

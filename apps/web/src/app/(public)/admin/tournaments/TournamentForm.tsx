@@ -157,7 +157,7 @@ export default function TournamentForm({
       return;
     }
 
-    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+    if (startDate && endDate && startDate > endDate) {
       setFeedbackModal({
         title: "Invalid dates",
         message: "End date must be the same as or later than the start date.",

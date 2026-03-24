@@ -6,6 +6,7 @@ import {
   resolveCurrentAdminUser,
 } from "@/lib/admin-auth";
 import { recalculateAndPersistPlayerElo } from "@/lib/player-elo";
+import { parseDateTimeInTimeZone, parseStoredMatchDateTime } from "@/lib/timezone";
 
 const VALID_MATCH_STATUSES = [
   "SCHEDULED",
@@ -471,7 +472,7 @@ export async function PATCH(
       }
     }
 
-    const match = await prisma.$transaction(async (tx) => {
+    const updatedMatchId = await prisma.$transaction(async (tx) => {
       const updated = await tx.match.update({
         where: { id },
         data: {
@@ -484,8 +485,8 @@ export async function PATCH(
             body.matchDate === null
               ? null
               : body.matchDate
-              ? new Date(body.matchDate)
-              : existingMatch.matchDate,
+                ? parseStoredMatchDateTime(body.matchDate, body.matchTime)
+                : existingMatch.matchDate,
           matchTime:
             body.matchTime === null
               ? null
@@ -516,14 +517,14 @@ export async function PATCH(
             body.resultSubmittedAt === null
               ? null
               : body.resultSubmittedAt
-              ? new Date(body.resultSubmittedAt)
-              : existingMatch.resultSubmittedAt,
+                ? parseDateTimeInTimeZone(body.resultSubmittedAt)
+                : existingMatch.resultSubmittedAt,
           approvedAt:
             body.approvedAt === null
               ? null
               : body.approvedAt
-              ? new Date(body.approvedAt)
-              : existingMatch.approvedAt,
+                ? parseDateTimeInTimeZone(body.approvedAt)
+                : existingMatch.approvedAt,
           approvedByUserId,
           enteredByUserId,
           updatedByUserId,
@@ -553,54 +554,56 @@ export async function PATCH(
         }
       }
 
-      await recalculateAndPersistPlayerElo(tx);
+      return updated.id;
+    });
 
-      return tx.match.findUniqueOrThrow({
-        where: { id: updated.id },
-        include: {
-          tournament: true,
-          tournamentStage: true,
-          stageRound: true,
-          tournamentGroup: true,
-          venue: true,
-          homeEntry: {
-            include: {
-              members: {
-                include: {
-                  player: true,
-                },
-                orderBy: { createdAt: "asc" },
+    await recalculateAndPersistPlayerElo(prisma);
+
+    const match = await prisma.match.findUniqueOrThrow({
+      where: { id: updatedMatchId },
+      include: {
+        tournament: true,
+        tournamentStage: true,
+        stageRound: true,
+        tournamentGroup: true,
+        venue: true,
+        homeEntry: {
+          include: {
+            members: {
+              include: {
+                player: true,
               },
+              orderBy: { createdAt: "asc" },
             },
-          },
-          awayEntry: {
-            include: {
-              members: {
-                include: {
-                  player: true,
-                },
-                orderBy: { createdAt: "asc" },
-              },
-            },
-          },
-          winnerEntry: {
-            include: {
-              members: {
-                include: {
-                  player: true,
-                },
-                orderBy: { createdAt: "asc" },
-              },
-            },
-          },
-          approvedByUser: true,
-          enteredByUser: true,
-          updatedByUser: true,
-          frames: {
-            orderBy: { frameNumber: "asc" },
           },
         },
-      });
+        awayEntry: {
+          include: {
+            members: {
+              include: {
+                player: true,
+              },
+              orderBy: { createdAt: "asc" },
+            },
+          },
+        },
+        winnerEntry: {
+          include: {
+            members: {
+              include: {
+                player: true,
+              },
+              orderBy: { createdAt: "asc" },
+            },
+          },
+        },
+        approvedByUser: true,
+        enteredByUser: true,
+        updatedByUser: true,
+        frames: {
+          orderBy: { frameNumber: "asc" },
+        },
+      },
     });
 
     return NextResponse.json(match);
@@ -651,9 +654,9 @@ export async function DELETE(
       await tx.match.delete({
         where: { id },
       });
-
-      await recalculateAndPersistPlayerElo(tx);
     });
+
+    await recalculateAndPersistPlayerElo(prisma);
 
     return NextResponse.json({
       message: "Match deleted successfully",

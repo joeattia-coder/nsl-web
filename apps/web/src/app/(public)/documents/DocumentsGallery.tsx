@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import LocalTimeText from "@/components/LocalTimeText";
 import { FaRegFilePdf } from "react-icons/fa6";
 import { FiFileText, FiX } from "react-icons/fi";
 import styles from "./DocumentsPage.module.css";
@@ -13,7 +14,7 @@ type DocumentItem = {
   fileName: string | null;
   mimeType: string | null;
   sizeLabel: string;
-  updatedAtLabel: string;
+  updatedAt: string;
 };
 
 type DocumentsGalleryProps = {
@@ -100,7 +101,11 @@ export function DocumentsGallery({ documents }: DocumentsGalleryProps) {
                   >
                     {isPdf ? <FaRegFilePdf aria-hidden="true" /> : fileTypeLabel}
                   </span>
-                  <span className={styles.documentDate}>{document.updatedAtLabel}</span>
+                  <LocalTimeText
+                    value={document.updatedAt}
+                    className={styles.documentDate}
+                    options={{ year: "numeric", month: "short", day: "numeric" }}
+                  />
                 </div>
 
                 <span className={styles.documentTitle}>{document.title}</span>

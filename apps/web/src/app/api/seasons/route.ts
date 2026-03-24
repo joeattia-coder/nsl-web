@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseDateInTimeZone } from "@/lib/timezone";
 
 export async function GET() {
   try {
@@ -37,8 +38,8 @@ export async function POST(request: Request) {
 
     const seasonName = String(body.seasonName ?? "").trim();
     const leagueId = String(body.leagueId ?? "").trim();
-    const startDate = body.startDate ? new Date(body.startDate) : null;
-    const endDate = body.endDate ? new Date(body.endDate) : null;
+    const startDate = parseDateInTimeZone(body.startDate);
+    const endDate = parseDateInTimeZone(body.endDate);
     const isActive =
       typeof body.isActive === "boolean" ? body.isActive : true;
 

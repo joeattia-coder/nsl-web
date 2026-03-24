@@ -1,5 +1,6 @@
 import { GLOBAL_ADMIN_ROLE_KEY, getVisibleUsersWhere } from "@/lib/admin-user-access";
 import { prisma } from "@/lib/prisma";
+import { parseDateTimeInTimeZone } from "@/lib/timezone";
 import type { CurrentAdminUserSummary } from "@/lib/admin-auth-types";
 
 export function parseOptionalString(value: unknown) {
@@ -34,7 +35,7 @@ export function parseOptionalDate(value: unknown) {
     return null;
   }
 
-  const parsed = new Date(normalized);
+  const parsed = parseDateTimeInTimeZone(normalized);
 
   if (Number.isNaN(parsed.getTime())) {
     throw new Error("Invalid date value.");

@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { KnockoutBracket } from "@/components/tournament-bracket/KnockoutBracket";
@@ -33,6 +35,8 @@ type UiMatch = {
 
   homeName: string;
   roadName: string;
+  homePlayerId: string | null;
+  roadPlayerId: string | null;
   homeCountryCode: string;
   roadCountryCode: string;
   roundType: string;
@@ -56,6 +60,7 @@ type UiMatch = {
 type StandingsRow = {
   rank: number;
   teamName: string;
+  playerId?: string | null;
   played: number;
   won: number;
   tied?: number;
@@ -202,6 +207,8 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     timeLabel,
     homeName,
     roadName,
+    homePlayerId: firstString(fx, ["homePlayerId", "HomePlayerId"], "") || null,
+    roadPlayerId: firstString(fx, ["roadPlayerId", "RoadPlayerId"], "") || null,
     homeCountryCode: firstString(fx, ["homeCountryCode", "HomeCountryCode"], ""),
     roadCountryCode: firstString(fx, ["roadCountryCode", "RoadCountryCode"], ""),
     roundType: firstString(fx, ["roundType", "RoundType"], ""),
@@ -220,10 +227,11 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
 }
 
 export default function MatchesPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [groupsRaw, setGroupsRaw] = useState<AnyObj[] | null>(null);
   const [groupsError, setGroupsError] = useState("");
-
-  const [selectedGroupId, setSelectedGroupId] = useState<string>("");
 
   const [fixturesRaw, setFixturesRaw] = useState<AnyObj[] | null>(null);
   const [fixturesError, setFixturesError] = useState("");
@@ -232,6 +240,7 @@ export default function MatchesPage() {
 
   // Tournament pills carousel refs + arrow state
   const groupsRowRef = useRef<HTMLDivElement | null>(null);
+  const activeGroupButtonRef = useRef<HTMLButtonElement | null>(null);
   const [canScrollGroupsLeft, setCanScrollGroupsLeft] = useState(false);
   const [canScrollGroupsRight, setCanScrollGroupsRight] = useState(false);
 
@@ -321,13 +330,40 @@ export default function MatchesPage() {
       .filter((g) => g.desc.toLowerCase() !== "other matches");
   }, [groupsRaw, groupIdsWithFixtures]);
 
+  const requestedGroupId = searchParams.get("group") ?? "";
+
   const activeGroupId = useMemo(() => {
     if (!groups.length) return "";
 
-    return groups.some((group) => String(group.id) === String(selectedGroupId))
-      ? selectedGroupId
+    return groups.some((group) => String(group.id) === String(requestedGroupId))
+      ? requestedGroupId
       : groups[0].id;
-  }, [groups, selectedGroupId]);
+  }, [groups, requestedGroupId]);
+
+  useEffect(() => {
+    if (!activeGroupId) {
+      return;
+    }
+
+    const currentGroupId = searchParams.get("group") ?? "";
+    if (currentGroupId === activeGroupId) {
+      return;
+    }
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("group", activeGroupId);
+    const nextQuery = nextParams.toString();
+
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  }, [activeGroupId, pathname, router, searchParams]);
+
+  const updateSelectedGroupId = (nextGroupId: string) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("group", nextGroupId);
+    const nextQuery = nextParams.toString();
+
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  };
 
   // Filter matches by selected tournament
   const filteredMatches: UiMatch[] = useMemo(() => {
@@ -411,6 +447,30 @@ export default function MatchesPage() {
       behavior: "smooth",
     });
   };
+
+  useEffect(() => {
+    const row = groupsRowRef.current;
+    const activeButton = activeGroupButtonRef.current;
+
+    if (!row || !activeButton || !activeGroupId) {
+      return;
+    }
+
+    const rowRect = row.getBoundingClientRect();
+    const buttonRect = activeButton.getBoundingClientRect();
+    const overflowLeft = buttonRect.left < rowRect.left;
+    const overflowRight = buttonRect.right > rowRect.right;
+
+    if (!overflowLeft && !overflowRight) {
+      return;
+    }
+
+    activeButton.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [activeGroupId, groups.length]);
 
   // -----------------------------
   // FETCH GROUP STAGE STANDINGS (Groups tab)
@@ -572,9 +632,10 @@ export default function MatchesPage() {
             {groups.map((g) => (
               <button
                 key={g.id}
+                ref={String(activeGroupId) === String(g.id) ? activeGroupButtonRef : null}
                 type="button"
                 className={`group-pill ${String(activeGroupId) === String(g.id) ? "active" : ""}`}
-                onClick={() => setSelectedGroupId(g.id)}
+                onClick={() => updateSelectedGroupId(g.id)}
                 title={g.desc}
               >
                 {g.desc}
@@ -619,8 +680,17 @@ export default function MatchesPage() {
 
                   <div className="match-center">
                     <div className="name-stack left">
-                      {!!m.homeParts.first && <div className="name-first">{m.homeParts.first}</div>}
-                      <div className="name-last">{m.homeParts.last || m.homeName}</div>
+                      {m.homePlayerId ? (
+                        <Link className="public-player-link name-stack-link" href={`/players/${m.homePlayerId}`}>
+                          {!!m.homeParts.first && <div className="name-first">{m.homeParts.first}</div>}
+                          <div className="name-last">{m.homeParts.last || m.homeName}</div>
+                        </Link>
+                      ) : (
+                        <>
+                          {!!m.homeParts.first && <div className="name-first">{m.homeParts.first}</div>}
+                          <div className="name-last">{m.homeParts.last || m.homeName}</div>
+                        </>
+                      )}
                       {m.homeWinProbability !== null ? (
                         <div className="match-probability-row match-probability-row-left">
                           <span
@@ -692,8 +762,17 @@ export default function MatchesPage() {
                     </div>
 
                     <div className="name-stack right">
-                      {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}
-                      <div className="name-last">{m.roadParts.last || m.roadName}</div>
+                      {m.roadPlayerId ? (
+                        <Link className="public-player-link name-stack-link" href={`/players/${m.roadPlayerId}`}>
+                          {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}
+                          <div className="name-last">{m.roadParts.last || m.roadName}</div>
+                        </Link>
+                      ) : (
+                        <>
+                          {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}
+                          <div className="name-last">{m.roadParts.last || m.roadName}</div>
+                        </>
+                      )}
                       {m.roadWinProbability !== null ? (
                         <div className="match-probability-row match-probability-row-right">
                           <span
@@ -724,9 +803,9 @@ export default function MatchesPage() {
                   </div>
 
                   <div className="match-actions">
-                    <button type="button" className="match-cta">
+                    <Link href={`/matches/${m.id}?group=${encodeURIComponent(activeGroupId)}`} className="match-cta">
                       Match Centre
-                    </button>
+                    </Link>
                   </div>
                 </div>
               );
@@ -835,9 +914,15 @@ export default function MatchesPage() {
                         <tr key={`${g.standingsDesc}-${r.rank}-${r.teamName}`}>
                           <td className="col-rank">{r.rank}</td>
                           <td className="col-team">
-                            <div className="player-cell" title={r.teamName}>
-                              {r.teamName}
-                            </div>
+                            {r.playerId ? (
+                              <Link className="player-cell public-player-link" href={`/players/${r.playerId}`} title={r.teamName}>
+                                {r.teamName}
+                              </Link>
+                            ) : (
+                              <div className="player-cell" title={r.teamName}>
+                                {r.teamName}
+                              </div>
+                            )}
                           </td>
                           <td className="col-num">{r.played}</td>
                           <td className="col-num">{r.won}</td>

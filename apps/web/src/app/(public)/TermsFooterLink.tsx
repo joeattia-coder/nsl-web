@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
+import LocalTimeText from "@/components/LocalTimeText";
 import { FiArrowRight, FiExternalLink, FiLoader, FiX } from "react-icons/fi";
 
 type TermsSnapshot = {
@@ -82,17 +83,22 @@ export default function TermsFooterLink({
     }
   };
 
-  const handleOpen: React.MouseEventHandler<HTMLAnchorElement> = async (event) => {
-    event.preventDefault();
+  const handleOpen = async () => {
     setIsOpen(true);
     await loadTerms();
   };
 
   return (
     <>
-      <Link href="/terms" className={className} onClick={(event) => void handleOpen(event)}>
+      <button
+        type="button"
+        className={`terms-link-trigger ${className}`}
+        onClick={() => void handleOpen()}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+      >
         {label}
-      </Link>
+      </button>
 
       {isMounted && isOpen
         ? createPortal(
@@ -119,8 +125,10 @@ export default function TermsFooterLink({
                       {terms?.title ?? "Terms of Service"}
                     </h2>
                     <p className="terms-modal-subtitle">
-                      {terms?.publishedAtLabel
-                        ? `Last updated ${terms.publishedAtLabel}.`
+                      {terms?.publishedAt
+                        ? <>
+                            Last updated <LocalTimeText value={terms.publishedAt} options={{ year: "numeric", month: "long", day: "numeric" }} />.
+                          </>
                         : "Preview the latest published terms."}
                     </p>
                   </div>

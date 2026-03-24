@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseDateInTimeZone } from "@/lib/timezone";
 
 export async function GET(
   _request: Request,
@@ -89,13 +90,13 @@ export async function PATCH(
         startDate:
           body.startDate !== undefined
             ? body.startDate
-              ? new Date(body.startDate)
+              ? parseDateInTimeZone(body.startDate)
               : null
             : existingSeason.startDate,
         endDate:
           body.endDate !== undefined
             ? body.endDate
-              ? new Date(body.endDate)
+              ? parseDateInTimeZone(body.endDate)
               : null
             : existingSeason.endDate,
         isActive:

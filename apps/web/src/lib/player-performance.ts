@@ -297,6 +297,7 @@ export async function getPlayerDashboardData(playerId: string) {
         firstName: true,
         middleInitial: true,
         lastName: true,
+        country: true,
         photoUrl: true,
         eloRating: true,
         updatedAt: true,
@@ -391,6 +392,7 @@ export async function getPlayerDashboardData(playerId: string) {
     player: {
       id: player.id,
       fullName: buildFullName(player.firstName, player.middleInitial, player.lastName),
+      country: player.country,
       photoUrl: player.photoUrl,
       eloRating: player.eloRating,
       updatedAt: player.updatedAt.toISOString(),

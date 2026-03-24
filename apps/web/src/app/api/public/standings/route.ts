@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 type PlayerLike = {
+  id?: string;
   firstName: string;
   middleInitial?: string | null;
   lastName: string;
@@ -20,6 +21,7 @@ type EntryLike = {
 type StandingAccumulator = {
   entryId: string;
   teamName: string;
+  playerId: string | null;
   played: number;
   won: number;
   tied: number;
@@ -29,6 +31,15 @@ type StandingAccumulator = {
   diff: number;
   points: number;
 };
+
+function getEntryPrimaryPlayerId(entry: EntryLike | null | undefined) {
+  if (!entry || entry.members.length !== 1) {
+    return null;
+  }
+
+  const playerId = entry.members[0]?.player.id;
+  return typeof playerId === "string" && playerId.trim() ? playerId : null;
+}
 
 function getEntryDisplayName(entry: EntryLike | null | undefined) {
   if (!entry) return "TBD";
@@ -89,6 +100,7 @@ export async function GET(req: Request) {
                   include: {
                     player: {
                       select: {
+                        id: true,
                         firstName: true,
                         middleInitial: true,
                         lastName: true,
@@ -116,6 +128,7 @@ export async function GET(req: Request) {
                   include: {
                     player: {
                       select: {
+                        id: true,
                         firstName: true,
                         middleInitial: true,
                         lastName: true,
@@ -162,6 +175,7 @@ export async function GET(req: Request) {
                       include: {
                         player: {
                           select: {
+                            id: true,
                             firstName: true,
                             middleInitial: true,
                             lastName: true,
@@ -182,6 +196,7 @@ export async function GET(req: Request) {
                       include: {
                         player: {
                           select: {
+                            id: true,
                             firstName: true,
                             middleInitial: true,
                             lastName: true,
@@ -218,6 +233,7 @@ export async function GET(req: Request) {
         standingsMap.set(entry.id, {
           entryId: entry.id,
           teamName: getEntryDisplayName(entry),
+          playerId: getEntryPrimaryPlayerId(entry),
           played: 0,
           won: 0,
           tied: 0,
@@ -264,6 +280,7 @@ export async function GET(req: Request) {
           standingsMap.set(homeKey, {
             entryId: homeKey,
             teamName: getEntryDisplayName(match.homeEntry),
+            playerId: getEntryPrimaryPlayerId(match.homeEntry),
             played: 0,
             won: 0,
             tied: 0,
@@ -279,6 +296,7 @@ export async function GET(req: Request) {
           standingsMap.set(awayKey, {
             entryId: awayKey,
             teamName: getEntryDisplayName(match.awayEntry),
+            playerId: getEntryPrimaryPlayerId(match.awayEntry),
             played: 0,
             won: 0,
             tied: 0,
@@ -326,6 +344,7 @@ export async function GET(req: Request) {
         .map((row, index) => ({
           rank: index + 1,
           teamName: row.teamName,
+          playerId: row.playerId,
           played: row.played,
           won: row.won,
           tied: row.tied,

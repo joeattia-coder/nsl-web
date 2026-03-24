@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { formatDateInputValue } from "@/lib/timezone";
 import { FiArrowLeft, FiPlus, FiSave, FiX } from "react-icons/fi";
 
 type SeasonFormMode = "create" | "edit";
@@ -75,8 +76,8 @@ export default function SeasonForm({
 
         setSeasonName(season.seasonName ?? "");
         setLeagueId(season.leagueId ?? "");
-        setStartDate(season.startDate ? String(season.startDate).slice(0, 10) : "");
-        setEndDate(season.endDate ? String(season.endDate).slice(0, 10) : "");
+        setStartDate(formatDateInputValue(season.startDate));
+        setEndDate(formatDateInputValue(season.endDate));
         setIsActive(season.isActive ?? true);
       } catch (err) {
         console.error(err);
@@ -106,7 +107,7 @@ export default function SeasonForm({
       return;
     }
 
-    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+    if (startDate && endDate && startDate > endDate) {
       setError("End date must be the same as or later than the start date.");
       return;
     }

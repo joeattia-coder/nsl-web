@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseDateTimeInTimeZone } from "@/lib/timezone";
 import {
   buildSeasonAdminPermissionScopes,
   buildTournamentAdminPermissionScopes,
@@ -132,11 +133,9 @@ export async function POST(request: Request) {
           | "REDS_10"
           | "REDS_15"
           | null,
-        registrationDeadline: registrationDeadline
-          ? new Date(registrationDeadline)
-          : null,
-        startDate: startDate ? new Date(startDate) : null,
-        endDate: endDate ? new Date(endDate) : null,
+        registrationDeadline: parseDateTimeInTimeZone(registrationDeadline),
+        startDate: parseDateTimeInTimeZone(startDate),
+        endDate: parseDateTimeInTimeZone(endDate),
         status: (status || "DRAFT") as
           | "DRAFT"
           | "REGISTRATION_OPEN"

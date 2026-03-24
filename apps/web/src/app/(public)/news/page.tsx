@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import LocalTimeText from "@/components/LocalTimeText";
 import { prisma } from "@/lib/prisma";
 import styles from "./NewsListingPage.module.css";
 
@@ -60,11 +61,10 @@ export default async function NewsListingPage() {
                 )}
                 <div className={styles.newsCardBody}>
                   <p className={styles.newsCardDate}>
-                    {(article.publishedAt ?? article.updatedAt).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    <LocalTimeText
+                      value={(article.publishedAt ?? article.updatedAt).toISOString()}
+                      options={{ year: "numeric", month: "long", day: "numeric" }}
+                    />
                   </p>
                   <h2 className={styles.newsCardTitle}>
                     <Link href={`/news/${article.slug}`} className={styles.newsCardTitleLink}>

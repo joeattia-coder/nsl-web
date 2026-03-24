@@ -6,21 +6,9 @@ import {
   requireScopedAdminPermission,
 } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import { formatDateTimeLocalValue } from "@/lib/timezone";
 import TournamentForm from "../../TournamentForm";
 import TournamentSubnav from "../TournamentSubnav";
-
-function toDateTimeLocal(date: Date | null) {
-  if (!date) return "";
-
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = `${d.getMonth() + 1}`.padStart(2, "0");
-  const day = `${d.getDate()}`.padStart(2, "0");
-  const hours = `${d.getHours()}`.padStart(2, "0");
-  const minutes = `${d.getMinutes()}`.padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -93,11 +81,11 @@ export default async function EditTournamentPage({ params }: PageProps) {
           venueId: tournament.venueId ?? "",
           tournamentName: tournament.tournamentName,
           participantType: tournament.participantType,
-          registrationDeadline: toDateTimeLocal(
+          registrationDeadline: formatDateTimeLocalValue(
             tournament.registrationDeadline
           ),
-          startDate: toDateTimeLocal(tournament.startDate),
-          endDate: toDateTimeLocal(tournament.endDate),
+          startDate: formatDateTimeLocalValue(tournament.startDate),
+          endDate: formatDateTimeLocalValue(tournament.endDate),
           status: tournament.status,
           isPublished: tournament.isPublished,
           description: tournament.description ?? "",

@@ -203,16 +203,12 @@ export default function MatchResultForm({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          matchDate:
-            startDateTime.trim() === ""
-              ? null
-              : startDateTime.slice(0, 10),
+          matchDate: startDateTime.trim() === "" ? null : startDateTime,
           matchTime:
             startDateTime.trim() === ""
               ? null
               : startDateTime.slice(11, 16),
-          resultSubmittedAt:
-            endDateTime.trim() === "" ? null : new Date(endDateTime).toISOString(),
+          resultSubmittedAt: endDateTime.trim() === "" ? null : endDateTime,
           homeScore: parsedHomeScore,
           awayScore: parsedAwayScore,
           winnerEntryId: effectiveWinnerEntryId,

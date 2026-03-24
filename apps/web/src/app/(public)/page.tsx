@@ -17,14 +17,16 @@ type UiMatch = {
   round: string;
   home: string;
   away: string;
+  homePlayerId: string | null;
+  awayPlayerId: string | null;
   homeCountryCode: string;
   awayCountryCode: string;
   homePlayerPhotoUrl: string;
   awayPlayerPhotoUrl: string;
-  ctaHref?: string;
 };
 
 const HOMEPAGE_MATCH_LIMIT = 12;
+const HOMEPAGE_MATCH_MINIMUM = 8;
 
 type HomeVideoHighlight = {
   id: string;
@@ -72,16 +74,6 @@ function parseTimeLabel(raw: string): string {
   const d = new Date(raw);
   if (Number.isNaN(d.getTime())) return raw;
   return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-}
-
-function sanitizeMatchCtaHref(rawHref: string): string | undefined {
-  const trimmed = rawHref.trim();
-  if (!trimmed) return undefined;
-
-  // Keep CTA navigation internal to this app.
-  if (trimmed.startsWith("/")) return trimmed;
-
-  return undefined;
 }
 
 function firstNumber(obj: AnyObj, keys: string[]): number | null {
@@ -165,15 +157,6 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
   const homeScore = firstNumber(fx, ["homeScore", "HomeScore", "HomeTeamScore"]);
   const awayScore = firstNumber(fx, ["roadScore", "RoadScore", "AwayScore", "RoadTeamScore"]);
 
-  // Optional: link to match centre if LR provides it
-  const ctaHref = sanitizeMatchCtaHref(
-    firstString(
-    fx,
-    ["MatchCentreUrl", "matchCentreUrl", "FixtureUrl", "fixtureUrl", "URL", "Url"],
-    ""
-    )
-  );
-
   return {
     id,
     time: time || "TBA",
@@ -183,11 +166,12 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     round: round || "",
     home,
     away,
+    homePlayerId: firstString(fx, ["homePlayerId", "HomePlayerId"], "") || null,
+    awayPlayerId: firstString(fx, ["roadPlayerId", "RoadPlayerId"], "") || null,
     homeCountryCode: firstString(fx, ["homeCountryCode", "HomeCountryCode"], ""),
     awayCountryCode: firstString(fx, ["roadCountryCode", "RoadCountryCode"], ""),
     homePlayerPhotoUrl: firstString(fx, ["homePlayerPhotoUrl", "HomePlayerPhotoUrl"], ""),
     awayPlayerPhotoUrl: firstString(fx, ["roadPlayerPhotoUrl", "RoadPlayerPhotoUrl"], ""),
-    ctaHref,
   };
 }
 
@@ -235,23 +219,44 @@ function getFixtureDateTimestamp(fx: AnyObj): number | null {
   return null;
 }
 
-function isScheduledFixture(fx: AnyObj): boolean {
-  return getFixtureMatchStatus(fx) === "SCHEDULED";
-}
+function isCompletedFixture(fx: AnyObj): boolean {
+  const matchStatus = getFixtureMatchStatus(fx);
 
-function shuffleFixtures(fixtures: Array<{ fixture: AnyObj; index: number }>) {
-  const shuffled = [...fixtures];
-
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  if (matchStatus === "COMPLETED") {
+    return true;
   }
 
-  return shuffled;
+  const homeScore = firstNumber(fx, ["homeScore", "HomeScore", "HomeTeamScore"]);
+  const awayScore = firstNumber(fx, ["roadScore", "RoadScore", "AwayScore", "RoadTeamScore"]);
+
+  return homeScore !== null && awayScore !== null;
 }
 
-function pickRandomFixturesFromDifferentTournaments(fixtures: Array<{ fixture: AnyObj; index: number }>) {
-  const shuffled = shuffleFixtures(fixtures);
+function getFixtureStableOrderScore(fx: AnyObj, idx: number) {
+  const seed = `${firstString(fx, ["FixtureID", "fixtureID", "fixtureId", "ID", "Id"], `fixture-${idx}`)}:${getFixtureTournamentKey(fx, idx)}`;
+  let hash = 0;
+
+  for (let index = 0; index < seed.length; index += 1) {
+    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
+  }
+
+  return hash;
+}
+
+function pickRandomFixturesFromDifferentTournaments(
+  fixtures: Array<{ fixture: AnyObj; index: number }>,
+  limit = HOMEPAGE_MATCH_LIMIT
+) {
+  const shuffled = [...fixtures].sort((left, right) => {
+    const leftScore = getFixtureStableOrderScore(left.fixture, left.index);
+    const rightScore = getFixtureStableOrderScore(right.fixture, right.index);
+
+    if (leftScore === rightScore) {
+      return left.index - right.index;
+    }
+
+    return leftScore - rightScore;
+  });
   const tournamentKeys = new Set<string>();
   const selected: Array<{ fixture: AnyObj; index: number }> = [];
 
@@ -264,7 +269,7 @@ function pickRandomFixturesFromDifferentTournaments(fixtures: Array<{ fixture: A
     tournamentKeys.add(tournamentKey);
     selected.push(entry);
 
-    if (selected.length >= HOMEPAGE_MATCH_LIMIT) {
+    if (selected.length >= limit) {
       return selected;
     }
   }
@@ -276,7 +281,7 @@ function pickRandomFixturesFromDifferentTournaments(fixtures: Array<{ fixture: A
 
     selected.push(entry);
 
-    if (selected.length >= HOMEPAGE_MATCH_LIMIT) {
+    if (selected.length >= limit) {
       break;
     }
   }
@@ -384,11 +389,11 @@ export default function Page() {
   }, [featuredVideos.length]);
 
   const matches: UiMatch[] = useMemo(() => {
-    const scheduledFixtures = (fixturesRaw ?? [])
+    const incompleteFixtures = (fixturesRaw ?? [])
       .map((fixture, index) => ({ fixture, index }))
-      .filter(({ fixture }) => isScheduledFixture(fixture));
+      .filter(({ fixture }) => !isCompletedFixture(fixture));
 
-    const scheduledFixturesWithDates = scheduledFixtures
+    const incompleteFixturesWithDates = incompleteFixtures
       .map((entry) => ({
         ...entry,
         timestamp: getFixtureDateTimestamp(entry.fixture),
@@ -396,13 +401,22 @@ export default function Page() {
       .filter((entry): entry is typeof entry & { timestamp: number } => entry.timestamp !== null)
       .sort((left, right) => left.timestamp - right.timestamp);
 
-    if (scheduledFixturesWithDates.length > 0) {
-      return scheduledFixturesWithDates
-        .slice(0, HOMEPAGE_MATCH_LIMIT)
-        .map(({ fixture, index }) => toUiMatch(fixture, index));
+    const datedSelections = incompleteFixturesWithDates.slice(0, HOMEPAGE_MATCH_LIMIT);
+
+    if (datedSelections.length >= HOMEPAGE_MATCH_MINIMUM) {
+      return datedSelections.map(({ fixture, index }) => toUiMatch(fixture, index));
     }
 
-    return pickRandomFixturesFromDifferentTournaments(scheduledFixtures)
+    const selectedFixtureIndexes = new Set(datedSelections.map(({ index }) => index));
+    const remainingFixtures = incompleteFixtures.filter(
+      ({ index }) => !selectedFixtureIndexes.has(index)
+    );
+    const additionalFixturesNeeded = Math.min(
+      HOMEPAGE_MATCH_LIMIT - datedSelections.length,
+      Math.max(HOMEPAGE_MATCH_MINIMUM - datedSelections.length, 0)
+    );
+
+    return [...datedSelections, ...pickRandomFixturesFromDifferentTournaments(remainingFixtures, additionalFixturesNeeded)]
       .map(({ fixture, index }) => toUiMatch(fixture, index));
   }, [fixturesRaw]);
 
@@ -739,10 +753,17 @@ export default function Page() {
                       )}
                     </div>
                     <div className="player-copy">
-                      <div className="player-name">
-                        <span className="player-name-line">{homeName.first}</span>
-                        <span className="player-name-line">{homeName.last}</span>
-                      </div>
+                      {m.homePlayerId ? (
+                        <Link className="public-player-link player-name" href={`/players/${m.homePlayerId}`}>
+                          <span className="player-name-line">{homeName.first}</span>
+                          <span className="player-name-line">{homeName.last}</span>
+                        </Link>
+                      ) : (
+                        <div className="player-name">
+                          <span className="player-name-line">{homeName.first}</span>
+                          <span className="player-name-line">{homeName.last}</span>
+                        </div>
+                      )}
                       {m.homeCountryCode ? (
                         <div className="player-flag-row">
                           <Image
@@ -762,10 +783,17 @@ export default function Page() {
 
                   <div className="player right">
                     <div className="player-copy player-copy-right">
-                      <div className="player-name right">
-                        <span className="player-name-line">{awayName.first}</span>
-                        <span className="player-name-line">{awayName.last}</span>
-                      </div>
+                      {m.awayPlayerId ? (
+                        <Link className="public-player-link player-name right" href={`/players/${m.awayPlayerId}`}>
+                          <span className="player-name-line">{awayName.first}</span>
+                          <span className="player-name-line">{awayName.last}</span>
+                        </Link>
+                      ) : (
+                        <div className="player-name right">
+                          <span className="player-name-line">{awayName.first}</span>
+                          <span className="player-name-line">{awayName.last}</span>
+                        </div>
+                      )}
                       {m.awayCountryCode ? (
                         <div className="player-flag-row player-flag-row-right">
                           <Image
@@ -795,15 +823,9 @@ export default function Page() {
                   </div>
                 </div>
 
-                {m.ctaHref ? (
-                  <a className="match-cta" href={m.ctaHref} target="_blank" rel="noopener noreferrer">
-                    Match Centre
-                  </a>
-                ) : (
-                  <button className="match-cta" type="button">
-                    Match Centre
-                  </button>
-                )}
+                <Link className="match-cta" href={`/matches/${m.id}`}>
+                  Match Centre
+                </Link>
               </div>
               );
             })}

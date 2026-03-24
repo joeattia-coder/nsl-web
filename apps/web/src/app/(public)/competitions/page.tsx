@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LocalTimeText from "@/components/LocalTimeText";
 import { prisma } from "@/lib/prisma";
 import styles from "./competitions.module.css";
 
@@ -134,7 +135,7 @@ export default async function CompetitionsPage() {
                     <div className={styles.metaItem}>
                       <span className={styles.metaLabel}>Starts</span>
                       <span className={styles.metaValue}>
-                        {new Date(tournament.startDate).toLocaleDateString()}
+                        <LocalTimeText value={tournament.startDate.toISOString()} options={{ year: "numeric", month: "numeric", day: "numeric" }} />
                       </span>
                     </div>
                   )}
@@ -143,7 +144,7 @@ export default async function CompetitionsPage() {
                     <div className={styles.metaItem}>
                       <span className={styles.metaLabel}>Ends</span>
                       <span className={styles.metaValue}>
-                        {new Date(tournament.endDate).toLocaleDateString()}
+                        <LocalTimeText value={tournament.endDate.toISOString()} options={{ year: "numeric", month: "numeric", day: "numeric" }} />
                       </span>
                     </div>
                   )}

@@ -2,8 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { normalizeCountryCode } from "@/lib/country";
 import { calculateExpectedScore, INITIAL_ELO } from "@/lib/player-elo";
 import { publicApiJson, publicApiOptions } from "@/lib/public-api-response";
+import { parseStoredMatchDateTime } from "@/lib/timezone";
 
 type PlayerLike = {
+  id?: string;
   firstName: string;
   middleInitial?: string | null;
   lastName: string;
@@ -22,6 +24,15 @@ type EntryLike = {
   members: EntryMemberLike[];
 };
 
+function getEntryPrimaryPlayerId(entry: EntryLike | null | undefined) {
+  if (!entry || entry.members.length !== 1) {
+    return null;
+  }
+
+  const playerId = entry.members[0]?.player.id;
+  return typeof playerId === "string" && playerId.trim() ? playerId : null;
+}
+
 export function OPTIONS() {
   return publicApiOptions();
 }
@@ -31,38 +42,21 @@ function pad2(value: number) {
 }
 
 function toCompactDateTime(date: Date | null, matchTime?: string | null) {
-  if (!date) return "";
+  const scheduledAt = parseStoredMatchDateTime(date, matchTime);
 
-  const year = date.getFullYear();
-  const month = pad2(date.getMonth() + 1);
-  const day = pad2(date.getDate());
+  if (!scheduledAt) return "";
 
-  let hours = 0;
-  let minutes = 0;
-
-  if (matchTime && /^\d{1,2}:\d{2}$/.test(matchTime.trim())) {
-    const [h, m] = matchTime.trim().split(":");
-    hours = Number(h);
-    minutes = Number(m);
-  } else {
-    hours = date.getHours();
-    minutes = date.getMinutes();
-  }
+  const year = scheduledAt.getUTCFullYear();
+  const month = pad2(scheduledAt.getUTCMonth() + 1);
+  const day = pad2(scheduledAt.getUTCDate());
+  const hours = scheduledAt.getUTCHours();
+  const minutes = scheduledAt.getUTCMinutes();
 
   return `${year}${month}${day} ${pad2(hours)}:${pad2(minutes)}`;
 }
 
 function toIsoDateTime(date: Date | null, matchTime?: string | null) {
-  if (!date) return "";
-
-  const d = new Date(date);
-
-  if (matchTime && /^\d{1,2}:\d{2}$/.test(matchTime.trim())) {
-    const [h, m] = matchTime.trim().split(":");
-    d.setHours(Number(h), Number(m), 0, 0);
-  }
-
-  return d.toISOString();
+  return parseStoredMatchDateTime(date, matchTime)?.toISOString() ?? "";
 }
 
 function toTimeString(date: Date | null, matchTime?: string | null) {
@@ -161,6 +155,7 @@ export async function GET() {
               include: {
                 player: {
                   select: {
+                    id: true,
                     firstName: true,
                     middleInitial: true,
                     lastName: true,
@@ -181,6 +176,7 @@ export async function GET() {
               include: {
                 player: {
                   select: {
+                    id: true,
                     firstName: true,
                     middleInitial: true,
                     lastName: true,
@@ -227,6 +223,8 @@ export async function GET() {
         roadTeamName: awayName,
         homeCountryCode,
         roadCountryCode,
+        homePlayerId: getEntryPrimaryPlayerId(match.homeEntry),
+        roadPlayerId: getEntryPrimaryPlayerId(match.awayEntry),
         homePlayerPhotoUrl: getEntryPhotoUrl(match.homeEntry),
         roadPlayerPhotoUrl: getEntryPhotoUrl(match.awayEntry),
         homeWinProbability,

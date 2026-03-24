@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { recalculateAndPersistPlayerElo } from "@/lib/player-elo";
+import { parseDateTimeInTimeZone, parseStoredMatchDateTime } from "@/lib/timezone";
 
 const VALID_MATCH_STATUSES = [
   "SCHEDULED",
@@ -411,7 +412,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const match = await prisma.$transaction(async (tx) => {
+    const createdMatchId = await prisma.$transaction(async (tx) => {
       const created = await tx.match.create({
         data: {
           tournamentId,
@@ -419,7 +420,7 @@ export async function POST(request: Request) {
           stageRoundId,
           tournamentGroupId: tournamentGroupId ?? null,
           venueId: venueId ?? null,
-          matchDate: matchDate ? new Date(matchDate) : null,
+          matchDate: parseStoredMatchDateTime(matchDate, matchTime),
           matchTime: matchTime ?? null,
           scheduleStatus: scheduleStatus ?? "TBC",
           matchStatus: matchStatus ?? "SCHEDULED",
@@ -434,67 +435,67 @@ export async function POST(request: Request) {
             | "REDS_6"
             | "REDS_10"
             | "REDS_15",
-          resultSubmittedAt: resultSubmittedAt
-            ? new Date(resultSubmittedAt)
-            : null,
-          approvedAt: approvedAt ? new Date(approvedAt) : null,
+          resultSubmittedAt: parseDateTimeInTimeZone(resultSubmittedAt),
+          approvedAt: parseDateTimeInTimeZone(approvedAt),
           approvedByUserId: approvedByUserId ?? null,
           enteredByUserId: enteredByUserId ?? null,
           updatedByUserId: updatedByUserId ?? null,
         },
       });
 
-      await recalculateAndPersistPlayerElo(tx);
+      return created.id;
+    });
 
-      return tx.match.findUniqueOrThrow({
-        where: { id: created.id },
-        include: {
-          tournament: true,
-          tournamentStage: true,
-          stageRound: true,
-          tournamentGroup: true,
-          venue: true,
-          homeEntry: {
-            include: {
-              members: {
-                include: {
-                  player: true,
-                },
-                orderBy: {
-                  createdAt: "asc",
-                },
+    await recalculateAndPersistPlayerElo(prisma);
+
+    const match = await prisma.match.findUniqueOrThrow({
+      where: { id: createdMatchId },
+      include: {
+        tournament: true,
+        tournamentStage: true,
+        stageRound: true,
+        tournamentGroup: true,
+        venue: true,
+        homeEntry: {
+          include: {
+            members: {
+              include: {
+                player: true,
+              },
+              orderBy: {
+                createdAt: "asc",
               },
             },
           },
-          awayEntry: {
-            include: {
-              members: {
-                include: {
-                  player: true,
-                },
-                orderBy: {
-                  createdAt: "asc",
-                },
-              },
-            },
-          },
-          winnerEntry: {
-            include: {
-              members: {
-                include: {
-                  player: true,
-                },
-                orderBy: {
-                  createdAt: "asc",
-                },
-              },
-            },
-          },
-          approvedByUser: true,
-          enteredByUser: true,
-          updatedByUser: true,
         },
-      });
+        awayEntry: {
+          include: {
+            members: {
+              include: {
+                player: true,
+              },
+              orderBy: {
+                createdAt: "asc",
+              },
+            },
+          },
+        },
+        winnerEntry: {
+          include: {
+            members: {
+              include: {
+                player: true,
+              },
+              orderBy: {
+                createdAt: "asc",
+              },
+            },
+          },
+        },
+        approvedByUser: true,
+        enteredByUser: true,
+        updatedByUser: true,
+      },
     });
 
     return NextResponse.json(match, { status: 201 });

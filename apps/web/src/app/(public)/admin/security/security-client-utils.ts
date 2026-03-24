@@ -1,3 +1,5 @@
+import { formatDateTimeLocalValue } from "@/lib/timezone";
+
 export const SECURITY_SCOPE_OPTIONS = [
   { value: "GLOBAL", label: "Global" },
   { value: "LEAGUE", label: "League" },
@@ -12,18 +14,7 @@ export async function getApiErrorMessage(response: Response, fallbackMessage: st
 }
 
 export function toDateTimeLocalValue(value: string | null | undefined) {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  const offset = date.getTimezoneOffset() * 60_000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+  return formatDateTimeLocalValue(value);
 }
 
 export function createClientKey(prefix: string) {
