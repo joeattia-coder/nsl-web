@@ -23,7 +23,7 @@ function sameIds(left: string[], right: string[]) {
 }
 
 function sumNullable(values: Array<number | null | undefined>) {
-  return values.reduce((total, value) => total + (typeof value === "number" ? value : 0), 0);
+  return values.reduce<number>((total, value) => total + (typeof value === "number" ? value : 0), 0);
 }
 
 function getEntryDisplayName(
