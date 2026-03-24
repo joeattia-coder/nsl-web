@@ -37,7 +37,7 @@ export function parseOptionalDate(value: unknown) {
 
   const parsed = parseDateTimeInTimeZone(normalized);
 
-  if (Number.isNaN(parsed.getTime())) {
+  if (!parsed || Number.isNaN(parsed.getTime())) {
     throw new Error("Invalid date value.");
   }
 
