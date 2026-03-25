@@ -48,8 +48,6 @@ type UiMatch = {
   roadScore: string;
   homePlayerPhotoUrl: string;
   roadPlayerPhotoUrl: string;
-  homeWinProbability: number | null;
-  roadWinProbability: number | null;
 
   fixtureGroupDesc: string;
   roundDesc: string;
@@ -108,11 +106,6 @@ function firstNumber(obj: AnyObj, keys: string[]): number | null {
     if (typeof v === "number" && Number.isFinite(v)) return v;
   }
   return null;
-}
-
-function formatWinProbability(probability: number | null) {
-  if (probability === null) return null;
-  return `${Math.round(probability * 100)}%`;
 }
 
 function splitName(full: string): NameParts {
@@ -198,8 +191,6 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
   const roadScore = roadScoreVal === null || roadScoreVal === undefined ? "" : String(roadScoreVal);
   const homePlayerPhotoUrl = firstString(fx, ["homePlayerPhotoUrl", "HomePlayerPhotoUrl"], "");
   const roadPlayerPhotoUrl = firstString(fx, ["roadPlayerPhotoUrl", "RoadPlayerPhotoUrl"], "");
-  const homeWinProbability = firstNumber(fx, ["homeWinProbability", "HomeWinProbability"]);
-  const roadWinProbability = firstNumber(fx, ["roadWinProbability", "RoadWinProbability"]);
 
   return {
     id,
@@ -218,8 +209,6 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     roadScore,
     homePlayerPhotoUrl,
     roadPlayerPhotoUrl,
-    homeWinProbability,
-    roadWinProbability,
     fixtureGroupDesc,
     roundDesc,
     fixtureGroupId,
@@ -671,20 +660,6 @@ export default function MatchesPageClient() {
                           <div className="name-last">{m.homeParts.last || m.homeName}</div>
                         </>
                       )}
-                      {m.homeWinProbability !== null ? (
-                        <div className="match-probability-row match-probability-row-left">
-                          <span
-                            className="match-probability-chip"
-                            aria-label="Elo-based win probability"
-                            tabIndex={0}
-                          >
-                            {formatWinProbability(m.homeWinProbability)}
-                            <span className="match-probability-tooltip" role="tooltip">
-                              Elo-based win probability
-                            </span>
-                          </span>
-                        </div>
-                      ) : null}
                       {m.homeCountryCode ? (
                         <div className="name-flag-row name-flag-row-left">
                           <Image
@@ -753,20 +728,6 @@ export default function MatchesPageClient() {
                           <div className="name-last">{m.roadParts.last || m.roadName}</div>
                         </>
                       )}
-                      {m.roadWinProbability !== null ? (
-                        <div className="match-probability-row match-probability-row-right">
-                          <span
-                            className="match-probability-chip"
-                            aria-label="Elo-based win probability"
-                            tabIndex={0}
-                          >
-                            {formatWinProbability(m.roadWinProbability)}
-                            <span className="match-probability-tooltip" role="tooltip">
-                              Elo-based win probability
-                            </span>
-                          </span>
-                        </div>
-                      ) : null}
                       {m.roadCountryCode ? (
                         <div className="name-flag-row name-flag-row-right">
                           <Image

@@ -3,6 +3,7 @@ import HeadToHeadStats, { type HeadToHeadStatRow } from "@/components/HeadToHead
 import LocalTimeText from "@/components/LocalTimeText";
 import { normalizeCountryCode } from "@/lib/country";
 import { getFlagCdnUrl } from "@/lib/country";
+import { getPlayerRankings } from "@/lib/player-performance";
 import { prisma } from "@/lib/prisma";
 import { parseStoredMatchDateTime } from "@/lib/timezone";
 import MatchCentreBackButton from "./MatchCentreBackButton";
@@ -24,6 +25,15 @@ function sameIds(left: string[], right: string[]) {
 
 function sumNullable(values: Array<number | null | undefined>) {
   return values.reduce<number>((total, value) => total + (typeof value === "number" ? value : 0), 0);
+}
+
+function formatRankings(playerIds: string[], rankingPositions: Map<string, number>) {
+  const labels = playerIds
+    .map((playerId) => rankingPositions.get(playerId))
+    .filter((position): position is number => typeof position === "number")
+    .map((position) => `#${position}`);
+
+  return labels.length > 0 ? labels.join(" / ") : "—";
 }
 
 function getEntryDisplayName(
@@ -100,7 +110,7 @@ function buildStatsRows(match: {
       breakValue: number;
     }>;
   }>;
-}, leftPlayerIds: string[], rightPlayerIds: string[]): HeadToHeadStatRow[] {
+}, leftPlayerIds: string[], rightPlayerIds: string[], leftRanking: string, rightRanking: string): HeadToHeadStatRow[] {
   const leftPointTotal = sumNullable(match.frames.map((frame) => frame.homePoints));
   const rightPointTotal = sumNullable(match.frames.map((frame) => frame.awayPoints));
   const leftHighestBreak = Math.max(0, ...match.frames.map((frame) => frame.homeHighBreak ?? 0));
@@ -111,6 +121,12 @@ function buildStatsRows(match: {
   const rightBreaks = breaks.filter((entry) => rightPlayerIds.includes(entry.playerId));
 
   return [
+    {
+      label: "Ranking",
+      leftValue: leftRanking,
+      rightValue: rightRanking,
+      highlightLeader: false,
+    },
     {
       label: "Total Match Points",
       leftValue: leftPointTotal,
@@ -271,83 +287,86 @@ export default async function MatchCentrePage({
   const leftPlayerIds = getEntryPlayerIds(match.homeEntry.members);
   const rightPlayerIds = getEntryPlayerIds(match.awayEntry.members);
 
-  const historicalMatches = await prisma.match.findMany({
-    where: {
-      OR: [
-        {
-          homeEntry: {
-            members: {
-              some: {
-                playerId: {
-                  in: leftPlayerIds,
+  const [historicalMatches, rankings] = await Promise.all([
+    prisma.match.findMany({
+      where: {
+        OR: [
+          {
+            homeEntry: {
+              members: {
+                some: {
+                  playerId: {
+                    in: leftPlayerIds,
+                  },
+                },
+              },
+            },
+            awayEntry: {
+              members: {
+                some: {
+                  playerId: {
+                    in: rightPlayerIds,
+                  },
                 },
               },
             },
           },
-          awayEntry: {
+          {
+            homeEntry: {
+              members: {
+                some: {
+                  playerId: {
+                    in: rightPlayerIds,
+                  },
+                },
+              },
+            },
+            awayEntry: {
+              members: {
+                some: {
+                  playerId: {
+                    in: leftPlayerIds,
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        homeScore: true,
+        awayScore: true,
+        matchStatus: true,
+        homeEntry: {
+          select: {
             members: {
-              some: {
-                playerId: {
-                  in: rightPlayerIds,
+              select: {
+                player: {
+                  select: {
+                    id: true,
+                  },
                 },
               },
             },
           },
         },
-        {
-          homeEntry: {
+        awayEntry: {
+          select: {
             members: {
-              some: {
-                playerId: {
-                  in: rightPlayerIds,
-                },
-              },
-            },
-          },
-          awayEntry: {
-            members: {
-              some: {
-                playerId: {
-                  in: leftPlayerIds,
-                },
-              },
-            },
-          },
-        },
-      ],
-    },
-    select: {
-      homeScore: true,
-      awayScore: true,
-      matchStatus: true,
-      homeEntry: {
-        select: {
-          members: {
-            select: {
-              player: {
-                select: {
-                  id: true,
+              select: {
+                player: {
+                  select: {
+                    id: true,
+                  },
                 },
               },
             },
           },
         },
       },
-      awayEntry: {
-        select: {
-          members: {
-            select: {
-              player: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
+    }),
+    getPlayerRankings(),
+  ]);
 
   const headToHead = historicalMatches.reduce(
     (accumulator, item) => {
@@ -388,7 +407,10 @@ export default async function MatchCentrePage({
   const scheduledAt = parseStoredMatchDateTime(match.matchDate, match.matchTime)?.toISOString() ?? null;
   const leftName = getEntryDisplayName(match.homeEntry);
   const rightName = getEntryDisplayName(match.awayEntry);
-  const stats = buildStatsRows(match, leftPlayerIds, rightPlayerIds);
+  const rankingPositions = new Map(rankings.map((player, index) => [player.id, index + 1]));
+  const leftRanking = formatRankings(leftPlayerIds, rankingPositions);
+  const rightRanking = formatRankings(rightPlayerIds, rankingPositions);
+  const stats = buildStatsRows(match, leftPlayerIds, rightPlayerIds, leftRanking, rightRanking);
   const leftCountryCode = getEntryCountryCode(match.homeEntry);
   const rightCountryCode = getEntryCountryCode(match.awayEntry);
   const venueLabel = [match.tournament.venue?.venueName, match.tournament.venue?.city, match.tournament.venue?.stateProvince]
