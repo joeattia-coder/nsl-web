@@ -31,7 +31,7 @@ type SubmissionRequestBody = {
   summaryNote?: string | null;
 };
 
-function isNonNegativeWholeNumber(value: unknown) {
+function isNonNegativeWholeNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
@@ -78,6 +78,9 @@ export async function POST(
       return NextResponse.json({ error: "Away score must be a whole number greater than or equal to 0." }, { status: 400 });
     }
 
+    const validatedHomeScore = homeScore;
+    const validatedAwayScore = awayScore;
+
     if (
       !Array.isArray(body.homeHighBreaks) ||
       !Array.isArray(body.awayHighBreaks) ||
@@ -101,8 +104,8 @@ export async function POST(
 
     const framesNeededToWin = Math.floor(bestOfFrames / 2) + 1;
     const derivedWinnerEntryId = determineWinnerEntryId({
-      homeScore,
-      awayScore,
+      homeScore: validatedHomeScore,
+      awayScore: validatedAwayScore,
       homeEntryId: accessContext.homeEntry.id,
       awayEntryId: accessContext.awayEntry.id,
       winnerEntryId: body.winnerEntryId ?? null,
@@ -149,8 +152,8 @@ export async function POST(
       submittedByEntryId: accessContext.currentEntry.id,
       targetEntryId: accessContext.opponentEntry.id,
       winnerEntryId: derivedWinnerEntryId,
-      homeScore,
-      awayScore,
+      homeScore: validatedHomeScore,
+      awayScore: validatedAwayScore,
       summaryNote,
       proposedMatchDate,
       proposedMatchTime,
@@ -174,8 +177,8 @@ export async function POST(
       scheduledAtLabel: formatScheduledAtLabel(accessContext.match.matchDate, accessContext.match.matchTime),
       homeEntryLabel: accessContext.homeEntry.label,
       awayEntryLabel: accessContext.awayEntry.label,
-      homeScore,
-      awayScore,
+      homeScore: validatedHomeScore,
+      awayScore: validatedAwayScore,
       winnerLabel,
       frameHighBreaks: normalizedFrames,
       reviewUrl: `${origin}/my-matches`,
