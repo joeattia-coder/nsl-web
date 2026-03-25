@@ -727,6 +727,7 @@ html[data-theme="light"] .sidebar {
   margin-left: 220px;
   height: 100vh;
   overflow-y: auto;
+  scroll-padding-top: var(--site-navbar-height);
   background: var(--theme-main-bg);
   color: var(--theme-main-text);
 }
@@ -2254,6 +2255,7 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   .main {
     width: 100%;
     margin-left: 0;
+    scroll-padding-top: var(--site-navbar-height-mobile);
   }
 
   .navbar {

@@ -142,6 +142,7 @@ function LayoutChrome({
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const mainRef = useRef<HTMLDivElement | null>(null);
   const isAdminUser = Boolean(currentUser?.isAdmin);
   const closeMenu = () => setMenuOpen(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -183,6 +184,10 @@ function LayoutChrome({
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname, mobileMenuOpen]);
+
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -354,7 +359,7 @@ function LayoutChrome({
         </nav>
       </aside>
 
-      <div className={`main${isAdminRoute ? " main-admin" : ""}`}>
+      <div ref={mainRef} className={`main${isAdminRoute ? " main-admin" : ""}`}>
         <nav className="navbar">
           <div className="nav-links">
             {showAdminNavigation ? (
