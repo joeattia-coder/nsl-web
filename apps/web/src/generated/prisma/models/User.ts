@@ -249,6 +249,9 @@ export type UserWhereInput = {
   approvedMatches?: Prisma.MatchListRelationFilter
   enteredMatches?: Prisma.MatchListRelationFilter
   updatedMatches?: Prisma.MatchListRelationFilter
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionListRelationFilter
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionListRelationFilter
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionListRelationFilter
   player?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
   authAccounts?: Prisma.AuthAccountListRelationFilter
   targetInvitations?: Prisma.InvitationListRelationFilter
@@ -282,6 +285,9 @@ export type UserOrderByWithRelationInput = {
   approvedMatches?: Prisma.MatchOrderByRelationAggregateInput
   enteredMatches?: Prisma.MatchOrderByRelationAggregateInput
   updatedMatches?: Prisma.MatchOrderByRelationAggregateInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionOrderByRelationAggregateInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionOrderByRelationAggregateInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionOrderByRelationAggregateInput
   player?: Prisma.PlayerOrderByWithRelationInput
   authAccounts?: Prisma.AuthAccountOrderByRelationAggregateInput
   targetInvitations?: Prisma.InvitationOrderByRelationAggregateInput
@@ -318,6 +324,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   approvedMatches?: Prisma.MatchListRelationFilter
   enteredMatches?: Prisma.MatchListRelationFilter
   updatedMatches?: Prisma.MatchListRelationFilter
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionListRelationFilter
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionListRelationFilter
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionListRelationFilter
   player?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
   authAccounts?: Prisma.AuthAccountListRelationFilter
   targetInvitations?: Prisma.InvitationListRelationFilter
@@ -389,6 +398,9 @@ export type UserCreateInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -422,6 +434,9 @@ export type UserUncheckedCreateInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -455,6 +470,9 @@ export type UserUpdateInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -488,6 +506,9 @@ export type UserUncheckedUpdateInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -872,6 +893,52 @@ export type UserUpdateOneWithoutUpdatedMatchesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUpdatedMatchesInput, Prisma.UserUpdateWithoutUpdatedMatchesInput>, Prisma.UserUncheckedUpdateWithoutUpdatedMatchesInput>
 }
 
+export type UserCreateNestedOneWithoutSubmittedMatchResultSubmissionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubmittedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutSubmittedMatchResultSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubmittedMatchResultSubmissionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutApprovedMatchResultSubmissionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApprovedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutApprovedMatchResultSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApprovedMatchResultSubmissionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutDisputedMatchResultSubmissionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDisputedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutDisputedMatchResultSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDisputedMatchResultSubmissionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSubmittedMatchResultSubmissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubmittedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutSubmittedMatchResultSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubmittedMatchResultSubmissionsInput
+  upsert?: Prisma.UserUpsertWithoutSubmittedMatchResultSubmissionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubmittedMatchResultSubmissionsInput, Prisma.UserUpdateWithoutSubmittedMatchResultSubmissionsInput>, Prisma.UserUncheckedUpdateWithoutSubmittedMatchResultSubmissionsInput>
+}
+
+export type UserUpdateOneWithoutApprovedMatchResultSubmissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApprovedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutApprovedMatchResultSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApprovedMatchResultSubmissionsInput
+  upsert?: Prisma.UserUpsertWithoutApprovedMatchResultSubmissionsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApprovedMatchResultSubmissionsInput, Prisma.UserUpdateWithoutApprovedMatchResultSubmissionsInput>, Prisma.UserUncheckedUpdateWithoutApprovedMatchResultSubmissionsInput>
+}
+
+export type UserUpdateOneWithoutDisputedMatchResultSubmissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDisputedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutDisputedMatchResultSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDisputedMatchResultSubmissionsInput
+  upsert?: Prisma.UserUpsertWithoutDisputedMatchResultSubmissionsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDisputedMatchResultSubmissionsInput, Prisma.UserUpdateWithoutDisputedMatchResultSubmissionsInput>, Prisma.UserUncheckedUpdateWithoutDisputedMatchResultSubmissionsInput>
+}
+
 export type UserCreateWithoutPlayerInput = {
   id?: string
   username?: string | null
@@ -889,6 +956,9 @@ export type UserCreateWithoutPlayerInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
   createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
@@ -921,6 +991,9 @@ export type UserUncheckedCreateWithoutPlayerInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
   createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -969,6 +1042,9 @@ export type UserUpdateWithoutPlayerInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
   createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
@@ -1001,6 +1077,9 @@ export type UserUncheckedUpdateWithoutPlayerInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
   createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1033,6 +1112,9 @@ export type UserCreateWithoutAccessGroupMembershipsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -1065,6 +1147,9 @@ export type UserUncheckedCreateWithoutAccessGroupMembershipsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -1113,6 +1198,9 @@ export type UserUpdateWithoutAccessGroupMembershipsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -1145,6 +1233,9 @@ export type UserUncheckedUpdateWithoutAccessGroupMembershipsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -1177,6 +1268,9 @@ export type UserCreateWithoutUserRolesInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -1209,6 +1303,9 @@ export type UserUncheckedCreateWithoutUserRolesInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -1257,6 +1354,9 @@ export type UserUpdateWithoutUserRolesInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -1289,6 +1389,9 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -1321,6 +1424,9 @@ export type UserCreateWithoutAuthAccountsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
   createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
@@ -1353,6 +1459,9 @@ export type UserUncheckedCreateWithoutAuthAccountsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
   createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1401,6 +1510,9 @@ export type UserUpdateWithoutAuthAccountsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
   createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
@@ -1433,6 +1545,9 @@ export type UserUncheckedUpdateWithoutAuthAccountsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
   createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1465,6 +1580,9 @@ export type UserCreateWithoutTargetInvitationsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
@@ -1497,6 +1615,9 @@ export type UserUncheckedCreateWithoutTargetInvitationsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
@@ -1534,6 +1655,9 @@ export type UserCreateWithoutAcceptedInvitationsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -1566,6 +1690,9 @@ export type UserUncheckedCreateWithoutAcceptedInvitationsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -1603,6 +1730,9 @@ export type UserCreateWithoutCreatedInvitationsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -1635,6 +1765,9 @@ export type UserUncheckedCreateWithoutCreatedInvitationsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -1683,6 +1816,9 @@ export type UserUpdateWithoutTargetInvitationsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
@@ -1715,6 +1851,9 @@ export type UserUncheckedUpdateWithoutTargetInvitationsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
@@ -1758,6 +1897,9 @@ export type UserUpdateWithoutAcceptedInvitationsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -1790,6 +1932,9 @@ export type UserUncheckedUpdateWithoutAcceptedInvitationsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -1833,6 +1978,9 @@ export type UserUpdateWithoutCreatedInvitationsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -1865,6 +2013,9 @@ export type UserUncheckedUpdateWithoutCreatedInvitationsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -1897,6 +2048,9 @@ export type UserCreateWithoutEmailVerificationTokensInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -1929,6 +2083,9 @@ export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -1977,6 +2134,9 @@ export type UserUpdateWithoutEmailVerificationTokensInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -2009,6 +2169,9 @@ export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -2041,6 +2204,9 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -2073,6 +2239,9 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2121,6 +2290,9 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -2153,6 +2325,9 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -2185,6 +2360,9 @@ export type UserCreateWithoutGrantedAccessGroupRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -2217,6 +2395,9 @@ export type UserUncheckedCreateWithoutGrantedAccessGroupRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2265,6 +2446,9 @@ export type UserUpdateWithoutGrantedAccessGroupRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -2297,6 +2481,9 @@ export type UserUncheckedUpdateWithoutGrantedAccessGroupRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -2329,6 +2516,9 @@ export type UserCreateWithoutRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -2361,6 +2551,9 @@ export type UserUncheckedCreateWithoutRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2398,6 +2591,9 @@ export type UserCreateWithoutGrantedRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -2430,6 +2626,9 @@ export type UserUncheckedCreateWithoutGrantedRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2478,6 +2677,9 @@ export type UserUpdateWithoutRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -2510,6 +2712,9 @@ export type UserUncheckedUpdateWithoutRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -2553,6 +2758,9 @@ export type UserUpdateWithoutGrantedRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -2585,6 +2793,9 @@ export type UserUncheckedUpdateWithoutGrantedRoleAssignmentsInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -2617,6 +2828,9 @@ export type UserCreateWithoutPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -2649,6 +2863,9 @@ export type UserUncheckedCreateWithoutPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2686,6 +2903,9 @@ export type UserCreateWithoutGrantedPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -2718,6 +2938,9 @@ export type UserUncheckedCreateWithoutGrantedPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2766,6 +2989,9 @@ export type UserUpdateWithoutPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -2798,6 +3024,9 @@ export type UserUncheckedUpdateWithoutPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -2841,6 +3070,9 @@ export type UserUpdateWithoutGrantedPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -2873,6 +3105,9 @@ export type UserUncheckedUpdateWithoutGrantedPermissionOverridesInput = {
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -2904,6 +3139,9 @@ export type UserCreateWithoutApprovedMatchesInput = {
   updatedAt?: Date | string
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -2936,6 +3174,9 @@ export type UserUncheckedCreateWithoutApprovedMatchesInput = {
   updatedAt?: Date | string
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2973,6 +3214,9 @@ export type UserCreateWithoutEnteredMatchesInput = {
   updatedAt?: Date | string
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -3005,6 +3249,9 @@ export type UserUncheckedCreateWithoutEnteredMatchesInput = {
   updatedAt?: Date | string
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -3042,6 +3289,9 @@ export type UserCreateWithoutUpdatedMatchesInput = {
   updatedAt?: Date | string
   approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
@@ -3074,6 +3324,9 @@ export type UserUncheckedCreateWithoutUpdatedMatchesInput = {
   updatedAt?: Date | string
   approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
   enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
   player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
   authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
   targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
@@ -3122,6 +3375,9 @@ export type UserUpdateWithoutApprovedMatchesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -3154,6 +3410,9 @@ export type UserUncheckedUpdateWithoutApprovedMatchesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -3197,6 +3456,9 @@ export type UserUpdateWithoutEnteredMatchesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -3229,6 +3491,9 @@ export type UserUncheckedUpdateWithoutEnteredMatchesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -3272,6 +3537,9 @@ export type UserUpdateWithoutUpdatedMatchesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
   player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
@@ -3304,6 +3572,477 @@ export type UserUncheckedUpdateWithoutUpdatedMatchesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
   enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
+  player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSubmittedMatchResultSubmissionsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
+  player?: Prisma.PlayerCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSubmittedMatchResultSubmissionsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
+  player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSubmittedMatchResultSubmissionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubmittedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutSubmittedMatchResultSubmissionsInput>
+}
+
+export type UserCreateWithoutApprovedMatchResultSubmissionsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutDisputedByUserInput
+  player?: Prisma.PlayerCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutApprovedMatchResultSubmissionsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutDisputedByUserInput
+  player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutApprovedMatchResultSubmissionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutApprovedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutApprovedMatchResultSubmissionsInput>
+}
+
+export type UserCreateWithoutDisputedMatchResultSubmissionsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionCreateNestedManyWithoutApprovedByUserInput
+  player?: Prisma.PlayerCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutDisputedMatchResultSubmissionsInput = {
+  id?: string
+  username?: string | null
+  normalizedUsername?: string | null
+  email?: string | null
+  normalizedEmail?: string | null
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  passwordSetAt?: Date | string | null
+  phoneNumber?: string | null
+  registrationStatus?: $Enums.RegistrationStatus
+  isLoginEnabled?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  approvedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutApprovedByUserInput
+  enteredMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutEnteredByUserInput
+  updatedMatches?: Prisma.MatchUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutSubmittedByUserInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedCreateNestedManyWithoutApprovedByUserInput
+  player?: Prisma.PlayerUncheckedCreateNestedOneWithoutUserInput
+  authAccounts?: Prisma.AuthAccountUncheckedCreateNestedManyWithoutUserInput
+  targetInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTargetUserInput
+  createdInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutCreatedByUserInput
+  acceptedInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutAcceptedByUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutUserInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedCreateNestedManyWithoutUserInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedCreateNestedManyWithoutGrantedByUserInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutUserInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedCreateNestedManyWithoutGrantedByUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutDisputedMatchResultSubmissionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDisputedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutDisputedMatchResultSubmissionsInput>
+}
+
+export type UserUpsertWithoutSubmittedMatchResultSubmissionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSubmittedMatchResultSubmissionsInput, Prisma.UserUncheckedUpdateWithoutSubmittedMatchResultSubmissionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubmittedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutSubmittedMatchResultSubmissionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSubmittedMatchResultSubmissionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSubmittedMatchResultSubmissionsInput, Prisma.UserUncheckedUpdateWithoutSubmittedMatchResultSubmissionsInput>
+}
+
+export type UserUpdateWithoutSubmittedMatchResultSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
+  player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSubmittedMatchResultSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
+  player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutApprovedMatchResultSubmissionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutApprovedMatchResultSubmissionsInput, Prisma.UserUncheckedUpdateWithoutApprovedMatchResultSubmissionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutApprovedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutApprovedMatchResultSubmissionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutApprovedMatchResultSubmissionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutApprovedMatchResultSubmissionsInput, Prisma.UserUncheckedUpdateWithoutApprovedMatchResultSubmissionsInput>
+}
+
+export type UserUpdateWithoutApprovedMatchResultSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutDisputedByUserNestedInput
+  player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutApprovedMatchResultSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  disputedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutDisputedByUserNestedInput
+  player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUncheckedUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUncheckedUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutDisputedMatchResultSubmissionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDisputedMatchResultSubmissionsInput, Prisma.UserUncheckedUpdateWithoutDisputedMatchResultSubmissionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDisputedMatchResultSubmissionsInput, Prisma.UserUncheckedCreateWithoutDisputedMatchResultSubmissionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDisputedMatchResultSubmissionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDisputedMatchResultSubmissionsInput, Prisma.UserUncheckedUpdateWithoutDisputedMatchResultSubmissionsInput>
+}
+
+export type UserUpdateWithoutDisputedMatchResultSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUpdateManyWithoutApprovedByUserNestedInput
+  player?: Prisma.PlayerUpdateOneWithoutUserNestedInput
+  authAccounts?: Prisma.AuthAccountUpdateManyWithoutUserNestedInput
+  targetInvitations?: Prisma.InvitationUpdateManyWithoutTargetUserNestedInput
+  createdInvitations?: Prisma.InvitationUpdateManyWithoutCreatedByUserNestedInput
+  acceptedInvitations?: Prisma.InvitationUpdateManyWithoutAcceptedByUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  roleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutUserNestedInput
+  accessGroupMemberships?: Prisma.AccessGroupMembershipUpdateManyWithoutUserNestedInput
+  grantedRoleAssignments?: Prisma.UserRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  grantedAccessGroupRoleAssignments?: Prisma.AccessGroupRoleAssignmentUpdateManyWithoutGrantedByUserNestedInput
+  permissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutUserNestedInput
+  grantedPermissionOverrides?: Prisma.UserPermissionOverrideUpdateManyWithoutGrantedByUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDisputedMatchResultSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  normalizedEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationStatus?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  isLoginEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedMatches?: Prisma.MatchUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  enteredMatches?: Prisma.MatchUncheckedUpdateManyWithoutEnteredByUserNestedInput
+  updatedMatches?: Prisma.MatchUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  submittedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutSubmittedByUserNestedInput
+  approvedMatchResultSubmissions?: Prisma.MatchResultSubmissionUncheckedUpdateManyWithoutApprovedByUserNestedInput
   player?: Prisma.PlayerUncheckedUpdateOneWithoutUserNestedInput
   authAccounts?: Prisma.AuthAccountUncheckedUpdateManyWithoutUserNestedInput
   targetInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -3329,6 +4068,9 @@ export type UserCountOutputType = {
   approvedMatches: number
   enteredMatches: number
   updatedMatches: number
+  submittedMatchResultSubmissions: number
+  approvedMatchResultSubmissions: number
+  disputedMatchResultSubmissions: number
   authAccounts: number
   targetInvitations: number
   createdInvitations: number
@@ -3348,6 +4090,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   approvedMatches?: boolean | UserCountOutputTypeCountApprovedMatchesArgs
   enteredMatches?: boolean | UserCountOutputTypeCountEnteredMatchesArgs
   updatedMatches?: boolean | UserCountOutputTypeCountUpdatedMatchesArgs
+  submittedMatchResultSubmissions?: boolean | UserCountOutputTypeCountSubmittedMatchResultSubmissionsArgs
+  approvedMatchResultSubmissions?: boolean | UserCountOutputTypeCountApprovedMatchResultSubmissionsArgs
+  disputedMatchResultSubmissions?: boolean | UserCountOutputTypeCountDisputedMatchResultSubmissionsArgs
   authAccounts?: boolean | UserCountOutputTypeCountAuthAccountsArgs
   targetInvitations?: boolean | UserCountOutputTypeCountTargetInvitationsArgs
   createdInvitations?: boolean | UserCountOutputTypeCountCreatedInvitationsArgs
@@ -3392,6 +4137,27 @@ export type UserCountOutputTypeCountEnteredMatchesArgs<ExtArgs extends runtime.T
  */
 export type UserCountOutputTypeCountUpdatedMatchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MatchWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSubmittedMatchResultSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MatchResultSubmissionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountApprovedMatchResultSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MatchResultSubmissionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDisputedMatchResultSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MatchResultSubmissionWhereInput
 }
 
 /**
@@ -3503,6 +4269,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   approvedMatches?: boolean | Prisma.User$approvedMatchesArgs<ExtArgs>
   enteredMatches?: boolean | Prisma.User$enteredMatchesArgs<ExtArgs>
   updatedMatches?: boolean | Prisma.User$updatedMatchesArgs<ExtArgs>
+  submittedMatchResultSubmissions?: boolean | Prisma.User$submittedMatchResultSubmissionsArgs<ExtArgs>
+  approvedMatchResultSubmissions?: boolean | Prisma.User$approvedMatchResultSubmissionsArgs<ExtArgs>
+  disputedMatchResultSubmissions?: boolean | Prisma.User$disputedMatchResultSubmissionsArgs<ExtArgs>
   player?: boolean | Prisma.User$playerArgs<ExtArgs>
   authAccounts?: boolean | Prisma.User$authAccountsArgs<ExtArgs>
   targetInvitations?: boolean | Prisma.User$targetInvitationsArgs<ExtArgs>
@@ -3573,6 +4342,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   approvedMatches?: boolean | Prisma.User$approvedMatchesArgs<ExtArgs>
   enteredMatches?: boolean | Prisma.User$enteredMatchesArgs<ExtArgs>
   updatedMatches?: boolean | Prisma.User$updatedMatchesArgs<ExtArgs>
+  submittedMatchResultSubmissions?: boolean | Prisma.User$submittedMatchResultSubmissionsArgs<ExtArgs>
+  approvedMatchResultSubmissions?: boolean | Prisma.User$approvedMatchResultSubmissionsArgs<ExtArgs>
+  disputedMatchResultSubmissions?: boolean | Prisma.User$disputedMatchResultSubmissionsArgs<ExtArgs>
   player?: boolean | Prisma.User$playerArgs<ExtArgs>
   authAccounts?: boolean | Prisma.User$authAccountsArgs<ExtArgs>
   targetInvitations?: boolean | Prisma.User$targetInvitationsArgs<ExtArgs>
@@ -3598,6 +4370,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     approvedMatches: Prisma.$MatchPayload<ExtArgs>[]
     enteredMatches: Prisma.$MatchPayload<ExtArgs>[]
     updatedMatches: Prisma.$MatchPayload<ExtArgs>[]
+    submittedMatchResultSubmissions: Prisma.$MatchResultSubmissionPayload<ExtArgs>[]
+    approvedMatchResultSubmissions: Prisma.$MatchResultSubmissionPayload<ExtArgs>[]
+    disputedMatchResultSubmissions: Prisma.$MatchResultSubmissionPayload<ExtArgs>[]
     player: Prisma.$PlayerPayload<ExtArgs> | null
     authAccounts: Prisma.$AuthAccountPayload<ExtArgs>[]
     targetInvitations: Prisma.$InvitationPayload<ExtArgs>[]
@@ -4024,6 +4799,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   approvedMatches<T extends Prisma.User$approvedMatchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$approvedMatchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   enteredMatches<T extends Prisma.User$enteredMatchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$enteredMatchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   updatedMatches<T extends Prisma.User$updatedMatchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$updatedMatchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  submittedMatchResultSubmissions<T extends Prisma.User$submittedMatchResultSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$submittedMatchResultSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchResultSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  approvedMatchResultSubmissions<T extends Prisma.User$approvedMatchResultSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$approvedMatchResultSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchResultSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  disputedMatchResultSubmissions<T extends Prisma.User$disputedMatchResultSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$disputedMatchResultSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchResultSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   player<T extends Prisma.User$playerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$playerArgs<ExtArgs>>): Prisma.Prisma__PlayerClient<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   authAccounts<T extends Prisma.User$authAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   targetInvitations<T extends Prisma.User$targetInvitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$targetInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4542,6 +5320,78 @@ export type User$updatedMatchesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.MatchScalarFieldEnum | Prisma.MatchScalarFieldEnum[]
+}
+
+/**
+ * User.submittedMatchResultSubmissions
+ */
+export type User$submittedMatchResultSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MatchResultSubmission
+   */
+  select?: Prisma.MatchResultSubmissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MatchResultSubmission
+   */
+  omit?: Prisma.MatchResultSubmissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MatchResultSubmissionInclude<ExtArgs> | null
+  where?: Prisma.MatchResultSubmissionWhereInput
+  orderBy?: Prisma.MatchResultSubmissionOrderByWithRelationInput | Prisma.MatchResultSubmissionOrderByWithRelationInput[]
+  cursor?: Prisma.MatchResultSubmissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MatchResultSubmissionScalarFieldEnum | Prisma.MatchResultSubmissionScalarFieldEnum[]
+}
+
+/**
+ * User.approvedMatchResultSubmissions
+ */
+export type User$approvedMatchResultSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MatchResultSubmission
+   */
+  select?: Prisma.MatchResultSubmissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MatchResultSubmission
+   */
+  omit?: Prisma.MatchResultSubmissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MatchResultSubmissionInclude<ExtArgs> | null
+  where?: Prisma.MatchResultSubmissionWhereInput
+  orderBy?: Prisma.MatchResultSubmissionOrderByWithRelationInput | Prisma.MatchResultSubmissionOrderByWithRelationInput[]
+  cursor?: Prisma.MatchResultSubmissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MatchResultSubmissionScalarFieldEnum | Prisma.MatchResultSubmissionScalarFieldEnum[]
+}
+
+/**
+ * User.disputedMatchResultSubmissions
+ */
+export type User$disputedMatchResultSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MatchResultSubmission
+   */
+  select?: Prisma.MatchResultSubmissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MatchResultSubmission
+   */
+  omit?: Prisma.MatchResultSubmissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MatchResultSubmissionInclude<ExtArgs> | null
+  where?: Prisma.MatchResultSubmissionWhereInput
+  orderBy?: Prisma.MatchResultSubmissionOrderByWithRelationInput | Prisma.MatchResultSubmissionOrderByWithRelationInput[]
+  cursor?: Prisma.MatchResultSubmissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MatchResultSubmissionScalarFieldEnum | Prisma.MatchResultSubmissionScalarFieldEnum[]
 }
 
 /**

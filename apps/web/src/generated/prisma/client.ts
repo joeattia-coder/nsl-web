@@ -167,6 +167,16 @@ export type GroupParticipant = Prisma.GroupParticipantModel
  */
 export type Match = Prisma.MatchModel
 /**
+ * Model MatchResultSubmission
+ * 
+ */
+export type MatchResultSubmission = Prisma.MatchResultSubmissionModel
+/**
+ * Model MatchResultSubmissionFrame
+ * 
+ */
+export type MatchResultSubmissionFrame = Prisma.MatchResultSubmissionFrameModel
+/**
  * Model PlayerEloHistory
  * 
  */

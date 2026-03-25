@@ -114,6 +114,15 @@ export const MatchStatus = {
 export type MatchStatus = (typeof MatchStatus)[keyof typeof MatchStatus]
 
 
+export const MatchResultSubmissionStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  DISPUTED: 'DISPUTED'
+} as const
+
+export type MatchResultSubmissionStatus = (typeof MatchResultSubmissionStatus)[keyof typeof MatchResultSubmissionStatus]
+
+
 export const ScheduleStatus = {
   TBC: 'TBC',
   CONFIRMED: 'CONFIRMED'

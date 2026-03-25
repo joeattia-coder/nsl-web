@@ -40,7 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/src/generated/prisma
+# Prisma client for the web app is generated into apps/web/src/generated/prisma
+# and is intentionally tracked in this repository.
 
 node_modules
 .next

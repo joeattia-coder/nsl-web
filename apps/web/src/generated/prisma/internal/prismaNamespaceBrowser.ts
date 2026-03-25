@@ -76,6 +76,8 @@ export const ModelName = {
   TournamentEntryMember: 'TournamentEntryMember',
   GroupParticipant: 'GroupParticipant',
   Match: 'Match',
+  MatchResultSubmission: 'MatchResultSubmission',
+  MatchResultSubmissionFrame: 'MatchResultSubmissionFrame',
   PlayerEloHistory: 'PlayerEloHistory',
   MatchFrame: 'MatchFrame',
   PlayerBreak: 'PlayerBreak',
@@ -481,6 +483,47 @@ export const MatchScalarFieldEnum = {
 } as const
 
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
+
+
+export const MatchResultSubmissionScalarFieldEnum = {
+  id: 'id',
+  matchId: 'matchId',
+  submittedByUserId: 'submittedByUserId',
+  submittedByPlayerId: 'submittedByPlayerId',
+  submittedByEntryId: 'submittedByEntryId',
+  targetEntryId: 'targetEntryId',
+  winnerEntryId: 'winnerEntryId',
+  homeScore: 'homeScore',
+  awayScore: 'awayScore',
+  status: 'status',
+  summaryNote: 'summaryNote',
+  proposedMatchDate: 'proposedMatchDate',
+  proposedMatchTime: 'proposedMatchTime',
+  proposedEndedAt: 'proposedEndedAt',
+  submittedAt: 'submittedAt',
+  approvedAt: 'approvedAt',
+  approvedByUserId: 'approvedByUserId',
+  disputedAt: 'disputedAt',
+  disputedByUserId: 'disputedByUserId',
+  disputeReason: 'disputeReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchResultSubmissionScalarFieldEnum = (typeof MatchResultSubmissionScalarFieldEnum)[keyof typeof MatchResultSubmissionScalarFieldEnum]
+
+
+export const MatchResultSubmissionFrameScalarFieldEnum = {
+  id: 'id',
+  submissionId: 'submissionId',
+  frameNumber: 'frameNumber',
+  homeHighBreak: 'homeHighBreak',
+  awayHighBreak: 'awayHighBreak',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchResultSubmissionFrameScalarFieldEnum = (typeof MatchResultSubmissionFrameScalarFieldEnum)[keyof typeof MatchResultSubmissionFrameScalarFieldEnum]
 
 
 export const PlayerEloHistoryScalarFieldEnum = {

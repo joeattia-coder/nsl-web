@@ -409,6 +409,8 @@ export const ModelName = {
   TournamentEntryMember: 'TournamentEntryMember',
   GroupParticipant: 'GroupParticipant',
   Match: 'Match',
+  MatchResultSubmission: 'MatchResultSubmission',
+  MatchResultSubmissionFrame: 'MatchResultSubmissionFrame',
   PlayerEloHistory: 'PlayerEloHistory',
   MatchFrame: 'MatchFrame',
   PlayerBreak: 'PlayerBreak',
@@ -434,7 +436,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "termsOfServiceVersion" | "videoHighlight" | "document"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchResultSubmission" | "matchResultSubmissionFrame" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "termsOfServiceVersion" | "videoHighlight" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2288,6 +2290,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MatchResultSubmission: {
+      payload: Prisma.$MatchResultSubmissionPayload<ExtArgs>
+      fields: Prisma.MatchResultSubmissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MatchResultSubmissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MatchResultSubmissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>
+        }
+        findFirst: {
+          args: Prisma.MatchResultSubmissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MatchResultSubmissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>
+        }
+        findMany: {
+          args: Prisma.MatchResultSubmissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>[]
+        }
+        create: {
+          args: Prisma.MatchResultSubmissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>
+        }
+        createMany: {
+          args: Prisma.MatchResultSubmissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MatchResultSubmissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>[]
+        }
+        delete: {
+          args: Prisma.MatchResultSubmissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>
+        }
+        update: {
+          args: Prisma.MatchResultSubmissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.MatchResultSubmissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MatchResultSubmissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MatchResultSubmissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.MatchResultSubmissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionPayload>
+        }
+        aggregate: {
+          args: Prisma.MatchResultSubmissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMatchResultSubmission>
+        }
+        groupBy: {
+          args: Prisma.MatchResultSubmissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchResultSubmissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MatchResultSubmissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchResultSubmissionCountAggregateOutputType> | number
+        }
+      }
+    }
+    MatchResultSubmissionFrame: {
+      payload: Prisma.$MatchResultSubmissionFramePayload<ExtArgs>
+      fields: Prisma.MatchResultSubmissionFrameFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MatchResultSubmissionFrameFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MatchResultSubmissionFrameFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>
+        }
+        findFirst: {
+          args: Prisma.MatchResultSubmissionFrameFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MatchResultSubmissionFrameFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>
+        }
+        findMany: {
+          args: Prisma.MatchResultSubmissionFrameFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>[]
+        }
+        create: {
+          args: Prisma.MatchResultSubmissionFrameCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>
+        }
+        createMany: {
+          args: Prisma.MatchResultSubmissionFrameCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MatchResultSubmissionFrameCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>[]
+        }
+        delete: {
+          args: Prisma.MatchResultSubmissionFrameDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>
+        }
+        update: {
+          args: Prisma.MatchResultSubmissionFrameUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>
+        }
+        deleteMany: {
+          args: Prisma.MatchResultSubmissionFrameDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MatchResultSubmissionFrameUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MatchResultSubmissionFrameUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>[]
+        }
+        upsert: {
+          args: Prisma.MatchResultSubmissionFrameUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchResultSubmissionFramePayload>
+        }
+        aggregate: {
+          args: Prisma.MatchResultSubmissionFrameAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMatchResultSubmissionFrame>
+        }
+        groupBy: {
+          args: Prisma.MatchResultSubmissionFrameGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchResultSubmissionFrameGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MatchResultSubmissionFrameCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchResultSubmissionFrameCountAggregateOutputType> | number
+        }
+      }
+    }
     PlayerEloHistory: {
       payload: Prisma.$PlayerEloHistoryPayload<ExtArgs>
       fields: Prisma.PlayerEloHistoryFieldRefs
@@ -3446,6 +3596,47 @@ export const MatchScalarFieldEnum = {
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
 
 
+export const MatchResultSubmissionScalarFieldEnum = {
+  id: 'id',
+  matchId: 'matchId',
+  submittedByUserId: 'submittedByUserId',
+  submittedByPlayerId: 'submittedByPlayerId',
+  submittedByEntryId: 'submittedByEntryId',
+  targetEntryId: 'targetEntryId',
+  winnerEntryId: 'winnerEntryId',
+  homeScore: 'homeScore',
+  awayScore: 'awayScore',
+  status: 'status',
+  summaryNote: 'summaryNote',
+  proposedMatchDate: 'proposedMatchDate',
+  proposedMatchTime: 'proposedMatchTime',
+  proposedEndedAt: 'proposedEndedAt',
+  submittedAt: 'submittedAt',
+  approvedAt: 'approvedAt',
+  approvedByUserId: 'approvedByUserId',
+  disputedAt: 'disputedAt',
+  disputedByUserId: 'disputedByUserId',
+  disputeReason: 'disputeReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchResultSubmissionScalarFieldEnum = (typeof MatchResultSubmissionScalarFieldEnum)[keyof typeof MatchResultSubmissionScalarFieldEnum]
+
+
+export const MatchResultSubmissionFrameScalarFieldEnum = {
+  id: 'id',
+  submissionId: 'submissionId',
+  frameNumber: 'frameNumber',
+  homeHighBreak: 'homeHighBreak',
+  awayHighBreak: 'awayHighBreak',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchResultSubmissionFrameScalarFieldEnum = (typeof MatchResultSubmissionFrameScalarFieldEnum)[keyof typeof MatchResultSubmissionFrameScalarFieldEnum]
+
+
 export const PlayerEloHistoryScalarFieldEnum = {
   id: 'id',
   playerId: 'playerId',
@@ -3874,6 +4065,20 @@ export type ListEnumMatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'MatchResultSubmissionStatus'
+ */
+export type EnumMatchResultSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchResultSubmissionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'MatchResultSubmissionStatus[]'
+ */
+export type ListEnumMatchResultSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchResultSubmissionStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -4076,6 +4281,8 @@ export type GlobalOmitConfig = {
   tournamentEntryMember?: Prisma.TournamentEntryMemberOmit
   groupParticipant?: Prisma.GroupParticipantOmit
   match?: Prisma.MatchOmit
+  matchResultSubmission?: Prisma.MatchResultSubmissionOmit
+  matchResultSubmissionFrame?: Prisma.MatchResultSubmissionFrameOmit
   playerEloHistory?: Prisma.PlayerEloHistoryOmit
   matchFrame?: Prisma.MatchFrameOmit
   playerBreak?: Prisma.PlayerBreakOmit
