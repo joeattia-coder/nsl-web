@@ -1,14 +1,26 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import LocalTimeText from "@/components/LocalTimeText";
+import { getFlagCdnUrl } from "@/lib/country";
 import { getPendingMatchResultSubmissionsForMatches } from "@/lib/match-result-submission-store";
 import { resolveCurrentUser } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { parseStoredMatchDateTime } from "@/lib/timezone";
 import MyMatchActions from "./MyMatchActions";
 import PlayerPortalHeader from "../PlayerPortalHeader";
+import PlayerPortalPortrait from "../PlayerPortalPortrait";
 
-function formatEntryName(members: Array<{ player: { firstName: string; lastName: string } }>) {
+type MatchEntryMember = {
+  player: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    photoUrl: string | null;
+    country: string | null;
+  };
+};
+
+function formatEntryName(members: MatchEntryMember[]) {
   const names = members.map((member) => `${member.player.firstName} ${member.player.lastName}`.trim());
 
   if (names.length === 0) {
@@ -16,6 +28,22 @@ function formatEntryName(members: Array<{ player: { firstName: string; lastName:
   }
 
   return names.join(" / ");
+}
+
+function getEntryPhotoUrl(members: MatchEntryMember[]) {
+  return members.map((member) => member.player.photoUrl?.trim() ?? "").find(Boolean) || null;
+}
+
+function getEntryCountry(members: MatchEntryMember[]) {
+  return members.map((member) => member.player.country?.trim() ?? "").find(Boolean) || null;
+}
+
+function formatMatchStatus(matchStatus: string) {
+  return matchStatus
+    .toLowerCase()
+    .split("_")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
 }
 
 export default async function MyMatchesPage() {
@@ -91,6 +119,8 @@ export default async function MyMatchesPage() {
                   id: true,
                   firstName: true,
                   lastName: true,
+                  photoUrl: true,
+                  country: true,
                 },
               },
             },
@@ -110,6 +140,8 @@ export default async function MyMatchesPage() {
                   id: true,
                   firstName: true,
                   lastName: true,
+                  photoUrl: true,
+                  country: true,
                 },
               },
             },
@@ -194,37 +226,79 @@ export default async function MyMatchesPage() {
                       : pendingMode === "submittedByYou"
                         ? "Result submitted and waiting for opponent approval"
                         : null;
+                    const homeName = formatEntryName(match.homeEntry.members);
+                    const awayName = formatEntryName(match.awayEntry.members);
+                    const homePhotoUrl = getEntryPhotoUrl(match.homeEntry.members);
+                    const awayPhotoUrl = getEntryPhotoUrl(match.awayEntry.members);
+                    const homeCountry = getEntryCountry(match.homeEntry.members);
+                    const awayCountry = getEntryCountry(match.awayEntry.members);
+                    const homeFlagUrl = getFlagCdnUrl(homeCountry, "w40");
+                    const awayFlagUrl = getFlagCdnUrl(awayCountry, "w40");
 
                     return (
                       <>
-                  <p className="my-match-meta">
-                    <strong>{match.tournament.tournamentName}</strong>
-                    <span>{match.stageRound.roundName}</span>
-                  </p>
-                  <p className="my-match-meta">
-                    <span>
-                      <LocalTimeText
-                        value={scheduledAt}
-                        fallback="TBC"
-                        options={{ weekday: "short", year: "numeric", month: "short", day: "numeric" }}
+                  <div className="my-match-header">
+                    <div className="my-match-header-main">
+                      <strong>{match.tournament.tournamentName}</strong>
+                      <span>{match.stageRound.roundName}</span>
+                    </div>
+                    <div className="my-match-header-side">
+                      <span>
+                        <LocalTimeText
+                          value={scheduledAt}
+                          fallback="TBC"
+                          options={{ weekday: "short", year: "numeric", month: "short", day: "numeric" }}
+                        />
+                      </span>
+                      <span>
+                        <LocalTimeText
+                          value={scheduledAt}
+                          fallback="TBA"
+                          options={{ hour: "numeric", minute: "2-digit" }}
+                        />
+                      </span>
+                      <span className="my-match-status-chip">{formatMatchStatus(match.matchStatus)}</span>
+                    </div>
+                  </div>
+                  <div className="my-match-teams">
+                    <div className="my-match-player my-match-player-left">
+                      <PlayerPortalPortrait
+                        photoUrl={homePhotoUrl}
+                        alt={homeName}
+                        className="my-match-player-photo"
                       />
-                    </span>
-                    <span>
-                      <LocalTimeText
-                        value={scheduledAt}
-                        fallback="TBA"
-                        options={{ hour: "numeric", minute: "2-digit" }}
-                      />
-                    </span>
-                    <span>{match.matchStatus.replaceAll("_", " ")}</span>
-                  </p>
-                  <p className="my-match-teams">
-                    {formatEntryName(match.homeEntry.members)}
+                      <div className="my-match-player-name-row my-match-player-name-row-left">
+                        <span className="my-match-player-name">{homeName}</span>
+                        {homeFlagUrl ? (
+                          <img
+                            src={homeFlagUrl}
+                            alt={homeCountry ? `${homeCountry} flag` : ""}
+                            className="my-match-player-flag"
+                          />
+                        ) : null}
+                      </div>
+                    </div>
                     <span className="my-match-score">
                       {match.homeScore ?? "-"} : {match.awayScore ?? "-"}
                     </span>
-                    {formatEntryName(match.awayEntry.members)}
-                  </p>
+                    <div className="my-match-player my-match-player-right">
+                      <PlayerPortalPortrait
+                        photoUrl={awayPhotoUrl}
+                        alt={awayName}
+                        className="my-match-player-photo"
+                      />
+                      <div className="my-match-player-name-row my-match-player-name-row-right">
+                        {awayFlagUrl ? (
+                          <img
+                            src={awayFlagUrl}
+                            alt={awayCountry ? `${awayCountry} flag` : ""}
+                            className="my-match-player-flag"
+                          />
+                        ) : null}
+                        <span className="my-match-player-name">{awayName}</span>
+                      </div>
+                    </div>
+                  </div>
                   {pendingLabel ? <p className="my-match-pending-note">{pendingLabel}</p> : null}
                   <div className="my-match-links-row">
                     <Link href={`/matches/${match.id}`} className="login-form-link">
