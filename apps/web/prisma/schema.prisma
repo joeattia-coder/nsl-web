@@ -143,6 +143,9 @@ model User {
   approvedMatches            Match[]                  @relation("MatchApprovedByUser")
   enteredMatches             Match[]                  @relation("MatchEnteredByUser")
   updatedMatches             Match[]                  @relation("MatchUpdatedByUser")
+  submittedMatchResultSubmissions MatchResultSubmission[] @relation("MatchResultSubmissionSubmittedByUser")
+  approvedMatchResultSubmissions  MatchResultSubmission[] @relation("MatchResultSubmissionApprovedByUser")
+  disputedMatchResultSubmissions  MatchResultSubmission[] @relation("MatchResultSubmissionDisputedByUser")
   player                     Player?
   authAccounts               AuthAccount[]
   targetInvitations          Invitation[]             @relation("InvitationTargetUser")
@@ -184,6 +187,7 @@ model Player {
   breaks        PlayerBreak[]
   entryMembers  TournamentEntryMember[]
   eloHistory    PlayerEloHistory[]
+  submittedMatchResultSubmissions MatchResultSubmission[] @relation("MatchResultSubmissionSubmittedByPlayer")
   invitations   Invitation[]
 
   @@index([lastName, firstName])
@@ -413,6 +417,9 @@ model TournamentEntry {
   awayMatches   Match[]                 @relation("MatchAwayEntry")
   homeMatches   Match[]                 @relation("MatchHomeEntry")
   winnerMatches Match[]                 @relation("MatchWinnerEntry")
+  submittedMatchResultSubmissions MatchResultSubmission[] @relation("MatchResultSubmissionSubmittedByEntry")
+  targetMatchResultSubmissions    MatchResultSubmission[] @relation("MatchResultSubmissionTargetEntry")
+  wonMatchResultSubmissions       MatchResultSubmission[] @relation("MatchResultSubmissionWinnerEntry")
   matchFrames   MatchFrame[]
   tournament    Tournament              @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   members       TournamentEntryMember[]
@@ -486,6 +493,7 @@ model Match {
   venue             Venue?           @relation(fields: [venueId], references: [id])
   winnerEntry       TournamentEntry? @relation("MatchWinnerEntry", fields: [winnerEntryId], references: [id])
   frames            MatchFrame[]
+  resultSubmissions MatchResultSubmission[]
   playerEloHistory  PlayerEloHistory[]
 
   @@index([tournamentId])
@@ -499,6 +507,63 @@ model Match {
   @@index([approvedByUserId])
   @@index([enteredByUserId])
   @@index([updatedByUserId])
+}
+
+model MatchResultSubmission {
+  id                  String                      @id @default(cuid())
+  matchId             String
+  submittedByUserId   String
+  submittedByPlayerId String
+  submittedByEntryId  String
+  targetEntryId       String
+  winnerEntryId       String?
+  homeScore           Int
+  awayScore           Int
+  status              MatchResultSubmissionStatus @default(PENDING)
+  summaryNote         String?
+  proposedMatchDate   DateTime?
+  proposedMatchTime   String?
+  proposedEndedAt     DateTime?
+  submittedAt         DateTime                    @default(now())
+  approvedAt          DateTime?
+  approvedByUserId    String?
+  disputedAt          DateTime?
+  disputedByUserId    String?
+  disputeReason       String?
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+  match               Match                       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  submittedByUser     User                        @relation("MatchResultSubmissionSubmittedByUser", fields: [submittedByUserId], references: [id], onDelete: Cascade)
+  submittedByPlayer   Player                      @relation("MatchResultSubmissionSubmittedByPlayer", fields: [submittedByPlayerId], references: [id], onDelete: Cascade)
+  submittedByEntry    TournamentEntry             @relation("MatchResultSubmissionSubmittedByEntry", fields: [submittedByEntryId], references: [id], onDelete: Cascade)
+  targetEntry         TournamentEntry             @relation("MatchResultSubmissionTargetEntry", fields: [targetEntryId], references: [id], onDelete: Cascade)
+  winnerEntry         TournamentEntry?            @relation("MatchResultSubmissionWinnerEntry", fields: [winnerEntryId], references: [id], onDelete: SetNull)
+  approvedByUser      User?                       @relation("MatchResultSubmissionApprovedByUser", fields: [approvedByUserId], references: [id], onDelete: SetNull)
+  disputedByUser      User?                       @relation("MatchResultSubmissionDisputedByUser", fields: [disputedByUserId], references: [id], onDelete: SetNull)
+  frames              MatchResultSubmissionFrame[]
+
+  @@index([matchId])
+  @@index([status])
+  @@index([submittedByPlayerId])
+  @@index([submittedByEntryId])
+  @@index([targetEntryId])
+  @@index([submittedAt])
+  @@index([approvedByUserId])
+  @@index([disputedByUserId])
+}
+
+model MatchResultSubmissionFrame {
+  id            String                @id @default(cuid())
+  submissionId  String
+  frameNumber   Int
+  homeHighBreak Int?
+  awayHighBreak Int?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  submission    MatchResultSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, frameNumber])
+  @@index([submissionId])
 }
 
 model PlayerEloHistory {
@@ -725,6 +790,12 @@ enum MatchStatus {
   CANCELLED
   FORFEIT
   ABANDONED
+}
+
+enum MatchResultSubmissionStatus {
+  PENDING
+  APPROVED
+  DISPUTED
 }
 
 enum ScheduleStatus {

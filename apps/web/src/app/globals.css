@@ -1388,6 +1388,27 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   box-shadow: var(--theme-shadow-soft);
 }
 
+.my-match-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.my-match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.my-match-pending-note {
+  margin: 0;
+  color: var(--theme-text-secondary);
+  font-size: 0.95rem;
+}
+
 .player-dashboard-page {
   display: block;
   min-height: auto;

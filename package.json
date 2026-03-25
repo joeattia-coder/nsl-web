@@ -29,5 +29,8 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "turbo": "^2.5.0"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
   }
 }

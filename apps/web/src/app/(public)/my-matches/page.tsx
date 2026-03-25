@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import LocalTimeText from "@/components/LocalTimeText";
+import { getPendingMatchResultSubmissionsForMatches } from "@/lib/match-result-submission-store";
 import { resolveCurrentUser } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { parseStoredMatchDateTime } from "@/lib/timezone";
+import MyMatchActions from "./MyMatchActions";
 import PlayerPortalHeader from "../PlayerPortalHeader";
 
 function formatEntryName(members: Array<{ player: { firstName: string; lastName: string } }>) {
@@ -81,10 +83,12 @@ export default async function MyMatchesPage() {
       },
       homeEntry: {
         select: {
+          id: true,
           members: {
             select: {
               player: {
                 select: {
+                  id: true,
                   firstName: true,
                   lastName: true,
                 },
@@ -98,10 +102,12 @@ export default async function MyMatchesPage() {
       },
       awayEntry: {
         select: {
+          id: true,
           members: {
             select: {
               player: {
                 select: {
+                  id: true,
                   firstName: true,
                   lastName: true,
                 },
@@ -116,6 +122,22 @@ export default async function MyMatchesPage() {
     },
     orderBy: [{ matchDate: "asc" }, { createdAt: "asc" }],
   });
+
+  const matchIds = matches.map((match) => match.id);
+  const playerEntryIds = matches.flatMap((match) => {
+    const entryIds: string[] = [];
+
+    if (match.homeEntry.members.some((member) => member.player.id === currentUser.linkedPlayerId)) {
+      entryIds.push(match.homeEntry.id);
+    }
+
+    if (match.awayEntry.members.some((member) => member.player.id === currentUser.linkedPlayerId)) {
+      entryIds.push(match.awayEntry.id);
+    }
+
+    return entryIds;
+  });
+  const pendingSubmissionsByMatchId = await getPendingMatchResultSubmissionsForMatches(matchIds, playerEntryIds);
 
   const linkedPlayer = await prisma.player.findUnique({
     where: {
@@ -154,6 +176,24 @@ export default async function MyMatchesPage() {
                 <article key={match.id} className="my-match-card">
                   {(() => {
                     const scheduledAt = parseStoredMatchDateTime(match.matchDate, match.matchTime)?.toISOString() ?? null;
+                    const currentEntryId = match.homeEntry.members.some(
+                      (member) => member.player.id === currentUser.linkedPlayerId
+                    )
+                      ? match.homeEntry.id
+                      : match.awayEntry.id;
+                    const pendingSubmission = pendingSubmissionsByMatchId.get(match.id);
+                    const pendingMode = pendingSubmission
+                      ? pendingSubmission.targetEntryId === currentEntryId
+                        ? "awaitingYourReview"
+                        : pendingSubmission.submittedByEntryId === currentEntryId
+                          ? "submittedByYou"
+                          : "none"
+                      : "none";
+                    const pendingLabel = pendingMode === "awaitingYourReview"
+                      ? "Opponent submitted a result awaiting your approval"
+                      : pendingMode === "submittedByYou"
+                        ? "Result submitted and waiting for opponent approval"
+                        : null;
 
                     return (
                       <>
@@ -185,9 +225,17 @@ export default async function MyMatchesPage() {
                     </span>
                     {formatEntryName(match.awayEntry.members)}
                   </p>
-                  <Link href="/matches" className="login-form-link">
-                    View public match hub
-                  </Link>
+                  {pendingLabel ? <p className="my-match-pending-note">{pendingLabel}</p> : null}
+                  <div className="my-match-links-row">
+                    <Link href={`/matches/${match.id}`} className="login-form-link">
+                      View public match hub
+                    </Link>
+                    <MyMatchActions
+                      matchId={match.id}
+                      editHref={`/my-matches/${match.id}/edit`}
+                      mode={pendingMode}
+                    />
+                  </div>
                       </>
                     );
                   })()}

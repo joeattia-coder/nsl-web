@@ -34,6 +34,49 @@ type ContactEmailInput = {
   accountUsername?: string | null;
 };
 
+type MatchResultSubmissionFrameInput = {
+  frameNumber: number;
+  homeHighBreak: number | null;
+  awayHighBreak: number | null;
+};
+
+type MatchResultApprovalRequestEmailInput = {
+  to: string;
+  recipientName?: string | null;
+  submittedByName: string;
+  matchId: string;
+  tournamentName: string;
+  venueLabel: string;
+  scheduledAtLabel?: string | null;
+  homeEntryLabel: string;
+  awayEntryLabel: string;
+  homeScore: number;
+  awayScore: number;
+  winnerLabel: string;
+  frameHighBreaks: MatchResultSubmissionFrameInput[];
+  reviewUrl: string;
+};
+
+type MatchResultDisputeNotificationEmailInput = {
+  to: string;
+  submittedByName: string;
+  submittedByEmail?: string | null;
+  disputedByName: string;
+  disputedByEmail?: string | null;
+  matchId: string;
+  tournamentName: string;
+  venueLabel: string;
+  scheduledAtLabel?: string | null;
+  homeEntryLabel: string;
+  awayEntryLabel: string;
+  homeScore: number;
+  awayScore: number;
+  winnerLabel: string;
+  frameHighBreaks: MatchResultSubmissionFrameInput[];
+  disputeReason?: string | null;
+  adminEditUrl: string;
+};
+
 type MailTransportConfig = {
   host: string;
   port: number;
@@ -108,6 +151,42 @@ function escapeHtml(value: string) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function formatFrameHighBreakLines(frameHighBreaks: MatchResultSubmissionFrameInput[]) {
+  const populated = frameHighBreaks.filter(
+    (frame) => frame.homeHighBreak !== null || frame.awayHighBreak !== null
+  );
+
+  if (populated.length === 0) {
+    return {
+      text: ["No high breaks submitted."],
+      html: "<p><strong>High breaks:</strong> No high breaks submitted.</p>",
+    };
+  }
+
+  return {
+    text: [
+      "High breaks:",
+      ...populated.map(
+        (frame) =>
+          `Frame ${frame.frameNumber}: ${frame.homeHighBreak ?? "-"} / ${frame.awayHighBreak ?? "-"}`
+      ),
+    ],
+    html: `
+      <div>
+        <p><strong>High breaks:</strong></p>
+        <ul>
+          ${populated
+            .map(
+              (frame) =>
+                `<li>Frame ${frame.frameNumber}: ${escapeHtml(String(frame.homeHighBreak ?? "-"))} / ${escapeHtml(String(frame.awayHighBreak ?? "-"))}</li>`
+            )
+            .join("")}
+        </ul>
+      </div>
+    `,
+  };
 }
 
 export function isEmailDeliveryConfigured() {
@@ -314,6 +393,165 @@ export async function sendContactEmail({
         <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
         <p><strong>Message details:</strong></p>
         <div style="white-space: pre-wrap;">${escapeHtml(details)}</div>
+      </div>
+    `,
+  });
+}
+
+export async function sendMatchResultApprovalRequestEmail({
+  to,
+  recipientName,
+  submittedByName,
+  matchId,
+  tournamentName,
+  venueLabel,
+  scheduledAtLabel,
+  homeEntryLabel,
+  awayEntryLabel,
+  homeScore,
+  awayScore,
+  winnerLabel,
+  frameHighBreaks,
+  reviewUrl,
+}: MatchResultApprovalRequestEmailInput) {
+  const config = getMailTransportConfig();
+
+  if (!config) {
+    throw new Error(
+      "SMTP is not configured. Set SMTP_HOST and SMTP_FROM_EMAIL to enable email delivery."
+    );
+  }
+
+  const transporter = createTransport(config);
+  const greetingTarget = recipientName?.trim() || "there";
+  const highBreakSummary = formatFrameHighBreakLines(frameHighBreaks);
+
+  await transporter.sendMail({
+    from: `${config.fromName} <${config.fromEmail}>`,
+    to,
+    replyTo: config.replyTo ?? undefined,
+    subject: `NSL Match Result Approval Needed: ${homeEntryLabel} vs ${awayEntryLabel}`,
+    text: [
+      `Hi ${greetingTarget},`,
+      "",
+      `${submittedByName} submitted a match result that needs your approval.`,
+      "",
+      `Match ID: ${matchId}`,
+      `Tournament: ${tournamentName}`,
+      `Venue: ${venueLabel || "Venue TBC"}`,
+      scheduledAtLabel ? `Scheduled: ${scheduledAtLabel}` : null,
+      `Match: ${homeEntryLabel} vs ${awayEntryLabel}`,
+      `Score: ${homeScore} - ${awayScore}`,
+      `Winner: ${winnerLabel}`,
+      "",
+      ...highBreakSummary.text,
+      "",
+      `Review and approve: ${reviewUrl}`,
+    ].filter(Boolean).join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
+        <p>Hi ${escapeHtml(greetingTarget)},</p>
+        <p>${escapeHtml(submittedByName)} submitted a match result that needs your approval.</p>
+        <p><strong>Match ID:</strong> ${escapeHtml(matchId)}</p>
+        <p><strong>Tournament:</strong> ${escapeHtml(tournamentName)}</p>
+        <p><strong>Venue:</strong> ${escapeHtml(venueLabel || "Venue TBC")}</p>
+        ${scheduledAtLabel ? `<p><strong>Scheduled:</strong> ${escapeHtml(scheduledAtLabel)}</p>` : ""}
+        <p><strong>Match:</strong> ${escapeHtml(homeEntryLabel)} vs ${escapeHtml(awayEntryLabel)}</p>
+        <p><strong>Score:</strong> ${escapeHtml(String(homeScore))} - ${escapeHtml(String(awayScore))}</p>
+        <p><strong>Winner:</strong> ${escapeHtml(winnerLabel)}</p>
+        ${highBreakSummary.html}
+        <p>
+          <a
+            href="${reviewUrl}"
+            style="display: inline-block; padding: 12px 18px; background: #111827; color: #ffffff; text-decoration: none;"
+          >
+            Review and approve
+          </a>
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendMatchResultDisputeNotificationEmail({
+  to,
+  submittedByName,
+  submittedByEmail,
+  disputedByName,
+  disputedByEmail,
+  matchId,
+  tournamentName,
+  venueLabel,
+  scheduledAtLabel,
+  homeEntryLabel,
+  awayEntryLabel,
+  homeScore,
+  awayScore,
+  winnerLabel,
+  frameHighBreaks,
+  disputeReason,
+  adminEditUrl,
+}: MatchResultDisputeNotificationEmailInput) {
+  const config = getMailTransportConfig();
+
+  if (!config) {
+    throw new Error(
+      "SMTP is not configured. Set SMTP_HOST and SMTP_FROM_EMAIL to enable email delivery."
+    );
+  }
+
+  const transporter = createTransport(config);
+  const highBreakSummary = formatFrameHighBreakLines(frameHighBreaks);
+
+  await transporter.sendMail({
+    from: `${config.fromName} <${config.fromEmail}>`,
+    to,
+    replyTo: config.replyTo ?? undefined,
+    subject: `****DISPUTE**** NSL Match Result: ${homeEntryLabel} vs ${awayEntryLabel}`,
+    text: [
+      `${disputedByName} disputed a player-submitted match result.`,
+      "",
+      `Match ID: ${matchId}`,
+      `Tournament: ${tournamentName}`,
+      `Venue: ${venueLabel || "Venue TBC"}`,
+      scheduledAtLabel ? `Scheduled: ${scheduledAtLabel}` : null,
+      `Submitted by: ${submittedByName}`,
+      submittedByEmail?.trim() ? `Submitted by email: ${submittedByEmail.trim()}` : null,
+      `Disputed by: ${disputedByName}`,
+      disputedByEmail?.trim() ? `Disputed by email: ${disputedByEmail.trim()}` : null,
+      `Match: ${homeEntryLabel} vs ${awayEntryLabel}`,
+      `Score: ${homeScore} - ${awayScore}`,
+      `Winner: ${winnerLabel}`,
+      disputeReason?.trim() ? `Dispute reason: ${disputeReason.trim()}` : null,
+      "",
+      ...highBreakSummary.text,
+      "",
+      `Admin edit match: ${adminEditUrl}`,
+    ].filter(Boolean).join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
+        <p>${escapeHtml(disputedByName)} disputed a player-submitted match result.</p>
+        <p><strong>Match ID:</strong> ${escapeHtml(matchId)}</p>
+        <p><strong>Tournament:</strong> ${escapeHtml(tournamentName)}</p>
+        <p><strong>Venue:</strong> ${escapeHtml(venueLabel || "Venue TBC")}</p>
+        ${scheduledAtLabel ? `<p><strong>Scheduled:</strong> ${escapeHtml(scheduledAtLabel)}</p>` : ""}
+        <p><strong>Submitted by:</strong> ${escapeHtml(submittedByName)}</p>
+        ${submittedByEmail?.trim() ? `<p><strong>Submitted by email:</strong> ${escapeHtml(submittedByEmail.trim())}</p>` : ""}
+        <p><strong>Disputed by:</strong> ${escapeHtml(disputedByName)}</p>
+        ${disputedByEmail?.trim() ? `<p><strong>Disputed by email:</strong> ${escapeHtml(disputedByEmail.trim())}</p>` : ""}
+        <p><strong>Match:</strong> ${escapeHtml(homeEntryLabel)} vs ${escapeHtml(awayEntryLabel)}</p>
+        <p><strong>Score:</strong> ${escapeHtml(String(homeScore))} - ${escapeHtml(String(awayScore))}</p>
+        <p><strong>Winner:</strong> ${escapeHtml(winnerLabel)}</p>
+        ${disputeReason?.trim() ? `<p><strong>Dispute reason:</strong> ${escapeHtml(disputeReason.trim())}</p>` : ""}
+        ${highBreakSummary.html}
+        <p>
+          <a
+            href="${adminEditUrl}"
+            style="display: inline-block; padding: 12px 18px; background: #111827; color: #ffffff; text-decoration: none;"
+          >
+            Open admin edit match
+          </a>
+        </p>
       </div>
     `,
   });
