@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FiUpload, FiX } from "react-icons/fi";
+import CountrySelect from "@/components/CountrySelect";
 import PlayerPortalPortrait from "../PlayerPortalPortrait";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -359,11 +360,9 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
         <label className="admin-form-field">
           <span className="admin-label">Country</span>
-          <input
-            type="text"
-            className="admin-input"
+          <CountrySelect
             value={country}
-            onChange={(event) => setCountry(event.target.value)}
+            onChange={setCountry}
           />
         </label>
 

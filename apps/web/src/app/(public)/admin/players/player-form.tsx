@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import { FiArrowLeft, FiImage, FiMail, FiSave, FiScissors, FiUpload, FiUserPlus, FiX } from "react-icons/fi";
+import CountrySelect from "@/components/CountrySelect";
 import { blobToFile, cropAndResizeToWebP, dataUrlToFile } from "@/lib/image-processing";
 
 type PlayerFormMode = "create" | "edit";
@@ -834,12 +835,11 @@ export default function PlayerForm({
               <label htmlFor="country" className="admin-label">
                 Country
               </label>
-              <input
+              <CountrySelect
                 id="country"
-                type="text"
+                className="admin-select admin-player-form-input"
                 value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="admin-input admin-player-form-input"
+                onChange={setCountry}
               />
             </div>
 

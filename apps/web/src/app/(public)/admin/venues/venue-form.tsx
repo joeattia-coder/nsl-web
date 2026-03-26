@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiArrowLeft, FiImage, FiMap, FiPlus, FiSave, FiUpload, FiX } from "react-icons/fi";
+import CountrySelect from "@/components/CountrySelect";
 
 type VenueFormMode = "create" | "edit";
 
@@ -463,12 +464,11 @@ export default function VenueForm({ mode, venueId }: VenueFormProps) {
                 <label htmlFor="country" className="admin-label">
                   Country
                 </label>
-                <input
+                <CountrySelect
                   id="country"
-                  type="text"
+                  className="admin-select admin-player-form-input"
                   value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="admin-input admin-player-form-input"
+                  onChange={setCountry}
                 />
               </div>
 

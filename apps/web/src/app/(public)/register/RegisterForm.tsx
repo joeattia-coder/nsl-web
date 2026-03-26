@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
+import CountrySelect from "@/components/CountrySelect";
 import PasswordField from "@/components/admin/PasswordField";
-import { COUNTRY_OPTIONS } from "@/lib/country";
 
 function normalizeMiddleInitial(value: string) {
   return value.replace(/[^a-z]/gi, "").slice(0, 1).toUpperCase();
@@ -181,19 +181,11 @@ export default function RegisterForm() {
             </div>
             <div className="admin-form-field">
               <label className="admin-label">Country</label>
-              <select
-                className="admin-select"
+              <CountrySelect
                 value={country}
-                onChange={(event) => setCountry(event.target.value)}
+                onChange={setCountry}
                 required
-              >
-                <option value="">Select country</option>
-                {COUNTRY_OPTIONS.map((countryOption) => (
-                  <option key={countryOption} value={countryOption}>
-                    {countryOption}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div className="admin-form-field">
               <label className="admin-label">Username</label>
