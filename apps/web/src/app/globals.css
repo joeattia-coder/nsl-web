@@ -1582,8 +1582,10 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
 }
 
 .my-match-header-main {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
   min-width: 0;
   color: var(--theme-page-text);
 }
@@ -1986,6 +1988,59 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   }
 
   .my-tournaments-rankings-table-wrap {
+
+@media (max-width: 560px) {
+  .my-match-card {
+    padding: 14px;
+  }
+
+  .my-match-header-main,
+  .my-match-header-side {
+    justify-content: center;
+  }
+
+  .my-match-header-main {
+    gap: 6px;
+  }
+
+  .my-match-teams {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 14px;
+  }
+
+  .my-match-player,
+  .my-match-player-left,
+  .my-match-player-right {
+    justify-items: center;
+  }
+
+  .my-match-player-name-row,
+  .my-match-player-name-row-left,
+  .my-match-player-name-row-right {
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+
+  .my-match-player-name {
+    text-align: center;
+  }
+
+  .my-match-score {
+    min-width: 0;
+    padding: 2px 0;
+  }
+
+  .my-match-links-row,
+  .my-match-actions {
+    justify-content: center;
+  }
+
+  .my-match-pending-note {
+    text-align: center;
+  }
+}
     padding: 1rem;
   }
 }
@@ -3295,16 +3350,6 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
 .rich-text-editor-input li {
   margin: 0.2rem 0;
 }
-
-@media (min-width: 768px) {
-.news-article-hero-image {
-    float: right;
-    width: 520px;
-    margin-left: 4rem;
-    margin-bottom: 2rem;
-  }
-}
-
 
 /* =========================
    SEASON HEADER + SEGMENTED PILL

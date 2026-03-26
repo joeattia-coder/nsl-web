@@ -217,6 +217,11 @@ export type AboutSectionVersion = Prisma.AboutSectionVersionModel
  */
 export type TermsOfServiceVersion = Prisma.TermsOfServiceVersionModel
 /**
+ * Model PrivacyPolicyVersion
+ * 
+ */
+export type PrivacyPolicyVersion = Prisma.PrivacyPolicyVersionModel
+/**
  * Model VideoHighlight
  * 
  */

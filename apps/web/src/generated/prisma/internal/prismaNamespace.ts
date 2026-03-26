@@ -419,6 +419,7 @@ export const ModelName = {
   FaqItem: 'FaqItem',
   AboutSectionVersion: 'AboutSectionVersion',
   TermsOfServiceVersion: 'TermsOfServiceVersion',
+  PrivacyPolicyVersion: 'PrivacyPolicyVersion',
   VideoHighlight: 'VideoHighlight',
   Document: 'Document'
 } as const
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchResultSubmission" | "matchResultSubmissionFrame" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "termsOfServiceVersion" | "videoHighlight" | "document"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchResultSubmission" | "matchResultSubmissionFrame" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "termsOfServiceVersion" | "privacyPolicyVersion" | "videoHighlight" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3030,6 +3031,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PrivacyPolicyVersion: {
+      payload: Prisma.$PrivacyPolicyVersionPayload<ExtArgs>
+      fields: Prisma.PrivacyPolicyVersionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PrivacyPolicyVersionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PrivacyPolicyVersionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>
+        }
+        findFirst: {
+          args: Prisma.PrivacyPolicyVersionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PrivacyPolicyVersionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>
+        }
+        findMany: {
+          args: Prisma.PrivacyPolicyVersionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>[]
+        }
+        create: {
+          args: Prisma.PrivacyPolicyVersionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>
+        }
+        createMany: {
+          args: Prisma.PrivacyPolicyVersionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PrivacyPolicyVersionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>[]
+        }
+        delete: {
+          args: Prisma.PrivacyPolicyVersionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>
+        }
+        update: {
+          args: Prisma.PrivacyPolicyVersionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PrivacyPolicyVersionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PrivacyPolicyVersionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PrivacyPolicyVersionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PrivacyPolicyVersionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivacyPolicyVersionPayload>
+        }
+        aggregate: {
+          args: Prisma.PrivacyPolicyVersionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePrivacyPolicyVersion>
+        }
+        groupBy: {
+          args: Prisma.PrivacyPolicyVersionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PrivacyPolicyVersionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PrivacyPolicyVersionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PrivacyPolicyVersionCountAggregateOutputType> | number
+        }
+      }
+    }
     VideoHighlight: {
       payload: Prisma.$VideoHighlightPayload<ExtArgs>
       fields: Prisma.VideoHighlightFieldRefs
@@ -3757,6 +3832,19 @@ export const TermsOfServiceVersionScalarFieldEnum = {
 export type TermsOfServiceVersionScalarFieldEnum = (typeof TermsOfServiceVersionScalarFieldEnum)[keyof typeof TermsOfServiceVersionScalarFieldEnum]
 
 
+export const PrivacyPolicyVersionScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  contentHtml: 'contentHtml',
+  contentJson: 'contentJson',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PrivacyPolicyVersionScalarFieldEnum = (typeof PrivacyPolicyVersionScalarFieldEnum)[keyof typeof PrivacyPolicyVersionScalarFieldEnum]
+
+
 export const VideoHighlightScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -4291,6 +4379,7 @@ export type GlobalOmitConfig = {
   faqItem?: Prisma.FaqItemOmit
   aboutSectionVersion?: Prisma.AboutSectionVersionOmit
   termsOfServiceVersion?: Prisma.TermsOfServiceVersionOmit
+  privacyPolicyVersion?: Prisma.PrivacyPolicyVersionOmit
   videoHighlight?: Prisma.VideoHighlightOmit
   document?: Prisma.DocumentOmit
 }

@@ -692,6 +692,18 @@ model TermsOfServiceVersion {
   @@index([publishedAt, createdAt])
 }
 
+model PrivacyPolicyVersion {
+  id          String   @id @default(cuid())
+  title       String
+  contentHtml String
+  contentJson Json?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([publishedAt, createdAt])
+}
+
 model VideoHighlight {
   id                String          @id @default(cuid())
   title             String

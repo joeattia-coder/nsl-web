@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -15,6 +15,7 @@ import type {
 import { isGlobalAdminUserRecord } from "@/lib/admin-user-access";
 
 const ADMIN_SESSION_COOKIE = "nsl_admin_session";
+const ADMIN_SESSION_HEADER = "x-nsl-session";
 const ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 const GLOBAL_ADMIN_ROLE_KEY = "ADMINISTRATOR";
 const PLAYER_ROLE_KEY = "PLAYER";
@@ -957,7 +958,12 @@ async function loadLegacyLoginUser(where: Prisma.UserWhereInput) {
 
 async function findCurrentAdminCandidate() {
   const cookieStore = await cookies();
-  const sessionUserId = decodeSessionValue(cookieStore.get(ADMIN_SESSION_COOKIE)?.value?.trim());
+  const requestHeaders = await headers();
+  const sessionToken =
+    requestHeaders.get(ADMIN_SESSION_HEADER)?.trim() ||
+    cookieStore.get(ADMIN_SESSION_COOKIE)?.value?.trim() ||
+    "";
+  const sessionUserId = decodeSessionValue(sessionToken);
 
   if (sessionUserId) {
     const cookieUser = await loadAdminUserById(sessionUserId);
@@ -1118,6 +1124,10 @@ export function getAdminSessionCookieOptions() {
 
 export function getAdminSessionCookieName() {
   return ADMIN_SESSION_COOKIE;
+}
+
+export function getAdminSessionHeaderName() {
+  return ADMIN_SESSION_HEADER;
 }
 
 export function hasAdminPermission(

@@ -231,23 +231,6 @@
   white-space: nowrap;
 }
 
-@media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-
-  .scoreCluster {
-    order: -1;
-    padding-bottom: 0;
-  }
-
-  .playerBlock {
-    width: 100%;
-    max-width: 280px;
-  }
-}
-
 @media (max-width: 640px) {
   .inner {
     padding: 0.95rem;

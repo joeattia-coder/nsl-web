@@ -27,6 +27,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import PrivacyFooterLink from "./PrivacyFooterLink";
 import TermsFooterLink from "./TermsFooterLink";
 
 type AdminNavItem = {
@@ -61,6 +62,7 @@ const adminSidebarItems: AdminNavItem[] = [
   { href: "/admin/matches", label: "Matches", icon: FiActivity },
   { href: "/admin/news", label: "News", icon: FiFileText },
   { href: "/admin/about", label: "About", icon: FiInfo },
+  { href: "/admin/privacy", label: "Privacy", icon: FiFileText },
   { href: "/admin/terms", label: "Terms", icon: FiFileText },
   { href: "/admin/documents", label: "Documents", icon: FiFileText },
   { href: "/admin/faqs", label: "FAQs", icon: FiHelpCircle },
@@ -478,6 +480,7 @@ function LayoutChrome({
             </div>
 
             <div className="site-footer-links">
+              <PrivacyFooterLink />
               <TermsFooterLink />
             </div>
           </div>

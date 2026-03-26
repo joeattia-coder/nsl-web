@@ -86,6 +86,7 @@ export const ModelName = {
   FaqItem: 'FaqItem',
   AboutSectionVersion: 'AboutSectionVersion',
   TermsOfServiceVersion: 'TermsOfServiceVersion',
+  PrivacyPolicyVersion: 'PrivacyPolicyVersion',
   VideoHighlight: 'VideoHighlight',
   Document: 'Document'
 } as const
@@ -644,6 +645,19 @@ export const TermsOfServiceVersionScalarFieldEnum = {
 } as const
 
 export type TermsOfServiceVersionScalarFieldEnum = (typeof TermsOfServiceVersionScalarFieldEnum)[keyof typeof TermsOfServiceVersionScalarFieldEnum]
+
+
+export const PrivacyPolicyVersionScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  contentHtml: 'contentHtml',
+  contentJson: 'contentJson',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PrivacyPolicyVersionScalarFieldEnum = (typeof PrivacyPolicyVersionScalarFieldEnum)[keyof typeof PrivacyPolicyVersionScalarFieldEnum]
 
 
 export const VideoHighlightScalarFieldEnum = {
