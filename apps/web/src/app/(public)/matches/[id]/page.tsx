@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import HeadToHeadStats, { type HeadToHeadStatRow } from "@/components/HeadToHeadStats";
-import LocalTimeText from "@/components/LocalTimeText";
+import type { HeadToHeadStatRow } from "@/components/HeadToHeadStats";
 import { normalizeCountryCode } from "@/lib/country";
 import { getFlagCdnUrl } from "@/lib/country";
+import type { PublicLiveMatchSnapshot } from "@/lib/live-match";
 import { getPlayerRankings } from "@/lib/player-performance";
 import { prisma } from "@/lib/prisma";
 import { parseStoredMatchDateTime } from "@/lib/timezone";
-import MatchCentreBackButton from "./MatchCentreBackButton";
+import LiveMatchCentrePanel from "./LiveMatchCentrePanel";
 import styles from "./MatchCentrePage.module.css";
 
 function buildFullName(firstName: string, middleInitial: string | null, lastName: string) {
@@ -163,11 +163,9 @@ function buildStatsRows(match: {
 }
 
 export default async function MatchCentrePage({
-  context,
   params,
   searchParams,
 }: {
-  context?: never;
   params: Promise<{ id: string }>;
   searchParams: Promise<{ group?: string | string[] }>;
 }) {
@@ -192,8 +190,10 @@ export default async function MatchCentrePage({
       homeScore: true,
       awayScore: true,
       publicNote: true,
+      updatedAt: true,
       tournament: {
         select: {
+          id: true,
           tournamentName: true,
           season: {
             select: {
@@ -417,44 +417,28 @@ export default async function MatchCentrePage({
     .filter(Boolean)
     .join(", ");
   const backHref = requestedGroupId ? `/matches?group=${encodeURIComponent(requestedGroupId)}` : "/matches";
+  const initialSnapshot: PublicLiveMatchSnapshot = {
+    id: match.id,
+    fixtureGroupIdentifier: match.tournament.id,
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    matchStatus: match.matchStatus,
+    scheduleStatus: match.scheduleStatus,
+    publicNote: match.publicNote,
+    updatedAt: match.updatedAt.toISOString(),
+  };
 
   return (
     <main className={`content ${styles.page}`}>
-      <section className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div className={styles.eyebrow}>Match Centre</div>
-          <div className={styles.titleRow}>
-            <div>
-              <h1 className={styles.title}>{match.tournament.tournamentName}</h1>
-              <p className={styles.subTitle}>{match.stageRound.roundName} • {match.tournament.season.seasonName}</p>
-            </div>
-            <MatchCentreBackButton className={styles.backButton} fallbackHref={backHref} />
-          </div>
-
-          <div className={styles.metaGrid}>
-            <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>Scheduled</span>
-              <span className={styles.metaValue}>
-                <LocalTimeText
-                  value={scheduledAt}
-                  fallback="TBC"
-                  options={{ weekday: "short", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }}
-                />
-              </span>
-            </div>
-            <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>Status</span>
-              <span className={styles.metaValue}>{match.matchStatus.replaceAll("_", " ")}</span>
-            </div>
-            <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>Venue</span>
-              <span className={styles.metaValue}>{venueLabel || "Venue TBC"}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <HeadToHeadStats
+      <LiveMatchCentrePanel
+        matchId={match.id}
+        backHref={backHref}
+        tournamentName={match.tournament.tournamentName}
+        seasonName={match.tournament.season.seasonName}
+        roundName={match.stageRound.roundName}
+        scheduledAt={scheduledAt}
+        venueLabel={venueLabel}
+        initialSnapshot={initialSnapshot}
         leftPlayerName={leftName}
         rightPlayerName={rightName}
         leftPlayerHref={leftPlayerIds.length === 1 ? `/players/${leftPlayerIds[0]}` : undefined}
@@ -465,18 +449,9 @@ export default async function MatchCentrePage({
         leftPlayerFlagAlt={leftCountryCode}
         rightPlayerFlagUrl={rightCountryCode ? getFlagCdnUrl(rightCountryCode, "w40") : null}
         rightPlayerFlagAlt={rightCountryCode}
-        leftScore={match.homeScore ?? 0}
-        rightScore={match.awayScore ?? 0}
         headToHead={headToHead}
         stats={stats}
       />
-
-      {match.publicNote ? (
-        <section className={styles.notePanel}>
-          <h2 className={styles.noteTitle}>Match Notes</h2>
-          <p className={styles.noteBody}>{match.publicNote}</p>
-        </section>
-      ) : null}
     </main>
   );
 }

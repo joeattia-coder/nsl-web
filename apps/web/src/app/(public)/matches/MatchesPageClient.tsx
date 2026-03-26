@@ -8,6 +8,8 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { KnockoutBracket } from "@/components/tournament-bracket/KnockoutBracket";
 import type { BracketRound } from "@/components/tournament-bracket/types";
 import { getFlagCdnUrl } from "@/lib/country";
+import type { PublicLiveMatchListResponse, PublicLiveMatchSnapshot } from "@/lib/live-match";
+import { useLivePolling } from "@/lib/useLivePolling";
 
 type AnyObj = Record<string, unknown>;
 
@@ -98,14 +100,6 @@ function firstString(obj: AnyObj, keys: string[], fallback = ""): string {
     if (typeof v === "number") return String(v);
   }
   return fallback;
-}
-
-function firstNumber(obj: AnyObj, keys: string[]): number | null {
-  for (const k of keys) {
-    const v = obj?.[k];
-    if (typeof v === "number" && Number.isFinite(v)) return v;
-  }
-  return null;
 }
 
 function splitName(full: string): NameParts {
@@ -213,6 +207,57 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
     roundDesc,
     fixtureGroupId,
   };
+}
+
+function getFixtureIdentity(fx: AnyObj) {
+  return firstString(fx, ["fixtureId", "FixtureID", "FixtureId", "id", "ID"], "");
+}
+
+function applyLiveSnapshots(current: AnyObj[] | null, snapshots: PublicLiveMatchSnapshot[]) {
+  if (!current || current.length === 0 || snapshots.length === 0) {
+    return current;
+  }
+
+  const updates = new Map(snapshots.map((snapshot) => [snapshot.id, snapshot]));
+  let changed = false;
+
+  const next = current.map((fixture) => {
+    const fixtureId = getFixtureIdentity(fixture);
+    const snapshot = updates.get(fixtureId);
+
+    if (!snapshot) {
+      return fixture;
+    }
+
+    const currentHomeScore = fixture.homeScore ?? null;
+    const currentAwayScore = fixture.roadScore ?? null;
+    const currentMatchStatus = typeof fixture.matchStatus === "string" ? fixture.matchStatus : "";
+    const currentScheduleStatus = typeof fixture.scheduleStatus === "string" ? fixture.scheduleStatus : "";
+    const currentPublicNote = typeof fixture.publicNote === "string" ? fixture.publicNote : fixture.publicNote ?? null;
+
+    if (
+      currentHomeScore === snapshot.homeScore &&
+      currentAwayScore === snapshot.awayScore &&
+      currentMatchStatus === snapshot.matchStatus &&
+      currentScheduleStatus === snapshot.scheduleStatus &&
+      currentPublicNote === snapshot.publicNote
+    ) {
+      return fixture;
+    }
+
+    changed = true;
+
+    return {
+      ...fixture,
+      homeScore: snapshot.homeScore,
+      roadScore: snapshot.awayScore,
+      matchStatus: snapshot.matchStatus,
+      scheduleStatus: snapshot.scheduleStatus,
+      publicNote: snapshot.publicNote,
+    };
+  });
+
+  return changed ? next : current;
 }
 
 export default function MatchesPageClient() {
@@ -369,6 +414,25 @@ export default function MatchesPageClient() {
   const selectedGroupDesc =
     groups.find((g) => String(g.id) === String(activeGroupId))?.desc || "Matches";
   const roundDesc = filteredMatches[0]?.roundDesc || "";
+
+  useLivePolling({
+    enabled: Boolean(activeGroupId) && fixturesRaw !== null,
+    intervalMs: 3000,
+    poll: async (signal) => {
+      const response = await fetch(`/api/public/fixtures/live?group=${encodeURIComponent(activeGroupId)}`, {
+        signal,
+        cache: "no-store",
+      });
+
+      const data = (await response.json().catch(() => null)) as PublicLiveMatchListResponse | null;
+
+      if (!response.ok) {
+        throw new Error(data && "error" in data ? String(data.error ?? "Failed to fetch live fixtures.") : "Failed to fetch live fixtures.");
+      }
+
+      setFixturesRaw((current) => applyLiveSnapshots(current, data?.items ?? []));
+    },
+  });
 
   const standingsGroups = standingsState.key === activeGroupId ? standingsState.data : null;
   const standingsError = standingsState.key === activeGroupId ? standingsState.error : "";

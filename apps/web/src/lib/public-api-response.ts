@@ -16,6 +16,16 @@ export function publicApiJson(data: unknown, init?: ResponseInit) {
   });
 }
 
+export function publicApiNoStoreJson(data: unknown, init?: ResponseInit) {
+  return publicApiJson(data, {
+    ...init,
+    headers: {
+      "Cache-Control": "no-store, max-age=0",
+      ...(init?.headers ?? {}),
+    },
+  });
+}
+
 export function publicApiOptions() {
   return new NextResponse(null, {
     status: 204,

@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SortableHeader,
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import type { AdminMatchesLiveResponse, AdminMatchesLiveSnapshot } from "@/lib/live-match";
+import { useLivePolling } from "@/lib/useLivePolling";
 import { FiEdit2 } from "react-icons/fi";
 
 export type MatchRow = {
@@ -53,12 +55,51 @@ function formatScore(homeScore: number | null, awayScore: number | null) {
   return `${homeScore} – ${awayScore}`;
 }
 
+function applyLiveSnapshots(current: MatchRow[], snapshots: AdminMatchesLiveSnapshot[]) {
+  if (current.length === 0 || snapshots.length === 0) {
+    return current;
+  }
+
+  const updates = new Map(snapshots.map((snapshot) => [snapshot.id, snapshot]));
+  let changed = false;
+
+  const next = current.map((match) => {
+    const snapshot = updates.get(match.id);
+
+    if (!snapshot) {
+      return match;
+    }
+
+    if (
+      match.homeScore === snapshot.homeScore &&
+      match.awayScore === snapshot.awayScore &&
+      match.venueName === snapshot.venueName &&
+      match.matchDate === snapshot.matchDate
+    ) {
+      return match;
+    }
+
+    changed = true;
+
+    return {
+      ...match,
+      homeScore: snapshot.homeScore,
+      awayScore: snapshot.awayScore,
+      venueName: snapshot.venueName,
+      matchDate: snapshot.matchDate,
+    };
+  });
+
+  return changed ? next : current;
+}
+
 export default function MatchesTable({
   matches,
   leagues,
   tournaments,
   defaultLeagueId,
 }: Props) {
+  const [liveMatches, setLiveMatches] = useState(matches);
   const [search, setSearch] = useState("");
   const [leagueFilter, setLeagueFilter] = useState<string>(
     defaultLeagueId ?? "all"
@@ -66,6 +107,29 @@ export default function MatchesTable({
   const [tournamentFilter, setTournamentFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("matchDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  useEffect(() => {
+    setLiveMatches(matches);
+  }, [matches]);
+
+  useLivePolling({
+    enabled: liveMatches.length > 0,
+    intervalMs: 3000,
+    poll: async (signal) => {
+      const response = await fetch("/api/admin/matches/live", {
+        signal,
+        cache: "no-store",
+      });
+
+      const data = (await response.json().catch(() => null)) as AdminMatchesLiveResponse | null;
+
+      if (!response.ok) {
+        throw new Error(data && "error" in data ? String(data.error ?? "Failed to fetch live matches.") : "Failed to fetch live matches.");
+      }
+
+      setLiveMatches((current) => applyLiveSnapshots(current, data?.items ?? []));
+    },
+  });
 
   // When league changes reset tournament filter
   const handleLeagueChange = (value: string) => {
@@ -81,7 +145,7 @@ export default function MatchesTable({
   const filteredMatches = useMemo(() => {
     const term = search.trim().toLowerCase();
 
-    let rows = matches;
+    let rows = liveMatches;
 
     if (leagueFilter !== "all") {
       rows = rows.filter((m) => m.leagueId === leagueFilter);
@@ -123,7 +187,7 @@ export default function MatchesTable({
       },
       sortDirection
     );
-  }, [matches, search, leagueFilter, tournamentFilter, sortKey, sortDirection]);
+  }, [liveMatches, search, leagueFilter, tournamentFilter, sortKey, sortDirection]);
 
   const handleSort = (columnKey: SortKey) => {
     if (sortKey === columnKey) {

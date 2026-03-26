@@ -9,6 +9,8 @@ import {
   sortRows,
 } from "@/lib/admin-table-sorting";
 import { consumeAdminFlashMessage } from "@/lib/admin-flash";
+import type { TournamentMatchesLiveResponse, TournamentMatchesLiveSnapshot } from "@/lib/live-match";
+import { useLivePolling } from "@/lib/useLivePolling";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 type MatchRow = {
@@ -83,12 +85,61 @@ function formatBestOf(bestOfFrames: number | null | undefined) {
   return `Bo${bestOfFrames}`;
 }
 
+function applyLiveSnapshots(current: MatchRow[], snapshots: TournamentMatchesLiveSnapshot[]) {
+  if (current.length === 0 || snapshots.length === 0) {
+    return current;
+  }
+
+  const updates = new Map(snapshots.map((snapshot) => [snapshot.id, snapshot]));
+  let changed = false;
+
+  const next = current.map((match) => {
+    const snapshot = updates.get(match.id);
+
+    if (!snapshot) {
+      return match;
+    }
+
+    if (
+      match.homeScore === snapshot.homeScore &&
+      match.awayScore === snapshot.awayScore &&
+      match.winnerName === snapshot.winnerName &&
+      match.bestOfFrames === snapshot.bestOfFrames &&
+      match.matchDate === snapshot.matchDate &&
+      match.matchTime === snapshot.matchTime &&
+      match.matchStatus === snapshot.matchStatus &&
+      match.scheduleStatus === snapshot.scheduleStatus &&
+      match.venueName === snapshot.venueName
+    ) {
+      return match;
+    }
+
+    changed = true;
+
+    return {
+      ...match,
+      homeScore: snapshot.homeScore,
+      awayScore: snapshot.awayScore,
+      winnerName: snapshot.winnerName,
+      bestOfFrames: snapshot.bestOfFrames,
+      matchDate: snapshot.matchDate,
+      matchTime: snapshot.matchTime,
+      matchStatus: snapshot.matchStatus,
+      scheduleStatus: snapshot.scheduleStatus,
+      venueName: snapshot.venueName,
+    };
+  });
+
+  return changed ? next : current;
+}
+
 export default function TournamentMatchesTable({
   tournamentId,
   tournamentName,
   matches,
 }: TournamentMatchesTableProps) {
   const router = useRouter();
+  const [liveMatches, setLiveMatches] = useState(matches);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("matchDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -108,12 +159,35 @@ export default function TournamentMatchesTable({
     }
   }, [tournamentId]);
 
+  useEffect(() => {
+    setLiveMatches(matches);
+  }, [matches]);
+
+  useLivePolling({
+    enabled: liveMatches.length > 0,
+    intervalMs: 3000,
+    poll: async (signal) => {
+      const response = await fetch(`/api/admin/tournaments/${tournamentId}/matches/live`, {
+        signal,
+        cache: "no-store",
+      });
+
+      const data = (await response.json().catch(() => null)) as TournamentMatchesLiveResponse | null;
+
+      if (!response.ok) {
+        throw new Error(data && "error" in data ? String(data.error ?? "Failed to fetch live tournament matches.") : "Failed to fetch live tournament matches.");
+      }
+
+      setLiveMatches((current) => applyLiveSnapshots(current, data?.items ?? []));
+    },
+  });
+
   const filteredMatches = useMemo(() => {
     const term = search.trim().toLowerCase();
 
     const rows = !term
-      ? matches
-      : matches.filter((match) => {
+      ? liveMatches
+      : liveMatches.filter((match) => {
           return (
             match.groupName.toLowerCase().includes(term) ||
             match.homeName.toLowerCase().includes(term) ||
@@ -156,7 +230,7 @@ export default function TournamentMatchesTable({
       },
       sortDirection
     );
-  }, [matches, search, sortDirection, sortKey]);
+  }, [liveMatches, search, sortDirection, sortKey]);
 
   const handleSort = (columnKey: SortKey) => {
     if (sortKey === columnKey) {
@@ -235,7 +309,7 @@ export default function TournamentMatchesTable({
             type="button"
             className="admin-toolbar-button admin-toolbar-button-danger"
             onClick={openDeleteModal}
-            disabled={matches.length === 0 || isDeletingAll}
+            disabled={liveMatches.length === 0 || isDeletingAll}
           >
             <FiTrash2 />
             <span>Delete All Matches</span>
@@ -393,8 +467,8 @@ export default function TournamentMatchesTable({
             </h2>
 
             <p className="admin-modal-text">
-              If you proceed, this will permanently delete all <strong>{matches.length}</strong>{" "}
-              generated match{matches.length === 1 ? "" : "es"} for <strong>{tournamentName}</strong>.
+              If you proceed, this will permanently delete all <strong>{liveMatches.length}</strong>{" "}
+              generated match{liveMatches.length === 1 ? "" : "es"} for <strong>{tournamentName}</strong>.
             </p>
 
             <p className="admin-modal-text">
