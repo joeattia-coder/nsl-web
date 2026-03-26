@@ -1,41 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { FaFacebookF, FaGoogle } from "react-icons/fa6";
 import PasswordField from "@/components/admin/PasswordField";
 
-type Challenge = {
-  prompt: string;
-  token: string;
-};
-
-function getAuthMessage(errorCode: string | null) {
-  switch (errorCode) {
-    case "social_not_configured":
-      return "That social login provider is not configured yet.";
-    case "social_auth_failed":
-      return "The social sign-up attempt failed. Please try again.";
-    case "social_state_invalid":
-      return "That social sign-up session expired. Please try again.";
-    case "social_provider_invalid":
-    case "social_profile_invalid":
-      return "That social provider response was invalid.";
-    case "social_email_required":
-      return "That social account did not provide an email address. Try another provider or use the registration form.";
-    case "social_account_exists":
-      return "An account with that email already exists. Try signing in instead.";
-    default:
-      return null;
-  }
-}
-
 export default function RegisterForm() {
-    const [showVerificationModal, setShowVerificationModal] = useState(false);
-    const [showLoginForm, setShowLoginForm] = useState(false);
-  const searchParams = useSearchParams();
-  const oauthError = getAuthMessage(searchParams.get("error"));
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -52,8 +22,6 @@ export default function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [verificationLink, setVerificationLink] = useState<string | null>(null);
 
   async function loadChallenge() {
     setIsLoadingChallenge(true);
@@ -93,14 +61,9 @@ export default function RegisterForm() {
     void loadChallenge();
   }, []);
 
-  const googleHref = "/api/auth/oauth/google?mode=register";
-  const facebookHref = "/api/auth/oauth/facebook?mode=register";
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
-    setSuccess(null);
-    setVerificationLink(null);
 
     if (password !== confirmPassword) {
       setError("The password confirmation does not match.");
@@ -148,173 +111,151 @@ export default function RegisterForm() {
 
   return (
     <div className="register-form-container">
-      {!showLoginForm ? (
-        <>
-          <h2 className="register-form-title">Player Registration</h2>
-          {success ? (
-            <p className="login-form-status login-form-status-success">{success}</p>
-          ) : null}
-          {verificationLink ? (
-            <p className="login-form-status login-form-status-info">
-              Development verification link: <a href={verificationLink}>{verificationLink}</a>
-            </p>
-          ) : null}
-          <form className="admin-form" onSubmit={handleSubmit} autoComplete="off">
-            <div className="admin-form-grid">
-              <div className="admin-form-field">
-                <label className="admin-label">First name</label>
-                <input
-                  type="text"
-                  className="admin-input"
-                  value={firstName}
-                  onChange={(event) => setFirstName(event.target.value)}
-                  required
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Last name</label>
-                <input
-                  type="text"
-                  className="admin-input"
-                  value={lastName}
-                  onChange={(event) => setLastName(event.target.value)}
-                  required
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Date of birth (optional)</label>
-                <input
-                  type="date"
-                  className="admin-input"
-                  value={dateOfBirth}
-                  onChange={(event) => setDateOfBirth(event.target.value)}
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Phone number (optional)</label>
-                <input
-                  type="text"
-                  className="admin-input"
-                  value={phoneNumber}
-                  onChange={(event) => setPhoneNumber(event.target.value)}
-                  autoComplete="tel"
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Username</label>
-                <input
-                  type="text"
-                  className="admin-input"
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
-                  autoComplete="username"
-                  required
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Email</label>
-                <input
-                  type="email"
-                  className="admin-input"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  autoComplete="email"
-                  required
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Password</label>
-                <PasswordField
-                  className="admin-input"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  autoComplete="new-password"
-                  required
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Confirm password</label>
-                <PasswordField
-                  className="admin-input"
-                  value={confirmPassword}
-                  onChange={(event) => setConfirmPassword(event.target.value)}
-                  autoComplete="new-password"
-                  required
-                />
-              </div>
-              <div className="admin-form-field">
-                <label className="admin-label">Human verification</label>
-                <span className="login-support-copy">
-                  {isLoadingChallenge ? "Loading challenge..." : verificationPrompt}
-                </span>
-                <input
-                  type="text"
-                  className="admin-input"
-                  value={verificationAnswer}
-                  onChange={(event) => setVerificationAnswer(event.target.value)}
-                  required
-                  disabled={isLoadingChallenge}
-                />
-              </div>
-              <div className="admin-form-field" style={{ display: "none" }} aria-hidden="true">
-                <span>Website</span>
-                <input
-                  tabIndex={-1}
-                  autoComplete="off"
-                  type="text"
-                  value={website}
-                  onChange={(event) => setWebsite(event.target.value)}
-                />
+      <>
+        <h2 className="register-form-title">Player Registration</h2>
+        <form className="admin-form" onSubmit={handleSubmit} autoComplete="off">
+          <div className="admin-form-grid">
+            <div className="admin-form-field">
+              <label className="admin-label">First name</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Last name</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Date of birth (optional)</label>
+              <input
+                type="date"
+                className="admin-input"
+                value={dateOfBirth}
+                onChange={(event) => setDateOfBirth(event.target.value)}
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Phone number (optional)</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
+                autoComplete="tel"
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Username</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                autoComplete="username"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Email</label>
+              <input
+                type="email"
+                className="admin-input"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Password</label>
+              <PasswordField
+                className="admin-input"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Confirm password</label>
+              <PasswordField
+                className="admin-input"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </div>
+            <div className="admin-form-field">
+              <label className="admin-label">Human verification</label>
+              <span className="login-support-copy">
+                {isLoadingChallenge ? "Loading challenge..." : verificationPrompt}
+              </span>
+              <input
+                type="text"
+                className="admin-input"
+                value={verificationAnswer}
+                onChange={(event) => setVerificationAnswer(event.target.value)}
+                required
+                disabled={isLoadingChallenge}
+              />
+            </div>
+            <div className="admin-form-field" style={{ display: "none" }} aria-hidden="true">
+              <span>Website</span>
+              <input
+                tabIndex={-1}
+                autoComplete="off"
+                type="text"
+                value={website}
+                onChange={(event) => setWebsite(event.target.value)}
+              />
+            </div>
+          </div>
+          {error ? <p className="admin-form-error">{error}</p> : null}
+          <button type="submit" className="admin-primary-button" disabled={isSubmitting || isLoadingChallenge}>
+            {isSubmitting ? "Registering..." : "Register"}
+          </button>
+          <p className="login-support-copy">Registration requires email verification before sign-in.</p>
+          <div className="account-settings-actions">
+            <Link href="/login" className="admin-link-button">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </form>
+        {showVerificationModal ? (
+          <div className="admin-modal-backdrop" onClick={() => setShowVerificationModal(false)} role="presentation">
+            <div
+              className="admin-modal"
+              onClick={(event) => event.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="register-verification-title"
+            >
+              <h2 id="register-verification-title" className="admin-modal-title">
+                Verify your email
+              </h2>
+              <p className="admin-modal-text">
+                Your account has been created. Check your email and open the verification link before signing in.
+              </p>
+              <div className="admin-modal-actions">
+                <Link href="/login" className="admin-modal-button admin-modal-button-primary">
+                  Go to login
+                </Link>
               </div>
             </div>
-            {error ? <p className="admin-form-error">{error}</p> : null}
-            <button type="submit" className="admin-primary-button" disabled={isSubmitting || isLoadingChallenge}>
-              {isSubmitting ? "Registering..." : "Register"}
-            </button>
-            <div className="login-divider" aria-hidden="true">
-              <span>or register with</span>
-            </div>
-            <div className="social-auth-actions">
-              <a href={googleHref} className="social-auth-button social-auth-button-google">
-                <FaGoogle aria-hidden="true" />
-                <span>Google</span>
-              </a>
-              <a href={facebookHref} className="social-auth-button social-auth-button-facebook">
-                <FaFacebookF aria-hidden="true" />
-                <span>Facebook</span>
-              </a>
-            </div>
-            <p className="login-support-copy">
-              Using social registration creates your player account immediately. Form registration requires email verification.
-            </p>
-            <div className="account-settings-actions">
-              <Link href="/login" className="admin-link-button">
-                Already have an account? Sign in
-              </Link>
-            </div>
-          </form>
-          {showVerificationModal && (
-            <div className="modal-overlay">
-              <div className="modal-content">
-                <h3>Email Verification Required</h3>
-                <p>Your account has been created. Please check your email and click the verification link to activate your account.</p>
-                <button className="admin-primary-button" onClick={() => { setShowVerificationModal(false); setShowLoginForm(true); }}>Go to Login</button>
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="login-form-container">
-          <h2 className="register-form-title">Sign In</h2>
-          <form className="admin-form" action="/login" method="get">
-            <div className="account-settings-actions">
-              <Link href="/login" className="admin-link-button">
-                Already have an account? Sign in
-              </Link>
-            </div>
-          </form>
-        </div>
-      )}
+          </div>
+        ) : null}
+      </>
     </div>
   );
 }

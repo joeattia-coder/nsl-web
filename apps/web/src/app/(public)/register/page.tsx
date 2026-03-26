@@ -9,7 +9,7 @@ export default function RegisterPage() {
           <p className="login-page-kicker">Player Registration</p>
           <h1 className="login-page-title">Create your player account</h1>
           <p className="login-page-subtitle">
-            Register with the form and verify your email, or use Google/Facebook for instant account creation.
+            Register with the form, then verify your email to activate your player account.
           </p>
         </div>
 
