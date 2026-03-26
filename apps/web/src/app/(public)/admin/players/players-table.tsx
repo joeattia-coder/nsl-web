@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SortableHeader,
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
 import { getFlagCdnUrl, normalizeCountryCode } from "@/lib/country";
+import type { AdminPlayerLiveSnapshot, AdminPlayersLiveResponse } from "@/lib/live-match";
+import { useLivePolling } from "@/lib/useLivePolling";
 import {
   FiCheckSquare,
   FiDownload,
@@ -40,7 +42,57 @@ type PlayersTableProps = {
 
 type SortKey = "fullName" | "email" | "phoneNumber" | "country" | "tournaments";
 
+function sameTournaments(
+  left: PlayerRow["tournaments"],
+  right: AdminPlayerLiveSnapshot["tournaments"]
+) {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return left.every(
+    (tournament, index) =>
+      tournament.id === right[index]?.id && tournament.name === right[index]?.name
+  );
+}
+
+function applyLivePlayers(current: PlayerRow[], snapshots: AdminPlayerLiveSnapshot[]) {
+  if (current.length === 0 && snapshots.length === 0) {
+    return current;
+  }
+
+  if (current.length !== snapshots.length) {
+    return snapshots.map((snapshot) => ({ ...snapshot }));
+  }
+
+  let changed = false;
+
+  const next = snapshots.map((snapshot, index) => {
+    const existing = current[index];
+
+    if (
+      existing &&
+      existing.id === snapshot.id &&
+      existing.fullName === snapshot.fullName &&
+      existing.email === snapshot.email &&
+      existing.phoneNumber === snapshot.phoneNumber &&
+      existing.country === snapshot.country &&
+      existing.photoUrl === snapshot.photoUrl &&
+      existing.linkedUserId === snapshot.linkedUserId &&
+      sameTournaments(existing.tournaments, snapshot.tournaments)
+    ) {
+      return existing;
+    }
+
+    changed = true;
+    return { ...snapshot };
+  });
+
+  return changed ? next : current;
+}
+
 export default function PlayersTable({ players }: PlayersTableProps) {
+  const [livePlayers, setLivePlayers] = useState(players);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("fullName");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -54,12 +106,48 @@ export default function PlayersTable({ players }: PlayersTableProps) {
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
+  useEffect(() => {
+    setLivePlayers(players);
+  }, [players]);
+
+  useEffect(() => {
+    const livePlayerIds = new Set(livePlayers.map((player) => player.id));
+
+    setSelectedIds((current) => {
+      const next = current.filter((id) => livePlayerIds.has(id));
+      return next.length === current.length ? current : next;
+    });
+  }, [livePlayers]);
+
+  useLivePolling({
+    enabled: livePlayers.length > 0,
+    intervalMs: 3000,
+    poll: async (signal) => {
+      const response = await fetch("/api/admin/players/live", {
+        signal,
+        cache: "no-store",
+      });
+
+      const data = (await response.json().catch(() => null)) as AdminPlayersLiveResponse | null;
+
+      if (!response.ok) {
+        throw new Error(
+          data && "error" in data
+            ? String(data.error ?? "Failed to fetch live players.")
+            : "Failed to fetch live players."
+        );
+      }
+
+      setLivePlayers((current) => applyLivePlayers(current, data?.items ?? []));
+    },
+  });
+
   const filteredPlayers = useMemo(() => {
     const term = search.trim().toLowerCase();
 
     const rows = !term
-      ? players
-      : players.filter((player) => {
+      ? livePlayers
+      : livePlayers.filter((player) => {
           return (
             player.fullName.toLowerCase().includes(term) ||
             player.email.toLowerCase().includes(term) ||
@@ -90,7 +178,7 @@ export default function PlayersTable({ players }: PlayersTableProps) {
       },
       sortDirection
     );
-  }, [players, search, sortDirection, sortKey]);
+  }, [livePlayers, search, sortDirection, sortKey]);
 
   const handleSort = (columnKey: SortKey) => {
     if (sortKey === columnKey) {
@@ -224,7 +312,8 @@ export default function PlayersTable({ players }: PlayersTableProps) {
       }
 
       setPlayerToDelete(null);
-      window.location.reload();
+      setLivePlayers((current) => current.filter((player) => player.id !== playerToDelete.id));
+      setSelectedIds((current) => current.filter((id) => id !== playerToDelete.id));
     } catch (err) {
       console.error(err);
       setActionError(
@@ -263,7 +352,7 @@ export default function PlayersTable({ players }: PlayersTableProps) {
       setShowBulkDeleteModal(false);
       setSelectedIds([]);
       setBulkMode(false);
-      window.location.reload();
+      setLivePlayers((current) => current.filter((player) => !deleteResults.includes(player.id)));
     } catch (err) {
       console.error(err);
       setActionError(

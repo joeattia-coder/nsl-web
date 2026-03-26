@@ -48,3 +48,24 @@ export type TournamentMatchesLiveResponse = {
   items: TournamentMatchesLiveSnapshot[];
   serverTime: string;
 };
+
+export type AdminPlayerLiveTournament = {
+  id: string;
+  name: string;
+};
+
+export type AdminPlayerLiveSnapshot = {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  country: string;
+  photoUrl: string;
+  linkedUserId: string | null;
+  tournaments: AdminPlayerLiveTournament[];
+};
+
+export type AdminPlayersLiveResponse = {
+  items: AdminPlayerLiveSnapshot[];
+  serverTime: string;
+};
