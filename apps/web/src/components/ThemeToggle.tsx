@@ -73,7 +73,7 @@ export default function ThemeToggle({
           disabled={disabled}
           onClick={() => handleSelect("light")}
         >
-          <LightIcon className={styles.icon} aria-hidden="true" />
+          <LightIcon className={styles.icon} aria-hidden={true} />
           <span className={styles.label}>{lightLabel}</span>
         </button>
 
@@ -85,7 +85,7 @@ export default function ThemeToggle({
           disabled={disabled}
           onClick={() => handleSelect("dark")}
         >
-          <DarkIcon className={styles.icon} aria-hidden="true" />
+          <DarkIcon className={styles.icon} aria-hidden={true} />
           <span className={styles.label}>{darkLabel}</span>
         </button>
       </div>
