@@ -12,6 +12,16 @@ import { validateHumanVerification } from "@/lib/human-verification";
 
 const PLAYER_ROLE_KEY = "PLAYER";
 
+class RegistrationConflictError extends Error {
+  status: number;
+
+  constructor(message: string, status = 409) {
+    super(message);
+    this.name = "RegistrationConflictError";
+    this.status = status;
+  }
+}
+
 function parseString(value: unknown) {
   return String(value ?? "").trim();
 }
@@ -21,15 +31,9 @@ function parseOptionalString(value: unknown) {
   return parsed || null;
 }
 
-function parseOptionalDate(value: unknown) {
-  const parsed = parseString(value);
-
-  if (!parsed) {
-    return null;
-  }
-
-  const date = new Date(parsed);
-  return Number.isNaN(date.getTime()) ? null : date;
+function parseMiddleInitial(value: unknown) {
+  const parsed = parseString(value).replace(/[^a-z]/gi, "").slice(0, 1).toUpperCase();
+  return parsed || null;
 }
 
 function normalizeEmail(value: string) {
@@ -73,6 +77,8 @@ async function removeStaleRegistrationUser(userId: string) {
 
 export async function POST(request: Request) {
   let createdUserId: string | null = null;
+  let createdPlayerId: string | null = null;
+  let linkedExistingPlayerId: string | null = null;
 
   async function rollbackCreatedRegistration(userId: string) {
     await prisma.$transaction(async (tx) => {
@@ -82,11 +88,26 @@ export async function POST(request: Request) {
         },
       });
 
-      await tx.player.deleteMany({
-        where: {
-          userId,
-        },
-      });
+      if (createdPlayerId) {
+        await tx.player.deleteMany({
+          where: {
+            id: createdPlayerId,
+            userId,
+          },
+        });
+      }
+
+      if (linkedExistingPlayerId) {
+        await tx.player.updateMany({
+          where: {
+            id: linkedExistingPlayerId,
+            userId,
+          },
+          data: {
+            userId: null,
+          },
+        });
+      }
 
       await tx.user.deleteMany({
         where: {
@@ -100,10 +121,10 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => null);
 
     const firstName = parseString(body?.firstName);
+    const middleInitial = parseMiddleInitial(body?.middleInitial);
     const lastName = parseString(body?.lastName);
-    const dateOfBirth = parseOptionalDate(body?.dateOfBirth);
-    const rawDateOfBirth = parseString(body?.dateOfBirth);
     const phoneNumber = parseOptionalString(body?.phoneNumber);
+    const country = parseString(body?.country);
     const username = parseString(body?.username);
     const normalizedUsername = username.toLowerCase();
     const email = normalizeEmail(parseString(body?.email));
@@ -116,9 +137,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Registration could not be completed." }, { status: 400 });
     }
 
-    if (!firstName || !lastName || !username || !email || !password) {
+    if (!firstName || !lastName || !country || !username || !email || !password) {
       return NextResponse.json(
-        { error: "First name, last name, username, email, and password are required." },
+        { error: "First name, last name, country, username, email, and password are required." },
         { status: 400 }
       );
     }
@@ -128,13 +149,6 @@ export async function POST(request: Request) {
     if (!usernamePattern.test(username)) {
       return NextResponse.json(
         { error: "Username must be 3-30 characters and can only include letters, numbers, periods, underscores, and hyphens." },
-        { status: 400 }
-      );
-    }
-
-    if (rawDateOfBirth && !dateOfBirth) {
-      return NextResponse.json(
-        { error: "Date of birth must be a valid date." },
         { status: 400 }
       );
     }
@@ -224,6 +238,33 @@ export async function POST(request: Request) {
         throw new Error("The Player role is not configured.");
       }
 
+      const matchingPlayers = await tx.player.findMany({
+        where: {
+          firstName: {
+            equals: firstName,
+            mode: "insensitive",
+          },
+          lastName: {
+            equals: lastName,
+            mode: "insensitive",
+          },
+          OR: [{ emailAddress: null }, { emailAddress: "" }],
+        },
+        select: {
+          id: true,
+          userId: true,
+        },
+        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+      });
+
+      const unlinkedMatchingPlayers = matchingPlayers.filter((player) => !player.userId);
+
+      if (unlinkedMatchingPlayers.length > 1) {
+        throw new RegistrationConflictError(
+          "Multiple player profiles match this name without an email address. Contact an administrator to complete account setup."
+        );
+      }
+
       const user = await tx.user.create({
         data: {
           username,
@@ -239,16 +280,37 @@ export async function POST(request: Request) {
         select: { id: true },
       });
 
-      await tx.player.create({
-        data: {
-          userId: user.id,
-          firstName,
-          lastName,
-          dateOfBirth,
-          phoneNumber,
-          emailAddress: email,
-        },
-      });
+      const existingPlayer = unlinkedMatchingPlayers[0] ?? null;
+
+      if (existingPlayer) {
+        await tx.player.update({
+          where: { id: existingPlayer.id },
+          data: {
+            userId: user.id,
+            middleInitial,
+            emailAddress: email,
+            phoneNumber,
+            country,
+          },
+        });
+      } else {
+        const player = await tx.player.create({
+          data: {
+            userId: user.id,
+            firstName,
+            middleInitial,
+            lastName,
+            phoneNumber,
+            country,
+            emailAddress: email,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        createdPlayerId = player.id;
+      }
 
       await tx.userRole.create({
         data: {
@@ -267,10 +329,14 @@ export async function POST(request: Request) {
         },
       });
 
-      return user;
+      return {
+        id: user.id,
+        linkedExistingPlayerId: existingPlayer?.id ?? null,
+      };
     });
 
     createdUserId = created.id;
+    linkedExistingPlayerId = created.linkedExistingPlayerId;
 
     const verificationLink = `${getRequestOrigin(request)}/api/auth/verify-email?token=${encodeURIComponent(rawToken)}`;
     const emailConfigured = isEmailDeliveryConfigured();
@@ -309,6 +375,9 @@ export async function POST(request: Request) {
       delivery: emailConfigured ? "email" : "development-link",
     });
   } catch (error) {
+    if (error instanceof RegistrationConflictError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error("POST /api/auth/register error:", error);
 
     if (createdUserId) {

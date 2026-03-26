@@ -5054,6 +5054,28 @@ html[data-theme="light"] .group-pill.active:hover {
   grid-column: 1 / -1;
 }
 
+.register-name-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr);
+  gap: 16px;
+  align-items: end;
+}
+
+.register-middle-initial-field {
+  min-width: 0;
+}
+
+.register-middle-initial-input {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .register-name-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .admin-label {
   font-size: 13px;
   font-weight: 600;

@@ -3,16 +3,22 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import PasswordField from "@/components/admin/PasswordField";
+import { COUNTRY_OPTIONS } from "@/lib/country";
+
+function normalizeMiddleInitial(value: string) {
+  return value.replace(/[^a-z]/gi, "").slice(0, 1).toUpperCase();
+}
 
 export default function RegisterForm() {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   const [firstName, setFirstName] = useState("");
+  const [middleInitial, setMiddleInitial] = useState("");
   const [lastName, setLastName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [username, setUsername] = useState("");
+  const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [verificationAnswer, setVerificationAnswer] = useState("");
@@ -85,11 +91,12 @@ export default function RegisterForm() {
         },
         body: JSON.stringify({
           firstName,
+          middleInitial,
           lastName,
-          dateOfBirth,
-          phoneNumber,
-          username,
           email,
+          phoneNumber,
+          country,
+          username,
           password,
           verificationToken,
           verificationAnswer,
@@ -115,33 +122,51 @@ export default function RegisterForm() {
         <h2 className="register-form-title">Player Registration</h2>
         <form className="admin-form" onSubmit={handleSubmit} autoComplete="off">
           <div className="admin-form-grid">
-            <div className="admin-form-field">
-              <label className="admin-label">First name</label>
-              <input
-                type="text"
-                className="admin-input"
-                value={firstName}
-                onChange={(event) => setFirstName(event.target.value)}
-                required
-              />
+            <div className="admin-form-field admin-form-field-full register-name-grid">
+              <div className="admin-form-field">
+                <label className="admin-label">First name</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="admin-form-field register-middle-initial-field">
+                <label className="admin-label">Middle initial (optional)</label>
+                <input
+                  type="text"
+                  className="admin-input register-middle-initial-input"
+                  value={middleInitial}
+                  onChange={(event) => setMiddleInitial(normalizeMiddleInitial(event.target.value))}
+                  autoComplete="off"
+                  inputMode="text"
+                  maxLength={1}
+                  pattern="[A-Za-z]"
+                  title="Enter one letter"
+                />
+              </div>
+              <div className="admin-form-field">
+                <label className="admin-label">Last name</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  required
+                />
+              </div>
             </div>
             <div className="admin-form-field">
-              <label className="admin-label">Last name</label>
+              <label className="admin-label">Email address</label>
               <input
-                type="text"
+                type="email"
                 className="admin-input"
-                value={lastName}
-                onChange={(event) => setLastName(event.target.value)}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
                 required
-              />
-            </div>
-            <div className="admin-form-field">
-              <label className="admin-label">Date of birth (optional)</label>
-              <input
-                type="date"
-                className="admin-input"
-                value={dateOfBirth}
-                onChange={(event) => setDateOfBirth(event.target.value)}
               />
             </div>
             <div className="admin-form-field">
@@ -155,6 +180,22 @@ export default function RegisterForm() {
               />
             </div>
             <div className="admin-form-field">
+              <label className="admin-label">Country</label>
+              <select
+                className="admin-select"
+                value={country}
+                onChange={(event) => setCountry(event.target.value)}
+                required
+              >
+                <option value="">Select country</option>
+                {COUNTRY_OPTIONS.map((countryOption) => (
+                  <option key={countryOption} value={countryOption}>
+                    {countryOption}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="admin-form-field">
               <label className="admin-label">Username</label>
               <input
                 type="text"
@@ -162,17 +203,6 @@ export default function RegisterForm() {
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 autoComplete="username"
-                required
-              />
-            </div>
-            <div className="admin-form-field">
-              <label className="admin-label">Email</label>
-              <input
-                type="email"
-                className="admin-input"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete="email"
                 required
               />
             </div>
