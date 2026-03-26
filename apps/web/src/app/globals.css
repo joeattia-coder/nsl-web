@@ -5054,18 +5054,17 @@ html[data-theme="light"] .group-pill.active:hover {
   grid-column: 1 / -1;
 }
 
-.register-first-name-field {
-  grid-column: span 1;
+.register-name-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 16px;
+  align-items: end;
 }
 
-.register-middle-initial-field {
-  min-width: 0;
-  width: 112px;
-}
-
-.register-middle-initial-input {
-  text-align: center;
-  text-transform: uppercase;
+.register-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
 .register-account-grid {
@@ -5074,13 +5073,20 @@ html[data-theme="light"] .group-pill.active:hover {
   gap: 16px;
 }
 
+.register-middle-initial-field {
+  min-width: 0;
+}
+
+.register-middle-initial-input {
+  text-align: center;
+  text-transform: uppercase;
+}
+
 @media (max-width: 720px) {
+  .register-name-grid,
+  .register-contact-grid,
   .register-account-grid {
     grid-template-columns: 1fr;
-  }
-
-  .register-middle-initial-field {
-    width: auto;
   }
 }
 

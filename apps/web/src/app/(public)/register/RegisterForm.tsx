@@ -122,49 +122,53 @@ export default function RegisterForm() {
         <h2 className="register-form-title">Player Registration</h2>
         <form className="admin-form" onSubmit={handleSubmit} autoComplete="off">
           <div className="admin-form-grid">
-            <div className="admin-form-field register-first-name-field">
-              <label className="admin-label">First name</label>
-              <input
-                type="text"
-                className="admin-input"
-                value={firstName}
-                onChange={(event) => setFirstName(event.target.value)}
-                required
-              />
+            <div className="admin-form-field admin-form-field-full register-name-grid">
+              <div className="admin-form-field">
+                <label className="admin-label">First name</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="admin-form-field register-middle-initial-field">
+                <label className="admin-label">Middle</label>
+                <input
+                  type="text"
+                  className="admin-input register-middle-initial-input"
+                  value={middleInitial}
+                  onChange={(event) => setMiddleInitial(normalizeMiddleInitial(event.target.value))}
+                  autoComplete="off"
+                  inputMode="text"
+                  maxLength={1}
+                  pattern="[A-Za-z]"
+                  title="Enter one letter"
+                />
+              </div>
             </div>
-            <div className="admin-form-field register-middle-initial-field">
-              <label className="admin-label">Middle initial</label>
-              <input
-                type="text"
-                className="admin-input register-middle-initial-input"
-                value={middleInitial}
-                onChange={(event) => setMiddleInitial(normalizeMiddleInitial(event.target.value))}
-                autoComplete="off"
-                inputMode="text"
-                maxLength={1}
-                pattern="[A-Za-z]"
-                title="Enter one letter"
-              />
-            </div>
-            <div className="admin-form-field">
-              <label className="admin-label">Last name</label>
-              <input
-                type="text"
-                className="admin-input"
-                value={lastName}
-                onChange={(event) => setLastName(event.target.value)}
-                required
-              />
-            </div>
-            <div className="admin-form-field">
-              <label className="admin-label">Phone number (optional)</label>
-              <input
-                type="text"
-                className="admin-input"
-                value={phoneNumber}
-                onChange={(event) => setPhoneNumber(event.target.value)}
-                autoComplete="tel"
-              />
+            <div className="admin-form-field admin-form-field-full register-contact-grid">
+              <div className="admin-form-field">
+                <label className="admin-label">Last name</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="admin-form-field">
+                <label className="admin-label">Phone number (optional)</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={phoneNumber}
+                  onChange={(event) => setPhoneNumber(event.target.value)}
+                  autoComplete="tel"
+                />
+              </div>
             </div>
             <div className="admin-form-field admin-form-field-full register-account-grid">
               <div className="admin-form-field">
