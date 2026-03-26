@@ -7,6 +7,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 export type FaqRow = {
@@ -181,11 +182,7 @@ export default function FaqsTable({ faqs }: FaqsTableProps) {
                       <td>{faq.isPublished ? "Published" : "Draft"}</td>
                       <td>{faq.sortOrder}</td>
                       <td>
-                        {new Date(faq.updatedAt).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {formatDateInAdminTimeZone(faq.updatedAt) || "-"}
                       </td>
                       <td>
                         <div className="admin-player-row-actions">

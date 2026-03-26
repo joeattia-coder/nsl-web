@@ -7,6 +7,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 export type NewsRow = {
@@ -198,11 +199,7 @@ export default function NewsTable({ articles }: NewsTableProps) {
                       <td>{article.status === "PUBLISHED" ? "Published" : "Draft"}</td>
                       <td>{formatPlacement(article)}</td>
                       <td>
-                        {new Date(article.updatedAt).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {formatDateInAdminTimeZone(article.updatedAt) || "-"}
                       </td>
                       <td>
                         <div className="admin-player-row-actions">

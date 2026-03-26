@@ -6,6 +6,8 @@ type CountrySelectProps = {
   required?: boolean;
   disabled?: boolean;
   placeholder?: string;
+  ariaInvalid?: boolean;
+  describedBy?: string;
 };
 
 import { COUNTRY_OPTIONS } from "@/lib/country";
@@ -18,6 +20,8 @@ export default function CountrySelect({
   required = false,
   disabled = false,
   placeholder = "Select country",
+  ariaInvalid = false,
+  describedBy,
 }: CountrySelectProps) {
   return (
     <select
@@ -27,6 +31,8 @@ export default function CountrySelect({
       onChange={(event) => onChange(event.target.value)}
       required={required}
       disabled={disabled}
+      aria-invalid={ariaInvalid ? "true" : "false"}
+      aria-describedby={describedBy}
     >
       <option value="">{placeholder}</option>
       {COUNTRY_OPTIONS.map((countryOption) => (

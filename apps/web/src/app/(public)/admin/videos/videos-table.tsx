@@ -7,6 +7,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 export type VideoRow = {
@@ -183,11 +184,7 @@ export default function VideosTable({ videos }: VideosTableProps) {
                       <td>{video.sourceType === "YOUTUBE" ? "YouTube" : "Uploaded File"}</td>
                       <td>{video.showInCarousel ? "Shown" : "Hidden"}</td>
                       <td>
-                        {new Date(video.updatedAt).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {formatDateInAdminTimeZone(video.updatedAt) || "-"}
                       </td>
                       <td>
                         <div className="admin-player-row-actions">

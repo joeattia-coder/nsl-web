@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { formatDateTimeInAdminTimeZone } from "@/lib/timezone";
 import { FiArrowLeft, FiPlus, FiSave, FiUpload, FiX } from "react-icons/fi";
 
 type DocumentFormMode = "create" | "edit";
@@ -38,7 +39,7 @@ const ALLOWED_TYPES = [
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
 function formatDateTime(value: string) {
-  return new Date(value).toLocaleString();
+  return formatDateTimeInAdminTimeZone(value) || value;
 }
 
 export default function DocumentForm({ mode, documentId }: DocumentFormProps) {

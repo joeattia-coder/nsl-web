@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FiUpload, FiX } from "react-icons/fi";
 import CountrySelect from "@/components/CountrySelect";
+import { formatDateTimeInAdminTimeZone } from "@/lib/timezone";
 import PlayerPortalPortrait from "../PlayerPortalPortrait";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -52,7 +53,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
   const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   const updatedLabel = useMemo(() => {
-    return new Date(updatedAt).toLocaleString();
+    return formatDateTimeInAdminTimeZone(updatedAt) || updatedAt;
   }, [updatedAt]);
 
   useEffect(() => {

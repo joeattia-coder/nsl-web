@@ -7,6 +7,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 export type DocumentRow = {
@@ -28,11 +29,13 @@ type DocumentsTableProps = {
 type SortKey = "title" | "showOnPublicDocumentsPage" | "createdAt" | "updatedAt";
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return (
+    formatDateInAdminTimeZone(value, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }) || "-"
+  );
 }
 
 function formatFileSize(sizeBytes: number | null) {

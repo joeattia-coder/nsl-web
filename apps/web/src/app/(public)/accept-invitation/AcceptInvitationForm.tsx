@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import PasswordField from "@/components/admin/PasswordField";
+import { formatDateTimeInAdminTimeZone } from "@/lib/timezone";
 
 function validatePasswordStrength(password: string) {
   if (password.length < 10) {
@@ -155,7 +156,7 @@ export default function AcceptInvitationForm() {
     );
   }
 
-  const expiryLabel = new Date(invitation.expiresAt).toLocaleString();
+  const expiryLabel = formatDateTimeInAdminTimeZone(invitation.expiresAt) || invitation.expiresAt;
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>

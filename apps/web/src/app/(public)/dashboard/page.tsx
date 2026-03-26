@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { FiAward, FiBarChart2, FiTarget, FiTrendingUp } from "react-icons/fi";
 import { resolveCurrentUser } from "@/lib/admin-auth";
 import { getPlayerDashboardData } from "@/lib/player-performance";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import PlayerPortalHeader from "../PlayerPortalHeader";
 
 function formatDate(value: string | null) {
@@ -9,12 +10,18 @@ function formatDate(value: string | null) {
     return "TBC";
   }
 
-  return new Date(value).toLocaleDateString("en-CA", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return (
+    formatDateInAdminTimeZone(
+      value,
+      {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      },
+      "en-CA"
+    ) || "TBC"
+  );
 }
 
 function formatSignedValue(value: number) {

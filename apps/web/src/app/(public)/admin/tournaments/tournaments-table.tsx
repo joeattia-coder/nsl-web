@@ -9,6 +9,7 @@ import {
   sortRows,
 } from "@/lib/admin-table-sorting";
 import { consumeAdminFlashMessage } from "@/lib/admin-flash";
+import { formatDateTimeInAdminTimeZone } from "@/lib/timezone";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 type TournamentRow = {
@@ -63,13 +64,7 @@ function formatStatus(status: string) {
 function formatDateTime(value: string) {
   if (!value) return "-";
 
-  const parsed = new Date(value);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return "-";
-  }
-
-  return parsed.toLocaleString();
+  return formatDateTimeInAdminTimeZone(value) || "-";
 }
 
 export default function TournamentsTable({

@@ -1,4 +1,4 @@
-import { parseStoredMatchDateTime } from "@/lib/timezone";
+import { formatDateTimeInAdminTimeZone, parseStoredMatchDateTime } from "@/lib/timezone";
 
 export type MatchResultSubmissionFrameValue = {
   frameNumber: number;
@@ -39,7 +39,7 @@ export function formatScheduledAtLabel(
     return null;
   }
 
-  return scheduledAt.toLocaleString("en-CA", {
+  return formatDateTimeInAdminTimeZone(scheduledAt, "en-CA", {
     dateStyle: "medium",
     timeStyle: "short",
   });

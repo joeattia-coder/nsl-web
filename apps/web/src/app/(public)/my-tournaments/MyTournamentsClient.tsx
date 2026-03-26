@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FiCalendar, FiMapPin, FiTrendingUp } from "react-icons/fi";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 
 type TournamentSummary = {
   id: string;
@@ -68,12 +69,18 @@ function formatDate(value: string | null) {
     return "TBC";
   }
 
-  return new Date(value).toLocaleDateString("en-CA", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return (
+    formatDateInAdminTimeZone(
+      value,
+      {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      },
+      "en-CA"
+    ) || "TBC"
+  );
 }
 
 function formatTournamentStatus(status: string) {

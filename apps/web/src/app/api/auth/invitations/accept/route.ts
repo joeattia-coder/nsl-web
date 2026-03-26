@@ -3,6 +3,8 @@ import { hashOpaqueToken } from "@/lib/auth-tokens";
 import { hashPassword, validatePasswordStrength } from "@/lib/passwords";
 import { prisma } from "@/lib/prisma";
 
+const PLAYER_ROLE_KEY = "PLAYER";
+
 function normalizeOptionalString(value: unknown) {
   const normalized = String(value ?? "").trim();
   return normalized || null;
@@ -207,9 +209,30 @@ export async function POST(request: Request) {
       }
 
       if (linkedPlayerId) {
+        const playerRole = await tx.role.findUnique({
+          where: { roleKey: PLAYER_ROLE_KEY },
+          select: { id: true },
+        });
+
+        if (!playerRole) {
+          throw new Error("The Player role is not configured.");
+        }
+
         await tx.player.update({
           where: { id: linkedPlayerId },
           data: { userId },
+        });
+
+        await tx.userRoleAssignment.createMany({
+          data: [
+            {
+              userId,
+              roleId: playerRole.id,
+              scopeType: "GLOBAL",
+              scopeId: "",
+            },
+          ],
+          skipDuplicates: true,
         });
       }
 

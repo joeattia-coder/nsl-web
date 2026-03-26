@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { FiArrowLeft, FiMail, FiSave, FiUserPlus } from "react-icons/fi";
 import { notifyAdminAuthChanged } from "@/app/(public)/AdminAuthContext";
 import PasswordField from "@/components/admin/PasswordField";
+import { formatDateInAdminTimeZone, formatDateTimeInAdminTimeZone } from "@/lib/timezone";
 
 type UserFormMode = "create" | "edit";
 
@@ -114,11 +115,7 @@ function formatDateLabel(value: string | null) {
     return value;
   }
 
-  return parsed.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return formatDateInAdminTimeZone(parsed) || value;
 }
 
 function formatDateTimeLabel(value: string | null) {
@@ -132,14 +129,7 @@ function formatDateTimeLabel(value: string | null) {
     return value;
   }
 
-  return `${parsed.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  })} ${parsed.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  })}`;
+  return formatDateTimeInAdminTimeZone(parsed) || value;
 }
 
 export default function UserForm({

@@ -9,6 +9,7 @@ import { KnockoutBracket } from "@/components/tournament-bracket/KnockoutBracket
 import type { BracketRound } from "@/components/tournament-bracket/types";
 import { getFlagCdnUrl } from "@/lib/country";
 import type { PublicLiveMatchListResponse, PublicLiveMatchSnapshot } from "@/lib/live-match";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { useLivePolling } from "@/lib/useLivePolling";
 
 type AnyObj = Record<string, unknown>;
@@ -131,13 +132,13 @@ function parseLRDateTime(raw: string): Date | null {
 }
 
 function formatDateLabel(d: Date): string {
-  const day = d.getDate();
-  const mon = d.toLocaleString(undefined, { month: "short" });
+  const day = formatDateInAdminTimeZone(d, { day: "numeric" });
+  const mon = formatDateInAdminTimeZone(d, { month: "short" });
   return `${day} ${mon}`;
 }
 
 function formatTimeLabel(d: Date): string {
-  return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return formatDateInAdminTimeZone(d, { hour: "2-digit", minute: "2-digit" });
 }
 
 function toUiGroup(g: AnyObj, idx: number): UiGroup {

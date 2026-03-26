@@ -8,6 +8,7 @@ import {
   sortRows,
 } from "@/lib/admin-table-sorting";
 import type { AdminMatchesLiveResponse, AdminMatchesLiveSnapshot } from "@/lib/live-match";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { useLivePolling } from "@/lib/useLivePolling";
 import { FiEdit2 } from "react-icons/fi";
 
@@ -43,11 +44,17 @@ type SortKey =
 
 function formatDate(dateString: string) {
   if (!dateString) return "—";
-  return new Intl.DateTimeFormat("en-CA", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(dateString));
+  return (
+    formatDateInAdminTimeZone(
+      dateString,
+      {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+      },
+      "en-CA"
+    ) || "—"
+  );
 }
 
 function formatScore(homeScore: number | null, awayScore: number | null) {

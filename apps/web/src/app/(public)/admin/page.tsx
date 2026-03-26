@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { buildCurrentLeagueRegisteredPlayersWhere } from "@/lib/player-performance";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import {
@@ -33,7 +34,7 @@ function monthKey(date: Date) {
 }
 
 function monthLabel(date: Date) {
-  return date.toLocaleString("en-CA", { month: "short" });
+  return formatDateInAdminTimeZone(date, { month: "short" }, "en-CA");
 }
 
 function getDashboardMetricVisual(label: string): {
@@ -616,12 +617,18 @@ export default async function AdminDashboardPage() {
                     <p className="admin-dashboard-activity-title">{match.tournament.tournamentName}</p>
                     <p className="admin-dashboard-activity-meta">
                       {formatStatusLabel(match.matchStatus)}
-                      {match.matchDate ? ` • ${match.matchDate.toLocaleDateString("en-CA")}` : " • Date TBD"}
+                      {match.matchDate
+                        ? ` • ${formatDateInAdminTimeZone(match.matchDate, undefined, "en-CA")}`
+                        : " • Date TBD"}
                       {match.matchTime ? ` ${match.matchTime}` : ""}
                     </p>
                   </div>
                   <span className="admin-dashboard-activity-created">
-                    {(match.approvedAt ?? match.resultSubmittedAt ?? match.updatedAt).toLocaleDateString("en-CA")}
+                    {formatDateInAdminTimeZone(
+                      match.approvedAt ?? match.resultSubmittedAt ?? match.updatedAt,
+                      undefined,
+                      "en-CA"
+                    )}
                   </span>
                 </article>
               ))

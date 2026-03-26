@@ -1,15 +1,11 @@
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
+import { formatDateInAdminTimeZone, formatDateTimeInAdminTimeZone } from "@/lib/timezone";
 
 export function formatDate(value: Date | null | undefined) {
   if (!value) {
     return "-";
   }
 
-  return dateFormatter.format(value);
+  return formatDateInAdminTimeZone(value) || "-";
 }
 
 export function formatDateTime(value: Date | null | undefined) {
@@ -17,10 +13,7 @@ export function formatDateTime(value: Date | null | undefined) {
     return "-";
   }
 
-  return `${dateFormatter.format(value)} ${value.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  })}`;
+  return formatDateTimeInAdminTimeZone(value) || "-";
 }
 
 export function formatScope(scopeType: string, scopeId: string) {

@@ -7,6 +7,11 @@ import {
 } from "@/lib/auth-tokens";
 import { isEmailDeliveryConfigured, sendPlayerRegistrationVerificationEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
+import {
+  getRegistrationAvailability,
+  normalizeRegistrationEmail,
+  normalizeRegistrationUsername,
+} from "@/lib/register-availability";
 import { hashPassword, validatePasswordStrength } from "@/lib/passwords";
 import { validateHumanVerification } from "@/lib/human-verification";
 
@@ -14,11 +19,13 @@ const PLAYER_ROLE_KEY = "PLAYER";
 
 class RegistrationConflictError extends Error {
   status: number;
+  field: "email" | "username" | null;
 
-  constructor(message: string, status = 409) {
+  constructor(message: string, status = 409, field: "email" | "username" | null = null) {
     super(message);
     this.name = "RegistrationConflictError";
     this.status = status;
+    this.field = field;
   }
 }
 
@@ -36,10 +43,6 @@ function parseMiddleInitial(value: unknown) {
   return parsed || null;
 }
 
-function normalizeEmail(value: string) {
-  return value.trim().toLowerCase();
-}
-
 function getRequestOrigin(request: Request) {
   const explicitOrigin =
     process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? process.env.AUTH_ORIGIN;
@@ -53,26 +56,6 @@ function getRequestOrigin(request: Request) {
   }
 
   return new URL(request.url).origin;
-}
-
-async function removeStaleRegistrationUser(userId: string) {
-  await prisma.$transaction(async (tx) => {
-    await tx.emailVerificationToken.deleteMany({
-      where: { userId },
-    });
-
-    await tx.passwordResetToken.deleteMany({
-      where: { userId },
-    });
-
-    await tx.player.deleteMany({
-      where: { userId },
-    });
-
-    await tx.user.delete({
-      where: { id: userId },
-    });
-  });
 }
 
 export async function POST(request: Request) {
@@ -126,8 +109,8 @@ export async function POST(request: Request) {
     const phoneNumber = parseOptionalString(body?.phoneNumber);
     const country = parseString(body?.country);
     const username = parseString(body?.username);
-    const normalizedUsername = username.toLowerCase();
-    const email = normalizeEmail(parseString(body?.email));
+    const normalizedUsername = normalizeRegistrationUsername(username);
+    const email = normalizeRegistrationEmail(parseString(body?.email));
     const password = String(body?.password ?? "");
     const verificationToken = parseString(body?.verificationToken);
     const verificationAnswer = parseString(body?.verificationAnswer);
@@ -171,55 +154,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: verificationError }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { normalizedEmail: email }, { normalizedUsername }],
-      },
-      select: {
-        id: true,
-        isLoginEnabled: true,
-        registrationStatus: true,
-        emailVerifiedAt: true,
-        player: {
-          select: {
-            id: true,
-          },
-        },
-        authAccounts: {
-          select: {
-            id: true,
-          },
-          take: 1,
-        },
-      },
-    });
+    const availability = await getRegistrationAvailability({ email, username });
 
-    if (
-      existingUser &&
-      !existingUser.player &&
-      !existingUser.isLoginEnabled &&
-      existingUser.registrationStatus === "INACTIVE" &&
-      !existingUser.emailVerifiedAt &&
-      existingUser.authAccounts.length === 0
-    ) {
-      await removeStaleRegistrationUser(existingUser.id);
+    if (availability.emailTaken) {
+      throw new RegistrationConflictError(
+        "An account with this email address already exists. Try signing in instead.",
+        409,
+        "email"
+      );
     }
 
-    const remainingUser = existingUser
-      ? await prisma.user.findFirst({
-          where: {
-            OR: [{ email }, { normalizedEmail: email }, { normalizedUsername }],
-          },
-          select: {
-            id: true,
-          },
-        })
-      : null;
-
-    if (remainingUser) {
-      return NextResponse.json(
-        { error: "An account with this email or username already exists. Try signing in instead." },
-        { status: 409 }
+    if (availability.usernameTaken) {
+      throw new RegistrationConflictError(
+        "That username is already in use. Choose another username.",
+        409,
+        "username"
       );
     }
 
@@ -312,11 +261,16 @@ export async function POST(request: Request) {
         createdPlayerId = player.id;
       }
 
-      await tx.userRole.create({
-        data: {
-          userId: user.id,
-          roleId: playerRole.id,
-        },
+      await tx.userRoleAssignment.createMany({
+        data: [
+          {
+            userId: user.id,
+            roleId: playerRole.id,
+            scopeType: "GLOBAL",
+            scopeId: "",
+          },
+        ],
+        skipDuplicates: true,
       });
 
       await tx.emailVerificationToken.create({
@@ -376,7 +330,10 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof RegistrationConflictError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json(
+        { error: error.message, field: error.field },
+        { status: error.status }
+      );
     }
     console.error("POST /api/auth/register error:", error);
 

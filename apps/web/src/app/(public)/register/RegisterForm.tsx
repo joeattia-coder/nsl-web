@@ -1,12 +1,110 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import CountrySelect from "@/components/CountrySelect";
 import PasswordField from "@/components/admin/PasswordField";
+import { FiCheck, FiX } from "react-icons/fi";
 
 function normalizeMiddleInitial(value: string) {
   return value.replace(/[^a-z]/gi, "").slice(0, 1).toUpperCase();
+}
+
+const USERNAME_PATTERN = /^[a-zA-Z0-9._-]{3,30}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 10;
+
+type RegisterFieldName =
+  | "firstName"
+  | "lastName"
+  | "country"
+  | "email"
+  | "username"
+  | "password"
+  | "confirmPassword"
+  | "verificationAnswer";
+
+type RegisterFieldErrors = Partial<Record<RegisterFieldName, string>>;
+
+type AvailabilityState = {
+  status: "idle" | "checking" | "available" | "duplicate";
+  value: string;
+};
+
+function validatePasswordStrength(password: string) {
+  if (!password.trim()) {
+    return "Password is required.";
+  }
+
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return `Use a password that is at least ${MIN_PASSWORD_LENGTH} characters long.`;
+  }
+
+  const hasLower = /[a-z]/.test(password);
+  const hasUpper = /[A-Z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSymbol = /[^A-Za-z\d]/.test(password);
+
+  if (!hasLower || !hasUpper || !hasDigit || !hasSymbol) {
+    return "Use at least one uppercase letter, one lowercase letter, one number, and one symbol.";
+  }
+
+  return null;
+}
+
+function validateRegisterFields(values: {
+  firstName: string;
+  lastName: string;
+  country: string;
+  email: string;
+  username: string;
+  password: string;
+  confirmPassword: string;
+  verificationAnswer: string;
+}) {
+  const errors: RegisterFieldErrors = {};
+
+  if (!values.firstName.trim()) {
+    errors.firstName = "First name is required.";
+  }
+
+  if (!values.lastName.trim()) {
+    errors.lastName = "Last name is required.";
+  }
+
+  if (!values.country.trim()) {
+    errors.country = "Country is required.";
+  }
+
+  if (!values.email.trim()) {
+    errors.email = "Email address is required.";
+  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
+    errors.email = "Enter a valid email address.";
+  }
+
+  if (!values.username.trim()) {
+    errors.username = "Username is required.";
+  } else if (!USERNAME_PATTERN.test(values.username.trim())) {
+    errors.username =
+      "Username must be 3-30 characters and can only include letters, numbers, periods, underscores, and hyphens.";
+  }
+
+  const passwordError = validatePasswordStrength(values.password);
+  if (passwordError) {
+    errors.password = passwordError;
+  }
+
+  if (!values.confirmPassword.trim()) {
+    errors.confirmPassword = "Confirm password is required.";
+  } else if (values.password !== values.confirmPassword) {
+    errors.confirmPassword = "The password confirmation does not match.";
+  }
+
+  if (!values.verificationAnswer.trim()) {
+    errors.verificationAnswer = "Human verification is required.";
+  }
+
+  return errors;
 }
 
 export default function RegisterForm() {
@@ -28,6 +126,18 @@ export default function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<RegisterFieldErrors>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [emailAvailability, setEmailAvailability] = useState<AvailabilityState>({
+    status: "idle",
+    value: "",
+  });
+  const [usernameAvailability, setUsernameAvailability] = useState<AvailabilityState>({
+    status: "idle",
+    value: "",
+  });
+  const emailAvailabilityRequestRef = useRef(0);
+  const usernameAvailabilityRequestRef = useRef(0);
 
   async function loadChallenge() {
     setIsLoadingChallenge(true);
@@ -67,12 +177,159 @@ export default function RegisterForm() {
     void loadChallenge();
   }, []);
 
+  const applyFieldValidation = (nextValues: {
+    firstName?: string;
+    lastName?: string;
+    country?: string;
+    email?: string;
+    username?: string;
+    password?: string;
+    confirmPassword?: string;
+    verificationAnswer?: string;
+  }) => {
+    const mergedValues = {
+      firstName,
+      lastName,
+      country,
+      email,
+      username,
+      password,
+      confirmPassword,
+      verificationAnswer,
+      ...nextValues,
+    };
+
+    setFieldErrors(validateRegisterFields(mergedValues));
+  };
+
+  const getVisibleFieldError = (fieldName: RegisterFieldName) => {
+    if (
+      fieldName === "confirmPassword" &&
+      confirmPassword.trim() &&
+      password !== confirmPassword
+    ) {
+      return "The password confirmation does not match.";
+    }
+
+    if (!submitAttempted) {
+      return null;
+    }
+
+    return fieldErrors[fieldName] ?? null;
+  };
+
+  const checkAvailability = async (field: "email" | "username", value: string) => {
+    const trimmedValue = value.trim();
+
+    if (field === "email") {
+      if (!trimmedValue || !EMAIL_PATTERN.test(trimmedValue)) {
+        setEmailAvailability({ status: "idle", value: trimmedValue });
+        return;
+      }
+
+      const requestId = ++emailAvailabilityRequestRef.current;
+      setEmailAvailability({ status: "checking", value: trimmedValue });
+
+      try {
+        const response = await fetch(
+          `/api/auth/register/availability?field=email&value=${encodeURIComponent(trimmedValue)}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (requestId !== emailAvailabilityRequestRef.current) {
+          return;
+        }
+
+        if (!response.ok) {
+          setEmailAvailability({ status: "idle", value: trimmedValue });
+          return;
+        }
+
+        const data = await response.json();
+        setEmailAvailability({
+          status: data?.duplicate ? "duplicate" : "available",
+          value: trimmedValue,
+        });
+      } catch {
+        if (requestId === emailAvailabilityRequestRef.current) {
+          setEmailAvailability({ status: "idle", value: trimmedValue });
+        }
+      }
+
+      return;
+    }
+
+    if (!trimmedValue || !USERNAME_PATTERN.test(trimmedValue)) {
+      setUsernameAvailability({ status: "idle", value: trimmedValue });
+      return;
+    }
+
+    const requestId = ++usernameAvailabilityRequestRef.current;
+    setUsernameAvailability({ status: "checking", value: trimmedValue });
+
+    try {
+      const response = await fetch(
+        `/api/auth/register/availability?field=username&value=${encodeURIComponent(trimmedValue)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (requestId !== usernameAvailabilityRequestRef.current) {
+        return;
+      }
+
+      if (!response.ok) {
+        setUsernameAvailability({ status: "idle", value: trimmedValue });
+        return;
+      }
+
+      const data = await response.json();
+      setUsernameAvailability({
+        status: data?.duplicate ? "duplicate" : "available",
+        value: trimmedValue,
+      });
+    } catch {
+      if (requestId === usernameAvailabilityRequestRef.current) {
+        setUsernameAvailability({ status: "idle", value: trimmedValue });
+      }
+    }
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    setSubmitAttempted(true);
+    const nextFieldErrors = validateRegisterFields({
+      firstName,
+      lastName,
+      country,
+      email,
+      username,
+      password,
+      confirmPassword,
+      verificationAnswer,
+    });
 
-    if (password !== confirmPassword) {
-      setError("The password confirmation does not match.");
+    if (emailAvailability.status === "duplicate") {
+      nextFieldErrors.email = "An account with this email address already exists. Try signing in instead.";
+    }
+
+    if (usernameAvailability.status === "duplicate") {
+      nextFieldErrors.username = "That username is already in use. Choose another username.";
+    }
+
+    setFieldErrors(nextFieldErrors);
+
+    if (Object.keys(nextFieldErrors).length > 0) {
       return;
     }
 
@@ -107,7 +364,19 @@ export default function RegisterForm() {
         setShowVerificationModal(true);
       } else {
         const data = await response.json();
-        setError(data?.error || "Registration failed.");
+        if (data?.field === "email") {
+          setFieldErrors((current) => ({
+            ...current,
+            email: data?.error || "An account with this email address already exists.",
+          }));
+        } else if (data?.field === "username") {
+          setFieldErrors((current) => ({
+            ...current,
+            username: data?.error || "That username is already in use.",
+          }));
+        } else {
+          setError(data?.error || "Registration failed.");
+        }
       }
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Registration failed.");
@@ -120,7 +389,7 @@ export default function RegisterForm() {
     <div className="register-form-container">
       <>
         <h2 className="register-form-title">Player Registration</h2>
-        <form className="admin-form" onSubmit={handleSubmit} autoComplete="off">
+        <form className="admin-form" onSubmit={handleSubmit} autoComplete="off" noValidate>
           <div className="admin-form-grid">
             <div className="admin-form-field">
               <label className="admin-label">First name</label>
@@ -128,9 +397,20 @@ export default function RegisterForm() {
                 type="text"
                 className="admin-input"
                 value={firstName}
-                onChange={(event) => setFirstName(event.target.value)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setFirstName(nextValue);
+                  applyFieldValidation({ firstName: nextValue });
+                }}
+                aria-invalid={fieldErrors.firstName ? "true" : "false"}
+                aria-describedby={fieldErrors.firstName ? "register-first-name-error" : undefined}
                 required
               />
+              {getVisibleFieldError("firstName") ? (
+                <p id="register-first-name-error" className="admin-form-error">
+                  {getVisibleFieldError("firstName")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field">
               <label className="admin-label">Middle initial (optional)</label>
@@ -152,9 +432,20 @@ export default function RegisterForm() {
                 type="text"
                 className="admin-input"
                 value={lastName}
-                onChange={(event) => setLastName(event.target.value)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setLastName(nextValue);
+                  applyFieldValidation({ lastName: nextValue });
+                }}
+                aria-invalid={fieldErrors.lastName ? "true" : "false"}
+                aria-describedby={fieldErrors.lastName ? "register-last-name-error" : undefined}
                 required
               />
+              {getVisibleFieldError("lastName") ? (
+                <p id="register-last-name-error" className="admin-form-error">
+                  {getVisibleFieldError("lastName")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field">
               <label className="admin-label">Phone number (optional)</label>
@@ -168,53 +459,150 @@ export default function RegisterForm() {
             </div>
             <div className="admin-form-field">
               <label className="admin-label">Email address</label>
-              <input
-                type="email"
-                className="admin-input"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete="email"
-                required
-              />
+              <div className="register-availability-field">
+                <input
+                  type="email"
+                  className="admin-input register-availability-input"
+                  value={email}
+                  onChange={(event) => {
+                    const nextValue = event.target.value;
+                    setEmail(nextValue);
+                    emailAvailabilityRequestRef.current += 1;
+                    setEmailAvailability({ status: "idle", value: nextValue.trim() });
+                    applyFieldValidation({ email: nextValue });
+                  }}
+                  onBlur={() => {
+                    void checkAvailability("email", email);
+                  }}
+                  autoComplete="email"
+                  aria-invalid={getVisibleFieldError("email") ? "true" : "false"}
+                  aria-describedby={getVisibleFieldError("email") ? "register-email-error" : undefined}
+                  required
+                />
+                {emailAvailability.status === "available" || emailAvailability.status === "duplicate" ? (
+                  <span
+                    className={`register-availability-badge ${
+                      emailAvailability.status === "available"
+                        ? "register-availability-badge-valid"
+                        : "register-availability-badge-invalid"
+                    }`}
+                    title={
+                      emailAvailability.status === "duplicate"
+                        ? "Email address already exists."
+                        : undefined
+                    }
+                    aria-hidden="true"
+                  >
+                    {emailAvailability.status === "available" ? <FiCheck /> : <FiX />}
+                  </span>
+                ) : null}
+              </div>
+              {getVisibleFieldError("email") ? (
+                <p id="register-email-error" className="admin-form-error">
+                  {getVisibleFieldError("email")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field">
               <label className="admin-label">Country</label>
               <CountrySelect
                 value={country}
-                onChange={setCountry}
+                onChange={(nextValue) => {
+                  setCountry(nextValue);
+                  applyFieldValidation({ country: nextValue });
+                }}
+                ariaInvalid={Boolean(fieldErrors.country)}
+                describedBy={fieldErrors.country ? "register-country-error" : undefined}
                 required
               />
+              {getVisibleFieldError("country") ? (
+                <p id="register-country-error" className="admin-form-error">
+                  {getVisibleFieldError("country")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field admin-form-field-full">
               <label className="admin-label">Username</label>
-              <input
-                type="text"
-                className="admin-input"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
-                autoComplete="username"
-                required
-              />
+              <div className="register-availability-field">
+                <input
+                  type="text"
+                  className="admin-input register-availability-input"
+                  value={username}
+                  onChange={(event) => {
+                    const nextValue = event.target.value;
+                    setUsername(nextValue);
+                    usernameAvailabilityRequestRef.current += 1;
+                    setUsernameAvailability({ status: "idle", value: nextValue.trim() });
+                    applyFieldValidation({ username: nextValue });
+                  }}
+                  onBlur={() => {
+                    void checkAvailability("username", username);
+                  }}
+                  autoComplete="username"
+                  aria-invalid={getVisibleFieldError("username") ? "true" : "false"}
+                  aria-describedby={getVisibleFieldError("username") ? "register-username-error" : undefined}
+                  required
+                />
+                {usernameAvailability.status === "available" || usernameAvailability.status === "duplicate" ? (
+                  <span
+                    className={`register-availability-badge ${
+                      usernameAvailability.status === "available"
+                        ? "register-availability-badge-valid"
+                        : "register-availability-badge-invalid"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {usernameAvailability.status === "available" ? <FiCheck /> : <FiX />}
+                  </span>
+                ) : null}
+              </div>
+              {getVisibleFieldError("username") ? (
+                <p id="register-username-error" className="admin-form-error">
+                  {getVisibleFieldError("username")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field admin-form-field-full">
               <label className="admin-label">Password</label>
               <PasswordField
                 className="admin-input"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setPassword(nextValue);
+                  applyFieldValidation({ password: nextValue });
+                }}
                 autoComplete="new-password"
+                aria-invalid={fieldErrors.password ? "true" : "false"}
+                aria-describedby={fieldErrors.password ? "register-password-error" : undefined}
                 required
               />
+              {getVisibleFieldError("password") ? (
+                <p id="register-password-error" className="admin-form-error">
+                  {getVisibleFieldError("password")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field admin-form-field-full">
               <label className="admin-label">Confirm password</label>
               <PasswordField
                 className="admin-input"
                 value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setConfirmPassword(nextValue);
+                  applyFieldValidation({ confirmPassword: nextValue });
+                }}
                 autoComplete="new-password"
+                aria-invalid={fieldErrors.confirmPassword ? "true" : "false"}
+                aria-describedby={fieldErrors.confirmPassword ? "register-confirm-password-error" : undefined}
                 required
               />
+              {getVisibleFieldError("confirmPassword") ? (
+                <p id="register-confirm-password-error" className="admin-form-error">
+                  {getVisibleFieldError("confirmPassword")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field admin-form-field-full">
               <label className="admin-label">Human verification</label>
@@ -225,10 +613,21 @@ export default function RegisterForm() {
                 type="text"
                 className="admin-input"
                 value={verificationAnswer}
-                onChange={(event) => setVerificationAnswer(event.target.value)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setVerificationAnswer(nextValue);
+                  applyFieldValidation({ verificationAnswer: nextValue });
+                }}
+                aria-invalid={fieldErrors.verificationAnswer ? "true" : "false"}
+                aria-describedby={fieldErrors.verificationAnswer ? "register-verification-error" : undefined}
                 required
                 disabled={isLoadingChallenge}
               />
+              {getVisibleFieldError("verificationAnswer") ? (
+                <p id="register-verification-error" className="admin-form-error">
+                  {getVisibleFieldError("verificationAnswer")}
+                </p>
+              ) : null}
             </div>
             <div className="admin-form-field" style={{ display: "none" }} aria-hidden="true">
               <span>Website</span>
@@ -242,7 +641,11 @@ export default function RegisterForm() {
             </div>
           </div>
           {error ? <p className="admin-form-error">{error}</p> : null}
-          <button type="submit" className="admin-primary-button" disabled={isSubmitting || isLoadingChallenge}>
+          <button
+            type="submit"
+            className="admin-primary-button"
+            disabled={isSubmitting || isLoadingChallenge}
+          >
             {isSubmitting ? "Registering..." : "Register"}
           </button>
           <p className="login-support-copy">Registration requires email verification before sign-in.</p>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiUser, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { getFlagCdnUrl } from "@/lib/country";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 
 type AnyObj = Record<string, unknown>;
 
@@ -62,8 +63,8 @@ function parseDateLabel(raw: string): string {
   // Works for ISO strings, "YYYY-MM-DD", etc. Falls back to raw.
   const d = new Date(raw);
   if (Number.isNaN(d.getTime())) return raw || "";
-  const day = d.getDate();
-  const mon = d.toLocaleString(undefined, { month: "short" });
+  const day = formatDateInAdminTimeZone(d, { day: "numeric" });
+  const mon = formatDateInAdminTimeZone(d, { month: "short" });
   return `${day} ${mon}`;
 }
 
@@ -73,7 +74,7 @@ function parseTimeLabel(raw: string): string {
   if (/^\d{1,2}:\d{2}$/.test(raw.trim())) return raw.trim();
   const d = new Date(raw);
   if (Number.isNaN(d.getTime())) return raw;
-  return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return formatDateInAdminTimeZone(d, { hour: "2-digit", minute: "2-digit" });
 }
 
 function firstNumber(obj: AnyObj, keys: string[]): number | null {

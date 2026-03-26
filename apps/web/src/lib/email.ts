@@ -1,6 +1,7 @@
 import "server-only";
 
 import nodemailer from "nodemailer";
+import { formatDateTimeInAdminTimeZone } from "@/lib/timezone";
 
 type PasswordResetEmailInput = {
   to: string;
@@ -138,10 +139,7 @@ function createTransport(config: MailTransportConfig) {
 }
 
 function formatExpiry(expiresAt: Date) {
-  return expiresAt.toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  return formatDateTimeInAdminTimeZone(expiresAt);
 }
 
 function escapeHtml(value: string) {

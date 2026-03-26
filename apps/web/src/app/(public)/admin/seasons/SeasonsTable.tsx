@@ -7,6 +7,7 @@ import {
   type SortDirection,
   sortRows,
 } from "@/lib/admin-table-sorting";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { FiCalendar, FiCheck, FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 
 type SeasonRow = {
@@ -314,9 +315,15 @@ export default function SeasonsTable({ seasons }: SeasonsTableProps) {
 function formatDate(value: string) {
   if (!value) return "—";
 
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return "—";
-
-  return date.toLocaleDateString("en-CA");
+  return (
+    formatDateInAdminTimeZone(
+      value,
+      {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      },
+      "en-CA"
+    ) || "—"
+  );
 }

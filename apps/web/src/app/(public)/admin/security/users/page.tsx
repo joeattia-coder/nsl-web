@@ -41,6 +41,7 @@ type DirectoryUserSummary = {
   userRoles: Array<{
     role: {
       roleKey: string;
+      roleName: string;
     };
   }>;
   accessGroupMemberships: Array<{
@@ -118,6 +119,7 @@ export default async function AdminSecurityUsersPage() {
                 role: {
                   select: {
                     roleKey: true,
+                    roleName: true,
                   },
                 },
               },
@@ -207,6 +209,7 @@ export default async function AdminSecurityUsersPage() {
                 role: {
                   select: {
                     roleKey: true,
+                    roleName: true,
                   },
                 },
               },
@@ -246,6 +249,7 @@ export default async function AdminSecurityUsersPage() {
             ? assignment.role.roleName
             : `${assignment.role.roleName} (${assignment.scopeType})`
         ),
+        ...user.userRoles.map((userRole) => `${userRole.role.roleName} (legacy global)`),
         ...user.accessGroupMemberships
           .filter((membership) => membership.group.isActive)
           .flatMap((membership) =>
