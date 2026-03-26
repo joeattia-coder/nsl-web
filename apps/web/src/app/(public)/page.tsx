@@ -600,8 +600,15 @@ export default function Page() {
       <div className="hero">
         <div className="hero-inner">
           <div className="hero-copy">
+            <div className="hero-kicker-row">
+              <span className="hero-kicker">National Snooker League</span>
+              <span className="hero-status-pill">Season Live</span>
+            </div>
+
             <h1>The National Snooker League</h1>
-            <p>Your professional snooker platform.</p>
+            <p>
+              Follow upcoming fixtures, rankings, video highlights, and the latest league news from one polished match hub.
+            </p>
 
             <div className="hero-actions">
               <Link className="hero-btn primary" href="/matches">
@@ -616,7 +623,7 @@ export default function Page() {
       </div>
 
       {featuredNews.length > 0 ? (
-        <section className="featured-news-section">
+        <section className="featured-news-section home-section">
           <div className="section-header">
             <h2 className="section-heading">Featured Matches and News</h2>
 
@@ -665,7 +672,11 @@ export default function Page() {
                   )}
 
                   <div className="featured-news-body compact">
+                    {article.publishedAt ? (
+                      <div className="featured-news-meta">{parseDateLabel(article.publishedAt)}</div>
+                    ) : null}
                     <h3 className="featured-news-title compact">{article.title}</h3>
+                    {article.excerpt ? <p className="featured-news-excerpt">{article.excerpt}</p> : null}
                   </div>
                 </Link>
               ))}
@@ -675,7 +686,7 @@ export default function Page() {
       ) : null}
 
       {/* Upcoming Matches */}
-      <section className="matches-section">
+      <section className="matches-section home-section">
         <div className="section-header">
           <h2 className="section-heading">Upcoming Matches</h2>
 
@@ -685,13 +696,13 @@ export default function Page() {
         </div>
 
         {fixturesError && (
-          <div style={{ marginBottom: 12, opacity: 0.9 }}>
+          <div className="home-feedback-banner home-feedback-banner-error">
             Failed to load fixtures: {fixturesError}
           </div>
         )}
 
         {!fixturesError && fixturesRaw === null && (
-          <div style={{ marginBottom: 12, opacity: 0.9 }}>
+          <div className="home-feedback-banner">
             Loading fixtures…
           </div>
         )}
@@ -832,7 +843,7 @@ export default function Page() {
             })}
 
             {fixturesRaw !== null && matches.length === 0 && (
-              <div style={{ padding: 12, opacity: 0.9 }}>
+              <div className="home-empty-state">
                 No matches available yet.
               </div>
             )}
@@ -842,7 +853,7 @@ export default function Page() {
 
       {/* Latest Video Highlights */}
       {featuredVideos.length > 0 ? (
-        <div className="video-section">
+        <div className="video-section home-section">
           <div className="section-header">
             <h2 className="video-heading">Latest Video Highlights</h2>
           </div>

@@ -1,25 +1,55 @@
 .rankingsPage {
   min-height: 100vh;
-  padding: 2rem 1rem 3rem;
+  padding: 24px 24px 40px;
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 18%, transparent), transparent 28%),
     radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 14%, transparent), transparent 22%),
+    radial-gradient(circle at 18% 24%, color-mix(in srgb, var(--theme-accent-brand) 10%, transparent), transparent 18%),
     linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 86%, var(--theme-surface-1)) 100%);
 }
 
 .rankingsSection {
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .rankingsHeader {
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.rankingsHeroCopy,
+.rankingsCards,
+.rankingsTableWrap {
+  animation: rankings-rise-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.rankingsCards {
+  animation-delay: 140ms;
+}
+
+.rankingsTableWrap {
+  animation-delay: 180ms;
+}
+
+.rankingsEyebrow {
+  margin: 0;
+  color: var(--theme-page-muted-3);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .rankingsTitle {
   margin: 0;
   color: var(--theme-page-text);
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.05;
   letter-spacing: -0.04em;
 }
@@ -27,9 +57,9 @@
 .rankingsIntro {
   margin: 0.75rem 0 0;
   max-width: 56rem;
-  color: var(--theme-page-muted-3);
-  font-size: 1rem;
-  line-height: 1.6;
+  color: var(--theme-page-muted-2);
+  font-size: 1.03rem;
+  line-height: 1.75;
 }
 
 .rankingsMeta {
@@ -41,14 +71,14 @@
 }
 
 .rankingsCards {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 
 .rankingsCardRow {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 
 .rankingsCardSelected {
@@ -57,12 +87,15 @@
   box-shadow: 0 10px 24px color-mix(in srgb, var(--dashboard-metric-accent) 26%, transparent);
 }
 
+
 .rankingsTableWrap {
-  background: linear-gradient(180deg, var(--theme-surface-1), var(--theme-surface-2));
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--theme-accent-brand) 10%, transparent), transparent 30%),
+    linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 96%, transparent), color-mix(in srgb, var(--theme-surface-2) 95%, transparent));
   border-radius: 8px;
-  border: 1px solid var(--theme-border-soft);
-  box-shadow: var(--theme-shadow-soft);
-  padding: 2rem;
+  border: 1px solid color-mix(in srgb, var(--theme-border-mid) 76%, transparent);
+  box-shadow: var(--theme-shadow-card);
+  padding: 24px;
   overflow: visible;
 }
 
@@ -79,23 +112,33 @@
   border-collapse: separate;
   border-spacing: 0;
   overflow: hidden;
-  border-radius: 8px;
-  font-size: 1.05rem;
+  border-radius: 0;
+  font-size: 1rem;
   color: var(--theme-page-text);
 }
 
 .rankingsTable th, .rankingsTable td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--theme-border-soft);
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-border-mid) 70%, transparent);
   text-align: left;
   color: var(--theme-page-text);
+  vertical-align: middle;
 }
 
 .rankingsTable th {
-  background: color-mix(in srgb, var(--theme-surface-2) 78%, var(--theme-page-bg));
+  background: color-mix(in srgb, var(--theme-surface-2) 82%, var(--theme-page-bg));
   font-weight: 600;
   color: var(--theme-page-muted-3);
   white-space: nowrap;
+}
+
+.rankingsFlagHeader,
+.rankingsFlagCell {
+  width: 56px;
+  min-width: 56px;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
 }
 
 .rankingsHeaderTrigger {
@@ -157,10 +200,11 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
+  min-width: 220px;
 }
 
 .rankingsPlayerPhoto {
-  border-radius: 6px;
+  border-radius: 0;
   object-fit: cover;
   background: var(--theme-surface-3);
   flex-shrink: 0;
@@ -169,7 +213,7 @@
 .rankingsPlayerFallback {
   width: 36px;
   height: 36px;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--theme-surface-3);
   color: var(--theme-page-muted-3);
   display: flex;
@@ -187,13 +231,15 @@
 }
 
 .rankingsCountryFlag {
-  border-radius: 3px;
+  display: inline-block;
+  border-radius: 0 !important;
   object-fit: cover;
-  box-shadow: 0 0 0 1px var(--theme-border-mid);
+  box-shadow: none;
 }
 
 .rankingsCountryFallback {
   color: var(--theme-page-muted-4);
+  font-size: 0.85rem;
 }
 
 .rankingsRow {
@@ -202,6 +248,10 @@
 
 .rankingsRowAlt {
   background: color-mix(in srgb, var(--theme-surface-2) 96%, transparent);
+}
+
+.rankingsRow:hover {
+  background: color-mix(in srgb, var(--theme-accent-brand) 6%, var(--theme-surface-2));
 }
 
 .rankingsStatus {
@@ -214,12 +264,33 @@
   color: var(--theme-accent-rose);
 }
 
+@keyframes rankings-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 900px) {
+  .rankingsHeader,
   .rankingsCardRow {
     grid-template-columns: 1fr;
   }
 
   .rankingsTableWrap {
     padding: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .rankingsPage {
+    padding-top: 20px;
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }

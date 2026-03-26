@@ -44,27 +44,41 @@ export default async function PublicDocumentsPage() {
     <main className={styles.documentsPage}>
       <section className={styles.documentsSection}>
         <header className={styles.documentsHero}>
-          <p className={styles.documentsEyebrow}>NSL Resources</p>
-          <h1 className={styles.documentsTitle}>Documents</h1>
-          <p className={styles.documentsSubtitle}>
-            Download forms, guides, and official league documents.
-          </p>
+          <div className={styles.documentsHeroCopy}>
+            <p className={styles.documentsEyebrow}>NSL Resources</p>
+            <h1 className={styles.documentsTitle}>Documents</h1>
+            <p className={styles.documentsSubtitle}>
+              Download forms, guides, and official league documents from a cleaner public resource library.
+            </p>
+          </div>
         </header>
 
         {documents.length === 0 ? (
           <div className={styles.emptyState}>No documents available yet.</div>
         ) : (
-          <DocumentsGallery
-            documents={documents.map((document) => ({
-              id: document.id,
-              title: document.title,
-              fileUrl: document.fileUrl,
-              fileName: document.fileName,
-              mimeType: document.mimeType,
-              sizeLabel: formatFileSize(document.sizeBytes),
-              updatedAt: document.updatedAt.toISOString(),
-            }))}
-          />
+          <section className={styles.documentsLibrarySection}>
+            <div className={styles.documentsLibraryHeader}>
+              <div>
+                <p className={styles.documentsSectionLabel}>Library</p>
+                <h2 className={styles.documentsSectionTitle}>Browse the current public document set.</h2>
+              </div>
+              <p className={styles.documentsSectionMeta}>
+                {documents.length} {documents.length === 1 ? "document" : "documents"} available
+              </p>
+            </div>
+
+            <DocumentsGallery
+              documents={documents.map((document) => ({
+                id: document.id,
+                title: document.title,
+                fileUrl: document.fileUrl,
+                fileName: document.fileName,
+                mimeType: document.mimeType,
+                sizeLabel: formatFileSize(document.sizeBytes),
+                updatedAt: document.updatedAt.toISOString(),
+              }))}
+            />
+          </section>
         )}
       </section>
     </main>

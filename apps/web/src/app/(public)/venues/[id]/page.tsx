@@ -1,5 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FiMapPin, FiPhone, FiShield } from "react-icons/fi";
 import { prisma } from "@/lib/prisma";
 import { getVenueAddressLines, getVenueMapEmbedUrl } from "@/lib/public-venues";
 import styles from "./VenueDetailPage.module.css";
@@ -44,8 +46,12 @@ export default async function VenueDetailPage({ params }: PageProps) {
   return (
     <main className={styles.venuePage}>
       <section className={styles.venueLayout}>
-        <div className={styles.venueDetailsColumn}>
-          <header className={styles.venueHeader}>
+        <header className={styles.venueHeader}>
+          <Link href="/venues" className={styles.backLink}>
+            Back to Venues
+          </Link>
+
+          <div className={styles.venueHeaderMain}>
             <div className={styles.venueLogoShell}>
               {venue.logoUrl ? (
                 <Image
@@ -62,10 +68,25 @@ export default async function VenueDetailPage({ params }: PageProps) {
             </div>
 
             <div className={styles.venueHeaderCopy}>
+              <p className={styles.venueEyebrow}>NSL Venue</p>
               <h1 className={styles.venueTitle}>{venue.venueName}</h1>
-              <p className={styles.venueSubtitle}>Venue details and map location.</p>
+              <p className={styles.venueSubtitle}>Venue details, contact information, and map location.</p>
             </div>
-          </header>
+          </div>
+
+          <div className={styles.venueSummaryPanel}>
+            <div className={styles.venueSummaryBadge}>
+              <FiShield aria-hidden="true" />
+              <span>Venue Profile</span>
+            </div>
+            <p className={styles.venueSummaryLead}>
+              Use this page to confirm the location, contact details, and map placement for this venue before visiting or referencing it in league activity.
+            </p>
+          </div>
+        </header>
+
+        <div className={styles.venueContentGrid}>
+          <div className={styles.venueDetailsColumn}>
 
           <div className={styles.venueCard}>
             <h2 className={styles.sectionTitle}>Address</h2>
@@ -80,12 +101,24 @@ export default async function VenueDetailPage({ params }: PageProps) {
                 <p className={styles.addressLine}>Address coming soon.</p>
               )}
             </div>
+              <div className={styles.detailMetaRow}>
+                <span className={styles.detailBadge}>
+                  <FiMapPin aria-hidden="true" />
+                  <span>Location</span>
+                </span>
+              </div>
           </div>
 
           {venue.phoneNumber ? (
             <div className={styles.venueCard}>
               <h2 className={styles.sectionTitle}>Phone</h2>
-              <p className={styles.detailText}>{venue.phoneNumber}</p>
+                <p className={styles.detailText}>{venue.phoneNumber}</p>
+                <div className={styles.detailMetaRow}>
+                  <span className={styles.detailBadge}>
+                    <FiPhone aria-hidden="true" />
+                    <span>Direct Contact</span>
+                  </span>
+                </div>
             </div>
           ) : null}
         </div>
@@ -107,6 +140,7 @@ export default async function VenueDetailPage({ params }: PageProps) {
               </div>
             )}
           </div>
+        </div>
         </div>
       </section>
     </main>

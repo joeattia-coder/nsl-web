@@ -144,7 +144,7 @@ export default function ContactForm({
           Your inquiry has been submitted successfully. A member of our team will review your message and reply within 24 hours.
         </p>
         <div className={styles.confirmationActions}>
-          <button type="button" className="admin-primary-button" onClick={handleReset}>
+          <button type="button" className={styles.submitButton} onClick={handleReset}>
             Send another message
           </button>
         </div>
@@ -153,14 +153,14 @@ export default function ContactForm({
   }
 
   return (
-    <form className="admin-form" onSubmit={handleSubmit} autoComplete="on">
-      <div className="admin-form-grid">
-        <div className="admin-form-field">
-          <label htmlFor="contact-first-name" className="admin-label">First name</label>
+    <form className={styles.contactForm} onSubmit={handleSubmit} autoComplete="on">
+      <div className={styles.formGrid}>
+        <div className={styles.formField}>
+          <label htmlFor="contact-first-name" className={styles.label}>First name</label>
           <input
             id="contact-first-name"
             type="text"
-            className="admin-input"
+            className={styles.input}
             value={firstName}
             onChange={(event) => setFirstName(event.target.value)}
             autoComplete="given-name"
@@ -168,12 +168,12 @@ export default function ContactForm({
           />
         </div>
 
-        <div className="admin-form-field">
-          <label htmlFor="contact-last-name" className="admin-label">Last name</label>
+        <div className={styles.formField}>
+          <label htmlFor="contact-last-name" className={styles.label}>Last name</label>
           <input
             id="contact-last-name"
             type="text"
-            className="admin-input"
+            className={styles.input}
             value={lastName}
             onChange={(event) => setLastName(event.target.value)}
             autoComplete="family-name"
@@ -181,12 +181,12 @@ export default function ContactForm({
           />
         </div>
 
-        <div className="admin-form-field admin-form-field-full">
-          <label htmlFor="contact-email" className="admin-label">Email</label>
+        <div className={`${styles.formField} ${styles.formFieldFull}`}>
+          <label htmlFor="contact-email" className={styles.label}>Email</label>
           <input
             id="contact-email"
             type="email"
-            className="admin-input"
+            className={styles.input}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
@@ -194,41 +194,44 @@ export default function ContactForm({
           />
         </div>
 
-        <div className="admin-form-field admin-form-field-full">
-          <label htmlFor="contact-subject" className="admin-label">Subject</label>
+        <div className={`${styles.formField} ${styles.formFieldFull}`}>
+          <label htmlFor="contact-subject" className={styles.label}>Subject</label>
           <input
             id="contact-subject"
             type="text"
-            className="admin-input"
+            className={styles.input}
             value={subject}
             onChange={(event) => setSubject(event.target.value)}
             maxLength={160}
+            placeholder="Example: Registration question for upcoming event"
             required
           />
         </div>
 
-        <div className="admin-form-field admin-form-field-full">
-          <label htmlFor="contact-details" className="admin-label">Details</label>
+        <div className={`${styles.formField} ${styles.formFieldFull}`}>
+          <label htmlFor="contact-details" className={styles.label}>Details</label>
           <textarea
             id="contact-details"
-            className="admin-textarea"
+            className={styles.textarea}
             value={details}
             onChange={(event) => setDetails(event.target.value)}
             rows={8}
             maxLength={5000}
+            placeholder="Share the relevant details, names, dates, event context, or account information needed to help resolve your request."
             required
           />
+          <p className={styles.fieldHint}>Include the event, player, or account context if it applies.</p>
         </div>
 
-        <div className="admin-form-field admin-form-field-full">
-          <label htmlFor="contact-verification" className="admin-label">Human verification</label>
-          <span className="login-support-copy">
+        <div className={`${styles.formField} ${styles.formFieldFull}`}>
+          <label htmlFor="contact-verification" className={styles.label}>Human verification</label>
+          <span className={styles.challengePrompt}>
             {isLoadingChallenge ? "Loading challenge..." : verificationPrompt}
           </span>
           <input
             id="contact-verification"
             type="text"
-            className="admin-input"
+            className={styles.input}
             value={verificationAnswer}
             onChange={(event) => setVerificationAnswer(event.target.value)}
             required
@@ -236,7 +239,7 @@ export default function ContactForm({
           />
         </div>
 
-        <div className="admin-form-field" style={{ display: "none" }} aria-hidden="true">
+        <div className={styles.honeypotField} aria-hidden="true">
           <span>Website</span>
           <input
             tabIndex={-1}
@@ -248,10 +251,13 @@ export default function ContactForm({
         </div>
       </div>
 
-      {error ? <p className="admin-form-error">{error}</p> : null}
+      {error ? <p className={styles.formError}>{error}</p> : null}
 
-      <div className="account-settings-actions">
-        <button type="submit" className="admin-primary-button" disabled={isSubmitting || isLoadingChallenge}>
+      <div className={styles.formFooter}>
+        <p className={styles.formFooterNote}>
+          Your message goes directly to the league team and is reviewed as part of the support queue.
+        </p>
+        <button type="submit" className={styles.submitButton} disabled={isSubmitting || isLoadingChallenge}>
           {isSubmitting ? "Sending..." : "Send Message"}
         </button>
       </div>

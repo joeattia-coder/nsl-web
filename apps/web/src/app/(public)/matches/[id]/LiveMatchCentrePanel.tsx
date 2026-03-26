@@ -34,6 +34,30 @@ type LiveMatchCentrePanelProps = {
   stats: HeadToHeadStatRow[];
 };
 
+function formatStatusLabel(value: string) {
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+function formatCompactDate(value: string | null) {
+  if (!value) {
+    return "Date TBC";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Date TBC";
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
 function isSameSnapshot(left: PublicLiveMatchSnapshot, right: PublicLiveMatchSnapshot) {
   return (
     left.updatedAt === right.updatedAt &&
@@ -68,6 +92,10 @@ export default function LiveMatchCentrePanel({
   stats,
 }: LiveMatchCentrePanelProps) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
+  const hasScore = typeof snapshot.homeScore === "number" || typeof snapshot.awayScore === "number";
+  const scoreLabel = hasScore ? `${snapshot.homeScore ?? 0} - ${snapshot.awayScore ?? 0}` : "VS";
+  const isLive = /LIVE|IN_PROGRESS/i.test(snapshot.matchStatus);
+  const compactMeta = `${formatCompactDate(scheduledAt)} • ${roundName} • ${seasonName}`;
 
   useEffect(() => {
     setSnapshot(initialSnapshot);
@@ -104,9 +132,18 @@ export default function LiveMatchCentrePanel({
           <div className={styles.titleRow}>
             <div>
               <h1 className={styles.title}>{tournamentName}</h1>
-              <p className={styles.subTitle}>{roundName} • {seasonName}</p>
+              <p className={styles.subTitle}>{compactMeta}</p>
             </div>
             <MatchCentreBackButton className={styles.backButton} fallbackHref={backHref} />
+          </div>
+
+          <div className={styles.statusRow}>
+            <span className={`${styles.statusPill} ${isLive ? styles.statusPillLive : styles.statusPillDefault}`}>
+              {formatStatusLabel(snapshot.matchStatus)}
+            </span>
+            <span className={styles.statusHint}>
+              Live score polling remains active while the match status changes.
+            </span>
           </div>
 
           <div className={styles.metaGrid}>
@@ -122,11 +159,15 @@ export default function LiveMatchCentrePanel({
             </div>
             <div className={styles.metaCard}>
               <span className={styles.metaLabel}>Status</span>
-              <span className={styles.metaValue}>{snapshot.matchStatus.replaceAll("_", " ")}</span>
+              <span className={styles.metaValue}>{formatStatusLabel(snapshot.matchStatus)}</span>
             </div>
             <div className={styles.metaCard}>
               <span className={styles.metaLabel}>Venue</span>
               <span className={styles.metaValue}>{venueLabel || "Venue TBC"}</span>
+            </div>
+            <div className={styles.metaCard}>
+              <span className={styles.metaLabel}>Scoreline</span>
+              <span className={styles.metaValue}>{scoreLabel}</span>
             </div>
           </div>
         </div>

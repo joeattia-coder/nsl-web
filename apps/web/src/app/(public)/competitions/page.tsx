@@ -32,9 +32,15 @@ interface League {
   Season: Season[];
 }
 
-export default async function CompetitionsPage() {
+type CompetitionsData = {
+  league: League | null;
+  season: Season | null;
+  tournaments: Tournament[];
+  loadError: boolean;
+};
+
+async function loadCompetitionsData(): Promise<CompetitionsData> {
   try {
-    // Fetch active league with its active season and published tournaments
     const league = await prisma.league.findFirst({
       where: { isActive: true },
       select: {
@@ -64,112 +70,133 @@ export default async function CompetitionsPage() {
             },
           },
           orderBy: { startDate: "desc" },
-          take: 1, // Get the most recent active season
+          take: 1,
         },
       },
     });
 
-    if (!league || !league.Season || league.Season.length === 0) {
-      return (
-        <div className={styles.container}>
-          <div className={styles.header}>
-            <h1 className={styles.title}>Competitions</h1>
-          </div>
-          <div className={styles.emptyState}>
-            <p>No active competitions at the moment.</p>
-          </div>
-        </div>
-      );
+    if (!league || league.Season.length === 0) {
+      return {
+        league: null,
+        season: null,
+        tournaments: [],
+        loadError: false,
+      };
     }
 
     const season = league.Season[0];
-    const tournaments = season.tournaments;
 
-    return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Competitions</h1>
-          <div className={styles.leagueInfo}>
-            {league.logoUrl && (
-              <img src={league.logoUrl} alt={league.leagueName} className={styles.logo} />
-            )}
-            <div className={styles.leagueDetails}>
-              <p className={styles.leagueName}>{league.leagueName}</p>
-              <p className={styles.seasonName}>{season.seasonName}</p>
-            </div>
-          </div>
-        </div>
-
-        {tournaments.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p>No competitions scheduled for this season yet.</p>
-          </div>
-        ) : (
-          <div className={styles.competitionsGrid}>
-            {tournaments.map((tournament) => (
-              <Link
-                key={tournament.id}
-                href={`/tournaments?id=${tournament.id}`}
-                className={styles.competitionCard}
-              >
-                <div className={styles.cardHeader}>
-                  <h3 className={styles.cardTitle}>{tournament.tournamentName}</h3>
-                  <span className={styles.participantBadge}>
-                    {tournament.participantType}
-                  </span>
-                </div>
-
-                {tournament.description && (
-                  <p className={styles.cardDescription}>{tournament.description}</p>
-                )}
-
-                <div className={styles.cardMeta}>
-                  <div className={styles.metaItem}>
-                    <span className={styles.metaLabel}>Status</span>
-                    <span className={`${styles.metaValue} ${styles[`status-${tournament.status.toLowerCase()}`]}`}>
-                      {tournament.status.replace(/_/g, " ")}
-                    </span>
-                  </div>
-
-                  {tournament.startDate && (
-                    <div className={styles.metaItem}>
-                      <span className={styles.metaLabel}>Starts</span>
-                      <span className={styles.metaValue}>
-                        <LocalTimeText value={tournament.startDate.toISOString()} options={{ year: "numeric", month: "numeric", day: "numeric" }} />
-                      </span>
-                    </div>
-                  )}
-
-                  {tournament.endDate && (
-                    <div className={styles.metaItem}>
-                      <span className={styles.metaLabel}>Ends</span>
-                      <span className={styles.metaValue}>
-                        <LocalTimeText value={tournament.endDate.toISOString()} options={{ year: "numeric", month: "numeric", day: "numeric" }} />
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className={styles.cardFooter}>
-                  <span className={styles.viewButton}>View Competition →</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    );
+    return {
+      league,
+      season,
+      tournaments: season.tournaments,
+      loadError: false,
+    };
   } catch (error) {
     console.error("Error fetching competitions:", error);
-    return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Competitions</h1>
-        </div>
-        <div className={styles.emptyState}>
-          <p>Unable to load competitions. Please try again later.</p>
-        </div>
-      </div>
-    );
+
+    return {
+      league: null,
+      season: null,
+      tournaments: [],
+      loadError: true,
+    };
   }
+}
+
+export default async function CompetitionsPage() {
+  const { season, tournaments, loadError } = await loadCompetitionsData();
+
+  return (
+    <main className={styles.container}>
+      <section className={styles.pageSection}>
+        <header className={styles.header}>
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}>NSL Competitions</p>
+            <h1 className={styles.title}>Competitions</h1>
+            <p className={styles.intro}>
+              Browse the active public competition slate, review the current season, and move directly into tournament pages from a cleaner league overview.
+            </p>
+          </div>
+        </header>
+
+        {loadError ? (
+          <div className={styles.emptyState}>
+            <h2>Unable to load competitions</h2>
+            <p>Please try again later.</p>
+          </div>
+        ) : !season ? (
+          <div className={styles.emptyState}>
+            <h2>No active competitions yet</h2>
+            <p>No active competitions are available at the moment.</p>
+          </div>
+        ) : tournaments.length === 0 ? (
+          <div className={styles.emptyState}>
+            <h2>No competitions scheduled</h2>
+            <p>No competitions are scheduled for this season yet.</p>
+          </div>
+        ) : (
+          <section className={styles.directorySection}>
+            <div className={styles.directoryHeader}>
+              <div>
+                <p className={styles.sectionLabel}>Schedule</p>
+                <h2 className={styles.sectionTitle}>Published competitions for the current season.</h2>
+              </div>
+              <p className={styles.sectionMeta}>{tournaments.length} {tournaments.length === 1 ? "competition" : "competitions"}</p>
+            </div>
+
+            <div className={styles.competitionsGrid}>
+              {tournaments.map((tournament) => (
+                <Link
+                  key={tournament.id}
+                  href={`/tournaments?id=${tournament.id}`}
+                  className={styles.competitionCard}
+                >
+                  <div className={styles.cardHeader}>
+                    <h3 className={styles.cardTitle}>{tournament.tournamentName}</h3>
+                    <span className={styles.participantBadge}>{tournament.participantType}</span>
+                  </div>
+
+                  <p className={styles.cardDescription}>
+                    {tournament.description || "Open the competition page for the full format, schedule, and tournament detail."}
+                  </p>
+
+                  <div className={styles.cardMeta}>
+                    <div className={styles.metaItem}>
+                      <span className={styles.metaLabel}>Status</span>
+                      <span className={`${styles.metaValue} ${styles[`status-${tournament.status.toLowerCase()}`]}`}>
+                        {tournament.status.replace(/_/g, " ")}
+                      </span>
+                    </div>
+
+                    {tournament.startDate ? (
+                      <div className={styles.metaItem}>
+                        <span className={styles.metaLabel}>Starts</span>
+                        <span className={styles.metaValue}>
+                          <LocalTimeText value={tournament.startDate.toISOString()} options={{ year: "numeric", month: "short", day: "numeric" }} />
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {tournament.endDate ? (
+                      <div className={styles.metaItem}>
+                        <span className={styles.metaLabel}>Ends</span>
+                        <span className={styles.metaValue}>
+                          <LocalTimeText value={tournament.endDate.toISOString()} options={{ year: "numeric", month: "short", day: "numeric" }} />
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className={styles.cardFooter}>
+                    <span className={styles.viewButton}>View Competition</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </section>
+    </main>
+  );
 }

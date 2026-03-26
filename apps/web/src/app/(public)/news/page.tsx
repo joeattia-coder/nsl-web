@@ -21,26 +21,45 @@ export default async function NewsListingPage() {
     },
   });
 
+  const featuredArticle = articles[0] ?? null;
+  const remainingArticles = featuredArticle ? articles.slice(1) : [];
+
   return (
     <main className={styles.newsPage}>
       <section className={styles.newsSection}>
-        <div className={styles.newsHero}>
-          <p className={styles.newsEyebrow}>
-            NSL Newsroom
-          </p>
-          <h1 className={styles.newsTitle}>Latest league stories</h1>
-          <p className={styles.newsSubtitle}>
-            Match reports, announcements, and editorial updates from across the National Snooker League.
-          </p>
-        </div>
+        <header className={styles.newsHero}>
+          <div className={styles.newsHeroCopy}>
+            <p className={styles.newsEyebrow}>NSL Newsroom</p>
+            <h1 className={styles.newsTitle}>Latest league stories</h1>
+            <p className={styles.newsSubtitle}>
+              Match reports, announcements, and editorial updates from across the National Snooker League.
+            </p>
+          </div>
+        </header>
 
         {articles.length === 0 ? (
           <div className={styles.emptyState}>
             No published news yet.
           </div>
         ) : (
-          <div className={styles.newsGrid}>
-            {articles.map((article) => (
+          <section className={styles.newsFeedSection}>
+            <div className={styles.newsFeedHeader}>
+              <div>
+                <p className={styles.newsFeedLabel}>Archive</p>
+                <h2 className={styles.newsFeedTitle}>
+                  {remainingArticles.length > 0 ? "More stories from the newsroom." : "The latest story is live now."}
+                </h2>
+              </div>
+              <p className={styles.newsFeedMeta}>{articles.length} published {articles.length === 1 ? "article" : "articles"}</p>
+            </div>
+
+            {remainingArticles.length === 0 ? (
+              <div className={styles.singleStoryState}>
+                The featured story above is currently the newest and only published article.
+              </div>
+            ) : (
+              <div className={styles.newsGrid}>
+                {remainingArticles.map((article) => (
               <article
                 key={article.id}
                 className={styles.newsCard}
@@ -82,8 +101,10 @@ export default async function NewsListingPage() {
                   </Link>
                 </div>
               </article>
-            ))}
-          </div>
+                ))}
+              </div>
+            )}
+          </section>
         )}
       </section>
     </main>

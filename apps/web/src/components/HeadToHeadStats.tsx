@@ -80,6 +80,19 @@ function renderPlayerPhoto(photo: string | null, name: string) {
   return <Image src="/images/player_silhouette.svg" alt="" width={320} height={400} className={styles.playerImage} />;
 }
 
+function renderPlayerName(name: string) {
+  const trimmedName = name.trim();
+  const [firstToken, ...remainingTokens] = trimmedName.split(/\s+/);
+  const secondaryLine = remainingTokens.join(" ");
+
+  return (
+    <>
+      <span className={styles.playerLabelPrimary}>{firstToken || trimmedName}</span>
+      {secondaryLine ? <span className={styles.playerLabelSecondary}>{secondaryLine}</span> : null}
+    </>
+  );
+}
+
 export default function HeadToHeadStats({
   leftPlayerName,
   rightPlayerName,
@@ -108,10 +121,10 @@ export default function HeadToHeadStats({
               <div className={styles.playerLabelRow}>
                 {leftPlayerHref ? (
                   <Link id="head-to-head-title" href={leftPlayerHref} className={`${styles.playerLabel} public-player-link`}>
-                    {leftPlayerName}
+                    {renderPlayerName(leftPlayerName)}
                   </Link>
                 ) : (
-                  <h2 id="head-to-head-title" className={styles.playerLabel}>{leftPlayerName}</h2>
+                  <h2 id="head-to-head-title" className={styles.playerLabel}>{renderPlayerName(leftPlayerName)}</h2>
                 )}
                 {leftPlayerFlagUrl ? (
                   <Image
@@ -161,10 +174,10 @@ export default function HeadToHeadStats({
                 ) : null}
                 {rightPlayerHref ? (
                   <Link href={rightPlayerHref} className={`${styles.playerLabel} public-player-link`}>
-                    {rightPlayerName}
+                    {renderPlayerName(rightPlayerName)}
                   </Link>
                 ) : (
-                  <div className={styles.playerLabel}>{rightPlayerName}</div>
+                  <div className={styles.playerLabel}>{renderPlayerName(rightPlayerName)}</div>
                 )}
               </div>
             </div>

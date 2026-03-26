@@ -50,32 +50,53 @@ export default async function ContactPage() {
     <main className={styles.contactPage}>
       <section className={styles.contactSection}>
         <header className={styles.hero}>
-          <p className={styles.eyebrow}>Contact NSL</p>
-          <h1 className={styles.title}>Get in touch with the league team</h1>
-          <p className={styles.subtitle}>
-            Send a message directly to the National Snooker League and we will forward it to
-            {" "}
-            <strong>
-              <a href="mailto:info@nsl-tv.com">info@nsl-tv.com</a>
-            </strong>
-            .
-          </p>
-        </header>
-
-        <div className={styles.formShell}>
-          <div className={styles.formIntro}>
-            <h2 className={styles.formTitle}>Contact form</h2>
-            <p className={styles.formCopy}>
-              Use the form below for general league questions, event inquiries, and support requests.
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}>Contact NSL</p>
+            <h1 className={styles.title}>Get in touch with the league team</h1>
+            <p className={styles.subtitle}>
+              Send a message directly to the National Snooker League for league questions, event inquiries, support requests, and general communication with the team.
             </p>
           </div>
+        </header>
 
-          <ContactForm
-            initialFirstName={firstName}
-            initialLastName={lastName}
-            initialEmail={email}
-          />
-        </div>
+        <section className={styles.contactLayout}>
+          <div className={styles.formShell}>
+            <div className={styles.formIntro}>
+              <p className={styles.sectionLabel}>Contact Form</p>
+              <h2 className={styles.formTitle}>Send a message with the details that matter.</h2>
+              <p className={styles.formCopy}>
+                Use the form below for general league questions, event inquiries, and support requests. The clearer the details, the faster the response path.
+              </p>
+            </div>
+
+            <ContactForm
+              initialFirstName={firstName}
+              initialLastName={lastName}
+              initialEmail={email}
+            />
+          </div>
+
+          <aside className={styles.contactAside}>
+            <div className={styles.asideCard}>
+              <p className={styles.asideLabel}>What To Include</p>
+              <h2 className={styles.asideTitle}>Make your message easy to act on.</h2>
+              <div className={styles.asideList}>
+                <div className={styles.asideItem}>
+                  <span>01</span>
+                  <p>Name the event, competition, or account issue clearly.</p>
+                </div>
+                <div className={styles.asideItem}>
+                  <span>02</span>
+                  <p>Summarize the problem or request in the subject line first.</p>
+                </div>
+                <div className={styles.asideItem}>
+                  <span>03</span>
+                  <p>Add the context the team needs so they can respond without guessing.</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </section>
       </section>
     </main>
   );

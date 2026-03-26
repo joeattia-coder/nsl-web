@@ -27,7 +27,7 @@ type Player = {
 };
 
 function getFlagSrc(country: string | undefined) {
-  return getFlagCdnUrl(country, "w40");
+  return getFlagCdnUrl(country, "w20");
 }
 
 function compareAlphabetical(left: Player, right: Player) {
@@ -109,7 +109,7 @@ function renderCountryCell(player: Player) {
   const flagSrc = getFlagSrc(player.country);
 
   if (!flagSrc) {
-    return <span className={styles.rankingsCountryFallback}>—</span>;
+    return <span className={styles.rankingsCountryFallback}>-</span>;
   }
 
   return (
@@ -127,7 +127,7 @@ function renderCountryCell(player: Player) {
 export default function RankingsPageContent() {
   const [selectedView, setSelectedView] = useState<"ranking" | "elo" | "highbreak">("ranking");
   const [players, setPlayers] = useState<Player[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const rankingPlayers = [...players].sort(compareRanking);
@@ -138,9 +138,6 @@ export default function RankingsPageContent() {
   const highBreakLeader = highBreakPlayers[0];
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-
     fetch("/api/public/player-rankings")
       .then(async (res) => {
         if (!res.ok) throw new Error("Failed to fetch rankings");
@@ -157,13 +154,16 @@ export default function RankingsPageContent() {
     <main className={styles.rankingsPage}>
       <section className={styles.rankingsSection}>
         <header className={styles.rankingsHeader}>
-          <h1 className={styles.rankingsTitle}>Player Rankings</h1>
-          <p className={styles.rankingsIntro}>
-            Switch between standings, ELO, and high breaks using the same card treatment as the admin dashboard.
-          </p>
-          <p className={styles.rankingsMeta}>
-            ELO uses match result plus frame-share: 75% win/loss outcome and 25% share of frames won, with faster movement for newer players.
-          </p>
+          <div className={styles.rankingsHeroCopy}>
+            <p className={styles.rankingsEyebrow}>NSL Rankings</p>
+            <h1 className={styles.rankingsTitle}>Player Rankings</h1>
+            <p className={styles.rankingsIntro}>
+              Switch between standings, ELO, and high breaks in a cleaner public leaderboard built to make league performance easier to read.
+            </p>
+            <p className={styles.rankingsMeta}>
+              ELO uses match result plus frame-share: 75% win/loss outcome and 25% share of frames won, with faster movement for newer players.
+            </p>
+          </div>
         </header>
 
         <div className={styles.rankingsCards}>
@@ -240,6 +240,7 @@ export default function RankingsPageContent() {
                     <tr>
                       <th>{renderHeaderLabel("RK", "Rank")}</th>
                       <th>{renderHeaderLabel("PLYR", "Player")}</th>
+                      <th className={styles.rankingsFlagHeader} aria-label="Country flag" />
                       <th>{renderHeaderLabel("MP", "Matches Played")}</th>
                       <th>{renderHeaderLabel("PTS", "Points")}</th>
                       <th>{renderHeaderLabel("W", "Matches Won")}</th>
@@ -249,23 +250,22 @@ export default function RankingsPageContent() {
                       <th>{renderHeaderLabel("FD", "Frame Differential")}</th>
                       <th>{renderHeaderLabel("HB", "High Break")}</th>
                       <th>{renderHeaderLabel("HBC", "High Break Cumulative")}</th>
-                      <th>{renderHeaderLabel("CTRY", "Country")}</th>
                     </tr>
                   )}
                   {selectedView === "elo" && (
                     <tr>
                       <th>{renderHeaderLabel("RK", "Rank")}</th>
                       <th>{renderHeaderLabel("PLYR", "Player")}</th>
+                      <th className={styles.rankingsFlagHeader} aria-label="Country flag" />
                       <th>{renderHeaderLabel("ELO", "ELO Rating")}</th>
-                      <th>{renderHeaderLabel("CTRY", "Country")}</th>
                     </tr>
                   )}
                   {selectedView === "highbreak" && (
                     <tr>
                       <th>{renderHeaderLabel("RK", "Rank")}</th>
                       <th>{renderHeaderLabel("PLYR", "Player")}</th>
+                      <th className={styles.rankingsFlagHeader} aria-label="Country flag" />
                       <th>{renderHeaderLabel("HB", "High Break")}</th>
-                      <th>{renderHeaderLabel("CTRY", "Country")}</th>
                     </tr>
                   )}
                 </thead>
@@ -276,6 +276,7 @@ export default function RankingsPageContent() {
                       <tr key={player.id} className={idx % 2 === 0 ? styles.rankingsRow : `${styles.rankingsRow} ${styles.rankingsRowAlt}`}>
                         <td>{idx + 1}</td>
                         <td>{renderPlayerCell(player)}</td>
+                        <td className={styles.rankingsFlagCell}>{renderCountryCell(player)}</td>
                         <td>{player.matchesPlayed}</td>
                         <td>{player.points}</td>
                         <td>{player.matchesWon}</td>
@@ -285,7 +286,6 @@ export default function RankingsPageContent() {
                         <td>{player.frameDifferential}</td>
                         <td>{player.highBreak}</td>
                         <td>{player.highBreakCumulative}</td>
-                        <td>{renderCountryCell(player)}</td>
                       </tr>
                     ))}
 
@@ -294,8 +294,8 @@ export default function RankingsPageContent() {
                       <tr key={player.id} className={idx % 2 === 0 ? styles.rankingsRow : `${styles.rankingsRow} ${styles.rankingsRowAlt}`}>
                         <td>{idx + 1}</td>
                         <td>{renderPlayerCell(player)}</td>
+                        <td className={styles.rankingsFlagCell}>{renderCountryCell(player)}</td>
                         <td>{player.eloRating ?? 0}</td>
-                        <td>{renderCountryCell(player)}</td>
                       </tr>
                     ))}
 
@@ -304,8 +304,8 @@ export default function RankingsPageContent() {
                       <tr key={player.id} className={idx % 2 === 0 ? styles.rankingsRow : `${styles.rankingsRow} ${styles.rankingsRowAlt}`}>
                         <td>{idx + 1}</td>
                         <td>{renderPlayerCell(player)}</td>
+                        <td className={styles.rankingsFlagCell}>{renderCountryCell(player)}</td>
                         <td>{player.highBreak}</td>
-                        <td>{renderCountryCell(player)}</td>
                       </tr>
                     ))}
                 </tbody>

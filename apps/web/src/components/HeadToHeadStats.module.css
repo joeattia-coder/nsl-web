@@ -99,10 +99,25 @@
 }
 
 .playerLabel {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem;
   font-size: clamp(1rem, 2vw, 1.28rem);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--theme-page-text);
+}
+
+.playerLabelPrimary,
+.playerLabelSecondary {
+  display: block;
+}
+
+.playerLabelSecondary {
+  color: var(--theme-page-muted-3);
+  font-size: 0.88em;
+  font-weight: 700;
 }
 
 .playerFlag {
@@ -264,17 +279,37 @@
   }
 
   .playerLabel {
-    font-size: 0.92rem;
+    display: grid;
+    justify-items: center;
+    gap: 0.12rem;
+    font-size: 0.88rem;
+    line-height: 1.05;
+    width: 100%;
   }
 
   .playerLabelRow {
     flex-direction: column;
     align-items: center;
     gap: 0.3rem;
+    width: 100%;
   }
 
   .playerLabel {
     order: 1;
+  }
+
+  .playerLabelPrimary,
+  .playerLabelSecondary {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .playerLabelSecondary {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   .playerFlag {

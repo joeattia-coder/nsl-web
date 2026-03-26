@@ -4,13 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import {
+  FiActivity,
+  FiCalendar,
+  FiChevronLeft,
+  FiChevronRight,
+  FiGrid,
+  FiPlayCircle,
+} from "react-icons/fi";
 import { KnockoutBracket } from "@/components/tournament-bracket/KnockoutBracket";
 import type { BracketRound } from "@/components/tournament-bracket/types";
 import { getFlagCdnUrl } from "@/lib/country";
 import type { PublicLiveMatchListResponse, PublicLiveMatchSnapshot } from "@/lib/live-match";
 import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { useLivePolling } from "@/lib/useLivePolling";
+import styles from "./MatchesPage.module.css";
 
 type AnyObj = Record<string, unknown>;
 
@@ -35,6 +43,7 @@ type UiMatch = {
   id: string;
   dateLabel: string;
   timeLabel: string;
+  matchStatus: string;
 
   homeName: string;
   roadName: string;
@@ -186,11 +195,13 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
   const roadScore = roadScoreVal === null || roadScoreVal === undefined ? "" : String(roadScoreVal);
   const homePlayerPhotoUrl = firstString(fx, ["homePlayerPhotoUrl", "HomePlayerPhotoUrl"], "");
   const roadPlayerPhotoUrl = firstString(fx, ["roadPlayerPhotoUrl", "RoadPlayerPhotoUrl"], "");
+  const matchStatus = firstString(fx, ["matchStatus", "MatchStatus"], "SCHEDULED");
 
   return {
     id,
     dateLabel: dateLabel || (rawFixtureDate ? rawFixtureDate : ""),
     timeLabel,
+    matchStatus,
     homeName,
     roadName,
     homePlayerId: firstString(fx, ["homePlayerId", "HomePlayerId"], "") || null,
@@ -212,6 +223,15 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
 
 function getFixtureIdentity(fx: AnyObj) {
   return firstString(fx, ["fixtureId", "FixtureID", "FixtureId", "id", "ID"], "");
+}
+
+function formatStatusLabel(value: string) {
+  const source = value.trim() || "SCHEDULED";
+  return source
+    .toLowerCase()
+    .split("_")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
 }
 
 function applyLiveSnapshots(current: AnyObj[] | null, snapshots: PublicLiveMatchSnapshot[]) {
@@ -415,6 +435,17 @@ export default function MatchesPageClient() {
   const selectedGroupDesc =
     groups.find((g) => String(g.id) === String(activeGroupId))?.desc || "Matches";
   const roundDesc = filteredMatches[0]?.roundDesc || "";
+  const totalMatches = filteredMatches.length;
+  const liveMatches = filteredMatches.filter((match) => /LIVE|IN_PROGRESS/i.test(match.matchStatus)).length;
+  const completedMatches = filteredMatches.filter(
+    (match) => match.matchStatus === "COMPLETED" || match.homeScore !== "" || match.roadScore !== ""
+  ).length;
+  const activeViewLabel =
+    activeTab === "matches"
+      ? "Live fixtures and scheduled pairings"
+      : activeTab === "groups"
+        ? "Round-robin tables and standings"
+        : "Broadcast bracket projection";
 
   useLivePolling({
     enabled: Boolean(activeGroupId) && fixturesRaw !== null,
@@ -595,81 +626,140 @@ export default function MatchesPageClient() {
   }, [standingsGroups]);
 
   return (
-    <main className="content matches-page-shell">
-      <div className="matches-page-header">
-        <div>
-          <h1 className="matches-page-title">Matches</h1>
-          <p className="matches-page-subtitle">Browse fixtures by tournament.</p>
-        </div>
-      </div>
+    <main className={`content ${styles.page}`}>
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}>Competition Hub</p>
+            <div className={styles.titleRow}>
+              <div>
+                <h1 className={styles.title}>Matches</h1>
+                <p className={styles.subtitle}>
+                  Follow every published fixture, group table, and knockout path from one broadcast-style control room.
+                </p>
+              </div>
+            </div>
+          </div>
 
-      <section className="season-switch-section">
-        <h2 className="season-title">Season</h2>
+          <div className={styles.heroStats}>
+            <article className={styles.statCard}>
+              <div className={styles.statTop}>
+                <p className={styles.statLabel}>Selected Tournament</p>
+                <span className={styles.statIcon} aria-hidden="true">
+                  <FiGrid />
+                </span>
+              </div>
+              <p className={styles.statValue}>{groups.length}</p>
+              <p className={styles.statHint}>Published groups available to browse across the current public schedule.</p>
+            </article>
 
-        <div className="season-switch season-switch-three" role="tablist" aria-label="Matches page view">
-          <button
-            type="button"
-            className={`season-tab ${activeTab === "matches" ? "active" : ""}`}
-            onClick={() => setActiveTab("matches")}
-            role="tab"
-            aria-selected={activeTab === "matches"}
-          >
-            Matches
-          </button>
+            <article className={styles.statCard}>
+              <div className={styles.statTop}>
+                <p className={styles.statLabel}>Fixtures</p>
+                <span className={styles.statIcon} aria-hidden="true">
+                  <FiCalendar />
+                </span>
+              </div>
+              <p className={styles.statValue}>{totalMatches}</p>
+              <p className={styles.statHint}>Matches currently attached to {selectedGroupDesc.toLowerCase()}.</p>
+            </article>
 
-          <button
-            type="button"
-            className={`season-tab ${activeTab === "groups" ? "active" : ""}`}
-            onClick={() => setActiveTab("groups")}
-            role="tab"
-            aria-selected={activeTab === "groups"}
-          >
-            Groups
-          </button>
+            <article className={styles.statCard}>
+              <div className={styles.statTop}>
+                <p className={styles.statLabel}>Live / In Progress</p>
+                <span className={styles.statIcon} aria-hidden="true">
+                  <FiPlayCircle />
+                </span>
+              </div>
+              <p className={styles.statValue}>{liveMatches}</p>
+              <p className={styles.statHint}>Live polling keeps active scorelines current without reloading the page.</p>
+            </article>
 
-          <button
-            type="button"
-            className={`season-tab ${activeTab === "knockout" ? "active" : ""}`}
-            onClick={() => setActiveTab("knockout")}
-            role="tab"
-            aria-selected={activeTab === "knockout"}
-          >
-            Knockout Stage
-          </button>
+            <article className={styles.statCard}>
+              <div className={styles.statTop}>
+                <p className={styles.statLabel}>Completed</p>
+                <span className={styles.statIcon} aria-hidden="true">
+                  <FiActivity />
+                </span>
+              </div>
+              <p className={styles.statValue}>{completedMatches}</p>
+              <p className={styles.statHint}>{activeViewLabel} for the currently selected event.</p>
+            </article>
+          </div>
         </div>
       </section>
 
-      <section className="groups-section">
-        <div className="groups-carousel-wrapper">
-          {canScrollGroupsLeft && (
+      <section className={styles.controlsPanel}>
+        <div className={styles.controlsHeader}>
+          <div>
+            <p className={styles.sectionEyebrow}>Navigation</p>
+            <h2 className={styles.sectionTitle}>Choose a view and tournament</h2>
+            <p className={styles.sectionBodyCopy}>
+              Switch between the live match list, round-robin standings, and the knockout bracket while keeping the same tournament in focus.
+            </p>
+          </div>
+
+          <div className={styles.tabList} role="tablist" aria-label="Matches page view">
             <button
-              className="carousel-arrow left"
+              type="button"
+              className={`${styles.tabButton} ${activeTab === "matches" ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab("matches")}
+              role="tab"
+              aria-selected={activeTab === "matches"}
+            >
+              Matches
+            </button>
+            <button
+              type="button"
+              className={`${styles.tabButton} ${activeTab === "groups" ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab("groups")}
+              role="tab"
+              aria-selected={activeTab === "groups"}
+            >
+              Groups
+            </button>
+            <button
+              type="button"
+              className={`${styles.tabButton} ${activeTab === "knockout" ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab("knockout")}
+              role="tab"
+              aria-selected={activeTab === "knockout"}
+            >
+              Knockout
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.groupsShell}>
+          {canScrollGroupsLeft ? (
+            <button
+              className={`${styles.carouselArrow} ${styles.carouselArrowLeft}`}
               onClick={() => scrollGroups("left")}
               aria-label="Scroll tournaments left"
               type="button"
             >
-              <FiChevronLeft size={24} style={{ stroke: "#fff" }} />
+              <FiChevronLeft size={20} />
             </button>
-          )}
+          ) : null}
 
-          {canScrollGroupsRight && (
+          {canScrollGroupsRight ? (
             <button
-              className="carousel-arrow right"
+              className={`${styles.carouselArrow} ${styles.carouselArrowRight}`}
               onClick={() => scrollGroups("right")}
               aria-label="Scroll tournaments right"
               type="button"
             >
-              <FiChevronRight size={24} style={{ stroke: "#fff" }} />
+              <FiChevronRight size={20} />
             </button>
-          )}
+          ) : null}
 
-          <div className="groups-row" ref={groupsRowRef}>
+          <div className={styles.groupsScroller} ref={groupsRowRef}>
             {groups.map((g) => (
               <button
                 key={g.id}
                 ref={String(activeGroupId) === String(g.id) ? activeGroupButtonRef : null}
                 type="button"
-                className={`group-pill ${String(activeGroupId) === String(g.id) ? "active" : ""}`}
+                className={`${styles.groupButton} ${String(activeGroupId) === String(g.id) ? styles.groupButtonActive : ""}`}
                 onClick={() => updateSelectedGroupId(g.id)}
                 title={g.desc}
               >
@@ -677,272 +767,297 @@ export default function MatchesPageClient() {
               </button>
             ))}
           </div>
-        </div>
 
-        {groupsError && <div className="api-error">Failed to load tournaments: {groupsError}</div>}
-        {!groupsError && groupsRaw === null && <div className="api-loading">Loading tournaments…</div>}
+          {groupsError ? <p className={styles.statusText}>Failed to load tournaments: {groupsError}</p> : null}
+          {!groupsError && groupsRaw === null ? <p className={styles.statusText}>Loading tournaments...</p> : null}
+        </div>
       </section>
 
-      {activeTab === "matches" && (
-        <section className="matches-list-section">
-          <div className="matches-list-header">
-            <h2 className="matches-list-title">
-              {selectedGroupDesc}
-              {roundDesc && ` - ${roundDesc}`}
-            </h2>
+      {activeTab === "matches" ? (
+        <section className={styles.contentPanel}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.sectionEyebrow}>Matches</p>
+              <h2 className={styles.sectionTitle}>
+                {selectedGroupDesc}
+                {roundDesc ? ` - ${roundDesc}` : ""}
+              </h2>
+              <p className={styles.sectionBodyCopy}>Every pairing includes direct access to the match centre and live score updates when available.</p>
+            </div>
 
-            <div className="matches-list-meta">
+            <p className={styles.sectionMeta}>
               {fixturesError
                 ? `Failed to load fixtures: ${fixturesError}`
                 : fixturesRaw === null
-                  ? "Loading fixtures…"
+                  ? "Loading fixtures..."
                   : `${filteredMatches.length} matches`}
-            </div>
+            </p>
           </div>
 
-          <div className="matches-lines">
+          <div className={styles.matchGrid}>
             {filteredMatches.map((m) => {
               const hasScore = m.homeScore !== "" || m.roadScore !== "";
-              const scoreText = hasScore ? `${m.homeScore || "0"} - ${m.roadScore || "0"}` : "—";
+              const scoreText = hasScore ? `${m.homeScore || "0"} - ${m.roadScore || "0"}` : "VS";
+              const isLive = /LIVE|IN_PROGRESS/i.test(m.matchStatus);
+              const isComplete = m.matchStatus === "COMPLETED" || hasScore;
+              const scoreLabel = isComplete ? "Score" : "";
+              const scheduleLabel = m.dateLabel
+                ? (m.timeLabel && m.timeLabel !== "TBA" ? `${m.dateLabel} • ${m.timeLabel}` : m.dateLabel)
+                : m.timeLabel;
+              const statusClass = isLive
+                ? styles.statusLive
+                : isComplete
+                  ? styles.statusComplete
+                  : styles.statusScheduled;
 
               return (
-                <div className="match-line" key={m.id}>
-                  <div className="match-when">
-                    <div className="match-time">{m.timeLabel}</div>
-                    <div className="match-date">{m.dateLabel}</div>
+                <article className={styles.matchCard} key={m.id}>
+                  <div className={styles.matchCardTop}>
+                    <div className={styles.matchSchedule}>
+                      <span className={styles.scheduleLine}>{scheduleLabel || "TBA"}</span>
+                      <span className={`${styles.statusBadge} ${statusClass}`}>{formatStatusLabel(m.matchStatus)}</span>
+                    </div>
+
+                    <p className={styles.roundMeta}>{m.roundDesc || m.fixtureGroupDesc || "Published fixture"}</p>
                   </div>
 
-                  <div className="match-center">
-                    <div className="name-stack left">
-                      {m.homePlayerId ? (
-                        <Link className="public-player-link name-stack-link" href={`/players/${m.homePlayerId}`}>
-                          {!!m.homeParts.first && <div className="name-first">{m.homeParts.first}</div>}
-                          <div className="name-last">{m.homeParts.last || m.homeName}</div>
-                        </Link>
-                      ) : (
-                        <>
-                          {!!m.homeParts.first && <div className="name-first">{m.homeParts.first}</div>}
-                          <div className="name-last">{m.homeParts.last || m.homeName}</div>
-                        </>
-                      )}
-                      {m.homeCountryCode ? (
-                        <div className="name-flag-row name-flag-row-left">
+                  <div className={styles.matchBody}>
+                    <div className={styles.competitor}>
+                      <div className={styles.portrait}>
+                        {m.homePlayerPhotoUrl ? (
                           <Image
-                            src={getFlagCdnUrl(m.homeCountryCode, "w40") ?? ""}
-                            alt={m.homeCountryCode}
-                            width={40}
-                            height={30}
-                            className="name-flag-img"
-                            title={m.homeCountryCode}
+                            src={m.homePlayerPhotoUrl}
+                            alt={m.homeName}
+                            width={92}
+                            height={92}
+                            className={styles.portraitImage}
                           />
-                        </div>
-                      ) : null}
-                    </div>
-
-                    <div className="match-icon">
-                      {m.homePlayerPhotoUrl ? (
-                        <Image
-                          src={m.homePlayerPhotoUrl}
-                          alt={m.homeName}
-                          width={72}
-                          height={72}
-                          className="match-player-photo"
-                        />
-                      ) : (
-                        <Image
-                          src="/images/player_silhouette.svg"
-                          alt=""
-                          width={72}
-                          height={72}
-                          className="match-silhouette"
-                        />
-                      )}
-                    </div>
-
-                    <div className="match-score">{scoreText}</div>
-
-                    <div className="match-icon">
-                      {m.roadPlayerPhotoUrl ? (
-                        <Image
-                          src={m.roadPlayerPhotoUrl}
-                          alt={m.roadName}
-                          width={72}
-                          height={72}
-                          className="match-player-photo"
-                        />
-                      ) : (
-                        <Image
-                          src="/images/player_silhouette.svg"
-                          alt=""
-                          width={72}
-                          height={72}
-                          className="match-silhouette"
-                        />
-                      )}
-                    </div>
-
-                    <div className="name-stack right">
-                      {m.roadPlayerId ? (
-                        <Link className="public-player-link name-stack-link" href={`/players/${m.roadPlayerId}`}>
-                          {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}
-                          <div className="name-last">{m.roadParts.last || m.roadName}</div>
-                        </Link>
-                      ) : (
-                        <>
-                          {!!m.roadParts.first && <div className="name-first">{m.roadParts.first}</div>}
-                          <div className="name-last">{m.roadParts.last || m.roadName}</div>
-                        </>
-                      )}
-                      {m.roadCountryCode ? (
-                        <div className="name-flag-row name-flag-row-right">
+                        ) : (
                           <Image
-                            src={getFlagCdnUrl(m.roadCountryCode, "w40") ?? ""}
-                            alt={m.roadCountryCode}
-                            width={40}
-                            height={30}
-                            className="name-flag-img"
-                            title={m.roadCountryCode}
+                            src="/images/player_silhouette.svg"
+                            alt=""
+                            width={92}
+                            height={92}
+                            className={styles.portraitSilhouette}
                           />
+                        )}
+                      </div>
+
+                      <div className={styles.competitorText}>
+                        {m.homePlayerId ? (
+                          <Link href={`/players/${m.homePlayerId}`} className={styles.playerCell} title={m.homeName}>
+                            <span className={styles.playerCellText}>{m.homeName}</span>
+                          </Link>
+                        ) : (
+                          <p className={styles.competitorName}>{m.homeName}</p>
+                        )}
+                        <div className={styles.competitorSub}>
+                          {m.homeCountryCode ? (
+                            <Image
+                              src={getFlagCdnUrl(m.homeCountryCode, "w40") ?? ""}
+                              alt={m.homeCountryCode}
+                              width={26}
+                              height={18}
+                              className={styles.flag}
+                              title={m.homeCountryCode}
+                            />
+                          ) : null}
+                          <span>{m.homeParts.first || "Home side"}</span>
                         </div>
-                      ) : null}
+                      </div>
+                    </div>
+
+                    <div className={styles.scorePanel}>
+                      {scoreLabel ? <p className={styles.scoreLabel}>{scoreLabel}</p> : null}
+                      <p className={styles.scoreValue}>{scoreText}</p>
+                    </div>
+
+                    <div className={`${styles.competitor} ${styles.competitorRight}`}>
+                      <div className={styles.portrait}>
+                        {m.roadPlayerPhotoUrl ? (
+                          <Image
+                            src={m.roadPlayerPhotoUrl}
+                            alt={m.roadName}
+                            width={92}
+                            height={92}
+                            className={styles.portraitImage}
+                          />
+                        ) : (
+                          <Image
+                            src="/images/player_silhouette.svg"
+                            alt=""
+                            width={92}
+                            height={92}
+                            className={styles.portraitSilhouette}
+                          />
+                        )}
+                      </div>
+
+                      <div className={styles.competitorText}>
+                        {m.roadPlayerId ? (
+                          <Link href={`/players/${m.roadPlayerId}`} className={styles.playerCell} title={m.roadName}>
+                            <span className={styles.playerCellText}>{m.roadName}</span>
+                          </Link>
+                        ) : (
+                          <p className={styles.competitorName}>{m.roadName}</p>
+                        )}
+                        <div className={styles.competitorSub}>
+                          {m.roadCountryCode ? (
+                            <Image
+                              src={getFlagCdnUrl(m.roadCountryCode, "w40") ?? ""}
+                              alt={m.roadCountryCode}
+                              width={26}
+                              height={18}
+                              className={styles.flag}
+                              title={m.roadCountryCode}
+                            />
+                          ) : null}
+                          <span>{m.roadParts.first || "Away side"}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="match-actions">
-                    <Link href={`/matches/${m.id}?group=${encodeURIComponent(activeGroupId)}`} className="match-cta">
+                  <div className={styles.matchCardFooter}>
+                    <p className={styles.footerCopy}>Open the match centre for head-to-head context, live notes, and the latest scoreline.</p>
+                    <Link href={`/matches/${m.id}?group=${encodeURIComponent(activeGroupId)}`} className={styles.matchCta}>
                       Match Centre
                     </Link>
                   </div>
-                </div>
+                </article>
               );
             })}
 
-            {fixturesRaw !== null && !fixturesError && filteredMatches.length === 0 && (
-              <div className="empty-state">No matches found for this tournament.</div>
-            )}
+            {fixturesRaw !== null && !fixturesError && filteredMatches.length === 0 ? (
+              <div className={styles.emptyState}>No matches are published for this tournament yet.</div>
+            ) : null}
           </div>
         </section>
-      )}
+      ) : null}
 
-      {activeTab === "knockout" && (
-        <section className="knockout-section">
-          <div className="matches-list-header">
-            <h2 className="matches-list-title">{selectedGroupDesc} - Knockout Stage</h2>
-
-            <div className="matches-list-meta">
-              {knockoutError
-                ? `Failed to load bracket: ${knockoutError}`
-                : knockoutLoading
-                  ? "Loading bracket…"
-                  : knockoutBracket
-                    ? `${knockoutBracket.entrantsCount} advancing players`
-                    : ""}
+      {activeTab === "groups" ? (
+        <section className={styles.standingsPanel}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.sectionEyebrow}>Groups</p>
+              <h2 className={styles.sectionTitle}>{selectedGroupDesc}</h2>
+              <p className={styles.sectionBodyCopy}>Standings update from approved results and keep the current group order visible at a glance.</p>
             </div>
-          </div>
 
-          {knockoutBracket?.sourceRoundName ? (
-            <p className="knockout-source-text">
-              Bracket projection is based on {knockoutBracket.sourceRoundName} advancement settings.
-            </p>
-          ) : null}
-
-          {knockoutError ? <div className="empty-state">{knockoutError}</div> : null}
-
-          {!knockoutError && knockoutLoading ? (
-            <div className="empty-state">Loading knockout bracket…</div>
-          ) : null}
-
-          {!knockoutError && !knockoutLoading && knockoutBracket && knockoutBracket.rounds.length > 0 ? (
-            <KnockoutBracket
-              rounds={knockoutBracket.rounds}
-              title={`${selectedGroupDesc} Knockout Bracket`}
-              subtitle={
-                knockoutBracket.sourceRoundName
-                  ? `Advancing positions are seeded from ${knockoutBracket.sourceRoundName} and displayed in broadcast bracket order.`
-                  : "Track every knockout matchup through each round in a premium bracket layout."
-              }
-              className="mt-2"
-            />
-          ) : null}
-
-          {!knockoutError &&
-          !knockoutLoading &&
-          knockoutBracket &&
-          knockoutBracket.rounds.length === 0 ? (
-            <div className="empty-state">No knockout bracket is available for this tournament yet.</div>
-          ) : null}
-        </section>
-      )}
-
-      {activeTab === "groups" && (
-        <section className="standings-section">
-          <div className="standings-header">
-            <h2 className="standings-title">{selectedGroupDesc}</h2>
-
-            <div className="standings-meta">
+            <p className={styles.sectionMeta}>
               {standingsError
                 ? `Failed to load standings: ${standingsError}`
                 : standingsLoading
-                  ? "Loading standings…"
+                  ? "Loading standings..."
                   : standingsGroups
                     ? `${totalStandingsPlayers} players`
                     : ""}
-            </div>
+            </p>
           </div>
 
-          {!standingsLoading && !standingsError && standingsGroups && standingsGroups.length === 0 && (
-            <div className="empty-state">No group standings available for this tournament.</div>
-          )}
+          {!standingsLoading && !standingsError && standingsGroups && standingsGroups.length === 0 ? (
+            <div className={styles.emptyState}>No group standings are available for this tournament yet.</div>
+          ) : null}
 
-          {!standingsError &&
-            standingsGroups &&
-            standingsGroups.length > 0 &&
-            standingsGroups.map((g) => (
-              <div className="standings-block" key={g.standingsDesc}>
-                <div className="standings-block-title">{g.standingsDesc}</div>
-
-                <div className="standings-table-wrap">
-                  <table className="standings-table">
-                    <thead>
-                      <tr>
-                        <th className="col-rank">#</th>
-                        <th className="col-team">Player</th>
-                        <th className="col-num">P</th>
-                        <th className="col-num">W</th>
-                        <th className="col-num">L</th>
-                        <th className="col-num">+/-</th>
-                        <th className="col-pts">Pts</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {g.rows.map((r) => (
-                        <tr key={`${g.standingsDesc}-${r.rank}-${r.teamName}`}>
-                          <td className="col-rank">{r.rank}</td>
-                          <td className="col-team">
-                            {r.playerId ? (
-                              <Link className="player-cell public-player-link" href={`/players/${r.playerId}`} title={r.teamName}>
-                                {r.teamName}
-                              </Link>
-                            ) : (
-                              <div className="player-cell" title={r.teamName}>
-                                {r.teamName}
-                              </div>
-                            )}
-                          </td>
-                          <td className="col-num">{r.played}</td>
-                          <td className="col-num">{r.won}</td>
-                          <td className="col-num">{r.lost}</td>
-                          <td className="col-num">{r.diff}</td>
-                          <td className="col-pts">{r.points}</td>
+          {!standingsError && standingsGroups && standingsGroups.length > 0 ? (
+            <div className={styles.standingsStack}>
+              {standingsGroups.map((g) => (
+                <section className={styles.standingsBlock} key={g.standingsDesc}>
+                  <h3 className={styles.standingsBlockTitle}>{g.standingsDesc}</h3>
+                  <div className={styles.standingsTableWrap}>
+                    <table className={styles.standingsTable}>
+                      <thead>
+                        <tr>
+                          <th className={styles.rankCell}>#</th>
+                          <th className={styles.teamHeader}>Player</th>
+                          <th className={styles.numCell}>P</th>
+                          <th className={styles.numCell}>W</th>
+                          <th className={styles.numCell}>L</th>
+                          <th className={styles.numCell}>+/-</th>
+                          <th className={styles.ptsCell}>Pts</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
+                      </thead>
+                      <tbody>
+                        {g.rows.map((r) => (
+                          <tr key={`${g.standingsDesc}-${r.rank}-${r.teamName}`}>
+                            <td className={styles.rankCell}>{r.rank}</td>
+                            <td className={styles.teamCell}>
+                              {r.playerId ? (
+                                <Link href={`/players/${r.playerId}`} className={styles.playerCell} title={r.teamName}>
+                                  <span className={styles.playerCellText}>{r.teamName}</span>
+                                </Link>
+                              ) : (
+                                <span className={styles.playerCell} title={r.teamName}>
+                                  <span className={styles.playerCellText}>{r.teamName}</span>
+                                </span>
+                              )}
+                            </td>
+                            <td className={styles.numCell}>{r.played}</td>
+                            <td className={styles.numCell}>{r.won}</td>
+                            <td className={styles.numCell}>{r.lost}</td>
+                            <td className={styles.numCell}>{r.diff}</td>
+                            <td className={styles.ptsCell}>{r.points}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : null}
         </section>
-      )}
+      ) : null}
+
+      {activeTab === "knockout" ? (
+        <section className={styles.knockoutPanel}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.sectionEyebrow}>Knockout Stage</p>
+              <h2 className={styles.sectionTitle}>{selectedGroupDesc} Bracket</h2>
+              <p className={styles.sectionBodyCopy}>Track the elimination path and advancing positions from the selected competition.</p>
+            </div>
+
+            <p className={styles.sectionMeta}>
+              {knockoutError
+                ? `Failed to load bracket: ${knockoutError}`
+                : knockoutLoading
+                  ? "Loading bracket..."
+                  : knockoutBracket
+                    ? `${knockoutBracket.entrantsCount} advancing players`
+                    : ""}
+            </p>
+          </div>
+
+          {knockoutBracket?.sourceRoundName ? (
+            <p className={styles.knockoutIntro}>
+              Bracket seeding currently pulls from {knockoutBracket.sourceRoundName} and displays the projected public path in broadcast order.
+            </p>
+          ) : null}
+
+          {knockoutError ? <div className={styles.emptyState}>{knockoutError}</div> : null}
+          {!knockoutError && knockoutLoading ? <div className={styles.emptyState}>Loading knockout bracket...</div> : null}
+
+          {!knockoutError && !knockoutLoading && knockoutBracket && knockoutBracket.rounds.length > 0 ? (
+            <div className={styles.knockoutBracketShell}>
+              <KnockoutBracket
+                rounds={knockoutBracket.rounds}
+                title={`${selectedGroupDesc} Knockout Bracket`}
+                subtitle={
+                  knockoutBracket.sourceRoundName
+                    ? `Advancing positions are seeded from ${knockoutBracket.sourceRoundName} and displayed in bracket order.`
+                    : "Track every knockout matchup through each round in a premium bracket layout."
+                }
+                className="mt-2"
+              />
+            </div>
+          ) : null}
+
+          {!knockoutError && !knockoutLoading && knockoutBracket && knockoutBracket.rounds.length === 0 ? (
+            <div className={styles.emptyState}>No knockout bracket is available for this tournament yet.</div>
+          ) : null}
+        </section>
+      ) : null}
     </main>
   );
 }

@@ -3,12 +3,21 @@
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--theme-accent-brand) 14%, transparent), transparent 28%),
     radial-gradient(circle at right, color-mix(in srgb, var(--theme-accent-success) 10%, transparent), transparent 22%),
+    radial-gradient(circle at 16% 22%, color-mix(in srgb, var(--theme-accent-brand) 10%, transparent), transparent 18%),
     linear-gradient(180deg, var(--theme-page-bg) 0%, color-mix(in srgb, var(--theme-page-bg) 92%, var(--theme-surface-2)) 100%);
   color: var(--theme-page-text);
-  padding: 24px 24px 32px;
+  padding: 28px 24px 40px;
 }
 
 .venueLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.venueContentGrid {
   display: grid;
   gap: 24px;
 }
@@ -18,19 +27,75 @@
   min-width: 0;
 }
 
+.venueDetailsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .venueHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.backLink,
+.venueHeaderMain,
+.venueSummaryPanel,
+.venueCard,
+.mapCard {
+  animation: venue-rise-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.venueSummaryPanel {
+  animation-delay: 100ms;
+}
+
+.venueCard:nth-of-type(1) {
+  animation-delay: 140ms;
+}
+
+.venueCard:nth-of-type(2) {
+  animation-delay: 180ms;
+}
+
+.mapCard {
+  animation-delay: 160ms;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--theme-border-mid) 72%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--theme-surface-2) 82%, transparent);
+  color: var(--theme-page-text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.backLink:hover {
+  background: color-mix(in srgb, var(--theme-surface-2) 96%, transparent);
+}
+
+.venueHeaderMain {
   display: grid;
   grid-template-columns: 140px minmax(0, 1fr);
   gap: 20px;
   align-items: center;
-  margin-bottom: 24px;
 }
 
 .venueLogoShell {
   width: 140px;
   height: 112px;
-  background: var(--theme-surface-3);
+  background: color-mix(in srgb, var(--theme-accent-brand) 10%, var(--theme-surface-2));
   border: 0;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,26 +124,99 @@
   gap: 8px;
 }
 
+.venueEyebrow {
+  margin: 0;
+  color: var(--theme-page-muted-3);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
 .venueTitle {
-  font-size: 1.95rem;
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.1;
   font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 .venueSubtitle {
-  color: var(--theme-page-muted-3);
+  margin: 0;
+  color: var(--theme-page-muted-2);
+  line-height: 1.7;
+  font-size: 1.02rem;
+}
+
+.venueSummaryPanel {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border: 1px solid color-mix(in srgb, var(--theme-border-mid) 80%, transparent);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--theme-accent-success) 14%, transparent), transparent 32%),
+    linear-gradient(160deg, color-mix(in srgb, var(--theme-surface-1) 94%, transparent), color-mix(in srgb, var(--theme-surface-2) 96%, transparent));
+  box-shadow: var(--theme-shadow-card);
+}
+
+.venueSummaryPanel::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(140deg, color-mix(in srgb, var(--theme-accent-brand) 16%, transparent), transparent 34%, color-mix(in srgb, var(--theme-accent-success) 16%, transparent));
+  opacity: 0.8;
+  pointer-events: none;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+}
+
+.venueSummaryBadge,
+.detailBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--theme-accent-brand) 10%, transparent);
+  color: var(--theme-page-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.venueSummaryBadge svg,
+.detailBadge svg {
+  width: 18px;
+  height: 18px;
+}
+
+.venueSummaryLead {
+  position: relative;
+  z-index: 1;
+  margin: 18px 0 0;
+  color: var(--theme-page-text);
+  font-size: clamp(1.05rem, 1.8vw, 1.22rem);
+  line-height: 1.7;
+  letter-spacing: -0.02em;
 }
 
 .venueCard,
 .mapCard {
-  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
-  border: 1px solid var(--theme-border-soft);
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: var(--theme-shadow-soft);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--theme-accent-brand) 10%, transparent), transparent 30%),
+    linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 96%, transparent), color-mix(in srgb, var(--theme-surface-2) 95%, transparent));
+  border: 1px solid color-mix(in srgb, var(--theme-border-mid) 76%, transparent);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--theme-shadow-card);
 }
 
 .sectionTitle {
+  margin: 0 0 14px;
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -95,8 +233,14 @@
 
 .addressLine,
 .detailText {
+  margin: 0;
   color: var(--theme-page-muted-2);
   line-height: 1.7;
+}
+
+.detailMetaRow {
+  display: flex;
+  margin-top: 18px;
 }
 
 .mapFrame {
@@ -104,6 +248,7 @@
   min-height: 420px;
   border: 0;
   background: var(--theme-surface-3);
+  border-radius: 8px;
 }
 
 .mapEmpty {
@@ -113,10 +258,25 @@
   min-height: 420px;
   color: var(--theme-page-muted-5);
   background: var(--theme-surface-3);
+  border-radius: 8px;
+  text-align: center;
+  padding: 24px;
+}
+
+@keyframes venue-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 767px) {
-  .venueHeader {
+  .venueHeaderMain {
     grid-template-columns: 1fr;
   }
 
@@ -133,7 +293,7 @@
     padding-right: 32px;
   }
 
-  .venueLayout {
+  .venueContentGrid {
     grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
     align-items: start;
   }

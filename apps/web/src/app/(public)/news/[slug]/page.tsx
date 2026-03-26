@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import LocalTimeText from "@/components/LocalTimeText";
 import { prisma } from "@/lib/prisma";
@@ -29,6 +30,28 @@ export default async function NewsArticlePage({ params }: PageProps) {
   return (
     <main className={styles.newsArticlePage}>
       <article className={styles.newsArticleContainer}>
+        <div className={styles.newsArticleHeaderShell}>
+          <Link href="/news" className={styles.newsArticleBackLink}>
+            Back to News
+          </Link>
+
+          <div className={styles.newsArticleHeader}>
+            <p className={styles.newsArticleDate}>
+              <LocalTimeText
+                value={publishedDate.toISOString()}
+                options={{ year: "numeric", month: "long", day: "numeric" }}
+              />
+            </p>
+            <h1 className={styles.newsArticleTitle}>
+              {article.title}
+            </h1>
+
+            {article.excerpt ? (
+              <p className={styles.newsArticleExcerpt}>{article.excerpt}</p>
+            ) : null}
+          </div>
+        </div>
+
         <div className={`news-article-flow ${styles.newsArticleFlow}`}>
           {article.coverImageUrl ? (
             <figure className="news-article-hero-image">
@@ -41,20 +64,6 @@ export default async function NewsArticlePage({ params }: PageProps) {
                 sizes="(max-width: 768px) 100vw, 1200px"
               />
             </figure>
-          ) : null}
-
-          <p className={styles.newsArticleDate}>
-            <LocalTimeText
-              value={publishedDate.toISOString()}
-              options={{ year: "numeric", month: "long", day: "numeric" }}
-            />
-          </p>
-          <h1 className={styles.newsArticleTitle}>
-            {article.title}
-          </h1>
-
-          {article.excerpt ? (
-            <p className={styles.newsArticleExcerpt}>{article.excerpt}</p>
           ) : null}
 
           {article.excerpt ? <div aria-hidden="true" className={styles.newsArticleSpacer} /> : null}

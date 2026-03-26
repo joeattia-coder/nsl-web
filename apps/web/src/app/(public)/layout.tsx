@@ -8,10 +8,14 @@ import {
   FiAward,
   FiBarChart2,
   FiChevronDown,
+  FiCompass,
   FiFileText,
   FiFilm,
+  FiFolder,
   FiHelpCircle,
   FiInfo,
+  FiLock,
+  FiRepeat,
   FiUser,
   FiLogOut,
   FiHome,
@@ -22,11 +26,13 @@ import {
   FiX,
   FiCalendar,
   FiSettings,
+  FiSun,
 } from "react-icons/fi";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 import PrivacyFooterLink from "./PrivacyFooterLink";
 import TermsFooterLink from "./TermsFooterLink";
 
@@ -62,9 +68,9 @@ const adminSidebarItems: AdminNavItem[] = [
   { href: "/admin/matches", label: "Matches", icon: FiActivity },
   { href: "/admin/news", label: "News", icon: FiFileText },
   { href: "/admin/about", label: "About", icon: FiInfo },
-  { href: "/admin/privacy", label: "Privacy", icon: FiFileText },
+  { href: "/admin/privacy", label: "Privacy", icon: FiLock },
   { href: "/admin/terms", label: "Terms", icon: FiFileText },
-  { href: "/admin/documents", label: "Documents", icon: FiFileText },
+  { href: "/admin/documents", label: "Documents", icon: FiFolder },
   { href: "/admin/faqs", label: "FAQs", icon: FiHelpCircle },
   { href: "/admin/videos", label: "Videos", icon: FiFilm },
   {
@@ -124,30 +130,41 @@ function resolveNavigationMode(
   return "public";
 }
 
+function isNavigationItemActive(pathname: string, href: string) {
+  if (href === "/" || href === "/admin") {
+    return pathname === href;
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 function LayoutChrome({
   children,
   isAdminRoute,
   mobileMenuOpen,
   setMobileMenuOpen,
   theme,
-  onToggleTheme,
+  onSetTheme,
 }: {
   children: React.ReactNode;
   isAdminRoute: boolean;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   theme: "dark" | "light";
-  onToggleTheme: () => void;
+  onSetTheme: (theme: "dark" | "light") => void;
 }) {
   const { currentUser, hasPermission, logout } = useAdminAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isNavbarElevated, setIsNavbarElevated] = useState(false);
+  const [isDesktopSidebarExpanded, setIsDesktopSidebarExpanded] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const mainRef = useRef<HTMLDivElement | null>(null);
   const isAdminUser = Boolean(currentUser?.isAdmin);
   const closeMenu = () => setMenuOpen(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
+  const isPathActive = (href: string) => isNavigationItemActive(pathname, href);
 
   const visibleSidebarItems = adminSidebarItems.filter((item) => {
     if (!item.permissions || item.permissions.length === 0) {
@@ -182,13 +199,26 @@ function LayoutChrome({
         : "Logged in";
 
   const visibleSidebarUserNavItems = hasPersonalNavigation ? visibleDropdownUserNavItems : [];
+  const collapsedSidebarTitle = (label: string) => (isDesktopSidebarExpanded ? undefined : label);
+  const collapsedNavigationSwitchHref = navigationMode === "admin" ? playerHomeHref : "/admin";
+  const collapsedNavigationSwitchLabel = navigationMode === "admin" ? "Switch to personal area" : "Switch to admin area";
 
   useEffect(() => {
-    setMenuOpen(false);
+    const animationFrame = window.requestAnimationFrame(() => {
+      setMenuOpen(false);
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
   }, [pathname, mobileMenuOpen]);
 
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    const animationFrame = window.requestAnimationFrame(() => {
+      setIsNavbarElevated(Boolean(mainRef.current && mainRef.current.scrollTop > 10));
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
   }, [pathname]);
 
   useEffect(() => {
@@ -237,10 +267,10 @@ function LayoutChrome({
   };
 
   return (
-    <div className="layout">
+    <div className={`layout${isDesktopSidebarExpanded ? " layout-sidebar-expanded" : ""}`}>
       <button
         type="button"
-        className="mobile-menu-button"
+        className={`mobile-menu-button${mobileMenuOpen ? " is-open" : ""}`}
         aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
         aria-expanded={mobileMenuOpen}
         onClick={() => {
@@ -256,9 +286,21 @@ function LayoutChrome({
         onClick={closeMobileMenu}
       />
 
-      <aside className={`sidebar${mobileMenuOpen ? " sidebar-open" : ""}`}>
+      <aside
+        className={`sidebar${mobileMenuOpen ? " sidebar-open" : ""}`}
+        onMouseEnter={() => setIsDesktopSidebarExpanded(true)}
+        onMouseLeave={() => setIsDesktopSidebarExpanded(false)}
+      >
         <div className="sidebar-logo">
           <Link href={showAdminNavigation ? "/admin" : "/"} onClick={closeMobileMenu}>
+            <Image
+              src="/images/nsl-logo-small.png"
+              alt=""
+              width={36}
+              height={36}
+              className="sidebar-logo-badge"
+              aria-hidden="true"
+            />
             <Image
               src="/images/nsl-logo.svg"
               alt="National Snooker League Logo"
@@ -271,20 +313,39 @@ function LayoutChrome({
         </div>
 
         {canSwitchNavigationMode ? (
-          <div className="sidebar-mode-switcher" role="group" aria-label="Navigation mode">
+          <div className="sidebar-navigation-switcher">
+            <div
+              className="sidebar-control-group sidebar-mode-switcher"
+              role="group"
+              aria-label="Navigation mode"
+              data-selected={navigationMode === "admin" ? "left" : "right"}
+            >
+              <span className="sidebar-control-active-pill" aria-hidden="true" />
+              <Link
+                href="/admin"
+                className={`sidebar-control-option${navigationMode === "admin" ? " sidebar-control-option-active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                <FiCompass className="sidebar-control-icon" />
+                <span>Admin</span>
+              </Link>
+              <Link
+                href={playerHomeHref}
+                className={`sidebar-control-option${navigationMode === "personal" ? " sidebar-control-option-active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                <FiUser className="sidebar-control-icon" />
+                <span>Personal</span>
+              </Link>
+            </div>
+
             <Link
-              href="/admin"
-              className={`sidebar-mode-button${navigationMode === "admin" ? " sidebar-mode-button-active" : ""}`}
+              href={collapsedNavigationSwitchHref}
+              className="sidebar-control-collapsed"
+              title={collapsedNavigationSwitchLabel}
               onClick={closeMobileMenu}
             >
-              Admin
-            </Link>
-            <Link
-              href={playerHomeHref}
-              className={`sidebar-mode-button${navigationMode === "personal" ? " sidebar-mode-button-active" : ""}`}
-              onClick={closeMobileMenu}
-            >
-              Personal
+              <FiRepeat className="sidebar-control-icon" />
             </Link>
           </div>
         ) : null}
@@ -295,28 +356,30 @@ function LayoutChrome({
             showAdminNavigation ? "Admin navigation" : hasPersonalNavigation ? "Personal navigation" : "Sidebar navigation"
           }
         >
-          <ul>
-            {showAdminNavigation ? (
-              <>
-                {visibleSidebarItems.map((item) => {
-                  const Icon = item.icon;
+          {showAdminNavigation ? (
+            <ul>
+              {visibleSidebarItems.map((item) => {
+                const Icon = item.icon;
 
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className="sidebar-item"
-                        onClick={closeMobileMenu}
-                      >
-                        <Icon className="sidebar-icon" />
-                        <span className="sidebar-label">{item.label}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </>
-            ) : (
-              <>
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={`sidebar-item${isPathActive(item.href) ? " sidebar-item-active" : ""}`}
+                      aria-current={isPathActive(item.href) ? "page" : undefined}
+                      title={collapsedSidebarTitle(item.label)}
+                      onClick={closeMobileMenu}
+                    >
+                      <Icon className="sidebar-icon" />
+                      <span className="sidebar-label">{item.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <>
+              <ul>
                 {publicSidebarItems.map((item) => {
                   const Icon = item.icon;
 
@@ -324,7 +387,9 @@ function LayoutChrome({
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className="sidebar-item"
+                        className={`sidebar-item${isPathActive(item.href) ? " sidebar-item-active" : ""}`}
+                        aria-current={isPathActive(item.href) ? "page" : undefined}
+                        title={collapsedSidebarTitle(item.label)}
                         onClick={closeMobileMenu}
                       >
                         <Icon className="sidebar-icon" />
@@ -333,10 +398,12 @@ function LayoutChrome({
                     </li>
                   );
                 })}
+              </ul>
 
-                {visibleSidebarUserNavItems.length > 0 ? (
-                  <>
-                    <li className="sidebar-nav-header">My account</li>
+              {visibleSidebarUserNavItems.length > 0 ? (
+                <>
+                  <div className="sidebar-nav-divider" aria-hidden="true" />
+                  <ul>
                     {visibleSidebarUserNavItems.map((item) => {
                       const Icon = item.icon;
 
@@ -344,7 +411,9 @@ function LayoutChrome({
                         <li key={item.href}>
                           <Link
                             href={item.href}
-                            className="sidebar-item"
+                            className={`sidebar-item${isPathActive(item.href) ? " sidebar-item-active" : ""}`}
+                            aria-current={isPathActive(item.href) ? "page" : undefined}
+                            title={collapsedSidebarTitle(item.label)}
                             onClick={closeMobileMenu}
                           >
                             <Icon className="sidebar-icon" />
@@ -353,16 +422,39 @@ function LayoutChrome({
                         </li>
                       );
                     })}
-                  </>
-                ) : null}
-              </>
-            )}
-          </ul>
+                  </ul>
+                </>
+              ) : null}
+            </>
+          )}
         </nav>
+
+        <div className="sidebar-footer">
+          <ThemeToggle
+            value={theme}
+            onChange={onSetTheme}
+            activePillColor="var(--theme-sidebar-bg)"
+            className="sidebar-theme-switcher"
+            ariaLabel="Theme mode"
+          />
+
+          <button
+            type="button"
+            className="sidebar-theme-collapsed"
+            title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            onClick={() => onSetTheme(theme === "dark" ? "light" : "dark")}
+          >
+            <FiSun className="sidebar-control-icon" />
+          </button>
+        </div>
       </aside>
 
-      <div ref={mainRef} className={`main${isAdminRoute ? " main-admin" : ""}`}>
-        <nav className="navbar">
+      <div
+        ref={mainRef}
+        className={`main${isAdminRoute ? " main-admin" : ""}`}
+        onScroll={(event) => setIsNavbarElevated(event.currentTarget.scrollTop > 10)}
+      >
+        <nav className={`navbar${isNavbarElevated ? " navbar-elevated" : ""}`}>
           <div className="nav-links">
             {showAdminNavigation ? (
               <>
@@ -386,20 +478,11 @@ function LayoutChrome({
           </div>
 
           <div className="navbar-right">
-            <button
-              type="button"
-              className="theme-toggle-button"
-              onClick={onToggleTheme}
-              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-            >
-              {theme === "dark" ? "Light" : "Dark"}
-            </button>
-
             {currentUser ? (
               <div className="admin-user-menu-shell" ref={userMenuRef}>
                 <button
                   type="button"
-                  className="admin-current-user-chip admin-user-menu-trigger"
+                  className={`admin-current-user-chip admin-user-menu-trigger${menuOpen ? " admin-user-menu-trigger-open" : ""}`}
                   onClick={() => setMenuOpen((open) => !open)}
                   aria-expanded={menuOpen}
                   aria-haspopup="menu"
@@ -460,7 +543,11 @@ function LayoutChrome({
                 ) : null}
               </div>
             ) : (
-              <Link href="/login" className="login-link">
+              <Link
+                href="/login"
+                className={`login-link${isPathActive("/login") ? " login-link-active" : ""}`}
+                aria-current={isPathActive("/login") ? "page" : undefined}
+              >
                 <FiUser size={28} className="login-icon" />
               </Link>
             )}
@@ -501,18 +588,22 @@ export default function PublicLayout({
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    setMobileMenuOpen(false);
+    const animationFrame = window.requestAnimationFrame(() => {
+      setMobileMenuOpen(false);
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
   }, [pathname, setMobileMenuOpen]);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("nsl-theme");
+    const animationFrame = window.requestAnimationFrame(() => {
+      if (storedTheme === "light" || storedTheme === "dark") {
+        setTheme(storedTheme);
+      }
+    });
 
-    if (storedTheme === "light" || storedTheme === "dark") {
-      setTheme(storedTheme);
-      return;
-    }
-
-    setTheme("dark");
+    return () => window.cancelAnimationFrame(animationFrame);
   }, []);
 
   useEffect(() => {
@@ -528,7 +619,7 @@ export default function PublicLayout({
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
         theme={theme}
-        onToggleTheme={() => setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"))}
+        onSetTheme={setTheme}
       >
         {children}
       </LayoutChrome>

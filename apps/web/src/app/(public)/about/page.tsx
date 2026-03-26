@@ -39,17 +39,19 @@ export default async function AboutPage() {
     <main className={styles.aboutPage}>
       <section className={styles.aboutSection}>
         <header className={styles.hero}>
-          <p className={styles.eyebrow}>About NSL</p>
-          <h1 className={styles.title}>{title}</h1>
-          <p className={styles.subtitle}>{subtitle}</p>
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}>About NSL</p>
+            <h1 className={styles.title}>{title}</h1>
+            <p className={styles.subtitle}>{subtitle}</p>
+          </div>
         </header>
 
-        <div className={styles.statementCard}>
+        <section className={styles.statementCard}>
           <div
             className={`${styles.statement} news-article-body`}
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
-        </div>
+        </section>
       </section>
     </main>
   );
