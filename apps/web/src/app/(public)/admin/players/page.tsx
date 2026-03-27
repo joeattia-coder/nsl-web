@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { summarizeAccountSetupInvitation } from "@/lib/admin-player-invitations";
+import { formatAdminPhoneNumber } from "@/lib/phone-format";
 import PlayersTable from "./players-table";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +18,22 @@ export default async function AdminPlayersPage() {
       country: true,
       photoUrl: true,
       userId: true,
+      invitations: {
+        where: {
+          purpose: "ACCOUNT_SETUP",
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+        select: {
+          status: true,
+          createdAt: true,
+          expiresAt: true,
+          acceptedAt: true,
+          revokedAt: true,
+        },
+      },
       entryMembers: {
         select: {
           tournamentEntry: {
@@ -34,6 +52,7 @@ export default async function AdminPlayersPage() {
   });
 
   const formattedPlayers = players.map((player) => ({
+    ...summarizeAccountSetupInvitation(player.invitations[0]),
     tournaments: Array.from(
       new Map(
         player.entryMembers.map((member) => [
@@ -50,7 +69,7 @@ export default async function AdminPlayersPage() {
       .filter(Boolean)
       .join(" "),
     email: player.emailAddress ?? "",
-    phoneNumber: player.phoneNumber ?? "",
+    phoneNumber: formatAdminPhoneNumber(player.phoneNumber),
     country: player.country ?? "",
     photoUrl: player.photoUrl ?? "",
     linkedUserId: player.userId ?? null,

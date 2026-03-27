@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { resolveCurrentAdminUser } from "@/lib/admin-auth";
+import { summarizeAccountSetupInvitation } from "@/lib/admin-player-invitations";
 import type { AdminPlayersLiveResponse } from "@/lib/live-match";
+import { formatAdminPhoneNumber } from "@/lib/phone-format";
 import { prisma } from "@/lib/prisma";
 
 const NO_STORE_HEADERS = {
@@ -31,6 +33,22 @@ export async function GET() {
         country: true,
         photoUrl: true,
         userId: true,
+        invitations: {
+          where: {
+            purpose: "ACCOUNT_SETUP",
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+          select: {
+            status: true,
+            createdAt: true,
+            expiresAt: true,
+            acceptedAt: true,
+            revokedAt: true,
+          },
+        },
         entryMembers: {
           select: {
             tournamentEntry: {
@@ -53,10 +71,11 @@ export async function GET() {
         id: player.id,
         fullName: buildFullName(player.firstName, player.middleInitial, player.lastName),
         email: player.emailAddress ?? "",
-        phoneNumber: player.phoneNumber ?? "",
+        phoneNumber: formatAdminPhoneNumber(player.phoneNumber),
         country: player.country ?? "",
         photoUrl: player.photoUrl ?? "",
         linkedUserId: player.userId ?? null,
+        ...summarizeAccountSetupInvitation(player.invitations[0]),
         tournaments: Array.from(
           new Map(
             player.entryMembers.map((member) => [

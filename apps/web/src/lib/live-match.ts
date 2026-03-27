@@ -1,3 +1,5 @@
+import type { AdminPlayerInviteState } from "@/lib/admin-player-invitations";
+
 export type LiveMatchCoreSnapshot = {
   id: string;
   homeScore: number | null;
@@ -62,6 +64,10 @@ export type AdminPlayerLiveSnapshot = {
   country: string;
   photoUrl: string;
   linkedUserId: string | null;
+  inviteState: AdminPlayerInviteState;
+  inviteLabel: string;
+  inviteMeta: string | null;
+  inviteUpdatedAt: string | null;
   tournaments: AdminPlayerLiveTournament[];
 };
 

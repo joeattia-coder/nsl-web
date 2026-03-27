@@ -10,6 +10,7 @@ import {
 } from "@/lib/admin-table-sorting";
 import { getFlagCdnUrl, normalizeCountryCode } from "@/lib/country";
 import type { AdminPlayerLiveSnapshot, AdminPlayersLiveResponse } from "@/lib/live-match";
+import type { AdminPlayerInviteState } from "@/lib/admin-player-invitations";
 import { useLivePolling } from "@/lib/useLivePolling";
 import {
   FiCheckSquare,
@@ -30,6 +31,10 @@ type PlayerRow = {
   country: string;
   photoUrl: string;
   linkedUserId: string | null;
+  inviteState: AdminPlayerInviteState;
+  inviteLabel: string;
+  inviteMeta: string | null;
+  inviteUpdatedAt: string | null;
   tournaments: Array<{
     id: string;
     name: string;
@@ -40,7 +45,7 @@ type PlayersTableProps = {
   players: PlayerRow[];
 };
 
-type SortKey = "fullName" | "email" | "phoneNumber" | "country" | "tournaments";
+type SortKey = "fullName" | "email" | "phoneNumber" | "country" | "tournaments" | "inviteLabel";
 
 function sameTournaments(
   left: PlayerRow["tournaments"],
@@ -79,6 +84,10 @@ function applyLivePlayers(current: PlayerRow[], snapshots: AdminPlayerLiveSnapsh
       existing.country === snapshot.country &&
       existing.photoUrl === snapshot.photoUrl &&
       existing.linkedUserId === snapshot.linkedUserId &&
+      existing.inviteState === snapshot.inviteState &&
+      existing.inviteLabel === snapshot.inviteLabel &&
+      existing.inviteMeta === snapshot.inviteMeta &&
+      existing.inviteUpdatedAt === snapshot.inviteUpdatedAt &&
       sameTournaments(existing.tournaments, snapshot.tournaments)
     ) {
       return existing;
@@ -153,6 +162,8 @@ export default function PlayersTable({ players }: PlayersTableProps) {
             player.email.toLowerCase().includes(term) ||
             player.phoneNumber.toLowerCase().includes(term) ||
             player.country.toLowerCase().includes(term) ||
+            player.inviteLabel.toLowerCase().includes(term) ||
+            player.inviteMeta?.toLowerCase().includes(term) ||
             player.tournaments.some((tournament) =>
               tournament.name.toLowerCase().includes(term)
             )
@@ -171,6 +182,8 @@ export default function PlayersTable({ players }: PlayersTableProps) {
             return player.country;
           case "tournaments":
             return player.tournaments.map((tournament) => tournament.name).join(", ");
+          case "inviteLabel":
+            return `${player.inviteLabel} ${player.inviteUpdatedAt ?? ""}`;
           case "fullName":
           default:
             return player.fullName;
@@ -235,6 +248,20 @@ export default function PlayersTable({ players }: PlayersTableProps) {
           payload?.details || payload?.error || "Failed to send invitation."
         );
       }
+
+      setLivePlayers((current) =>
+        current.map((existing) =>
+          existing.id === player.id
+            ? {
+                ...existing,
+                inviteState: "invite-sent",
+                inviteLabel: "Sent",
+                inviteMeta: `Sent ${formatAdminDateLabel(new Date().toISOString())}`,
+                inviteUpdatedAt: new Date().toISOString(),
+              }
+            : existing
+        )
+      );
 
       setActionSuccess(
         payload?.message || `Invitation sent to ${player.email || player.fullName}.`
@@ -510,6 +537,13 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
+                <SortableHeader
+                  label="Invite"
+                  columnKey="inviteLabel"
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="admin-players-actions-col">Actions</th>
               </tr>
             </thead>
@@ -518,7 +552,7 @@ export default function PlayersTable({ players }: PlayersTableProps) {
               {filteredPlayers.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={bulkMode ? 8 : 7}
+                    colSpan={bulkMode ? 9 : 8}
                     className="admin-players-empty"
                   >
                     No players found.
@@ -607,6 +641,16 @@ export default function PlayersTable({ players }: PlayersTableProps) {
                         ) : (
                           "—"
                         )}
+                      </td>
+
+                      <td>
+                        <div className="admin-player-invite-cell">
+                          <span
+                            className={`admin-player-invite-badge ${getInviteBadgeClassName(player.inviteState)}`}
+                          >
+                            {player.inviteMeta ?? player.inviteLabel}
+                          </span>
+                        </div>
                       </td>
 
                       <td>
@@ -752,5 +796,31 @@ export default function PlayersTable({ players }: PlayersTableProps) {
 function getInitials(fullName: string) {
   const parts = fullName.split(" ").filter(Boolean);
   return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("");
+}
+
+function getInviteBadgeClassName(inviteState: AdminPlayerInviteState) {
+  switch (inviteState) {
+    case "invite-sent":
+      return "admin-player-invite-badge-pending";
+    case "accepted":
+      return "admin-player-invite-badge-accepted";
+    case "expired":
+      return "admin-player-invite-badge-expired";
+    case "revoked":
+      return "admin-player-invite-badge-revoked";
+    case "not-sent":
+    default:
+      return "admin-player-invite-badge-idle";
+  }
+}
+
+function formatAdminDateLabel(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
