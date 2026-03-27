@@ -141,6 +141,11 @@
   text-align: center;
 }
 
+.rankingsFlagCell > * {
+  display: block;
+  margin: 0 auto;
+}
+
 .rankingsHeaderTrigger {
   position: relative;
   display: inline-flex;

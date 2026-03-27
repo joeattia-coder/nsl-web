@@ -239,8 +239,8 @@ export default function RankingsPageContent() {
                   {selectedView === "ranking" && (
                     <tr>
                       <th>{renderHeaderLabel("RK", "Rank")}</th>
-                      <th>{renderHeaderLabel("PLYR", "Player")}</th>
                       <th className={styles.rankingsFlagHeader} aria-label="Country flag" />
+                      <th>{renderHeaderLabel("PLYR", "Player")}</th>
                       <th>{renderHeaderLabel("MP", "Matches Played")}</th>
                       <th>{renderHeaderLabel("PTS", "Points")}</th>
                       <th>{renderHeaderLabel("W", "Matches Won")}</th>
@@ -255,16 +255,16 @@ export default function RankingsPageContent() {
                   {selectedView === "elo" && (
                     <tr>
                       <th>{renderHeaderLabel("RK", "Rank")}</th>
-                      <th>{renderHeaderLabel("PLYR", "Player")}</th>
                       <th className={styles.rankingsFlagHeader} aria-label="Country flag" />
+                      <th>{renderHeaderLabel("PLYR", "Player")}</th>
                       <th>{renderHeaderLabel("ELO", "ELO Rating")}</th>
                     </tr>
                   )}
                   {selectedView === "highbreak" && (
                     <tr>
                       <th>{renderHeaderLabel("RK", "Rank")}</th>
-                      <th>{renderHeaderLabel("PLYR", "Player")}</th>
                       <th className={styles.rankingsFlagHeader} aria-label="Country flag" />
+                      <th>{renderHeaderLabel("PLYR", "Player")}</th>
                       <th>{renderHeaderLabel("HB", "High Break")}</th>
                     </tr>
                   )}
@@ -275,8 +275,8 @@ export default function RankingsPageContent() {
                     rankingPlayers.map((player, idx) => (
                       <tr key={player.id} className={idx % 2 === 0 ? styles.rankingsRow : `${styles.rankingsRow} ${styles.rankingsRowAlt}`}>
                         <td>{idx + 1}</td>
-                        <td>{renderPlayerCell(player)}</td>
                         <td className={styles.rankingsFlagCell}>{renderCountryCell(player)}</td>
+                        <td>{renderPlayerCell(player)}</td>
                         <td>{player.matchesPlayed}</td>
                         <td>{player.points}</td>
                         <td>{player.matchesWon}</td>
@@ -293,8 +293,8 @@ export default function RankingsPageContent() {
                     eloPlayers.map((player, idx) => (
                       <tr key={player.id} className={idx % 2 === 0 ? styles.rankingsRow : `${styles.rankingsRow} ${styles.rankingsRowAlt}`}>
                         <td>{idx + 1}</td>
-                        <td>{renderPlayerCell(player)}</td>
                         <td className={styles.rankingsFlagCell}>{renderCountryCell(player)}</td>
+                        <td>{renderPlayerCell(player)}</td>
                         <td>{player.eloRating ?? 0}</td>
                       </tr>
                     ))}
@@ -303,8 +303,8 @@ export default function RankingsPageContent() {
                     highBreakPlayers.map((player, idx) => (
                       <tr key={player.id} className={idx % 2 === 0 ? styles.rankingsRow : `${styles.rankingsRow} ${styles.rankingsRowAlt}`}>
                         <td>{idx + 1}</td>
-                        <td>{renderPlayerCell(player)}</td>
                         <td className={styles.rankingsFlagCell}>{renderCountryCell(player)}</td>
+                        <td>{renderPlayerCell(player)}</td>
                         <td>{player.highBreak}</td>
                       </tr>
                     ))}
