@@ -239,7 +239,7 @@
 
 .tabButtonActive:hover {
   transform: none;
-  background: linear-gradient(0deg, #10621a 0%, #7fc781 100%);
+  background: linear-gradient(0deg, #ffffff 0%, #b1b1b1 100%);
   color: #313131;
   box-shadow: var(--theme-shadow-soft);
 }
@@ -998,19 +998,30 @@
   }
 
   .competitorName,
-  .playerCell {
+  .competitorText .playerCell {
     justify-content: center;
     text-align: center;
     width: 100%;
   }
 
-  .playerCell {
+  .competitorText .playerCell {
     flex-direction: column;
     gap: 0.18rem;
   }
 
-  .playerCell::before {
+  .competitorText .playerCell::before {
     display: none;
+  }
+
+  .teamCell .playerCell {
+    justify-content: flex-start;
+    flex-direction: row;
+    width: auto;
+    text-align: left;
+  }
+
+  .teamCell .playerCellText {
+    text-align: left;
   }
 
   .playerCellText {

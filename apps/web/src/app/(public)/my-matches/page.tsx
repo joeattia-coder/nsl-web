@@ -237,79 +237,81 @@ export default async function MyMatchesPage() {
 
                     return (
                       <>
-                  <div className="my-match-header">
-                    <div className="my-match-header-main">
-                      <strong>{match.tournament.tournamentName}</strong>
-                      <span>{match.stageRound.roundName}</span>
-                    </div>
-                    <div className="my-match-header-side">
-                      <span>
-                        <LocalTimeText
-                          value={scheduledAt}
-                          fallback="TBC"
-                          options={{ weekday: "short", year: "numeric", month: "short", day: "numeric" }}
-                        />
-                      </span>
-                      <span>
-                        <LocalTimeText
-                          value={scheduledAt}
-                          fallback="TBA"
-                          options={{ hour: "numeric", minute: "2-digit" }}
-                        />
-                      </span>
-                      <span className="my-match-status-chip">{formatMatchStatus(match.matchStatus)}</span>
-                    </div>
-                  </div>
-                  <div className="my-match-teams">
-                    <div className="my-match-player my-match-player-left">
-                      <PlayerPortalPortrait
-                        photoUrl={homePhotoUrl}
-                        alt={homeName}
-                        className="my-match-player-photo"
-                      />
-                      <div className="my-match-player-name-row my-match-player-name-row-left">
-                        <span className="my-match-player-name">{homeName}</span>
-                        {homeFlagUrl ? (
-                          <img
-                            src={homeFlagUrl}
-                            alt={homeCountry ? `${homeCountry} flag` : ""}
-                            className="my-match-player-flag"
+                        <div className="my-match-header">
+                          <div className="my-match-header-main">
+                            <strong>{match.tournament.tournamentName}</strong>
+                            <span>{match.stageRound.roundName}</span>
+                          </div>
+                          <div className="my-match-header-status">
+                            <span className="my-match-status-chip">{formatMatchStatus(match.matchStatus)}</span>
+                          </div>
+                          <div className="my-match-header-side">
+                            <span>
+                              <LocalTimeText
+                                value={scheduledAt}
+                                fallback="TBC"
+                                options={{ weekday: "short", year: "numeric", month: "short", day: "numeric" }}
+                              />
+                            </span>
+                            <span>
+                              <LocalTimeText
+                                value={scheduledAt}
+                                fallback="TBA"
+                                options={{ hour: "numeric", minute: "2-digit" }}
+                              />
+                            </span>
+                          </div>
+                        </div>
+                        <div className="my-match-teams">
+                          <div className="my-match-player my-match-player-left">
+                            <PlayerPortalPortrait
+                              photoUrl={homePhotoUrl}
+                              alt={homeName}
+                              className="my-match-player-photo"
+                            />
+                            <div className="my-match-player-name-row my-match-player-name-row-left">
+                              <span className="my-match-player-name">{homeName}</span>
+                              {homeFlagUrl ? (
+                                <img
+                                  src={homeFlagUrl}
+                                  alt={homeCountry ? `${homeCountry} flag` : ""}
+                                  className="my-match-player-flag"
+                                />
+                              ) : null}
+                            </div>
+                          </div>
+                          <span className="my-match-score">
+                            {match.homeScore ?? "-"} : {match.awayScore ?? "-"}
+                          </span>
+                          <div className="my-match-player my-match-player-right">
+                            <PlayerPortalPortrait
+                              photoUrl={awayPhotoUrl}
+                              alt={awayName}
+                              className="my-match-player-photo"
+                            />
+                            <div className="my-match-player-name-row my-match-player-name-row-right">
+                              {awayFlagUrl ? (
+                                <img
+                                  src={awayFlagUrl}
+                                  alt={awayCountry ? `${awayCountry} flag` : ""}
+                                  className="my-match-player-flag"
+                                />
+                              ) : null}
+                              <span className="my-match-player-name">{awayName}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {pendingLabel ? <p className="my-match-pending-note">{pendingLabel}</p> : null}
+                        <div className="my-match-links-row">
+                          <Link href={`/matches/${match.id}`} className="login-form-link">
+                            View public match hub
+                          </Link>
+                          <MyMatchActions
+                            matchId={match.id}
+                            editHref={`/my-matches/${match.id}/edit`}
+                            mode={pendingMode}
                           />
-                        ) : null}
-                      </div>
-                    </div>
-                    <span className="my-match-score">
-                      {match.homeScore ?? "-"} : {match.awayScore ?? "-"}
-                    </span>
-                    <div className="my-match-player my-match-player-right">
-                      <PlayerPortalPortrait
-                        photoUrl={awayPhotoUrl}
-                        alt={awayName}
-                        className="my-match-player-photo"
-                      />
-                      <div className="my-match-player-name-row my-match-player-name-row-right">
-                        {awayFlagUrl ? (
-                          <img
-                            src={awayFlagUrl}
-                            alt={awayCountry ? `${awayCountry} flag` : ""}
-                            className="my-match-player-flag"
-                          />
-                        ) : null}
-                        <span className="my-match-player-name">{awayName}</span>
-                      </div>
-                    </div>
-                  </div>
-                  {pendingLabel ? <p className="my-match-pending-note">{pendingLabel}</p> : null}
-                  <div className="my-match-links-row">
-                    <Link href={`/matches/${match.id}`} className="login-form-link">
-                      View public match hub
-                    </Link>
-                    <MyMatchActions
-                      matchId={match.id}
-                      editHref={`/my-matches/${match.id}/edit`}
-                      mode={pendingMode}
-                    />
-                  </div>
+                        </div>
                       </>
                     );
                   })()}

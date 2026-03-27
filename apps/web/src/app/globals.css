@@ -335,6 +335,10 @@ html[data-theme="light"] .sidebar {
 
 .sidebar-icon {
   font-size: 20px;
+  display: block;
+  width: 20px;
+  height: 20px;
+  line-height: 1;
   flex-shrink: 0;
   transition: transform 0.2s ease;
 }
@@ -533,38 +537,35 @@ html[data-theme="light"] .sidebar {
   box-shadow: var(--theme-shadow-soft);
 }
 
-.my-tournaments-selector-panel {
-  padding: 18px;
-}
-
+.my-tournaments-selector-panel,
 .my-tournaments-main-panel {
-  padding: 22px;
+  padding: 1.2rem;
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 84%, transparent);
+  border-radius: 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 95%, white) 0%, var(--theme-surface-2) 100%);
+  box-shadow: var(--theme-shadow-soft);
 }
 
-.my-tournaments-sidebar-header {
-  margin-bottom: 14px;
-}
-
-.my-tournaments-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.my-tournaments-list,
+.my-tournaments-standings-stack,
+.my-tournaments-rankings-panel {
+  display: grid;
+  gap: 0.9rem;
 }
 
 .my-tournament-button {
   display: grid;
-  gap: 8px;
-  flex: 1 1 260px;
-  min-width: min(100%, 260px);
-  padding: 14px;
-  border: 1px solid var(--theme-border-soft);
-  border-radius: 12px;
-  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+  gap: 0.55rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 84%, transparent);
+  border-radius: 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 97%, white) 0%, var(--theme-surface-2) 100%);
   color: var(--theme-page-text);
   text-align: left;
   font: inherit;
   cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: var(--theme-shadow-soft);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
 }
 
 .my-tournament-button:hover,
@@ -607,7 +608,7 @@ html[data-theme="light"] .sidebar {
   justify-content: center;
   min-height: 24px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--theme-accent-brand) 12%, var(--theme-surface-1));
   color: var(--theme-page-text);
   font-size: 0.74rem;
@@ -633,7 +634,7 @@ html[data-theme="light"] .sidebar {
   min-height: 34px;
   padding: 0 12px;
   border: 1px solid var(--theme-border-soft);
-  border-radius: 999px;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--theme-surface-1) 88%, transparent);
   color: var(--theme-page-text);
   font-size: 0.84rem;
@@ -649,10 +650,10 @@ html[data-theme="light"] .sidebar {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 0 0 18px;
+  margin: 6px 0 18px;
   padding: 8px;
   border: 1px solid var(--theme-border-soft);
-  border-radius: 999px;
+  border-radius: 8px;
   background: linear-gradient(180deg, var(--theme-surface-1), var(--theme-surface-2));
   box-shadow: var(--theme-shadow-soft);
 }
@@ -664,7 +665,7 @@ html[data-theme="light"] .sidebar {
   min-height: 42px;
   padding: 0 18px;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 8px;
   background: transparent;
   color: var(--theme-page-muted-2);
   font: inherit;
@@ -1740,10 +1741,9 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
 }
 
 .my-match-header {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: flex-start;
-  justify-content: space-between;
   gap: 12px 18px;
 }
 
@@ -1764,14 +1764,22 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   color: var(--theme-page-muted-3);
 }
 
+.my-match-header-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .my-match-header-side {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
   gap: 8px;
-  margin-left: auto;
+  min-width: 0;
   color: var(--theme-page-muted-3);
   font-size: 0.92rem;
+  text-align: right;
 }
 
 .my-match-status-chip {
@@ -2107,13 +2115,17 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   }
 
   .my-match-header {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .my-match-header-side {
     justify-content: flex-start;
-    margin-left: 0;
+  }
+
+  .my-match-header-side {
+    text-align: left;
   }
 
   .my-match-teams {
@@ -2152,21 +2164,25 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   .my-tournaments-view-pill {
     flex: 1 1 0;
   }
-
-  .my-tournaments-rankings-table-wrap {
+}
 
 @media (max-width: 560px) {
   .my-match-card {
     padding: 14px;
   }
 
-  .my-match-header-main,
-  .my-match-header-side {
-    justify-content: center;
+  .my-match-header {
+    gap: 8px 10px;
   }
 
   .my-match-header-main {
+    justify-content: flex-start;
     gap: 6px;
+  }
+
+  .my-match-header-side {
+    justify-content: flex-end;
+    text-align: right;
   }
 
   .my-match-teams {
@@ -2205,9 +2221,6 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
 
   .my-match-pending-note {
     text-align: center;
-  }
-}
-    padding: 1rem;
   }
 }
 
@@ -4674,20 +4687,23 @@ html[data-theme="light"] .group-pill.active:hover {
   .sidebar-item,
   .sidebar-nav[aria-label="Admin navigation"] .sidebar-item {
     display: grid;
-    grid-template-columns: 40px;
+    grid-template-columns: 40px 0fr;
     align-items: center;
     width: 40px;
     height: 40px;
-    justify-content: center;
+    justify-content: initial;
     gap: 0;
     padding: 0;
     margin-bottom: 0;
     margin-inline: auto;
+    overflow: hidden;
   }
 
   .sidebar-item .sidebar-icon,
   .sidebar-nav[aria-label="Admin navigation"] .sidebar-icon {
+    grid-column: 1;
     justify-self: center;
+    align-self: center;
   }
 
   .layout.layout-sidebar-expanded .sidebar-item,
@@ -4700,6 +4716,10 @@ html[data-theme="light"] .group-pill.active:hover {
   }
 
   .sidebar-nav .sidebar-label {
+    grid-column: 2;
+    display: block;
+    min-width: 0;
+    align-self: center;
     opacity: 0;
     transform: translateX(-6px);
     max-width: 0;
@@ -7046,7 +7066,7 @@ html[data-theme="light"] .group-pill.active:hover {
 .my-match-status-chip,
 .my-tournament-status-pill,
 .my-tournaments-meta-chip {
-  border-radius: 999px;
+  border-radius: 8px;
 }
 
 .my-match-status-chip {
@@ -7128,31 +7148,49 @@ html[data-theme="light"] .group-pill.active:hover {
 }
 
 .my-tournaments-view-toggle {
-  display: inline-grid;
-    grid-template-columns: 40px;
-  gap: 0.35rem;
-    width: 40px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 6px 0 18px;
+  padding: 8px;
   border: 1px solid color-mix(in srgb, var(--theme-border-soft) 84%, transparent);
-    justify-content: center;
-    gap: 0;
-    padding: 0;
+  border-radius: 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 97%, white) 0%, var(--theme-surface-2) 100%);
+  box-shadow: var(--theme-shadow-soft);
+}
 
-    margin-inline: auto;
 .my-tournaments-view-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 42px;
-  padding: 0 1rem;
+  padding: 0 18px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
   color: var(--theme-page-muted-2);
-    grid-template-columns: 40px minmax(0, 1fr);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-    justify-content: initial;
+.my-tournaments-view-pill:hover,
+.my-tournaments-view-pill:focus-visible {
+  transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--theme-accent-brand) 30%, var(--theme-border-soft));
-    padding: 0 10px 0 18px;
-    margin-inline: 0;
+  background: color-mix(in srgb, var(--theme-surface-2) 84%, transparent);
   color: var(--theme-page-text);
+  outline: none;
+}
+
+.my-tournaments-view-pill.is-active {
+  border-color: color-mix(in srgb, var(--theme-accent-brand) 30%, var(--theme-border-soft));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--theme-accent-brand) 16%, var(--theme-surface-1)) 0%, color-mix(in srgb, var(--theme-accent-cyan) 12%, var(--theme-surface-2)) 100%);
+  color: var(--theme-page-text);
+  box-shadow: var(--theme-shadow-soft);
 }
 
 .my-tournaments-rankings-table-wrap,
