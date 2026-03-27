@@ -42,69 +42,111 @@ export default async function NewsListingPage() {
             No published news yet.
           </div>
         ) : (
-          <section className={styles.newsFeedSection}>
-            <div className={styles.newsFeedHeader}>
-              <div>
-                <p className={styles.newsFeedLabel}>Archive</p>
-                <h2 className={styles.newsFeedTitle}>
-                  {remainingArticles.length > 0 ? "More stories from the newsroom." : "The latest story is live now."}
-                </h2>
-              </div>
-              <p className={styles.newsFeedMeta}>{articles.length} published {articles.length === 1 ? "article" : "articles"}</p>
-            </div>
-
-            {remainingArticles.length === 0 ? (
-              <div className={styles.singleStoryState}>
-                The featured story above is currently the newest and only published article.
-              </div>
-            ) : (
-              <div className={styles.newsGrid}>
-                {remainingArticles.map((article) => (
-              <article
-                key={article.id}
-                className={styles.newsCard}
-              >
-                {article.coverImageUrl ? (
-                  <Image
-                    src={article.coverImageUrl}
-                    alt={article.title}
-                    width={960}
-                    height={560}
-                    className={styles.newsCardImage}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                  />
-                ) : (
-                  <div className={styles.newsCardFallback}>
-                    NSL News
-                  </div>
-                )}
-                <div className={styles.newsCardBody}>
-                  <p className={styles.newsCardDate}>
-                    <LocalTimeText
-                      value={(article.publishedAt ?? article.updatedAt).toISOString()}
-                      options={{ year: "numeric", month: "long", day: "numeric" }}
+          <>
+            {featuredArticle ? (
+              <section className={styles.featuredStorySection}>
+                <article className={styles.featuredStoryCard}>
+                  {featuredArticle.coverImageUrl ? (
+                    <Image
+                      src={featuredArticle.coverImageUrl}
+                      alt={featuredArticle.title}
+                      width={1440}
+                      height={840}
+                      className={styles.featuredStoryImage}
+                      sizes="(max-width: 1024px) 100vw, 58vw"
                     />
-                  </p>
-                  <h2 className={styles.newsCardTitle}>
-                    <Link href={`/news/${article.slug}`} className={styles.newsCardTitleLink}>
-                      {article.title}
+                  ) : (
+                    <div className={styles.featuredStoryFallback}>NSL News</div>
+                  )}
+
+                  <div className={styles.featuredStoryBody}>
+                    <p className={styles.featuredStoryLabel}>Featured story</p>
+                    <h2 className={styles.featuredStoryTitle}>
+                      <Link href={`/news/${featuredArticle.slug}`} className={styles.featuredStoryTitleLink}>
+                        {featuredArticle.title}
+                      </Link>
+                    </h2>
+                    <p className={styles.featuredStoryDate}>
+                      <LocalTimeText
+                        value={(featuredArticle.publishedAt ?? featuredArticle.updatedAt).toISOString()}
+                        options={{ year: "numeric", month: "long", day: "numeric" }}
+                      />
+                    </p>
+                    <p className={styles.featuredStoryExcerpt}>
+                      {featuredArticle.excerpt || "Read the full story for details from the NSL newsroom."}
+                    </p>
+                    <Link href={`/news/${featuredArticle.slug}`} className={styles.newsCardLink}>
+                      Read Featured Story
                     </Link>
+                  </div>
+                </article>
+              </section>
+            ) : null}
+
+            <section className={styles.newsFeedSection}>
+              <div className={styles.newsFeedHeader}>
+                <div>
+                  <p className={styles.newsFeedLabel}>Archive</p>
+                  <h2 className={styles.newsFeedTitle}>
+                    {remainingArticles.length > 0 ? "More stories from the newsroom." : "The latest story is live now."}
                   </h2>
-                  <p className={styles.newsCardExcerpt}>
-                    {article.excerpt || "Read the full story for details from the NSL newsroom."}
-                  </p>
-                  <Link
-                    href={`/news/${article.slug}`}
-                    className={styles.newsCardLink}
-                  >
-                    Read Article
-                  </Link>
                 </div>
-              </article>
-                ))}
+                <p className={styles.newsFeedMeta}>{articles.length} published {articles.length === 1 ? "article" : "articles"}</p>
               </div>
-            )}
-          </section>
+
+              {remainingArticles.length === 0 ? (
+                <div className={styles.singleStoryState}>
+                  The featured story above is currently the newest and only published article.
+                </div>
+              ) : (
+                <div className={styles.newsGrid}>
+                  {remainingArticles.map((article) => (
+                    <article
+                      key={article.id}
+                      className={styles.newsCard}
+                    >
+                      {article.coverImageUrl ? (
+                        <Image
+                          src={article.coverImageUrl}
+                          alt={article.title}
+                          width={960}
+                          height={560}
+                          className={styles.newsCardImage}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className={styles.newsCardFallback}>
+                          NSL News
+                        </div>
+                      )}
+                      <div className={styles.newsCardBody}>
+                        <p className={styles.newsCardDate}>
+                          <LocalTimeText
+                            value={(article.publishedAt ?? article.updatedAt).toISOString()}
+                            options={{ year: "numeric", month: "long", day: "numeric" }}
+                          />
+                        </p>
+                        <h2 className={styles.newsCardTitle}>
+                          <Link href={`/news/${article.slug}`} className={styles.newsCardTitleLink}>
+                            {article.title}
+                          </Link>
+                        </h2>
+                        <p className={styles.newsCardExcerpt}>
+                          {article.excerpt || "Read the full story for details from the NSL newsroom."}
+                        </p>
+                        <Link
+                          href={`/news/${article.slug}`}
+                          className={styles.newsCardLink}
+                        >
+                          Read Article
+                        </Link>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
         )}
       </section>
     </main>
