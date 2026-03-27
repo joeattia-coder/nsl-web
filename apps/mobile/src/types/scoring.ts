@@ -4,15 +4,19 @@ export type SnookerBall = "red" | "yellow" | "green" | "brown" | "blue" | "pink"
 
 export type SnookerFormat = "REDS_6" | "REDS_10" | "REDS_15";
 
+export type ExpectedShot = "red" | "color" | "yellow" | "green" | "brown" | "blue" | "pink" | "black" | "none";
+
 export type RecordedBreak = {
   id: string;
   side: PlayerSide;
   points: number;
+  balls: SnookerBall[];
 };
 
 export type LiveBreak = {
   side: PlayerSide;
   points: number;
+  balls: SnookerBall[];
 };
 
 export type LiveFrameState = {
@@ -22,6 +26,8 @@ export type LiveFrameState = {
   breaks: RecordedBreak[];
   currentBreak: LiveBreak | null;
   activeSide: PlayerSide;
+  redsRemaining: number;
+  expectedShot: ExpectedShot;
   winnerSide: PlayerSide | null;
   isComplete: boolean;
 };
@@ -36,7 +42,7 @@ export type MatchScoringState = {
 };
 
 export type ScoringAction =
-  | { type: "pot"; side: PlayerSide; ball: SnookerBall }
+  | { type: "pot"; side: PlayerSide; ball: SnookerBall; scoredAs?: SnookerBall; isFreeBall?: boolean }
   | { type: "foul"; side: PlayerSide; points: number }
   | { type: "endTurn" }
   | { type: "awardFrame"; side: PlayerSide }

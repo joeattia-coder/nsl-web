@@ -1,5 +1,5 @@
 import type { MatchDetailResponse } from "../types/api";
-import type { MatchScoringState, PlayerSide, RecordedBreak, ScoringAction, SnookerBall } from "../types/scoring";
+import type { ExpectedShot, MatchScoringState, PlayerSide, RecordedBreak, ScoringAction, SnookerBall } from "../types/scoring";
 
 const BALL_POINTS: Record<SnookerBall, number> = {
   red: 1,
@@ -11,7 +11,33 @@ const BALL_POINTS: Record<SnookerBall, number> = {
   black: 7,
 };
 
-function createEmptyFrame(frameNumber: number) {
+const CLEARANCE_ORDER: SnookerBall[] = ["yellow", "green", "brown", "blue", "pink", "black"];
+
+function isColorBall(ball: SnookerBall) {
+  return ball !== "red";
+}
+
+function getNextClearanceBall(ball: SnookerBall): ExpectedShot {
+  const currentIndex = CLEARANCE_ORDER.indexOf(ball);
+
+  if (currentIndex === -1 || currentIndex === CLEARANCE_ORDER.length - 1) {
+    return "none";
+  }
+
+  return CLEARANCE_ORDER[currentIndex + 1];
+}
+
+function getClearancePointsFrom(ball: SnookerBall) {
+  const startIndex = CLEARANCE_ORDER.indexOf(ball);
+
+  if (startIndex === -1) {
+    return 0;
+  }
+
+  return CLEARANCE_ORDER.slice(startIndex).reduce((total, entry) => total + BALL_POINTS[entry], 0);
+}
+
+function getInitialFrameState(frameNumber: number, redsRemaining: number) {
   return {
     frameNumber,
     homePoints: 0,
@@ -19,9 +45,68 @@ function createEmptyFrame(frameNumber: number) {
     breaks: [] as RecordedBreak[],
     currentBreak: null,
     activeSide: "home" as PlayerSide,
+    redsRemaining,
+    expectedShot: "red" as ExpectedShot,
     winnerSide: null,
     isComplete: false,
   };
+}
+
+function getTotalRedsFromFormat(snookerFormat: MatchScoringState["snookerFormat"]) {
+  switch (snookerFormat) {
+    case "REDS_6":
+      return 6;
+    case "REDS_10":
+      return 10;
+    default:
+      return 15;
+  }
+}
+
+function isLegalPot(frame: MatchScoringState["frames"][number], ball: SnookerBall, scoredAs: SnookerBall, isFreeBall: boolean) {
+  if (frame.expectedShot === "none") {
+    return false;
+  }
+
+  if (isFreeBall) {
+    if (frame.expectedShot === "red") {
+      return scoredAs === "red" && isColorBall(ball);
+    }
+
+    if (frame.expectedShot === "color") {
+      return isColorBall(ball) && isColorBall(scoredAs);
+    }
+
+    return scoredAs === frame.expectedShot && isColorBall(ball);
+  }
+
+  if (frame.expectedShot === "red") {
+    return ball === "red";
+  }
+
+  if (frame.expectedShot === "color") {
+    return isColorBall(ball) && scoredAs === ball;
+  }
+
+  return ball === frame.expectedShot && scoredAs === ball;
+}
+
+function advanceFrameAfterPot(frame: MatchScoringState["frames"][number], scoredAs: SnookerBall, isFreeBall: boolean) {
+  if (frame.expectedShot === "red") {
+    if (!isFreeBall) {
+      frame.redsRemaining = Math.max(frame.redsRemaining - 1, 0);
+    }
+
+    frame.expectedShot = "color";
+    return;
+  }
+
+  if (frame.expectedShot === "color") {
+    frame.expectedShot = frame.redsRemaining > 0 ? "red" : "yellow";
+    return;
+  }
+
+  frame.expectedShot = getNextClearanceBall(scoredAs);
 }
 
 function deepCloneState(state: MatchScoringState): MatchScoringState {
@@ -29,8 +114,8 @@ function deepCloneState(state: MatchScoringState): MatchScoringState {
     ...state,
     frames: state.frames.map((frame) => ({
       ...frame,
-      currentBreak: frame.currentBreak ? { ...frame.currentBreak } : null,
-      breaks: frame.breaks.map((entry) => ({ ...entry })),
+      currentBreak: frame.currentBreak ? { ...frame.currentBreak, balls: [...frame.currentBreak.balls] } : null,
+      breaks: frame.breaks.map((entry) => ({ ...entry, balls: [...entry.balls] })),
     })),
   };
 }
@@ -40,6 +125,7 @@ export function getFramesNeededToWin(bestOfFrames: number) {
 }
 
 export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
+  const totalReds = getTotalRedsFromFormat(match.snookerFormat);
   const officialFrames = match.pendingSubmission?.frames.length
     ? match.pendingSubmission.frames
     : match.frames.map((frame) => ({
@@ -49,7 +135,7 @@ export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
       }));
 
   const frames = Array.from({ length: match.bestOfFrames }, (_, index) => {
-    const frame = createEmptyFrame(index + 1);
+    const frame = getInitialFrameState(index + 1, totalReds);
     const officialFrame = match.frames.find((entry) => entry.frameNumber === index + 1);
     const pendingFrame = officialFrames.find((entry) => entry.frameNumber === index + 1);
     const winnerSide: PlayerSide | null = officialFrame?.winnerEntryId
@@ -65,6 +151,7 @@ export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
           id: entry.id,
           side: entry.side,
           points: entry.breakValue,
+          balls: [],
         });
       }
     } else if (pendingFrame?.homeHighBreak) {
@@ -72,6 +159,7 @@ export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
         id: `pending-home-${index + 1}`,
         side: "home",
         points: pendingFrame.homeHighBreak,
+        balls: [],
       });
     }
 
@@ -80,6 +168,7 @@ export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
         id: `pending-away-${index + 1}`,
         side: "away",
         points: pendingFrame.awayHighBreak,
+        balls: [],
       });
     }
 
@@ -91,6 +180,7 @@ export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
       winnerSide,
       isComplete: Boolean(winnerSide),
       activeSide: match.currentSide,
+      expectedShot: winnerSide ? "none" : frame.expectedShot,
     };
   });
 
@@ -119,11 +209,18 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
   }
 
   if (action.type === "pot") {
-    const points = BALL_POINTS[action.ball];
+    const scoredAs = action.scoredAs ?? action.ball;
+
+    if (!isLegalPot(frame, action.ball, scoredAs, Boolean(action.isFreeBall))) {
+      return nextState;
+    }
+
+    const points = BALL_POINTS[scoredAs];
     const nextBreakPoints = frame.currentBreak?.side === action.side ? frame.currentBreak.points + points : points;
     frame.currentBreak = {
       side: action.side,
       points: nextBreakPoints,
+      balls: frame.currentBreak?.side === action.side ? [...frame.currentBreak.balls, action.ball] : [action.ball],
     };
     frame.activeSide = action.side;
 
@@ -132,6 +229,8 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
     } else {
       frame.awayPoints += points;
     }
+
+    advanceFrameAfterPot(frame, scoredAs, Boolean(action.isFreeBall));
 
     return nextState;
   }
@@ -150,6 +249,7 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
         id: `${frame.frameNumber}-${frame.breaks.length + 1}`,
         side: frame.currentBreak.side,
         points: frame.currentBreak.points,
+        balls: [...frame.currentBreak.balls],
       });
     }
 
@@ -164,6 +264,7 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
         id: `${frame.frameNumber}-${frame.breaks.length + 1}`,
         side: frame.currentBreak.side,
         points: frame.currentBreak.points,
+        balls: [...frame.currentBreak.balls],
       });
     }
 
@@ -178,6 +279,7 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
         id: `${frame.frameNumber}-${frame.breaks.length + 1}`,
         side: frame.currentBreak.side,
         points: frame.currentBreak.points,
+        balls: [...frame.currentBreak.balls],
       });
     }
 
@@ -221,4 +323,52 @@ export function summarizeScoringState(state: MatchScoringState) {
       homeScore >= getFramesNeededToWin(state.bestOfFrames) ||
       awayScore >= getFramesNeededToWin(state.bestOfFrames),
   };
+}
+
+export function getLegalPots(frame: MatchScoringState["frames"][number]) {
+  if (frame.expectedShot === "none") {
+    return [] as SnookerBall[];
+  }
+
+  if (frame.expectedShot === "red") {
+    return ["red"] as SnookerBall[];
+  }
+
+  if (frame.expectedShot === "color") {
+    return CLEARANCE_ORDER;
+  }
+
+  return [frame.expectedShot];
+}
+
+export function getFreeBallScoreTarget(frame: MatchScoringState["frames"][number], nominatedBall: SnookerBall): SnookerBall | null {
+  if (frame.expectedShot === "none") {
+    return null;
+  }
+
+  if (frame.expectedShot === "red") {
+    return nominatedBall === "red" ? null : "red";
+  }
+
+  if (frame.expectedShot === "color") {
+    return nominatedBall === "red" ? null : nominatedBall;
+  }
+
+  return nominatedBall === "red" ? null : frame.expectedShot;
+}
+
+export function getPossiblePointsRemaining(frame: MatchScoringState["frames"][number]) {
+  if (frame.expectedShot === "none") {
+    return 0;
+  }
+
+  if (frame.expectedShot === "red") {
+    return frame.redsRemaining * 8 + 27;
+  }
+
+  if (frame.expectedShot === "color") {
+    return 7 + frame.redsRemaining * 8 + 27;
+  }
+
+  return getClearancePointsFrom(frame.expectedShot);
 }

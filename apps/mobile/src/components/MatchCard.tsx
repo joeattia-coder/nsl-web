@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 
 import type { MatchItem } from "../types/app";
@@ -21,16 +22,12 @@ function formatMatchDateTime(value: string | null) {
 type MatchCardProps = {
   match: MatchItem;
   onViewHub?: () => void;
-  onSubmitResult?: () => void;
+  onStartMatch?: () => void;
+  onOpenMenu?: () => void;
 };
 
-export function MatchCard({ match, onViewHub, onSubmitResult }: MatchCardProps) {
-  const actionLabel =
-    match.pendingMode === "awaitingYourReview"
-      ? "Review Result"
-      : match.pendingMode === "submittedByYou"
-        ? "Pending"
-        : "Submit Result";
+export function MatchCard({ match, onViewHub, onStartMatch, onOpenMenu }: MatchCardProps) {
+  const canStartMatch = match.status !== "Completed";
 
   return (
     <View style={styles.card}>
@@ -40,7 +37,12 @@ export function MatchCard({ match, onViewHub, onSubmitResult }: MatchCardProps) 
           <Text style={styles.meta}>{match.venue}</Text>
           <Text style={styles.meta}>{match.stage} • {formatMatchDateTime(match.dateTime)}</Text>
         </View>
-        <StatusPill status={match.status} />
+        <View style={styles.metaActions}>
+          <StatusPill status={match.status} />
+          <Pressable onPress={onOpenMenu} style={styles.menuButton} accessibilityRole="button" accessibilityLabel={`More actions for ${match.homePlayer.name} versus ${match.awayPlayer.name}`}>
+            <MaterialCommunityIcons name="dots-horizontal" size={20} color={appTheme.colors.text} />
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.playersRow}>
@@ -66,12 +68,8 @@ export function MatchCard({ match, onViewHub, onSubmitResult }: MatchCardProps) 
         <Pressable onPress={onViewHub} style={[styles.actionButton, styles.secondaryButton]}>
           <Text style={styles.secondaryButtonText}>View Match Hub</Text>
         </Pressable>
-        <Pressable
-          onPress={onSubmitResult}
-          disabled={match.pendingMode === "submittedByYou"}
-          style={[styles.actionButton, styles.primaryButton, !match.canSubmitResult && styles.buttonDisabled]}
-        >
-          <Text style={styles.primaryButtonText}>{actionLabel}</Text>
+        <Pressable onPress={onStartMatch} disabled={!canStartMatch} style={[styles.actionButton, styles.primaryButton, !canStartMatch && styles.buttonDisabled]}>
+          <Text style={styles.primaryButtonText}>Start Match</Text>
         </Pressable>
       </View>
     </View>
@@ -94,9 +92,23 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: 12,
   },
+  metaActions: {
+    alignItems: "flex-end",
+    gap: 10,
+  },
   metaCopy: {
     flex: 1,
     gap: 3,
+  },
+  menuButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: appTheme.colors.surfaceStrong,
+    borderWidth: 1,
+    borderColor: appTheme.colors.border,
   },
   tournament: {
     color: appTheme.colors.text,

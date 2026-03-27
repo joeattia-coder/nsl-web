@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "audit:security-migration": "tsx scripts/audit-security-migration.ts",
+    "backfill:invite-email-verification": "tsx scripts/backfill-invite-email-verification.ts",
     "backfill:security-groups": "tsx scripts/backfill-security-groups.ts",
     "backfill:timezone-datetimes": "tsx scripts/backfill-timezone-datetimes.ts",
     "seed": "tsx prisma/seed.ts",

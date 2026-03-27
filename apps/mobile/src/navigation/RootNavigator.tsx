@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { LoginScreen } from "../screens/auth/LoginScreen";
+import { MatchScoringScreen } from "../screens/player/MatchScoringScreen";
 import { useAppSession } from "../state/app-session";
 import type { RootStackParamList } from "../types/app";
 import { appTheme } from "../theme";
@@ -26,6 +27,7 @@ export function RootNavigator() {
       {isAuthenticated ? (
         <>
           <Stack.Screen name="Tabs" component={RoleTabs} />
+          <Stack.Screen name="MatchScoring" component={MatchScoringScreen} />
         </>
       ) : (
         <Stack.Screen name="Login" component={LoginScreen} />

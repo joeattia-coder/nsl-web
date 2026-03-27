@@ -6,15 +6,13 @@ import { EmptyState } from "../../components/EmptyState";
 import { HeroHeaderCard } from "../../components/HeroHeaderCard";
 import { LoadingSkeleton } from "../../components/LoadingSkeleton";
 import { MatchCard } from "../../components/MatchCard";
-import { FormField } from "../../components/FormField";
-import { PrimaryButton } from "../../components/PrimaryButton";
 import { ScreenContainer } from "../../components/ScreenContainer";
 import { SectionHeader } from "../../components/SectionHeader";
 import { SegmentedControl } from "../../components/SegmentedControl";
 import { mobileApi } from "../../lib/mobile-api";
 import { useAppSession } from "../../state/app-session";
 import { appTheme } from "../../theme";
-import type { MainTabParamList, MatchItem } from "../../types/app";
+import type { MatchItem } from "../../types/app";
 
 const filters = [
   { key: "all", label: "All" },
@@ -29,9 +27,6 @@ export function MatchesScreen() {
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [reviewTarget, setReviewTarget] = useState<MatchItem | null>(null);
-  const [disputeReason, setDisputeReason] = useState("");
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const loadMatches = async () => {
     try {
@@ -63,47 +58,6 @@ export function MatchesScreen() {
     return true;
   }), [filter, matches]);
 
-  const handleReviewApprove = async () => {
-    if (!reviewTarget) {
-      return;
-    }
-
-    setIsSubmittingReview(true);
-
-    try {
-      await mobileApi.approveMatchResult(reviewTarget.id);
-      setReviewTarget(null);
-      setDisputeReason("");
-      await loadMatches();
-      Alert.alert("Review Result", "The submitted result has been approved.");
-    } catch (error) {
-      Alert.alert("Review Result", error instanceof Error ? error.message : "Unable to approve this result.");
-    } finally {
-      setIsSubmittingReview(false);
-    }
-  };
-
-  const handleReviewDispute = async () => {
-    if (!reviewTarget || !disputeReason.trim()) {
-      Alert.alert("Review Result", "Add a dispute reason before sending the dispute.");
-      return;
-    }
-
-    setIsSubmittingReview(true);
-
-    try {
-      await mobileApi.disputeMatchResult(reviewTarget.id, disputeReason.trim());
-      setReviewTarget(null);
-      setDisputeReason("");
-      await loadMatches();
-      Alert.alert("Review Result", "The dispute has been sent to league staff.");
-    } catch (error) {
-      Alert.alert("Review Result", error instanceof Error ? error.message : "Unable to dispute this result.");
-    } finally {
-      setIsSubmittingReview(false);
-    }
-  };
-
   return (
     <ScreenContainer>
       <HeroHeaderCard
@@ -130,43 +84,12 @@ export function MatchesScreen() {
               key={match.id}
               match={match}
               onViewHub={() => Alert.alert("Match Hub", `${match.tournamentName}\n${match.stage}\n${match.venue}`)}
-              onSubmitResult={() => {
-                if (match.pendingMode === "awaitingYourReview") {
-                  setReviewTarget(match);
-                  setDisputeReason("");
-                  return;
-                }
-
-                if (match.pendingMode === "submittedByYou") {
-                  Alert.alert("Result Pending", "This result is already waiting for opponent approval.");
-                  return;
-                }
-
-                navigation.navigate("Score" as keyof MainTabParamList, { matchId: match.id });
-              }}
+              onStartMatch={() => navigation.getParent()?.navigate("MatchScoring", { matchId: match.id })}
+              onOpenMenu={() => Alert.alert("Match Actions", "Additional actions will live here.", [{ text: "Coin Toss", onPress: () => Alert.alert("Coin Toss", "Coin toss controls can be added here next.") }, { text: "Cancel", style: "cancel" }])}
             />
           ))}
         </View>
       )}
-
-      {reviewTarget ? (
-        <View style={styles.reviewPanel}>
-          <Text style={styles.reviewTitle}>Review submitted result</Text>
-          <Text style={styles.reviewCopy}>{reviewTarget.homePlayer.name} vs {reviewTarget.awayPlayer.name}</Text>
-          <FormField
-            label="Dispute Reason"
-            value={disputeReason}
-            onChangeText={setDisputeReason}
-            multiline
-            numberOfLines={4}
-            style={styles.reviewInput}
-          />
-          <View style={styles.reviewActions}>
-            <PrimaryButton label={isSubmittingReview ? "Approving..." : "Approve"} onPress={handleReviewApprove} disabled={isSubmittingReview} />
-            <PrimaryButton label={isSubmittingReview ? "Disputing..." : "Dispute"} variant="ghost" onPress={handleReviewDispute} disabled={isSubmittingReview} />
-          </View>
-        </View>
-      ) : null}
     </ScreenContainer>
   );
 }
@@ -175,29 +98,7 @@ const styles = StyleSheet.create({
   stack: {
     gap: 12,
   },
-  reviewPanel: {
-    padding: appTheme.spacing.lg,
-    borderRadius: appTheme.radii.md,
-    borderWidth: 1,
-    borderColor: appTheme.colors.border,
-    backgroundColor: appTheme.colors.surfaceStrong,
-    gap: 12,
-  },
-  reviewTitle: {
-    color: appTheme.colors.text,
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  reviewCopy: {
+  infoText: {
     color: appTheme.colors.textMuted,
-    fontSize: appTheme.typography.body,
-  },
-  reviewInput: {
-    minHeight: 110,
-    textAlignVertical: "top",
-    paddingTop: 14,
-  },
-  reviewActions: {
-    gap: 12,
   },
 });

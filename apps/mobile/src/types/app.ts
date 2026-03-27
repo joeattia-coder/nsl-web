@@ -20,6 +20,7 @@ export type MainTabParamList = {
 export type RootStackParamList = {
   Login: undefined;
   Tabs: undefined;
+  MatchScoring: { matchId: string };
   TournamentDetail: { tournamentId: string };
   LeagueContent: { initialSection?: LeagueBrowseSection } | undefined;
   ChangePassword: undefined;
