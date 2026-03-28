@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "95f244fc-717f-432a-b69a-8779f76e6c2d"
+      }
+    },
+    "android": {
+      "package": "com.joe.attia.nsltv"
+    },
+    "ios": {
+      "bundleIdentifier": "com.joe.attia.nsltv",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    }
+  }
+}

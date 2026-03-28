@@ -1,0 +1,71 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# local env and logs
+.env
+.env.*
+.env*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# editor and local tooling
+.vscode/
+.idea/
+.expo/
+
+# system files
+.DS_Store
+*.pem
+
+# root build caches and artifacts
+.turbo/
+coverage/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# web app artifacts not needed for mobile EAS builds
+apps/web/.next/
+apps/web/out/
+apps/web/.vercel/
+apps/web/public/uploads/
+
+# mobile local Expo artifacts
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/web-build/
+apps/mobile/expo-env.d.ts
+
+# android generated outputs only
+apps/mobile/android/.gradle/
+apps/mobile/android/build/
+apps/mobile/android/app/build/
+apps/mobile/android/app/.cxx/
+apps/mobile/android/app/intermediates/
+apps/mobile/android/app/outputs/
+apps/mobile/android/app/tmp/
+apps/mobile/android/app/kotlin/
+
+# native local-only files
+apps/mobile/android/*.jks
+apps/mobile/android/*.keystore
+apps/mobile/**/*.orig.*
+apps/mobile/**/*.mobileprovision
+apps/mobile/**/*.p8
+apps/mobile/**/*.p12
+apps/mobile/**/*.key
+
+# docs and local reports not needed for mobile build
+docs/
+bugreport-*.zip

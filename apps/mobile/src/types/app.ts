@@ -6,9 +6,9 @@ export type MatchStatus = "Scheduled" | "Completed" | "In Progress";
 
 export type MainTabParamList = {
   Home: undefined;
+  Dashboard: undefined;
   Tournaments: undefined;
   Matches: undefined;
-  Score: { matchId?: string } | undefined;
   Profile: undefined;
   Overview: undefined;
   League: undefined;
@@ -18,7 +18,10 @@ export type MainTabParamList = {
 };
 
 export type RootStackParamList = {
-  Login: undefined;
+  PublicHome: undefined;
+  PublicLeagueContent: { initialSection?: LeagueBrowseSection } | undefined;
+  Login: { prefillIdentifier?: string } | undefined;
+  Register: { prefillIdentifier?: string } | undefined;
   Tabs: undefined;
   MatchScoring: { matchId: string };
   TournamentDetail: { tournamentId: string };

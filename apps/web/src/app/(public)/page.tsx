@@ -4,8 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiUser, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import LiveMatchesCarousel, { type LiveCarouselMatch } from "@/components/public/LiveMatchesCarousel";
 import { getFlagCdnUrl } from "@/lib/country";
+import type { PublicLiveMatchListResponse, PublicLiveMatchSnapshot } from "@/lib/live-match";
 import { formatDateInAdminTimeZone } from "@/lib/timezone";
+import { useLivePolling } from "@/lib/useLivePolling";
 
 type AnyObj = Record<string, unknown>;
 
@@ -186,6 +189,75 @@ function getFixtureTournamentKey(fx: AnyObj, idx: number): string {
     firstString(fx, ["fixtureGroupDesc", "FixtureGroupDesc", "tournamentName"], "") ||
     `tournament-${idx}`
   );
+}
+
+function getFixtureIdentity(fx: AnyObj) {
+  return firstString(fx, ["fixtureId", "FixtureID", "FixtureId", "id", "ID"], "");
+}
+
+function applyLiveSnapshots(current: AnyObj[] | null, snapshots: PublicLiveMatchSnapshot[]) {
+  if (!current || current.length === 0 || snapshots.length === 0) {
+    return current;
+  }
+
+  const updates = new Map(snapshots.map((snapshot) => [snapshot.id, snapshot]));
+  let changed = false;
+
+  const next = current.map((fixture) => {
+    const fixtureId = getFixtureIdentity(fixture);
+    const snapshot = updates.get(fixtureId);
+
+    if (!snapshot) {
+      return fixture;
+    }
+
+    const currentHomeScore = fixture.homeScore ?? null;
+    const currentAwayScore = fixture.roadScore ?? null;
+    const currentMatchStatus = typeof fixture.matchStatus === "string" ? fixture.matchStatus : "";
+    const currentScheduleStatus = typeof fixture.scheduleStatus === "string" ? fixture.scheduleStatus : "";
+    const currentPublicNote = typeof fixture.publicNote === "string" ? fixture.publicNote : fixture.publicNote ?? null;
+    const currentLiveSessionStatus = typeof fixture.liveSessionStatus === "string" ? fixture.liveSessionStatus : fixture.liveSessionStatus ?? null;
+    const currentFrameNumber = typeof fixture.currentFrameNumber === "number" ? fixture.currentFrameNumber : null;
+    const currentFrameHomePoints = typeof fixture.currentFrameHomePoints === "number" ? fixture.currentFrameHomePoints : null;
+    const currentFrameAwayPoints = typeof fixture.currentFrameAwayPoints === "number" ? fixture.currentFrameAwayPoints : null;
+    const currentActiveSide = fixture.activeSide === "home" || fixture.activeSide === "away" ? fixture.activeSide : null;
+    const currentUpdatedAt = typeof fixture.updatedAt === "string" ? fixture.updatedAt : null;
+
+    if (
+      currentHomeScore === snapshot.homeScore &&
+      currentAwayScore === snapshot.awayScore &&
+      currentMatchStatus === snapshot.matchStatus &&
+      currentScheduleStatus === snapshot.scheduleStatus &&
+      currentPublicNote === snapshot.publicNote &&
+      currentLiveSessionStatus === snapshot.liveSessionStatus &&
+      currentFrameNumber === snapshot.currentFrameNumber &&
+      currentFrameHomePoints === snapshot.currentFrameHomePoints &&
+      currentFrameAwayPoints === snapshot.currentFrameAwayPoints &&
+      currentActiveSide === snapshot.activeSide &&
+      currentUpdatedAt === snapshot.updatedAt
+    ) {
+      return fixture;
+    }
+
+    changed = true;
+
+    return {
+      ...fixture,
+      homeScore: snapshot.homeScore,
+      roadScore: snapshot.awayScore,
+      matchStatus: snapshot.matchStatus,
+      scheduleStatus: snapshot.scheduleStatus,
+      publicNote: snapshot.publicNote,
+      liveSessionStatus: snapshot.liveSessionStatus,
+      currentFrameNumber: snapshot.currentFrameNumber,
+      currentFrameHomePoints: snapshot.currentFrameHomePoints,
+      currentFrameAwayPoints: snapshot.currentFrameAwayPoints,
+      activeSide: snapshot.activeSide,
+      updatedAt: snapshot.updatedAt,
+    };
+  });
+
+  return changed ? next : current;
 }
 
 function getFixtureDateTimestamp(fx: AnyObj): number | null {
@@ -389,6 +461,25 @@ export default function Page() {
     };
   }, [featuredVideos.length]);
 
+  useLivePolling({
+    enabled: fixturesRaw !== null,
+    intervalMs: 3000,
+    poll: async (signal) => {
+      const response = await fetch("/api/public/fixtures/live", {
+        signal,
+        cache: "no-store",
+      });
+
+      const data = (await response.json().catch(() => null)) as PublicLiveMatchListResponse | null;
+
+      if (!response.ok) {
+        throw new Error(data && "error" in data ? String(data.error ?? "Failed to fetch live fixtures.") : "Failed to fetch live fixtures.");
+      }
+
+      setFixturesRaw((current) => applyLiveSnapshots(current, data?.items ?? []));
+    },
+  });
+
   const matches: UiMatch[] = useMemo(() => {
     const incompleteFixtures = (fixturesRaw ?? [])
       .map((fixture, index) => ({ fixture, index }))
@@ -419,6 +510,39 @@ export default function Page() {
 
     return [...datedSelections, ...pickRandomFixturesFromDifferentTournaments(remainingFixtures, additionalFixturesNeeded)]
       .map(({ fixture, index }) => toUiMatch(fixture, index));
+  }, [fixturesRaw]);
+
+  const liveCarouselMatches = useMemo(() => {
+    return (fixturesRaw ?? [])
+      .map((fixture, index) => ({ fixture, uiMatch: toUiMatch(fixture, index) }))
+      .filter(({ fixture }) => {
+        const liveSessionStatus = firstString(fixture, ["liveSessionStatus", "LiveSessionStatus"], "").toUpperCase();
+        const matchStatus = firstString(fixture, ["matchStatus", "MatchStatus"], "").toUpperCase();
+
+        return liveSessionStatus === "ACTIVE" || liveSessionStatus === "PAUSED" || /LIVE|IN_PROGRESS/.test(matchStatus);
+      })
+      .sort((left, right) => {
+        const leftUpdatedAt = Date.parse(firstString(left.fixture, ["updatedAt", "UpdatedAt"], "")) || 0;
+        const rightUpdatedAt = Date.parse(firstString(right.fixture, ["updatedAt", "UpdatedAt"], "")) || 0;
+
+        return rightUpdatedAt - leftUpdatedAt;
+      })
+      .map(({ fixture, uiMatch }): LiveCarouselMatch => {
+        const groupId = firstString(fixture, ["fixtureGroupIdentifier", "FixtureGroupIdentifier"], "");
+
+        return {
+          id: uiMatch.id,
+          href: groupId ? `/matches/${uiMatch.id}?group=${encodeURIComponent(groupId)}` : `/matches/${uiMatch.id}`,
+          eventLabel: uiMatch.event,
+          homeName: uiMatch.home,
+          awayName: uiMatch.away,
+          homeScore: firstNumber(fixture, ["homeScore", "HomeScore", "HomeTeamScore"]),
+          awayScore: firstNumber(fixture, ["roadScore", "RoadScore", "AwayScore", "RoadTeamScore"]),
+          currentFrameNumber: firstNumber(fixture, ["currentFrameNumber", "CurrentFrameNumber"]),
+          currentFrameHomePoints: firstNumber(fixture, ["currentFrameHomePoints", "CurrentFrameHomePoints"]),
+          currentFrameAwayPoints: firstNumber(fixture, ["currentFrameAwayPoints", "CurrentFrameAwayPoints"]),
+        };
+      });
   }, [fixturesRaw]);
 
   // FEATURED NEWS CAROUSEL ARROWS
@@ -621,6 +745,15 @@ export default function Page() {
           </div>
         </div>
       </div>
+
+      {liveCarouselMatches.length > 0 ? (
+        <LiveMatchesCarousel
+          matches={liveCarouselMatches}
+          className="home-live-carousel-section"
+          title="Live Matches"
+          body="Jump straight into any live-scored table from the home page and open the same broadcast match centre view."
+        />
+      ) : null}
 
       {featuredNews.length > 0 ? (
         <section className="featured-news-section home-section">

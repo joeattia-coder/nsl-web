@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { deviceSignIn, type DeviceSignInStatus } from "../lib/device-sign-in";
 import { mobileApi } from "../lib/mobile-api";
 import type { AuthSessionUser } from "../types/api";
 import type { AppUser, UserRole } from "../types/app";
@@ -9,16 +10,27 @@ type LoginPayload = {
   password: string;
 };
 
+const defaultDeviceSignInStatus: DeviceSignInStatus = {
+  isSupported: false,
+  isEnrolled: false,
+  hasCredentials: false,
+};
+
 type AppSessionContextValue = {
   isAuthenticated: boolean;
   isBootstrapping: boolean;
   currentRole: UserRole;
   availableRoles: UserRole[];
   currentUser: AppUser;
+  deviceSignInStatus: DeviceSignInStatus;
   login: (payload: LoginPayload) => Promise<void>;
+  loginWithDevice: () => Promise<void>;
   logout: () => Promise<void>;
+  enableDeviceSignIn: (payload: LoginPayload) => Promise<void>;
+  disableDeviceSignIn: () => Promise<void>;
   switchRole: (role: UserRole) => void;
   refreshSession: () => Promise<AuthSessionUser | null>;
+  refreshDeviceSignInStatus: () => Promise<DeviceSignInStatus>;
 };
 
 const AppSessionContext = createContext<AppSessionContextValue | null>(null);
@@ -62,14 +74,16 @@ function mapCurrentRole(user: AuthSessionUser | null, preferredRole: UserRole | 
 
 function mapCurrentUser(user: AuthSessionUser | null, role: UserRole): AppUser {
   const fullName = user?.displayName?.trim() || "National Snooker League";
-  const email = user?.email?.trim() || user?.username?.trim() || "player@nsl.local";
+  const email = user?.email?.trim() || user?.username?.trim() || "guest@nsl.local";
 
   return {
     id: user?.id ?? "guest",
     role,
     fullName,
     subtitle:
-      role === "league_admin"
+      !user
+        ? "Public fixtures, rankings, and league updates before sign-in"
+        : role === "league_admin"
         ? "League operations and competition control"
         : "Player-facing matchday control and score submission",
     email,
@@ -85,6 +99,7 @@ export function AppSessionProvider({ children }: { children: ReactNode }) {
   const [sessionUser, setSessionUser] = useState<AuthSessionUser | null>(null);
   const [isBootstrapping, setIsBootstrapping] = useState(true);
   const [currentRole, setCurrentRole] = useState<UserRole>("player");
+  const [deviceSignInStatus, setDeviceSignInStatus] = useState<DeviceSignInStatus>(defaultDeviceSignInStatus);
 
   const availableRoles = useMemo(() => mapAvailableRoles(sessionUser), [sessionUser]);
 
@@ -101,12 +116,21 @@ export function AppSessionProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshDeviceSignInStatus = async () => {
+    const status = await deviceSignIn.getStatus();
+    setDeviceSignInStatus(status);
+    return status;
+  };
+
   useEffect(() => {
     let isMounted = true;
 
     const bootstrap = async () => {
       try {
-        const user = await mobileApi.getSession();
+        const [user, status] = await Promise.all([
+          mobileApi.getSession(),
+          deviceSignIn.getStatus(),
+        ]);
 
         if (!isMounted) {
           return;
@@ -114,6 +138,7 @@ export function AppSessionProvider({ children }: { children: ReactNode }) {
 
         setSessionUser(user);
         setCurrentRole(mapCurrentRole(user, null));
+        setDeviceSignInStatus(status);
       } catch {
         if (!isMounted) {
           return;
@@ -121,6 +146,11 @@ export function AppSessionProvider({ children }: { children: ReactNode }) {
 
         setSessionUser(null);
         setCurrentRole("player");
+        const status = await deviceSignIn.getStatus().catch(() => defaultDeviceSignInStatus);
+
+        if (isMounted) {
+          setDeviceSignInStatus(status);
+        }
       } finally {
         if (isMounted) {
           setIsBootstrapping(false);
@@ -144,10 +174,31 @@ export function AppSessionProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const loginWithDevice = async () => {
+    const credentials = await deviceSignIn.getCredentialsWithPrompt();
+
+    await mobileApi.login(credentials.identifier, credentials.password);
+    const user = await refreshSession();
+
+    if (!user) {
+      throw new Error("Device sign-in completed but no authenticated session was available to the mobile app.");
+    }
+  };
+
+  const enableDeviceSignIn = async ({ emailOrUsername, password }: LoginPayload) => {
+    await deviceSignIn.storeCredentials(emailOrUsername.trim(), password);
+    await refreshDeviceSignInStatus();
+  };
+
   const logout = async () => {
     await mobileApi.logout();
     setSessionUser(null);
     setCurrentRole("player");
+  };
+
+  const disableDeviceSignIn = async () => {
+    await deviceSignIn.clearCredentials();
+    await refreshDeviceSignInStatus();
   };
 
   const switchRole = (role: UserRole) => {
@@ -166,10 +217,15 @@ export function AppSessionProvider({ children }: { children: ReactNode }) {
         currentRole,
         availableRoles,
         currentUser,
+        deviceSignInStatus,
         login,
+        loginWithDevice,
         logout,
+        enableDeviceSignIn,
+        disableDeviceSignIn,
         switchRole,
         refreshSession,
+        refreshDeviceSignInStatus,
       }}
     >
       {children}

@@ -13,7 +13,10 @@
       "backgroundColor": "#000000"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Allow NSL Mobile to use Face ID for faster sign-in on this device."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +32,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
-    ]
+      "expo-secure-store",
+      "expo-local-authentication"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3dadb0db-b20f-495b-b0a1-c57bbed1b5e2"
+      }
+    }
   }
 }

@@ -9,22 +9,26 @@ type ScoringModalProps = {
   onClose: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  closeOnBackdropPress?: boolean;
+  showCloseButton?: boolean;
 };
 
-export function ScoringModal({ visible, title, subtitle, onClose, children, footer }: ScoringModalProps) {
+export function ScoringModal({ visible, title, subtitle, onClose, children, footer, closeOnBackdropPress = true, showCloseButton = true }: ScoringModalProps) {
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        {closeOnBackdropPress ? <Pressable style={StyleSheet.absoluteFill} onPress={onClose} /> : <View style={StyleSheet.absoluteFill} />}
         <View style={styles.card}>
           <View style={styles.header}>
             <View style={styles.copy}>
               <Text style={styles.title}>{title}</Text>
               {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
             </View>
-            <Pressable onPress={onClose} style={styles.closeButton} accessibilityRole="button" accessibilityLabel={`Close ${title}`}>
-              <Text style={styles.closeGlyph}>×</Text>
-            </Pressable>
+            {showCloseButton ? (
+              <Pressable onPress={onClose} style={styles.closeButton} accessibilityRole="button" accessibilityLabel={`Close ${title}`}>
+                <Text style={styles.closeGlyph}>×</Text>
+              </Pressable>
+            ) : null}
           </View>
           <View style={styles.body}>{children}</View>
           {footer ? <View style={styles.footer}>{footer}</View> : null}

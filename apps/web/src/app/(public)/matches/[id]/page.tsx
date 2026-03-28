@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import type { HeadToHeadStatRow } from "@/components/HeadToHeadStats";
 import { normalizeCountryCode } from "@/lib/country";
 import { getFlagCdnUrl } from "@/lib/country";
-import type { PublicLiveMatchSnapshot } from "@/lib/live-match";
+import type { PublicLiveBroadcastState, PublicLiveMatchSnapshot } from "@/lib/live-match";
 import { getPlayerRankings } from "@/lib/player-performance";
+import { derivePublicLiveBroadcastState } from "@/lib/public-live-broadcast";
 import { prisma } from "@/lib/prisma";
 import { parseStoredMatchDateTime } from "@/lib/timezone";
 import LiveMatchCentrePanel from "./LiveMatchCentrePanel";
@@ -191,6 +192,19 @@ export default async function MatchCentrePage({
       awayScore: true,
       publicNote: true,
       updatedAt: true,
+      liveSession: {
+        select: {
+          status: true,
+          homeFramesWon: true,
+          awayFramesWon: true,
+          currentFrameNumber: true,
+          currentFrameHomePoints: true,
+          currentFrameAwayPoints: true,
+          activeSide: true,
+          scoringState: true,
+          lastSyncedAt: true,
+        },
+      },
       tournament: {
         select: {
           id: true,
@@ -420,13 +434,31 @@ export default async function MatchCentrePage({
   const initialSnapshot: PublicLiveMatchSnapshot = {
     id: match.id,
     fixtureGroupIdentifier: match.tournament.id,
-    homeScore: match.homeScore,
-    awayScore: match.awayScore,
-    matchStatus: match.matchStatus,
+    homeScore: match.liveSession?.homeFramesWon ?? match.homeScore,
+    awayScore: match.liveSession?.awayFramesWon ?? match.awayScore,
+    matchStatus:
+      match.liveSession?.status === "ACTIVE" || match.liveSession?.status === "PAUSED"
+        ? "IN_PROGRESS"
+        : match.liveSession?.status === "COMPLETED"
+          ? "COMPLETED"
+          : match.liveSession?.status === "ABANDONED"
+            ? "ABANDONED"
+            : match.matchStatus,
     scheduleStatus: match.scheduleStatus,
     publicNote: match.publicNote,
-    updatedAt: match.updatedAt.toISOString(),
+    liveSessionStatus: match.liveSession?.status ?? null,
+    currentFrameNumber: match.liveSession?.currentFrameNumber ?? null,
+    currentFrameHomePoints: match.liveSession?.currentFrameHomePoints ?? null,
+    currentFrameAwayPoints: match.liveSession?.currentFrameAwayPoints ?? null,
+    activeSide:
+      match.liveSession?.activeSide === "home" || match.liveSession?.activeSide === "away"
+        ? match.liveSession.activeSide
+        : null,
+    updatedAt: (match.liveSession?.lastSyncedAt ?? match.updatedAt).toISOString(),
   };
+  const initialDetails: PublicLiveBroadcastState | null = match.liveSession?.scoringState
+    ? derivePublicLiveBroadcastState(match.liveSession.scoringState)
+    : null;
 
   return (
     <main className={`content ${styles.page}`}>
@@ -439,6 +471,7 @@ export default async function MatchCentrePage({
         scheduledAt={scheduledAt}
         venueLabel={venueLabel}
         initialSnapshot={initialSnapshot}
+        initialDetails={initialDetails}
         leftPlayerName={leftName}
         rightPlayerName={rightName}
         leftPlayerHref={leftPlayerIds.length === 1 ? `/players/${leftPlayerIds[0]}` : undefined}

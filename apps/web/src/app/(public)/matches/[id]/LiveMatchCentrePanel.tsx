@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import HeadToHeadStats, { type HeadToHeadStatRow } from "@/components/HeadToHeadStats";
 import LocalTimeText from "@/components/LocalTimeText";
-import type { PublicLiveMatchResponse, PublicLiveMatchSnapshot } from "@/lib/live-match";
+import type { PublicLiveBroadcastState, PublicLiveMatchResponse, PublicLiveMatchSnapshot } from "@/lib/live-match";
+import { formatDateInAdminTimeZone } from "@/lib/timezone";
 import { useLivePolling } from "@/lib/useLivePolling";
+import LiveBroadcastBoard from "./LiveBroadcastBoard";
 import MatchCentreBackButton from "./MatchCentreBackButton";
 import styles from "./MatchCentrePage.module.css";
 
@@ -17,6 +19,7 @@ type LiveMatchCentrePanelProps = {
   scheduledAt: string | null;
   venueLabel: string;
   initialSnapshot: PublicLiveMatchSnapshot;
+  initialDetails: PublicLiveBroadcastState | null;
   leftPlayerName: string;
   rightPlayerName: string;
   leftPlayerHref?: string;
@@ -47,15 +50,16 @@ function formatCompactDate(value: string | null) {
     return "Date TBC";
   }
 
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
+  const formatted = formatDateInAdminTimeZone(value, {
+    month: "short",
+    day: "numeric",
+  });
+
+  if (!formatted) {
     return "Date TBC";
   }
 
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-  }).format(date);
+  return formatted;
 }
 
 function isSameSnapshot(left: PublicLiveMatchSnapshot, right: PublicLiveMatchSnapshot) {
@@ -65,7 +69,12 @@ function isSameSnapshot(left: PublicLiveMatchSnapshot, right: PublicLiveMatchSna
     left.awayScore === right.awayScore &&
     left.matchStatus === right.matchStatus &&
     left.scheduleStatus === right.scheduleStatus &&
-    left.publicNote === right.publicNote
+    left.publicNote === right.publicNote &&
+    left.liveSessionStatus === right.liveSessionStatus &&
+    left.currentFrameNumber === right.currentFrameNumber &&
+    left.currentFrameHomePoints === right.currentFrameHomePoints &&
+    left.currentFrameAwayPoints === right.currentFrameAwayPoints &&
+    left.activeSide === right.activeSide
   );
 }
 
@@ -78,6 +87,7 @@ export default function LiveMatchCentrePanel({
   scheduledAt,
   venueLabel,
   initialSnapshot,
+  initialDetails,
   leftPlayerName,
   rightPlayerName,
   leftPlayerHref,
@@ -92,6 +102,7 @@ export default function LiveMatchCentrePanel({
   stats,
 }: LiveMatchCentrePanelProps) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
+  const [details, setDetails] = useState<PublicLiveBroadcastState | null>(initialDetails);
   const hasScore = typeof snapshot.homeScore === "number" || typeof snapshot.awayScore === "number";
   const scoreLabel = hasScore ? `${snapshot.homeScore ?? 0} - ${snapshot.awayScore ?? 0}` : "VS";
   const isLive = /LIVE|IN_PROGRESS/i.test(snapshot.matchStatus);
@@ -99,7 +110,8 @@ export default function LiveMatchCentrePanel({
 
   useEffect(() => {
     setSnapshot(initialSnapshot);
-  }, [initialSnapshot]);
+    setDetails(initialDetails);
+  }, [initialDetails, initialSnapshot]);
 
   useLivePolling({
     enabled: Boolean(matchId),
@@ -121,6 +133,7 @@ export default function LiveMatchCentrePanel({
       }
 
       setSnapshot((current) => (isSameSnapshot(current, data.item) ? current : data.item));
+      setDetails(data.details ?? null);
     },
   });
 
@@ -172,6 +185,25 @@ export default function LiveMatchCentrePanel({
           </div>
         </div>
       </section>
+
+      {snapshot.liveSessionStatus === "ACTIVE" || snapshot.liveSessionStatus === "PAUSED" || snapshot.liveSessionStatus === "COMPLETED" ? (
+        details ? (
+          <LiveBroadcastBoard
+            snapshot={snapshot}
+            details={details}
+            leftPlayerName={leftPlayerName}
+            rightPlayerName={rightPlayerName}
+            leftPlayerHref={leftPlayerHref}
+            rightPlayerHref={rightPlayerHref}
+            leftPlayerPhoto={leftPlayerPhoto}
+            rightPlayerPhoto={rightPlayerPhoto}
+            leftPlayerFlagUrl={leftPlayerFlagUrl}
+            leftPlayerFlagAlt={leftPlayerFlagAlt}
+            rightPlayerFlagUrl={rightPlayerFlagUrl}
+            rightPlayerFlagAlt={rightPlayerFlagAlt}
+          />
+        ) : null
+      ) : null}
 
       <HeadToHeadStats
         leftPlayerName={leftPlayerName}

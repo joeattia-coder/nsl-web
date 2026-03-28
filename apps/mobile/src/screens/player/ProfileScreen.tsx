@@ -17,7 +17,7 @@ import type { UserRole, UserProfile } from "../../types/app";
 
 export function ProfileScreen() {
   const navigation = useNavigation<any>();
-  const { availableRoles, currentRole, currentUser, refreshSession, switchRole, logout } = useAppSession();
+  const { availableRoles, currentRole, currentUser, refreshSession, switchRole, logout, deviceSignInStatus, disableDeviceSignIn } = useAppSession();
   const [profile, setProfile] = useState<UserProfile>({
     firstName: "",
     lastName: "",
@@ -160,6 +160,37 @@ export function ProfileScreen() {
         </View>
       ) : null}
 
+      {deviceSignInStatus.isSupported ? (
+        <View style={styles.panel}>
+          <SectionHeader
+            title="Device Sign-In"
+            subtitle={deviceSignInStatus.hasCredentials ? "This device can use a native authentication prompt before replaying your saved NSL credentials." : "After a password sign-in, you can enable Face ID, fingerprint, or device PIN convenience login on this device."}
+          />
+          {deviceSignInStatus.hasCredentials ? (
+            <PrimaryButton
+              label="Forget This Device Sign-In"
+              variant="ghost"
+              onPress={() => {
+                Alert.alert("Device Sign-In", "Remove saved sign-in credentials from this device?", [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Remove",
+                    style: "destructive",
+                    onPress: () => {
+                      void disableDeviceSignIn().catch((error) => {
+                        Alert.alert("Device Sign-In", error instanceof Error ? error.message : "Unable to remove device sign-in.");
+                      });
+                    },
+                  },
+                ]);
+              }}
+            />
+          ) : (
+            <Text style={styles.deviceCopy}>Sign in from the public login screen with your password to enroll this device.</Text>
+          )}
+        </View>
+      ) : null}
+
       <View style={styles.panel}>
         <SectionHeader title="Profile Details" subtitle="Editable player identity and contact info." />
         <View style={styles.formGrid}>
@@ -257,5 +288,10 @@ const styles = StyleSheet.create({
   },
   actionStack: {
     gap: 12,
+  },
+  deviceCopy: {
+    color: appTheme.colors.textMuted,
+    fontSize: appTheme.typography.body,
+    lineHeight: 21,
   },
 });

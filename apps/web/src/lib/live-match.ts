@@ -12,10 +12,53 @@ export type LiveMatchCoreSnapshot = {
 export type PublicLiveMatchSnapshot = LiveMatchCoreSnapshot & {
   fixtureGroupIdentifier: string;
   publicNote: string | null;
+  liveSessionStatus: string | null;
+  currentFrameNumber: number | null;
+  currentFrameHomePoints: number | null;
+  currentFrameAwayPoints: number | null;
+  activeSide: "home" | "away" | null;
+};
+
+export type PublicLiveFrameSummary = {
+  frameNumber: number;
+  homePoints: number;
+  awayPoints: number;
+  homeHighBreak: number | null;
+  awayHighBreak: number | null;
+  homeFouls: number;
+  awayFouls: number;
+  winnerSide: "home" | "away" | null;
+  isComplete: boolean;
+  isCurrent: boolean;
+};
+
+export type PublicLiveBreakState = {
+  side: "home" | "away";
+  points: number;
+  balls: string[];
+};
+
+export type PublicLiveBroadcastState = {
+  startedAt: string | null;
+  currentFrameNumber: number | null;
+  redsRemaining: number | null;
+  expectedShot: string | null;
+  activeSide: "home" | "away" | null;
+  currentBreak: PublicLiveBreakState | null;
+  highestBreak: {
+    home: number | null;
+    away: number | null;
+  };
+  totalFouls: {
+    home: number;
+    away: number;
+  };
+  frames: PublicLiveFrameSummary[];
 };
 
 export type PublicLiveMatchResponse = {
   item: PublicLiveMatchSnapshot;
+  details?: PublicLiveBroadcastState | null;
   serverTime: string;
 };
 

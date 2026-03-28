@@ -1,4 +1,6 @@
 import type { MatchStatus } from "./app";
+import type { MatchScoringState, PlayerSide } from "./scoring";
+import type { PublicFixture, PublicFixturesResponse, PublicNewsArticle, PublicNewsResponse } from "@nsl/shared";
 
 export type AuthSessionUser = {
   id: string;
@@ -39,6 +41,45 @@ export type LoginResponse = {
   ok: true;
   nextPath: string;
   sessionToken: string;
+};
+
+export type RegistrationAvailabilityField = "email" | "username";
+
+export type RegistrationAvailabilityResponse = {
+  field: RegistrationAvailabilityField;
+  available: boolean;
+  duplicate: boolean;
+  normalizedValue?: string;
+};
+
+export type HumanVerificationChallengeResponse = {
+  ok: true;
+  challenge: {
+    prompt: string;
+    token: string;
+  };
+};
+
+export type RegisterPayload = {
+  firstName: string;
+  middleInitial: string;
+  lastName: string;
+  phoneNumber: string;
+  country: string;
+  email: string;
+  username: string;
+  password: string;
+  verificationToken: string;
+  verificationAnswer: string;
+  website: string;
+};
+
+export type RegisterResponse = {
+  ok: true;
+  userId: string;
+  message: string;
+  verificationLink: string | null;
+  delivery: "email" | "development-link";
 };
 
 export type ProfileResponse = {
@@ -263,6 +304,58 @@ export type MatchDetailResponse = {
   };
 };
 
+export type LiveMatchSessionStatus = "ACTIVE" | "PAUSED" | "COMPLETED" | "ABANDONED";
+
+export type LiveMatchSessionSummary = {
+  homeScore: number | null;
+  awayScore: number | null;
+  currentFrameNumber: number | null;
+  currentFrameHomePoints: number | null;
+  currentFrameAwayPoints: number | null;
+  activeSide: PlayerSide | null;
+};
+
+export type LiveMatchSessionParticipantState = {
+  startedAt: string | null;
+  completedAt: string | null;
+};
+
+export type LiveMatchSessionRecord = {
+  id: string;
+  matchId: string;
+  status: LiveMatchSessionStatus;
+  version: number;
+  scoringState: MatchScoringState | null;
+  summary: LiveMatchSessionSummary;
+  participants: {
+    home: LiveMatchSessionParticipantState;
+    away: LiveMatchSessionParticipantState;
+  };
+  finalizedAt: string | null;
+  lastSyncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type LiveMatchSessionResponse = {
+  session: LiveMatchSessionRecord | null;
+};
+
+export type LiveMatchSessionSyncPayload = {
+  baseVersion: number;
+  scoringState: MatchScoringState;
+  summary: {
+    homeScore: number;
+    awayScore: number;
+    currentFrameNumber: number;
+    currentFrameHomePoints: number;
+    currentFrameAwayPoints: number;
+    activeSide: PlayerSide | null;
+    isComplete: boolean;
+  };
+  status?: LiveMatchSessionStatus;
+};
+
 export type StandingsResponse = {
   fixtureGroupIdentifier: string;
   groupCount: number;
@@ -304,4 +397,31 @@ export type RankingsResponse = {
     photoUrl?: string;
     country?: string;
   }>;
+};
+
+export type PublicNewsListResponse = PublicNewsResponse;
+
+export type PublicHomeVideo = {
+  id: string;
+  title: string;
+  sourceType: "YOUTUBE" | "UPLOAD";
+  videoUrl: string;
+  carouselSortOrder: number | null;
+  embedUrl: string;
+  watchUrl: string;
+};
+
+export type PublicVideosResponse = {
+  videos: PublicHomeVideo[];
+};
+
+export type PublicFixturesListResponse = PublicFixturesResponse;
+
+export type PublicRankingPlayer = RankingsResponse["players"][number];
+
+export type MobileHomeFeedResponse = {
+  news: PublicNewsArticle[];
+  videos: PublicHomeVideo[];
+  fixtures: PublicFixture[];
+  rankings: PublicRankingPlayer[];
 };

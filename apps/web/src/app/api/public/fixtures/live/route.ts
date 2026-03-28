@@ -6,6 +6,22 @@ export function OPTIONS() {
   return publicApiOptions();
 }
 
+function getPublicMatchStatus(matchStatus: string, liveSessionStatus: string | null) {
+  if (liveSessionStatus === "ACTIVE" || liveSessionStatus === "PAUSED") {
+    return "IN_PROGRESS";
+  }
+
+  if (liveSessionStatus === "COMPLETED") {
+    return "COMPLETED";
+  }
+
+  if (liveSessionStatus === "ABANDONED") {
+    return "ABANDONED";
+  }
+
+  return matchStatus;
+}
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
@@ -27,6 +43,18 @@ export async function GET(request: Request) {
         scheduleStatus: true,
         publicNote: true,
         updatedAt: true,
+        liveSession: {
+          select: {
+            status: true,
+            homeFramesWon: true,
+            awayFramesWon: true,
+            currentFrameNumber: true,
+            currentFrameHomePoints: true,
+            currentFrameAwayPoints: true,
+            activeSide: true,
+            lastSyncedAt: true,
+          },
+        },
       },
     });
 
@@ -34,12 +62,20 @@ export async function GET(request: Request) {
       items: matches.map((match) => ({
         id: match.id,
         fixtureGroupIdentifier: match.tournamentId,
-        homeScore: match.homeScore,
-        awayScore: match.awayScore,
-        matchStatus: match.matchStatus,
+        homeScore: match.liveSession?.homeFramesWon ?? match.homeScore,
+        awayScore: match.liveSession?.awayFramesWon ?? match.awayScore,
+        matchStatus: getPublicMatchStatus(match.matchStatus, match.liveSession?.status ?? null),
         scheduleStatus: match.scheduleStatus,
         publicNote: match.publicNote,
-        updatedAt: match.updatedAt.toISOString(),
+        liveSessionStatus: match.liveSession?.status ?? null,
+        currentFrameNumber: match.liveSession?.currentFrameNumber ?? null,
+        currentFrameHomePoints: match.liveSession?.currentFrameHomePoints ?? null,
+        currentFrameAwayPoints: match.liveSession?.currentFrameAwayPoints ?? null,
+        activeSide:
+          match.liveSession?.activeSide === "home" || match.liveSession?.activeSide === "away"
+            ? match.liveSession.activeSide
+            : null,
+        updatedAt: (match.liveSession?.lastSyncedAt ?? match.updatedAt).toISOString(),
       })),
       serverTime: new Date().toISOString(),
     };

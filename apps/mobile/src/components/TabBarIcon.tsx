@@ -13,9 +13,9 @@ export function TabBarIcon({ routeName, color, size = 22, strokeWidth = 1.5 }: T
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {routeName === "Home" ? <HomeIcon color={color} strokeWidth={strokeWidth} /> : null}
+      {routeName === "Dashboard" ? <DashboardIcon color={color} strokeWidth={strokeWidth} /> : null}
       {routeName === "Tournaments" ? <TrophyIcon color={color} strokeWidth={strokeWidth} /> : null}
       {routeName === "Matches" ? <CalendarIcon color={color} strokeWidth={strokeWidth} /> : null}
-      {routeName === "Score" ? <ChartIcon color={color} strokeWidth={strokeWidth} /> : null}
       {routeName === "Profile" ? <ProfileIcon color={color} strokeWidth={strokeWidth} /> : null}
       {routeName === "Overview" ? <GridIcon color={color} strokeWidth={strokeWidth} /> : null}
       {routeName === "League" ? <TableIcon color={color} strokeWidth={strokeWidth} /> : null}
@@ -29,6 +29,17 @@ function HomeIcon({ color, strokeWidth }: IconShapeProps) {
       <Path d="M3.75 10.5 12 3.75l8.25 6.75" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M5.25 9.75V20.25H18.75V9.75" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M10.125 20.25v-5.625h3.75v5.625" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  );
+}
+
+function DashboardIcon({ color, strokeWidth }: IconShapeProps) {
+  return (
+    <>
+      <Rect x="4.5" y="4.5" width="6.375" height="6.375" rx="1.125" stroke={color} strokeWidth={strokeWidth} />
+      <Rect x="13.125" y="4.5" width="6.375" height="4.125" rx="1.125" stroke={color} strokeWidth={strokeWidth} />
+      <Rect x="13.125" y="10.875" width="6.375" height="8.625" rx="1.125" stroke={color} strokeWidth={strokeWidth} />
+      <Rect x="4.5" y="13.125" width="6.375" height="6.375" rx="1.125" stroke={color} strokeWidth={strokeWidth} />
     </>
   );
 }
@@ -55,17 +66,6 @@ function CalendarIcon({ color, strokeWidth }: IconShapeProps) {
       <Path d="M3.75 9.75h16.5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
       <Path d="M8.25 13.125h3" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
       <Path d="M8.25 16.875h7.5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
-    </>
-  );
-}
-
-function ChartIcon({ color, strokeWidth }: IconShapeProps) {
-  return (
-    <>
-      <Path d="M4.5 19.5h15" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
-      <Rect x="6" y="11.25" width="2.625" height="6.75" rx="0.75" stroke={color} strokeWidth={strokeWidth} />
-      <Rect x="10.6875" y="7.5" width="2.625" height="10.5" rx="0.75" stroke={color} strokeWidth={strokeWidth} />
-      <Rect x="15.375" y="9.375" width="2.625" height="8.625" rx="0.75" stroke={color} strokeWidth={strokeWidth} />
     </>
   );
 }

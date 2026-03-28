@@ -12,6 +12,7 @@ import {
   FiGrid,
   FiPlayCircle,
 } from "react-icons/fi";
+import LiveMatchesCarousel, { type LiveCarouselMatch } from "@/components/public/LiveMatchesCarousel";
 import { KnockoutBracket } from "@/components/tournament-bracket/KnockoutBracket";
 import type { BracketRound } from "@/components/tournament-bracket/types";
 import { getFlagCdnUrl } from "@/lib/country";
@@ -44,6 +45,13 @@ type UiMatch = {
   dateLabel: string;
   timeLabel: string;
   matchStatus: string;
+  liveSessionStatus: string | null;
+  currentFrameNumber: number | null;
+  currentFrameHomePoints: number | null;
+  currentFrameAwayPoints: number | null;
+  activeSide: "home" | "away" | null;
+  publicNote: string | null;
+  updatedAt: string | null;
 
   homeName: string;
   roadName: string;
@@ -196,12 +204,28 @@ function toUiMatch(fx: AnyObj, idx: number): UiMatch {
   const homePlayerPhotoUrl = firstString(fx, ["homePlayerPhotoUrl", "HomePlayerPhotoUrl"], "");
   const roadPlayerPhotoUrl = firstString(fx, ["roadPlayerPhotoUrl", "RoadPlayerPhotoUrl"], "");
   const matchStatus = firstString(fx, ["matchStatus", "MatchStatus"], "SCHEDULED");
+  const liveSessionStatusRaw = fx?.liveSessionStatus ?? fx?.LiveSessionStatus ?? null;
+  const liveSessionStatus = typeof liveSessionStatusRaw === "string" ? liveSessionStatusRaw : null;
+  const currentFrameNumber = typeof fx?.currentFrameNumber === "number" ? fx.currentFrameNumber : null;
+  const currentFrameHomePoints = typeof fx?.currentFrameHomePoints === "number" ? fx.currentFrameHomePoints : null;
+  const currentFrameAwayPoints = typeof fx?.currentFrameAwayPoints === "number" ? fx.currentFrameAwayPoints : null;
+  const activeSideRaw = fx?.activeSide ?? null;
+  const activeSide = activeSideRaw === "home" || activeSideRaw === "away" ? activeSideRaw : null;
+  const publicNote = typeof fx?.publicNote === "string" ? fx.publicNote : null;
+  const updatedAt = typeof fx?.updatedAt === "string" ? fx.updatedAt : null;
 
   return {
     id,
     dateLabel: dateLabel || (rawFixtureDate ? rawFixtureDate : ""),
     timeLabel,
     matchStatus,
+    liveSessionStatus,
+    currentFrameNumber,
+    currentFrameHomePoints,
+    currentFrameAwayPoints,
+    activeSide,
+    publicNote,
+    updatedAt,
     homeName,
     roadName,
     homePlayerId: firstString(fx, ["homePlayerId", "HomePlayerId"], "") || null,
@@ -255,13 +279,25 @@ function applyLiveSnapshots(current: AnyObj[] | null, snapshots: PublicLiveMatch
     const currentMatchStatus = typeof fixture.matchStatus === "string" ? fixture.matchStatus : "";
     const currentScheduleStatus = typeof fixture.scheduleStatus === "string" ? fixture.scheduleStatus : "";
     const currentPublicNote = typeof fixture.publicNote === "string" ? fixture.publicNote : fixture.publicNote ?? null;
+    const currentLiveSessionStatus = typeof fixture.liveSessionStatus === "string" ? fixture.liveSessionStatus : fixture.liveSessionStatus ?? null;
+    const currentFrameNumber = typeof fixture.currentFrameNumber === "number" ? fixture.currentFrameNumber : null;
+    const currentFrameHomePoints = typeof fixture.currentFrameHomePoints === "number" ? fixture.currentFrameHomePoints : null;
+    const currentFrameAwayPoints = typeof fixture.currentFrameAwayPoints === "number" ? fixture.currentFrameAwayPoints : null;
+    const currentActiveSide = fixture.activeSide === "home" || fixture.activeSide === "away" ? fixture.activeSide : null;
+    const currentUpdatedAt = typeof fixture.updatedAt === "string" ? fixture.updatedAt : null;
 
     if (
       currentHomeScore === snapshot.homeScore &&
       currentAwayScore === snapshot.awayScore &&
       currentMatchStatus === snapshot.matchStatus &&
       currentScheduleStatus === snapshot.scheduleStatus &&
-      currentPublicNote === snapshot.publicNote
+      currentPublicNote === snapshot.publicNote &&
+      currentLiveSessionStatus === snapshot.liveSessionStatus &&
+      currentFrameNumber === snapshot.currentFrameNumber &&
+      currentFrameHomePoints === snapshot.currentFrameHomePoints &&
+      currentFrameAwayPoints === snapshot.currentFrameAwayPoints &&
+      currentActiveSide === snapshot.activeSide &&
+      currentUpdatedAt === snapshot.updatedAt
     ) {
       return fixture;
     }
@@ -275,6 +311,12 @@ function applyLiveSnapshots(current: AnyObj[] | null, snapshots: PublicLiveMatch
       matchStatus: snapshot.matchStatus,
       scheduleStatus: snapshot.scheduleStatus,
       publicNote: snapshot.publicNote,
+      liveSessionStatus: snapshot.liveSessionStatus,
+      currentFrameNumber: snapshot.currentFrameNumber,
+      currentFrameHomePoints: snapshot.currentFrameHomePoints,
+      currentFrameAwayPoints: snapshot.currentFrameAwayPoints,
+      activeSide: snapshot.activeSide,
+      updatedAt: snapshot.updatedAt,
     };
   });
 
@@ -432,6 +474,34 @@ export default function MatchesPageClient() {
     return byGroup.slice(0, 300).map(toUiMatch);
   }, [activeGroupId, fixturesRaw]);
 
+  const liveCarouselMatches = useMemo(() => {
+    return (fixturesRaw ?? [])
+      .map(toUiMatch)
+      .filter(
+        (match) =>
+          match.liveSessionStatus === "ACTIVE" ||
+          match.liveSessionStatus === "PAUSED" ||
+          /LIVE|IN_PROGRESS/i.test(match.matchStatus)
+      )
+      .sort((left, right) => {
+        const leftTime = left.updatedAt ? Date.parse(left.updatedAt) : 0;
+        const rightTime = right.updatedAt ? Date.parse(right.updatedAt) : 0;
+        return rightTime - leftTime;
+      })
+      .map((match): LiveCarouselMatch => ({
+        id: match.id,
+        href: `/matches/${match.id}?group=${encodeURIComponent(match.fixtureGroupId)}`,
+        eventLabel: match.fixtureGroupDesc || match.roundDesc || "Published fixture",
+        homeName: match.homeName,
+        awayName: match.roadName,
+        homeScore: match.homeScore,
+        awayScore: match.roadScore,
+        currentFrameNumber: match.currentFrameNumber,
+        currentFrameHomePoints: match.currentFrameHomePoints,
+        currentFrameAwayPoints: match.currentFrameAwayPoints,
+      }));
+  }, [fixturesRaw]);
+
   const selectedGroupDesc =
     groups.find((g) => String(g.id) === String(activeGroupId))?.desc || "Matches";
   const roundDesc = filteredMatches[0]?.roundDesc || "";
@@ -448,10 +518,10 @@ export default function MatchesPageClient() {
         : "Broadcast bracket projection";
 
   useLivePolling({
-    enabled: Boolean(activeGroupId) && fixturesRaw !== null,
+    enabled: fixturesRaw !== null,
     intervalMs: 3000,
     poll: async (signal) => {
-      const response = await fetch(`/api/public/fixtures/live?group=${encodeURIComponent(activeGroupId)}`, {
+      const response = await fetch("/api/public/fixtures/live", {
         signal,
         cache: "no-store",
       });
@@ -689,6 +759,8 @@ export default function MatchesPageClient() {
         </div>
       </section>
 
+      {liveCarouselMatches.length > 0 ? <LiveMatchesCarousel matches={liveCarouselMatches} /> : null}
+
       <section className={styles.controlsPanel}>
         <div className={styles.controlsHeader}>
           <div>
@@ -815,7 +887,10 @@ export default function MatchesPageClient() {
                   <div className={styles.matchCardTop}>
                     <div className={styles.matchSchedule}>
                       <span className={styles.scheduleLine}>{scheduleLabel || "TBA"}</span>
-                      <span className={`${styles.statusBadge} ${statusClass}`}>{formatStatusLabel(m.matchStatus)}</span>
+                      <div className={styles.matchStatusRow}>
+                        <span className={`${styles.statusBadge} ${statusClass}`}>{formatStatusLabel(m.matchStatus)}</span>
+                        {isLive ? <span className={styles.liveBadgeCompact}>Live</span> : null}
+                      </div>
                     </div>
 
                     <p className={styles.roundMeta}>{m.roundDesc || m.fixtureGroupDesc || "Published fixture"}</p>

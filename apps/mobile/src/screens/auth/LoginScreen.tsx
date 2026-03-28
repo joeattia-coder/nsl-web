@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { FormField } from "../../components/FormField";
@@ -9,24 +10,76 @@ import { PrimaryButton } from "../../components/PrimaryButton";
 import { ScreenContainer } from "../../components/ScreenContainer";
 import { useAppSession } from "../../state/app-session";
 import { appTheme } from "../../theme";
+import type { RootStackParamList } from "../../types/app";
 
-export function LoginScreen() {
-  const { login, isBootstrapping } = useAppSession();
-  const [emailOrUsername, setEmailOrUsername] = useState("amir.attia@nsl.example");
-  const [password, setPassword] = useState("password");
+type LoginScreenProps = {
+  route?: { params?: RootStackParamList["Login"] };
+};
+
+export function LoginScreen({ route }: LoginScreenProps) {
+  const navigation = useNavigation<any>();
+  const { login, loginWithDevice, enableDeviceSignIn, deviceSignInStatus, isBootstrapping } = useAppSession();
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeviceSigningIn, setIsDeviceSigningIn] = useState(false);
+
+  useEffect(() => {
+    if (route?.params?.prefillIdentifier) {
+      setEmailOrUsername(route.params.prefillIdentifier);
+    }
+  }, [route?.params?.prefillIdentifier]);
 
   const handleLogin = async () => {
+    const trimmedIdentifier = emailOrUsername.trim();
+
+    if (!trimmedIdentifier || !password) {
+      Alert.alert("Sign in", "Enter your email or username and password.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      await login({ emailOrUsername, password });
+      await login({ emailOrUsername: trimmedIdentifier, password });
+
+      if (deviceSignInStatus.isSupported && deviceSignInStatus.isEnrolled && !deviceSignInStatus.hasCredentials) {
+        Alert.alert(
+          "Enable Device Sign-In",
+          "Use Face ID, fingerprint, or your device PIN to sign in faster on this device next time.",
+          [
+            { text: "Not now", style: "cancel" },
+            {
+              text: "Enable",
+              onPress: () => {
+                void enableDeviceSignIn({ emailOrUsername: trimmedIdentifier, password }).catch((error) => {
+                  Alert.alert("Device Sign-In", error instanceof Error ? error.message : "Unable to enable device sign-in.");
+                });
+              },
+            },
+          ]
+        );
+      }
     } catch (error) {
       Alert.alert("Sign in", error instanceof Error ? error.message : "Unable to sign in.");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleDeviceLogin = async () => {
+    setIsDeviceSigningIn(true);
+
+    try {
+      await loginWithDevice();
+    } catch (error) {
+      Alert.alert("Device Sign-In", error instanceof Error ? error.message : "Unable to sign in with this device.");
+    } finally {
+      setIsDeviceSigningIn(false);
+    }
+  };
+
+  const showDeviceButton = deviceSignInStatus.isSupported && deviceSignInStatus.isEnrolled && deviceSignInStatus.hasCredentials;
 
   return (
     <ScreenContainer scrollable={false} contentContainerStyle={styles.screenFill}>
@@ -49,18 +102,33 @@ export function LoginScreen() {
           <View style={styles.formStack}>
             <FormField label="Email or Username" value={emailOrUsername} onChangeText={setEmailOrUsername} autoCapitalize="none" />
             <FormField label="Password" value={password} onChangeText={setPassword} secureTextEntry />
+            <Pressable style={styles.registerRow} onPress={() => navigation.navigate("Register", { prefillIdentifier: emailOrUsername.trim() || undefined })}>
+              <Text style={styles.registerText}>Don&apos;t have an account? Register Now</Text>
+            </Pressable>
           </View>
+
+          {showDeviceButton ? (
+            <PrimaryButton
+              label={isDeviceSigningIn ? "Waiting For Device..." : "Sign In With Device"}
+              onPress={handleDeviceLogin}
+              disabled={isSubmitting || isBootstrapping || isDeviceSigningIn}
+              variant="ghost"
+              icon={<MaterialCommunityIcons name="cellphone-key" size={18} color={appTheme.colors.text} />}
+            />
+          ) : null}
 
           <PrimaryButton
             label={isSubmitting ? "Signing In..." : "Login"}
             onPress={handleLogin}
-            disabled={isSubmitting || isBootstrapping}
+            disabled={isSubmitting || isBootstrapping || isDeviceSigningIn}
             icon={<MaterialCommunityIcons name="arrow-right-circle-outline" size={18} color="#17110a" />}
           />
 
-          <Pressable style={styles.forgotRow}>
-            <Text style={styles.forgotText}>Forgot password?</Text>
-          </Pressable>
+          <View style={styles.footerActions}>
+            <Pressable style={styles.forgotRow} onPress={() => navigation.navigate("PublicHome")}>
+              <Text style={styles.forgotText}>Back to public home</Text>
+            </Pressable>
+          </View>
         </LinearGradient>
       </KeyboardAvoidingView>
     </ScreenContainer>
@@ -138,6 +206,18 @@ const styles = StyleSheet.create({
   },
   formStack: {
     gap: appTheme.spacing.md,
+  },
+  footerActions: {
+    gap: 12,
+  },
+  registerRow: {
+    alignItems: "center",
+    paddingTop: 4,
+  },
+  registerText: {
+    color: appTheme.colors.teal,
+    fontSize: 13,
+    fontWeight: "700",
   },
   forgotRow: {
     alignItems: "center",

@@ -76,6 +76,8 @@ export const ModelName = {
   TournamentEntryMember: 'TournamentEntryMember',
   GroupParticipant: 'GroupParticipant',
   Match: 'Match',
+  MatchLiveSession: 'MatchLiveSession',
+  MatchLiveEvent: 'MatchLiveEvent',
   MatchResultSubmission: 'MatchResultSubmission',
   MatchResultSubmissionFrame: 'MatchResultSubmissionFrame',
   PlayerEloHistory: 'PlayerEloHistory',
@@ -484,6 +486,46 @@ export const MatchScalarFieldEnum = {
 } as const
 
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
+
+
+export const MatchLiveSessionScalarFieldEnum = {
+  id: 'id',
+  matchId: 'matchId',
+  status: 'status',
+  version: 'version',
+  scoringState: 'scoringState',
+  homeFramesWon: 'homeFramesWon',
+  awayFramesWon: 'awayFramesWon',
+  currentFrameNumber: 'currentFrameNumber',
+  currentFrameHomePoints: 'currentFrameHomePoints',
+  currentFrameAwayPoints: 'currentFrameAwayPoints',
+  activeSide: 'activeSide',
+  homeStartedAt: 'homeStartedAt',
+  awayStartedAt: 'awayStartedAt',
+  homeCompletedAt: 'homeCompletedAt',
+  awayCompletedAt: 'awayCompletedAt',
+  finalizedAt: 'finalizedAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdByUserId: 'createdByUserId',
+  updatedByUserId: 'updatedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchLiveSessionScalarFieldEnum = (typeof MatchLiveSessionScalarFieldEnum)[keyof typeof MatchLiveSessionScalarFieldEnum]
+
+
+export const MatchLiveEventScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  version: 'version',
+  eventType: 'eventType',
+  payload: 'payload',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type MatchLiveEventScalarFieldEnum = (typeof MatchLiveEventScalarFieldEnum)[keyof typeof MatchLiveEventScalarFieldEnum]
 
 
 export const MatchResultSubmissionScalarFieldEnum = {

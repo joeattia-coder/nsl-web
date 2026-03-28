@@ -4,12 +4,24 @@ import { apiBaseUrl } from "./public-api";
 import type {
   AuthSessionUser,
   DashboardResponse,
+  HumanVerificationChallengeResponse,
   LatestTermsResponse,
+  LiveMatchSessionResponse,
+  LiveMatchSessionStatus,
+  LiveMatchSessionSyncPayload,
   LoginResponse,
   MatchDetailResponse,
   MatchSummaryResponse,
+  MobileHomeFeedResponse,
   PlayerProfileUpdatePayload,
   ProfileResponse,
+  PublicFixturesListResponse,
+  PublicNewsListResponse,
+  PublicVideosResponse,
+  RegisterPayload,
+  RegisterResponse,
+  RegistrationAvailabilityField,
+  RegistrationAvailabilityResponse,
   RankingsResponse,
   StandingsResponse,
   TournamentsResponse,
@@ -19,7 +31,7 @@ const MOBILE_SESSION_STORAGE_KEY = "nsl.mobile.session-token";
 const MOBILE_SESSION_HEADER = "x-nsl-session";
 
 type RequestOptions = {
-  method?: "GET" | "POST" | "PATCH";
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
   query?: Record<string, string | number | boolean | null | undefined>;
 };
@@ -33,6 +45,22 @@ type MatchSubmissionPayload = {
   homeHighBreaks: Array<number | null>;
   awayHighBreaks: Array<number | null>;
   summaryNote?: string | null;
+};
+
+class ApiRequestError extends Error {
+  status: number;
+  field?: string;
+
+  constructor(message: string, status: number, field?: string) {
+    super(message);
+    this.name = "ApiRequestError";
+    this.status = status;
+    this.field = field;
+  }
+}
+
+type LiveMatchSessionCreatePayload = Pick<LiveMatchSessionSyncPayload, "summary" | "status"> & {
+  initialState: LiveMatchSessionSyncPayload["scoringState"];
 };
 
 function normalizeBaseUrl(baseUrl: string) {
@@ -72,13 +100,17 @@ async function requestJson<T>(path: string, options: RequestOptions = {}) {
   const payload = responseText ? (JSON.parse(responseText) as Record<string, unknown>) : null;
 
   if (!response.ok) {
-    const message =
+    const genericMessage =
       (payload?.error as string | undefined) ||
-      (payload?.details as string | undefined) ||
       responseText ||
       `Request failed with status ${response.status}`;
+    const detailedMessage = (payload?.details as string | undefined) || genericMessage;
+    const message =
+      response.status >= 500
+        ? detailedMessage
+        : genericMessage;
 
-    throw new Error(message);
+    throw new ApiRequestError(message, response.status, payload?.field as string | undefined);
   }
 
   return payload as T;
@@ -132,6 +164,26 @@ export const mobileApi = {
     return response;
   },
 
+  getRegistrationAvailability(field: RegistrationAvailabilityField, value: string) {
+    return requestJson<RegistrationAvailabilityResponse>("/api/auth/register/availability", {
+      query: {
+        field,
+        value,
+      },
+    });
+  },
+
+  getHumanVerificationChallenge() {
+    return requestJson<HumanVerificationChallengeResponse>("/api/auth/human-verification");
+  },
+
+  register(payload: RegisterPayload) {
+    return requestJson<RegisterResponse>("/api/auth/register", {
+      method: "POST",
+      body: payload,
+    });
+  },
+
   async logout() {
     const response = await requestJson<{ ok: true }>("/api/auth/logout", {
       method: "POST",
@@ -166,6 +218,47 @@ export const mobileApi = {
     return requestJson<DashboardResponse>("/api/player-dashboard");
   },
 
+  getPublicNews(limit = 8) {
+    return requestJson<PublicNewsListResponse>("/api/public/news", {
+      query: {
+        placement: "NEWS_SECTION",
+        limit,
+      },
+    });
+  },
+
+  getPublicVideos(limit = 8) {
+    return requestJson<PublicVideosResponse>("/api/public/videos", {
+      query: {
+        limit,
+      },
+    });
+  },
+
+  getPublicFixtures() {
+    return requestJson<PublicFixturesListResponse>("/api/public/fixtures");
+  },
+
+  getPublicPlayerRankings() {
+    return requestJson<RankingsResponse>("/api/public/player-rankings");
+  },
+
+  async getHomeFeed() {
+    const [news, videos, fixtures, rankings] = await Promise.all([
+      mobileApi.getPublicNews(6),
+      mobileApi.getPublicVideos(6),
+      mobileApi.getPublicFixtures(),
+      mobileApi.getPublicPlayerRankings(),
+    ]);
+
+    return {
+      news: news.articles,
+      videos: videos.videos,
+      fixtures: fixtures.fixtures,
+      rankings: rankings.players,
+    } satisfies MobileHomeFeedResponse;
+  },
+
   getMyTournaments() {
     return requestJson<TournamentsResponse>("/api/my-tournaments");
   },
@@ -198,10 +291,55 @@ export const mobileApi = {
     return requestJson<MatchDetailResponse>(`/api/my-matches/${encodeURIComponent(matchId)}`);
   },
 
+  getLiveMatchSession(matchId: string) {
+    return requestJson<LiveMatchSessionResponse>(`/api/my-matches/${encodeURIComponent(matchId)}/live-session`);
+  },
+
+  ensureLiveMatchSession(matchId: string, payload: LiveMatchSessionCreatePayload) {
+    return requestJson<LiveMatchSessionResponse>(`/api/my-matches/${encodeURIComponent(matchId)}/live-session`, {
+      method: "POST",
+      body: payload,
+    });
+  },
+
+  syncLiveMatchSession(matchId: string, payload: LiveMatchSessionSyncPayload) {
+    return requestJson<LiveMatchSessionResponse>(`/api/my-matches/${encodeURIComponent(matchId)}/live-session`, {
+      method: "PATCH",
+      body: payload,
+    });
+  },
+
+  resetLiveMatchSession(matchId: string) {
+    return requestJson<{ ok: true }>(`/api/my-matches/${encodeURIComponent(matchId)}/live-session`, {
+      method: "DELETE",
+    });
+  },
+
+  adminResetLiveMatchSession(matchId: string) {
+    return requestJson<{ ok: true }>(`/api/admin/matches/${encodeURIComponent(matchId)}/live-session/reset`, {
+      method: "POST",
+    });
+  },
+
+  completeLiveMatchSession(matchId: string) {
+    return requestJson<LiveMatchSessionResponse & { finalized?: boolean }>(`/api/my-matches/${encodeURIComponent(matchId)}/live-session/complete`, {
+      method: "POST",
+    });
+  },
+
   submitMatchResult(matchId: string, payload: MatchSubmissionPayload) {
     return requestJson<{ ok: true }>(`/api/my-matches/${encodeURIComponent(matchId)}/submission`, {
       method: "POST",
       body: payload,
+    });
+  },
+
+  submitLiveMatchResult(matchId: string) {
+    return requestJson<{ ok: true }>(`/api/my-matches/${encodeURIComponent(matchId)}/submission`, {
+      method: "POST",
+      body: {
+        source: "liveSession",
+      },
     });
   },
 
@@ -220,3 +358,5 @@ export const mobileApi = {
     });
   },
 };
+
+export { ApiRequestError };

@@ -143,6 +143,16 @@ export type GroupParticipant = Prisma.GroupParticipantModel
  */
 export type Match = Prisma.MatchModel
 /**
+ * Model MatchLiveSession
+ * 
+ */
+export type MatchLiveSession = Prisma.MatchLiveSessionModel
+/**
+ * Model MatchLiveEvent
+ * 
+ */
+export type MatchLiveEvent = Prisma.MatchLiveEventModel
+/**
  * Model MatchResultSubmission
  * 
  */

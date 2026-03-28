@@ -28,6 +28,7 @@ import {
   FiSettings,
   FiSun,
 } from "react-icons/fi";
+import { FaFacebookF } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -35,6 +36,31 @@ import { useEffect, useRef, useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import PrivacyFooterLink from "./PrivacyFooterLink";
 import TermsFooterLink from "./TermsFooterLink";
+
+const socialLinks = [
+  {
+    href: "https://www.facebook.com/NationalSnookerLeague",
+    label: "NSL on Facebook",
+    platform: "facebook",
+  },
+  {
+    href: "https://www.youtube.com/@NSLTV-Snooker",
+    label: "NSL on YouTube",
+    platform: "youtube",
+  },
+] as const;
+
+function YoutubeBrandIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
+      <path
+        fill="#FF0033"
+        d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8Z"
+      />
+      <path fill="#FFFFFF" d="M9.75 8.4 16.2 12l-6.45 3.6V8.4Z" />
+    </svg>
+  );
+}
 
 type AdminNavItem = {
   href: string;
@@ -478,6 +504,26 @@ function LayoutChrome({
           </div>
 
           <div className="navbar-right">
+            <div className="social-links" aria-label="Social links">
+              {socialLinks.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={`social-nav-link social-link social-link-${item.platform}`}
+                  aria-label={item.label}
+                  title={item.label}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {item.platform === "youtube" ? (
+                    <YoutubeBrandIcon className="social-link-icon social-link-icon-youtube" />
+                  ) : (
+                    <FaFacebookF size={16} className="social-link-icon social-link-icon-facebook" />
+                  )}
+                </a>
+              ))}
+            </div>
+
             {currentUser ? (
               <div className="admin-user-menu-shell" ref={userMenuRef}>
                 <button

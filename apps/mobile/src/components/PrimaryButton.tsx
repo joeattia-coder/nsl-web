@@ -24,7 +24,7 @@ export function PrimaryButton({ label, onPress, variant = "solid", disabled = fa
 const styles = StyleSheet.create({
   button: {
     minHeight: 52,
-    borderRadius: appTheme.radii.pill,
+    borderRadius: appTheme.radii.md,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 18,
