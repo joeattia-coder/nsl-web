@@ -17,6 +17,10 @@ function isColorBall(ball: SnookerBall) {
   return ball !== "red";
 }
 
+function isOpenRedSequence(frame: MatchScoringState["frames"][number]) {
+  return frame.expectedShot === "color" && frame.redsRemaining > 0;
+}
+
 function getNextClearanceBall(ball: SnookerBall): ExpectedShot {
   const currentIndex = CLEARANCE_ORDER.indexOf(ball);
 
@@ -104,6 +108,10 @@ function isLegalPot(frame: MatchScoringState["frames"][number], ball: SnookerBal
   }
 
   if (frame.expectedShot === "color") {
+    if (ball === "red") {
+      return frame.redsRemaining > 0 && scoredAs === "red";
+    }
+
     return isColorBall(ball) && scoredAs === ball;
   }
 
@@ -121,6 +129,15 @@ function advanceFrameAfterPot(frame: MatchScoringState["frames"][number], scored
   }
 
   if (frame.expectedShot === "color") {
+    if (scoredAs === "red") {
+      if (!isFreeBall) {
+        frame.redsRemaining = Math.max(frame.redsRemaining - 1, 0);
+      }
+
+      frame.expectedShot = "color";
+      return;
+    }
+
     frame.expectedShot = frame.redsRemaining > 0 ? "red" : "yellow";
     return;
   }
@@ -382,7 +399,7 @@ export function getLegalPots(frame: MatchScoringState["frames"][number]) {
   }
 
   if (frame.expectedShot === "color") {
-    return CLEARANCE_ORDER;
+    return isOpenRedSequence(frame) ? (["red", ...CLEARANCE_ORDER] as SnookerBall[]) : CLEARANCE_ORDER;
   }
 
   return [frame.expectedShot];

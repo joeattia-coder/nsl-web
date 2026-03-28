@@ -149,7 +149,7 @@ export default async function CompetitionsPage() {
               {tournaments.map((tournament) => (
                 <Link
                   key={tournament.id}
-                  href={`/tournaments?id=${tournament.id}`}
+                  href={`/tournaments/${tournament.id}`}
                   className={styles.competitionCard}
                 >
                   <div className={styles.cardHeader}>

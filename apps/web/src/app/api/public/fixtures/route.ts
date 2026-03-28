@@ -119,12 +119,16 @@ function getEntryAverageElo(entry: EntryLike | null | undefined) {
   return ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const fixtureGroupIdentifier = searchParams.get("fixtureGroupIdentifier")?.trim() || null;
+
     const matches = await prisma.match.findMany({
       where: {
         tournament: {
           isPublished: true,
+          ...(fixtureGroupIdentifier ? { id: fixtureGroupIdentifier } : {}),
         },
       },
       include: {
