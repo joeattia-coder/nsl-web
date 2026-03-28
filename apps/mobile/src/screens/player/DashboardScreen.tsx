@@ -16,7 +16,6 @@ import { appTheme } from "../../theme";
 const quickActions = [
   { key: "Tournaments", label: "My Tournaments", icon: "trophy-outline" },
   { key: "Matches", label: "My Matches", icon: "calendar-clock-outline" },
-  { key: "Score", label: "Score", icon: "scoreboard-outline" },
 ];
 
 export function DashboardScreen() {
@@ -64,7 +63,7 @@ export function DashboardScreen() {
     }
 
     return [
-      { id: "ranking", label: "Ranking", value: `#${dashboard.rankingPosition ?? "-"}`, helper: "League ladder position", tone: "accent" as const },
+      { id: "ranking", label: "Ranking", value: `#${dashboard.rankingPosition ?? "-"}`, tone: "accent" as const },
       { id: "elo", label: "Elo Rating", value: String(dashboard.player.eloRating), helper: "Current live rating", tone: "gold" as const },
       { id: "win-rate", label: "Win Rate", value: `${dashboard.winPercentage}%`, helper: `${dashboard.stats.matchesWon} wins from ${dashboard.stats.matchesPlayed} matches`, tone: "accent" as const },
       { id: "high-break", label: "High Break", value: String(dashboard.stats.highBreak), helper: `Cumulative ${dashboard.stats.highBreakCumulative}`, tone: "gold" as const },
@@ -104,7 +103,7 @@ export function DashboardScreen() {
     ];
   }, [dashboard]);
 
-  const useSingleColumnStats = width < 420;
+  const statColumns = width >= 720 ? 4 : 2;
 
   return (
     <ScreenContainer>
@@ -125,8 +124,8 @@ export function DashboardScreen() {
       ) : (
         <View style={styles.statGrid}>
           {statCards.map((item) => (
-            <View key={item.id} style={[styles.statCardWrap, useSingleColumnStats ? styles.statCardWrapStacked : styles.statCardWrapGrid]}>
-              <StatCard label={item.label} value={item.value} helper={item.helper} tone={item.tone} />
+            <View key={item.id} style={[styles.statCardWrap, statColumns === 4 ? styles.statCardWrapQuarter : styles.statCardWrapHalf]}>
+              <StatCard label={item.label} value={item.value} helper={item.helper} tone={item.tone} compact />
             </View>
           ))}
         </View>
@@ -174,11 +173,11 @@ const styles = StyleSheet.create({
   statCardWrap: {
     minWidth: 0,
   },
-  statCardWrapGrid: {
+  statCardWrapHalf: {
     width: "48%",
   },
-  statCardWrapStacked: {
-    width: "100%",
+  statCardWrapQuarter: {
+    width: "23%",
   },
   panel: {
     padding: appTheme.spacing.lg,

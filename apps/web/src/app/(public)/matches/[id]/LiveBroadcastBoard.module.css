@@ -1,0 +1,299 @@
+.panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+  border: 1px solid var(--theme-border-soft);
+  background:
+    radial-gradient(circle at top center, color-mix(in srgb, var(--theme-accent-success) 12%, transparent), transparent 55%),
+    linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+  box-shadow: var(--theme-shadow-card);
+}
+
+.panelHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--theme-page-muted-4);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.5vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--theme-page-text);
+}
+
+.headerMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.liveBadge,
+.frameState,
+.frameStateMuted {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.liveBadge,
+.frameState {
+  border: 1px solid color-mix(in srgb, var(--theme-accent-success) 36%, var(--theme-border-soft));
+  background: color-mix(in srgb, var(--theme-accent-success) 12%, var(--theme-surface-1));
+  color: var(--theme-page-text);
+}
+
+.frameStateMuted {
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 84%, transparent);
+  background: color-mix(in srgb, var(--theme-surface-2) 88%, transparent);
+  color: var(--theme-page-muted-3);
+}
+
+.headerStamp {
+  color: var(--theme-page-muted-3);
+  font-size: 0.85rem;
+}
+
+.heroBoard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.5fr) minmax(0, 0.95fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.playerColumn,
+.centerBoard {
+  min-width: 0;
+}
+
+.playerColumn {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+.playerShell {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 84%, transparent);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+  min-height: 240px;
+}
+
+.playerPhoto {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playerMeta,
+.playerMetaRight {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.playerMetaRight {
+  justify-content: flex-end;
+}
+
+.playerName {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  color: var(--theme-page-text);
+  text-decoration: none;
+}
+
+.playerPrimary {
+  font-size: 1.18rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.playerSecondary {
+  color: var(--theme-page-muted-3);
+  font-size: 0.86rem;
+}
+
+.flag {
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 84%, transparent);
+}
+
+.centerBoard {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.scorelineWrap {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 1.05rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-brand) 22%, var(--theme-border-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 95%, white) 0%, var(--theme-surface-2) 100%);
+}
+
+.matchScoreLabel,
+.metricLabel,
+.ribbonLabel,
+.frameLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--theme-page-muted-4);
+}
+
+.matchScoreValue {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  color: var(--theme-page-text);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+
+.scoreDash {
+  color: var(--theme-page-muted-4);
+}
+
+.matchStatus {
+  color: var(--theme-page-muted-2);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.currentFrameGrid,
+.ribbonGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.metricCard,
+.ribbonCard,
+.ribbonCardWide,
+.frameCard {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 84%, transparent);
+  background: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+}
+
+.metricValue {
+  color: var(--theme-page-text);
+  font-size: clamp(1rem, 1.8vw, 1.35rem);
+  font-weight: 800;
+}
+
+.metricHint,
+.breakTrail,
+.frameMetaRow {
+  color: var(--theme-page-muted-3);
+  font-size: 0.83rem;
+  line-height: 1.45;
+}
+
+.ribbonCardWide {
+  grid-column: span 2;
+}
+
+.ribbonValueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--theme-page-text);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.framesStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+}
+
+.frameCardCurrent {
+  border-color: color-mix(in srgb, var(--theme-accent-success) 38%, var(--theme-border-soft));
+  box-shadow: var(--theme-shadow-soft);
+}
+
+.frameCardComplete {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 92%, white) 0%, var(--theme-surface-2) 100%);
+}
+
+.frameHeader,
+.frameMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.frameScore {
+  color: var(--theme-page-text);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+@media (max-width: 1100px) {
+  .heroBoard {
+    grid-template-columns: 1fr;
+  }
+
+  .currentFrameGrid,
+  .ribbonGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .panel {
+    padding: 0.95rem;
+  }
+
+  .currentFrameGrid,
+  .ribbonGrid,
+  .framesStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .ribbonCardWide {
+    grid-column: auto;
+  }
+
+  .matchScoreValue {
+    font-size: clamp(2rem, 12vw, 3rem);
+  }
+
+  .playerShell {
+    min-height: 180px;
+  }
+}

@@ -409,6 +409,8 @@ export const ModelName = {
   TournamentEntryMember: 'TournamentEntryMember',
   GroupParticipant: 'GroupParticipant',
   Match: 'Match',
+  MatchLiveSession: 'MatchLiveSession',
+  MatchLiveEvent: 'MatchLiveEvent',
   MatchResultSubmission: 'MatchResultSubmission',
   MatchResultSubmissionFrame: 'MatchResultSubmissionFrame',
   PlayerEloHistory: 'PlayerEloHistory',
@@ -437,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchResultSubmission" | "matchResultSubmissionFrame" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "termsOfServiceVersion" | "privacyPolicyVersion" | "videoHighlight" | "document"
+    modelProps: "venue" | "season" | "tournament" | "tournamentStage" | "stageRound" | "tournamentGroup" | "user" | "player" | "role" | "accessGroup" | "accessGroupMembership" | "userRole" | "authAccount" | "invitation" | "emailVerificationToken" | "passwordResetToken" | "permission" | "rolePermission" | "accessGroupRoleAssignment" | "userRoleAssignment" | "userPermissionOverride" | "tournamentEntry" | "tournamentEntryMember" | "groupParticipant" | "match" | "matchLiveSession" | "matchLiveEvent" | "matchResultSubmission" | "matchResultSubmissionFrame" | "playerEloHistory" | "matchFrame" | "playerBreak" | "league" | "newsArticle" | "faqItem" | "aboutSectionVersion" | "termsOfServiceVersion" | "privacyPolicyVersion" | "videoHighlight" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2291,6 +2293,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MatchLiveSession: {
+      payload: Prisma.$MatchLiveSessionPayload<ExtArgs>
+      fields: Prisma.MatchLiveSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MatchLiveSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MatchLiveSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.MatchLiveSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MatchLiveSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>
+        }
+        findMany: {
+          args: Prisma.MatchLiveSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>[]
+        }
+        create: {
+          args: Prisma.MatchLiveSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>
+        }
+        createMany: {
+          args: Prisma.MatchLiveSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MatchLiveSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.MatchLiveSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>
+        }
+        update: {
+          args: Prisma.MatchLiveSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.MatchLiveSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MatchLiveSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MatchLiveSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.MatchLiveSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.MatchLiveSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMatchLiveSession>
+        }
+        groupBy: {
+          args: Prisma.MatchLiveSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchLiveSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MatchLiveSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchLiveSessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    MatchLiveEvent: {
+      payload: Prisma.$MatchLiveEventPayload<ExtArgs>
+      fields: Prisma.MatchLiveEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MatchLiveEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MatchLiveEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>
+        }
+        findFirst: {
+          args: Prisma.MatchLiveEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MatchLiveEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>
+        }
+        findMany: {
+          args: Prisma.MatchLiveEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>[]
+        }
+        create: {
+          args: Prisma.MatchLiveEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>
+        }
+        createMany: {
+          args: Prisma.MatchLiveEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MatchLiveEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>[]
+        }
+        delete: {
+          args: Prisma.MatchLiveEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>
+        }
+        update: {
+          args: Prisma.MatchLiveEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.MatchLiveEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MatchLiveEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MatchLiveEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.MatchLiveEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchLiveEventPayload>
+        }
+        aggregate: {
+          args: Prisma.MatchLiveEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMatchLiveEvent>
+        }
+        groupBy: {
+          args: Prisma.MatchLiveEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchLiveEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MatchLiveEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchLiveEventCountAggregateOutputType> | number
+        }
+      }
+    }
     MatchResultSubmission: {
       payload: Prisma.$MatchResultSubmissionPayload<ExtArgs>
       fields: Prisma.MatchResultSubmissionFieldRefs
@@ -3671,6 +3821,46 @@ export const MatchScalarFieldEnum = {
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
 
 
+export const MatchLiveSessionScalarFieldEnum = {
+  id: 'id',
+  matchId: 'matchId',
+  status: 'status',
+  version: 'version',
+  scoringState: 'scoringState',
+  homeFramesWon: 'homeFramesWon',
+  awayFramesWon: 'awayFramesWon',
+  currentFrameNumber: 'currentFrameNumber',
+  currentFrameHomePoints: 'currentFrameHomePoints',
+  currentFrameAwayPoints: 'currentFrameAwayPoints',
+  activeSide: 'activeSide',
+  homeStartedAt: 'homeStartedAt',
+  awayStartedAt: 'awayStartedAt',
+  homeCompletedAt: 'homeCompletedAt',
+  awayCompletedAt: 'awayCompletedAt',
+  finalizedAt: 'finalizedAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdByUserId: 'createdByUserId',
+  updatedByUserId: 'updatedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MatchLiveSessionScalarFieldEnum = (typeof MatchLiveSessionScalarFieldEnum)[keyof typeof MatchLiveSessionScalarFieldEnum]
+
+
+export const MatchLiveEventScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  version: 'version',
+  eventType: 'eventType',
+  payload: 'payload',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type MatchLiveEventScalarFieldEnum = (typeof MatchLiveEventScalarFieldEnum)[keyof typeof MatchLiveEventScalarFieldEnum]
+
+
 export const MatchResultSubmissionScalarFieldEnum = {
   id: 'id',
   matchId: 'matchId',
@@ -4153,6 +4343,48 @@ export type ListEnumMatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'MatchLiveSessionStatus'
+ */
+export type EnumMatchLiveSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchLiveSessionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'MatchLiveSessionStatus[]'
+ */
+export type ListEnumMatchLiveSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchLiveSessionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'MatchLiveEventType'
+ */
+export type EnumMatchLiveEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchLiveEventType'>
+    
+
+
+/**
+ * Reference to a field of type 'MatchLiveEventType[]'
+ */
+export type ListEnumMatchLiveEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchLiveEventType[]'>
+    
+
+
+/**
  * Reference to a field of type 'MatchResultSubmissionStatus'
  */
 export type EnumMatchResultSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchResultSubmissionStatus'>
@@ -4177,20 +4409,6 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -4369,6 +4587,8 @@ export type GlobalOmitConfig = {
   tournamentEntryMember?: Prisma.TournamentEntryMemberOmit
   groupParticipant?: Prisma.GroupParticipantOmit
   match?: Prisma.MatchOmit
+  matchLiveSession?: Prisma.MatchLiveSessionOmit
+  matchLiveEvent?: Prisma.MatchLiveEventOmit
   matchResultSubmission?: Prisma.MatchResultSubmissionOmit
   matchResultSubmissionFrame?: Prisma.MatchResultSubmissionFrameOmit
   playerEloHistory?: Prisma.PlayerEloHistoryOmit

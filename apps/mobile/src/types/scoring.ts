@@ -23,11 +23,14 @@ export type LiveFrameState = {
   frameNumber: number;
   homePoints: number;
   awayPoints: number;
+  homeFouls: number;
+  awayFouls: number;
   breaks: RecordedBreak[];
   currentBreak: LiveBreak | null;
   activeSide: PlayerSide;
   redsRemaining: number;
   expectedShot: ExpectedShot;
+  freeBallAvailable: boolean;
   winnerSide: PlayerSide | null;
   isComplete: boolean;
 };
@@ -42,9 +45,10 @@ export type MatchScoringState = {
 };
 
 export type ScoringAction =
-  | { type: "pot"; side: PlayerSide; ball: SnookerBall; scoredAs?: SnookerBall; isFreeBall?: boolean }
+  | { type: "pot"; side: PlayerSide; ball: SnookerBall; isFreeBall?: boolean }
   | { type: "foul"; side: PlayerSide; points: number }
   | { type: "endTurn" }
+  | { type: "declineFreeBall" }
   | { type: "awardFrame"; side: PlayerSide }
   | { type: "startNextFrame" }
   | { type: "resetMatch"; nextState: MatchScoringState };

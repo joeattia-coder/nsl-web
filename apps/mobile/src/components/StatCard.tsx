@@ -6,16 +6,17 @@ import { appTheme } from "../theme";
 type StatCardProps = {
   label: string;
   value: string;
-  helper: string;
+  helper?: string;
   tone?: StatTone;
+  compact?: boolean;
 };
 
-export function StatCard({ label, value, helper, tone = "neutral" }: StatCardProps) {
+export function StatCard({ label, value, helper, tone = "neutral", compact = false }: StatCardProps) {
   return (
-    <View style={[styles.card, tone === "accent" && styles.cardAccent, tone === "gold" && styles.cardGold]}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.value, tone === "accent" && styles.valueAccent, tone === "gold" && styles.valueGold]}>{value}</Text>
-      <Text style={styles.helper}>{helper}</Text>
+    <View style={[styles.card, compact && styles.cardCompact, tone === "accent" && styles.cardAccent, tone === "gold" && styles.cardGold]}>
+      <Text style={[styles.label, compact && styles.labelCompact]}>{label}</Text>
+      <Text style={[styles.value, compact && styles.valueCompact, tone === "accent" && styles.valueAccent, tone === "gold" && styles.valueGold]}>{value}</Text>
+      {helper ? <Text style={[styles.helper, compact && styles.helperCompact]}>{helper}</Text> : null}
     </View>
   );
 }
@@ -31,6 +32,11 @@ const styles = StyleSheet.create({
     backgroundColor: appTheme.colors.surface,
     gap: 10,
   },
+  cardCompact: {
+    minHeight: 88,
+    padding: 12,
+    gap: 6,
+  },
   cardAccent: {
     borderColor: appTheme.colors.borderStrong,
   },
@@ -44,10 +50,16 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     fontWeight: "700",
   },
+  labelCompact: {
+    fontSize: 10,
+  },
   value: {
     color: appTheme.colors.text,
     fontSize: 24,
     fontWeight: "900",
+  },
+  valueCompact: {
+    fontSize: 21,
   },
   valueAccent: {
     color: appTheme.colors.teal,
@@ -59,5 +71,9 @@ const styles = StyleSheet.create({
     color: appTheme.colors.textMuted,
     fontSize: appTheme.typography.caption,
     lineHeight: 18,
+  },
+  helperCompact: {
+    fontSize: 10,
+    lineHeight: 14,
   },
 });

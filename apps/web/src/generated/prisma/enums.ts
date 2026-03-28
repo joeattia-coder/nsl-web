@@ -114,6 +114,25 @@ export const MatchStatus = {
 export type MatchStatus = (typeof MatchStatus)[keyof typeof MatchStatus]
 
 
+export const MatchLiveSessionStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  ABANDONED: 'ABANDONED'
+} as const
+
+export type MatchLiveSessionStatus = (typeof MatchLiveSessionStatus)[keyof typeof MatchLiveSessionStatus]
+
+
+export const MatchLiveEventType = {
+  SESSION_CREATED: 'SESSION_CREATED',
+  SNAPSHOT_SYNC: 'SNAPSHOT_SYNC',
+  STATUS_CHANGED: 'STATUS_CHANGED'
+} as const
+
+export type MatchLiveEventType = (typeof MatchLiveEventType)[keyof typeof MatchLiveEventType]
+
+
 export const MatchResultSubmissionStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',

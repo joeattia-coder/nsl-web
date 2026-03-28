@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveCurrentUser } from "@/lib/admin-auth";
+import { deriveMatchResultFromLiveSession } from "@/lib/live-session-match-result";
 import {
   determineWinnerEntryId,
   formatScheduledAtLabel,
@@ -18,9 +19,11 @@ import {
   getEntryParticipantNames,
   getPlayerMatchAccessContext,
 } from "@/lib/player-match-access";
+import { prisma } from "@/lib/prisma";
 import { parseDateTimeInTimeZone } from "@/lib/timezone";
 
 type SubmissionRequestBody = {
+  source?: "manual" | "liveSession";
   startDateTime?: string | null;
   endDateTime?: string | null;
   homeScore?: number | null;
@@ -59,47 +62,91 @@ export async function POST(
 
     const body = (await request.json().catch(() => null)) as SubmissionRequestBody | null;
 
-    if (!body) {
-      return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
-    }
+    const submissionSource = body?.source === "liveSession" ? "liveSession" : "manual";
 
     const bestOfFrames = accessContext.match.bestOfFrames ?? 5;
-    const homeScore = body.homeScore;
-    const awayScore = body.awayScore;
-    const startDateTime = String(body.startDateTime ?? "").trim();
-    const endDateTime = String(body.endDateTime ?? "").trim();
-    const summaryNote = String(body.summaryNote ?? "").trim() || null;
+    let validatedHomeScore: number;
+    let validatedAwayScore: number;
+    let startDateTime = "";
+    let endDateTime = "";
+    let summaryNote: string | null = null;
+    let normalizedFrames;
+    let submittedWinnerEntryId: string | null | undefined;
 
-    if (!isNonNegativeWholeNumber(homeScore)) {
-      return NextResponse.json({ error: "Home score must be a whole number greater than or equal to 0." }, { status: 400 });
-    }
+    if (submissionSource === "liveSession") {
+      const liveSession = await prisma.matchLiveSession.findUnique({
+        where: {
+          matchId: id,
+        },
+        select: {
+          scoringState: true,
+          lastSyncedAt: true,
+        },
+      });
 
-    if (!isNonNegativeWholeNumber(awayScore)) {
-      return NextResponse.json({ error: "Away score must be a whole number greater than or equal to 0." }, { status: 400 });
-    }
+      const derivedResult = liveSession
+        ? deriveMatchResultFromLiveSession({
+            scoringState: liveSession.scoringState,
+            homeEntryId: accessContext.homeEntry.id,
+            awayEntryId: accessContext.awayEntry.id,
+            completedAt: liveSession.lastSyncedAt.toISOString(),
+          })
+        : null;
 
-    const validatedHomeScore = homeScore;
-    const validatedAwayScore = awayScore;
+      if (!derivedResult || !derivedResult.isComplete || !derivedResult.winnerEntryId) {
+        return NextResponse.json({ error: "A completed live scoring session is required before submitting the official result." }, { status: 409 });
+      }
 
-    if (
-      !Array.isArray(body.homeHighBreaks) ||
-      !Array.isArray(body.awayHighBreaks) ||
-      body.homeHighBreaks.length !== bestOfFrames ||
-      body.awayHighBreaks.length !== bestOfFrames
-    ) {
-      return NextResponse.json(
-        { error: "Frame high break arrays must match the number of frames in the match format." },
-        { status: 400 }
-      );
-    }
+      validatedHomeScore = derivedResult.homeScore;
+      validatedAwayScore = derivedResult.awayScore;
+      startDateTime = derivedResult.startedAt ?? "";
+      endDateTime = derivedResult.completedAt ?? "";
+      summaryNote = "Submitted from the live scoring session.";
+      normalizedFrames = derivedResult.frames;
+      submittedWinnerEntryId = derivedResult.winnerEntryId;
+    } else {
+      if (!body) {
+        return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+      }
 
-    const normalizedFrames = normalizeFrameHighBreaks(body.homeHighBreaks, body.awayHighBreaks);
+      const homeScore = body.homeScore;
+      const awayScore = body.awayScore;
+      startDateTime = String(body.startDateTime ?? "").trim();
+      endDateTime = String(body.endDateTime ?? "").trim();
+      summaryNote = String(body.summaryNote ?? "").trim() || null;
+      submittedWinnerEntryId = body.winnerEntryId ?? null;
 
-    if (normalizedFrames.length !== bestOfFrames) {
-      return NextResponse.json(
-        { error: "Frame high break arrays must match the number of frames in the match format." },
-        { status: 400 }
-      );
+      if (!isNonNegativeWholeNumber(homeScore)) {
+        return NextResponse.json({ error: "Home score must be a whole number greater than or equal to 0." }, { status: 400 });
+      }
+
+      if (!isNonNegativeWholeNumber(awayScore)) {
+        return NextResponse.json({ error: "Away score must be a whole number greater than or equal to 0." }, { status: 400 });
+      }
+
+      validatedHomeScore = homeScore;
+      validatedAwayScore = awayScore;
+
+      if (
+        !Array.isArray(body.homeHighBreaks) ||
+        !Array.isArray(body.awayHighBreaks) ||
+        body.homeHighBreaks.length !== bestOfFrames ||
+        body.awayHighBreaks.length !== bestOfFrames
+      ) {
+        return NextResponse.json(
+          { error: "Frame high break arrays must match the number of frames in the match format." },
+          { status: 400 }
+        );
+      }
+
+      normalizedFrames = normalizeFrameHighBreaks(body.homeHighBreaks, body.awayHighBreaks);
+
+      if (normalizedFrames.length !== bestOfFrames) {
+        return NextResponse.json(
+          { error: "Frame high break arrays must match the number of frames in the match format." },
+          { status: 400 }
+        );
+      }
     }
 
     const framesNeededToWin = Math.floor(bestOfFrames / 2) + 1;
@@ -108,7 +155,7 @@ export async function POST(
       awayScore: validatedAwayScore,
       homeEntryId: accessContext.homeEntry.id,
       awayEntryId: accessContext.awayEntry.id,
-      winnerEntryId: body.winnerEntryId ?? null,
+      winnerEntryId: submittedWinnerEntryId ?? null,
       framesNeededToWin,
     });
 

@@ -42,14 +42,29 @@ function getInitialFrameState(frameNumber: number, redsRemaining: number) {
     frameNumber,
     homePoints: 0,
     awayPoints: 0,
+    homeFouls: 0,
+    awayFouls: 0,
     breaks: [] as RecordedBreak[],
     currentBreak: null,
     activeSide: "home" as PlayerSide,
     redsRemaining,
     expectedShot: "red" as ExpectedShot,
+    freeBallAvailable: false,
     winnerSide: null,
     isComplete: false,
   };
+}
+
+function getExpectedShotForNewVisit(frame: MatchScoringState["frames"][number]): ExpectedShot {
+  if (frame.redsRemaining > 0) {
+    return "red";
+  }
+
+  if (frame.expectedShot === "color") {
+    return "yellow";
+  }
+
+  return frame.expectedShot;
 }
 
 function getTotalRedsFromFormat(snookerFormat: MatchScoringState["snookerFormat"]) {
@@ -69,6 +84,10 @@ function isLegalPot(frame: MatchScoringState["frames"][number], ball: SnookerBal
   }
 
   if (isFreeBall) {
+    if (!frame.freeBallAvailable) {
+      return false;
+    }
+
     if (frame.expectedShot === "red") {
       return scoredAs === "red" && isColorBall(ball);
     }
@@ -114,6 +133,8 @@ function deepCloneState(state: MatchScoringState): MatchScoringState {
     ...state,
     frames: state.frames.map((frame) => ({
       ...frame,
+      homeFouls: frame.homeFouls,
+      awayFouls: frame.awayFouls,
       currentBreak: frame.currentBreak ? { ...frame.currentBreak, balls: [...frame.currentBreak.balls] } : null,
       breaks: frame.breaks.map((entry) => ({ ...entry, balls: [...entry.balls] })),
     })),
@@ -176,6 +197,8 @@ export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
       ...frame,
       homePoints: officialFrame?.homePoints ?? 0,
       awayPoints: officialFrame?.awayPoints ?? 0,
+      homeFouls: 0,
+      awayFouls: 0,
       breaks,
       winnerSide,
       isComplete: Boolean(winnerSide),
@@ -202,6 +225,17 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
   }
 
   const nextState = deepCloneState(state);
+
+  if (action.type === "startNextFrame") {
+    const nextFrameIndex = nextState.frames.findIndex((entry, index) => index > nextState.currentFrameIndex && !entry.isComplete);
+
+    if (nextFrameIndex !== -1) {
+      nextState.currentFrameIndex = nextFrameIndex;
+    }
+
+    return nextState;
+  }
+
   const frame = nextState.frames[nextState.currentFrameIndex];
 
   if (!frame || frame.isComplete) {
@@ -209,7 +243,13 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
   }
 
   if (action.type === "pot") {
-    const scoredAs = action.scoredAs ?? action.ball;
+    const scoredAs = action.isFreeBall
+      ? getFreeBallScoreTarget(frame, action.ball)
+      : action.ball;
+
+    if (!scoredAs) {
+      return nextState;
+    }
 
     if (!isLegalPot(frame, action.ball, scoredAs, Boolean(action.isFreeBall))) {
       return nextState;
@@ -231,6 +271,7 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
     }
 
     advanceFrameAfterPot(frame, scoredAs, Boolean(action.isFreeBall));
+    frame.freeBallAvailable = false;
 
     return nextState;
   }
@@ -253,8 +294,15 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
       });
     }
 
+    if (action.side === "home") {
+      frame.homeFouls += 1;
+    } else {
+      frame.awayFouls += 1;
+    }
+
     frame.currentBreak = null;
     frame.activeSide = opponent;
+    frame.freeBallAvailable = true;
     return nextState;
   }
 
@@ -270,6 +318,13 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
 
     frame.currentBreak = null;
     frame.activeSide = frame.activeSide === "home" ? "away" : "home";
+    frame.expectedShot = getExpectedShotForNewVisit(frame);
+    frame.freeBallAvailable = false;
+    return nextState;
+  }
+
+  if (action.type === "declineFreeBall") {
+    frame.freeBallAvailable = false;
     return nextState;
   }
 
@@ -286,16 +341,8 @@ export function applyScoringAction(state: MatchScoringState, action: ScoringActi
     frame.currentBreak = null;
     frame.winnerSide = action.side;
     frame.isComplete = true;
-    return nextState;
-  }
-
-  if (action.type === "startNextFrame") {
-    const nextFrameIndex = nextState.frames.findIndex((entry, index) => index > nextState.currentFrameIndex && !entry.isComplete);
-
-    if (nextFrameIndex !== -1) {
-      nextState.currentFrameIndex = nextFrameIndex;
-    }
-
+    frame.expectedShot = "none";
+    frame.freeBallAvailable = false;
     return nextState;
   }
 
@@ -342,6 +389,10 @@ export function getLegalPots(frame: MatchScoringState["frames"][number]) {
 }
 
 export function getFreeBallScoreTarget(frame: MatchScoringState["frames"][number], nominatedBall: SnookerBall): SnookerBall | null {
+  if (!frame.freeBallAvailable) {
+    return null;
+  }
+
   if (frame.expectedShot === "none") {
     return null;
   }
@@ -355,6 +406,28 @@ export function getFreeBallScoreTarget(frame: MatchScoringState["frames"][number
   }
 
   return nominatedBall === "red" ? null : frame.expectedShot;
+}
+
+export function getFreeBallOptions(frame: MatchScoringState["frames"][number]) {
+  if (!frame.freeBallAvailable) {
+    return [] as SnookerBall[];
+  }
+
+  if (frame.expectedShot === "none") {
+    return [] as SnookerBall[];
+  }
+
+  if (frame.expectedShot === "red" || frame.expectedShot === "color") {
+    return CLEARANCE_ORDER;
+  }
+
+  const currentIndex = CLEARANCE_ORDER.indexOf(frame.expectedShot);
+
+  if (currentIndex === -1 || currentIndex === CLEARANCE_ORDER.length - 1) {
+    return [] as SnookerBall[];
+  }
+
+  return CLEARANCE_ORDER.slice(currentIndex + 1);
 }
 
 export function getPossiblePointsRemaining(frame: MatchScoringState["frames"][number]) {

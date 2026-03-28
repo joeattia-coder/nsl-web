@@ -143,6 +143,9 @@ model User {
   approvedMatches            Match[]                  @relation("MatchApprovedByUser")
   enteredMatches             Match[]                  @relation("MatchEnteredByUser")
   updatedMatches             Match[]                  @relation("MatchUpdatedByUser")
+  createdLiveMatchSessions   MatchLiveSession[]       @relation("MatchLiveSessionCreatedByUser")
+  updatedLiveMatchSessions   MatchLiveSession[]       @relation("MatchLiveSessionUpdatedByUser")
+  createdLiveMatchEvents     MatchLiveEvent[]         @relation("MatchLiveEventCreatedByUser")
   submittedMatchResultSubmissions MatchResultSubmission[] @relation("MatchResultSubmissionSubmittedByUser")
   approvedMatchResultSubmissions  MatchResultSubmission[] @relation("MatchResultSubmissionApprovedByUser")
   disputedMatchResultSubmissions  MatchResultSubmission[] @relation("MatchResultSubmissionDisputedByUser")
@@ -493,6 +496,7 @@ model Match {
   venue             Venue?           @relation(fields: [venueId], references: [id])
   winnerEntry       TournamentEntry? @relation("MatchWinnerEntry", fields: [winnerEntryId], references: [id])
   frames            MatchFrame[]
+  liveSession       MatchLiveSession?
   resultSubmissions MatchResultSubmission[]
   playerEloHistory  PlayerEloHistory[]
 
@@ -507,6 +511,53 @@ model Match {
   @@index([approvedByUserId])
   @@index([enteredByUserId])
   @@index([updatedByUserId])
+}
+
+model MatchLiveSession {
+  id                    String                 @id @default(cuid())
+  matchId               String                 @unique
+  status                MatchLiveSessionStatus @default(ACTIVE)
+  version               Int                    @default(1)
+  scoringState          Json?
+  homeFramesWon         Int?
+  awayFramesWon         Int?
+  currentFrameNumber    Int?
+  currentFrameHomePoints Int?
+  currentFrameAwayPoints Int?
+  activeSide            String?
+  homeStartedAt         DateTime?
+  awayStartedAt         DateTime?
+  homeCompletedAt       DateTime?
+  awayCompletedAt       DateTime?
+  finalizedAt           DateTime?
+  lastSyncedAt          DateTime               @default(now())
+  createdByUserId       String?
+  updatedByUserId       String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  match                 Match                  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  createdByUser         User?                  @relation("MatchLiveSessionCreatedByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  updatedByUser         User?                  @relation("MatchLiveSessionUpdatedByUser", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  events                MatchLiveEvent[]
+
+  @@index([status])
+  @@index([lastSyncedAt])
+}
+
+model MatchLiveEvent {
+  id              String             @id @default(cuid())
+  sessionId       String
+  version         Int
+  eventType       MatchLiveEventType
+  payload         Json?
+  createdByUserId String?
+  createdAt       DateTime           @default(now())
+  session         MatchLiveSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdByUser   User?              @relation("MatchLiveEventCreatedByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId])
+  @@index([version])
+  @@index([createdAt])
 }
 
 model MatchResultSubmission {
@@ -802,6 +853,19 @@ enum MatchStatus {
   CANCELLED
   FORFEIT
   ABANDONED
+}
+
+enum MatchLiveSessionStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ABANDONED
+}
+
+enum MatchLiveEventType {
+  SESSION_CREATED
+  SNAPSHOT_SYNC
+  STATUS_CHANGED
 }
 
 enum MatchResultSubmissionStatus {

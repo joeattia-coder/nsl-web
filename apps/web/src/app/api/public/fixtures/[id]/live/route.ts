@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { PublicLiveMatchResponse } from "@/lib/live-match";
+import { derivePublicLiveBroadcastState } from "@/lib/public-live-broadcast";
 import { publicApiNoStoreJson, publicApiOptions } from "@/lib/public-api-response";
 
 type RouteContext = {
@@ -8,6 +9,22 @@ type RouteContext = {
 
 export function OPTIONS() {
   return publicApiOptions();
+}
+
+function getPublicMatchStatus(matchStatus: string, liveSessionStatus: string | null) {
+  if (liveSessionStatus === "ACTIVE" || liveSessionStatus === "PAUSED") {
+    return "IN_PROGRESS";
+  }
+
+  if (liveSessionStatus === "COMPLETED") {
+    return "COMPLETED";
+  }
+
+  if (liveSessionStatus === "ABANDONED") {
+    return "ABANDONED";
+  }
+
+  return matchStatus;
 }
 
 export async function GET(_request: Request, context: RouteContext) {
@@ -30,6 +47,19 @@ export async function GET(_request: Request, context: RouteContext) {
         scheduleStatus: true,
         publicNote: true,
         updatedAt: true,
+        liveSession: {
+          select: {
+            status: true,
+            homeFramesWon: true,
+            awayFramesWon: true,
+            currentFrameNumber: true,
+            currentFrameHomePoints: true,
+            currentFrameAwayPoints: true,
+            activeSide: true,
+            scoringState: true,
+            lastSyncedAt: true,
+          },
+        },
       },
     });
 
@@ -41,13 +71,22 @@ export async function GET(_request: Request, context: RouteContext) {
       item: {
         id: match.id,
         fixtureGroupIdentifier: match.tournamentId,
-        homeScore: match.homeScore,
-        awayScore: match.awayScore,
-        matchStatus: match.matchStatus,
+        homeScore: match.liveSession?.homeFramesWon ?? match.homeScore,
+        awayScore: match.liveSession?.awayFramesWon ?? match.awayScore,
+        matchStatus: getPublicMatchStatus(match.matchStatus, match.liveSession?.status ?? null),
         scheduleStatus: match.scheduleStatus,
         publicNote: match.publicNote,
-        updatedAt: match.updatedAt.toISOString(),
+        liveSessionStatus: match.liveSession?.status ?? null,
+        currentFrameNumber: match.liveSession?.currentFrameNumber ?? null,
+        currentFrameHomePoints: match.liveSession?.currentFrameHomePoints ?? null,
+        currentFrameAwayPoints: match.liveSession?.currentFrameAwayPoints ?? null,
+        activeSide:
+          match.liveSession?.activeSide === "home" || match.liveSession?.activeSide === "away"
+            ? match.liveSession.activeSide
+            : null,
+        updatedAt: (match.liveSession?.lastSyncedAt ?? match.updatedAt).toISOString(),
       },
+      details: match.liveSession?.scoringState ? derivePublicLiveBroadcastState(match.liveSession.scoringState) : null,
       serverTime: new Date().toISOString(),
     };
 

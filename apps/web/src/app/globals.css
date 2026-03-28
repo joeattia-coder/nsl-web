@@ -958,6 +958,72 @@ html[data-theme="light"] .navbar.navbar-elevated {
   flex-shrink: 0;
 }
 
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-direction: row;
+}
+
+.social-nav-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--theme-border-soft) 82%, transparent);
+  background: color-mix(in srgb, var(--theme-surface-1) 78%, transparent);
+  color: inherit;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.social-nav-link:visited {
+  color: inherit;
+}
+
+.social-nav-link:hover,
+.social-nav-link:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  outline: none;
+}
+
+.social-link {
+  flex: 0 0 auto;
+}
+
+.social-link-icon {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.social-link-facebook {
+  border-color: color-mix(in srgb, #1877f2 24%, var(--theme-border-soft));
+  background: color-mix(in srgb, #1877f2 10%, var(--theme-surface-1));
+}
+
+.social-link-icon-facebook {
+  color: #1877f2;
+}
+
+.social-link-youtube {
+  border-color: color-mix(in srgb, #1877f2 24%, var(--theme-border-soft));
+  background: color-mix(in srgb, #1877f2 10%, var(--theme-surface-1));
+}
+
+.social-link-icon-youtube {
+  width: 18px;
+  height: 18px;
+}
+
+.social-nav-link:hover .social-link-icon,
+.social-nav-link:focus-visible .social-link-icon {
+  transform: scale(1.08);
+  opacity: 0.88;
+}
+
 .site-footer {
   border-top: 1px solid var(--theme-border-soft);
   background:
@@ -2988,6 +3054,10 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.home-live-carousel-section {
+  margin-top: 48px;
 }
 
 .home-section {

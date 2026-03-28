@@ -5,8 +5,8 @@ import { getRoleConfig } from "../config/roles";
 import { BottomTabBar } from "../components/BottomTabBar";
 import { ProfileScreen } from "../screens/player/ProfileScreen";
 import { DashboardScreen } from "../screens/player/DashboardScreen";
+import { HomeScreen } from "../screens/player/HomeScreen";
 import { MatchesScreen } from "../screens/player/MatchesScreen";
-import { ScoreScreen } from "../screens/player/ScoreScreen";
 import { TournamentDetailScreen } from "../screens/player/TournamentDetailScreen";
 import { TournamentsScreen } from "../screens/player/TournamentsScreen";
 import { ChangePasswordScreen } from "../screens/shared/ChangePasswordScreen";
@@ -18,10 +18,10 @@ import type { MainTabParamList, TabRouteName } from "../types/app";
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const screenRegistry: Record<TabRouteName, ComponentType<any>> = {
-  Home: DashboardScreen,
+  Home: HomeScreen,
+  Dashboard: DashboardScreen,
   Tournaments: TournamentsScreen,
   Matches: MatchesScreen,
-  Score: ScoreScreen,
   Profile: ProfileScreen,
   Overview: OverviewScreen,
   League: LeagueContentScreen,

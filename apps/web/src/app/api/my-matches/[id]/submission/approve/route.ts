@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { resolveCurrentUser } from "@/lib/admin-auth";
+import { deriveMatchResultFromLiveSession } from "@/lib/live-session-match-result";
+import { persistOfficialMatchResult } from "@/lib/match-finalization";
 import {
   getMatchResultSubmissionFrames,
   getPendingMatchResultSubmissionForTargetEntry,
@@ -39,53 +41,68 @@ export async function POST(
 
     const frames = await getMatchResultSubmissionFrames(pendingSubmission.id);
     const bestOfFrames = accessContext.match.bestOfFrames ?? frames.length;
+    const liveSession = await prisma.matchLiveSession.findUnique({
+      where: {
+        matchId: id,
+      },
+      select: {
+        scoringState: true,
+        lastSyncedAt: true,
+      },
+    });
+    const derivedLiveResult = liveSession
+      ? deriveMatchResultFromLiveSession({
+          scoringState: liveSession.scoringState,
+          homeEntryId: accessContext.homeEntry.id,
+          awayEntryId: accessContext.awayEntry.id,
+          completedAt: liveSession.lastSyncedAt.toISOString(),
+        })
+      : null;
+    const useLiveFrames = Boolean(
+      derivedLiveResult &&
+      derivedLiveResult.homeScore === pendingSubmission.homeScore &&
+      derivedLiveResult.awayScore === pendingSubmission.awayScore &&
+      derivedLiveResult.winnerEntryId === pendingSubmission.winnerEntryId
+    );
 
     await prisma.$transaction(async (tx) => {
-      await tx.match.update({
-        where: {
-          id,
-        },
-        data: {
-          matchDate: pendingSubmission.proposedMatchDate,
-          matchTime: pendingSubmission.proposedMatchTime,
-          matchStatus: "COMPLETED",
-          homeScore: pendingSubmission.homeScore,
-          awayScore: pendingSubmission.awayScore,
-          winnerEntryId: pendingSubmission.winnerEntryId,
-          resultSubmittedAt: pendingSubmission.proposedEndedAt,
-          approvedAt: new Date(),
-          approvedByUserId: currentUser.id,
-          enteredByUserId: pendingSubmission.submittedByUserId,
-          updatedByUserId: currentUser.id,
-        },
-      });
+      await persistOfficialMatchResult({
+        tx,
+        matchId: id,
+        currentUserId: currentUser.id,
+        enteredByUserId: pendingSubmission.submittedByUserId,
+        matchDate: pendingSubmission.proposedMatchDate,
+        matchTime: pendingSubmission.proposedMatchTime,
+        homeScore: pendingSubmission.homeScore,
+        awayScore: pendingSubmission.awayScore,
+        winnerEntryId: pendingSubmission.winnerEntryId,
+        resultSubmittedAt: pendingSubmission.proposedEndedAt,
+        frames: Array.from({ length: bestOfFrames }, (_, index) => {
+          const frame = useLiveFrames
+            ? (derivedLiveResult?.frames[index] ?? {
+                frameNumber: index + 1,
+                winnerEntryId: null,
+                homePoints: 0,
+                awayPoints: 0,
+                homeHighBreak: null,
+                awayHighBreak: null,
+              })
+            : (frames[index] ?? {
+                frameNumber: index + 1,
+                homeHighBreak: null,
+                awayHighBreak: null,
+              });
 
-      for (let index = 0; index < bestOfFrames; index += 1) {
-        const frame = frames[index] ?? {
-          frameNumber: index + 1,
-          homeHighBreak: null,
-          awayHighBreak: null,
-        };
-
-        await tx.matchFrame.upsert({
-          where: {
-            matchId_frameNumber: {
-              matchId: id,
-              frameNumber: index + 1,
-            },
-          },
-          create: {
-            matchId: id,
+          return {
             frameNumber: index + 1,
+            winnerEntryId: "winnerEntryId" in frame && typeof frame.winnerEntryId === "string" ? frame.winnerEntryId : null,
+            homePoints: "homePoints" in frame && typeof frame.homePoints === "number" ? frame.homePoints : null,
+            awayPoints: "awayPoints" in frame && typeof frame.awayPoints === "number" ? frame.awayPoints : null,
             homeHighBreak: frame.homeHighBreak,
             awayHighBreak: frame.awayHighBreak,
-          },
-          update: {
-            homeHighBreak: frame.homeHighBreak,
-            awayHighBreak: frame.awayHighBreak,
-          },
-        });
-      }
+          };
+        }),
+      });
 
       await tx.$executeRaw(Prisma.sql`
         UPDATE "MatchResultSubmission"
