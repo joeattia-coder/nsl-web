@@ -161,6 +161,10 @@ function getParticipantCompleteField(side: "home" | "away") {
   return side === "home" ? "homeCompletedAt" : "awayCompletedAt";
 }
 
+function getOpponentSide(side: "home" | "away") {
+  return side === "home" ? "away" : "home";
+}
+
 async function getAuthorizedContext(matchId: string) {
   const currentUser = await resolveCurrentUser();
 
@@ -485,11 +489,62 @@ export async function DELETE(_request: Request, context: RouteContext) {
       return authorization.error;
     }
 
+    const currentSide = getCurrentSide(authorization);
+
+    if (!currentSide) {
+      return authorization.error;
+    }
+
+    const session = await prisma.matchLiveSession.findUnique({
+      where: {
+        matchId: id,
+      },
+      select: sessionSelect,
+    });
+
+    if (!session) {
+      return NextResponse.json({ ok: true, session: null });
+    }
+
+    if (session.finalizedAt) {
+      return NextResponse.json(
+        {
+          error: "This live-scored match has already been finalized.",
+          session: mapSession(session),
+        },
+        { status: 409 }
+      );
+    }
+
+    const startField = getParticipantStartField(currentSide);
+    const opponentStartField = getParticipantStartField(getOpponentSide(currentSide));
+
+    if (session[opponentStartField]) {
+      return NextResponse.json(
+        {
+          error: "The other player has already started this live match. Please ask an admin or official to reset it.",
+          session: mapSession(session),
+        },
+        { status: 409 }
+      );
+    }
+
+    if (!session[startField]) {
+      return NextResponse.json({ ok: true, session: mapSession(session) });
+    }
+
+    await prisma.matchLiveSession.delete({
+      where: {
+        id: session.id,
+      },
+    });
+
     return NextResponse.json(
       {
-        error: "Players cannot reset a live-scored match. Please contact an admin or official.",
+        ok: true,
+        removed: true,
       },
-      { status: 403 }
+      { status: 200 }
     );
   } catch (error) {
     console.error("DELETE /api/my-matches/[id]/live-session error:", error);

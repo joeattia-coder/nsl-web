@@ -82,6 +82,7 @@ export function MatchScoringScreen() {
   const [showFreeBallModal, setShowFreeBallModal] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [isSubmittingResult, setIsSubmittingResult] = useState(false);
+  const [isCancellingStartedMatch, setIsCancellingStartedMatch] = useState(false);
   const [liveSyncError, setLiveSyncError] = useState<string | null>(null);
   const [isLiveSessionConnected, setIsLiveSessionConnected] = useState(false);
   const [liveSession, setLiveSession] = useState<LiveMatchSessionRecord | null>(null);
@@ -466,6 +467,44 @@ export function MatchScoringScreen() {
     navigation.goBack();
   };
 
+  const handleCancelStartedMatch = useCallback(() => {
+    if (!match || !showWaitingForStartModal || isCancellingStartedMatch) {
+      return;
+    }
+
+    Alert.alert(
+      "Close match?",
+      "This will cancel your match start, remove it from live view, and let you open a different match instead.",
+      [
+        {
+          text: "Keep Waiting",
+          style: "cancel",
+        },
+        {
+          text: "Close Match",
+          style: "destructive",
+          onPress: () => {
+            setIsCancellingStartedMatch(true);
+
+            void mobileApi.resetLiveMatchSession(match.id)
+              .then(() => {
+                navigation.goBack();
+              })
+              .catch((cancelError) => {
+                Alert.alert(
+                  "Unable to close match",
+                  cancelError instanceof Error ? cancelError.message : "Unable to close this live match right now."
+                );
+              })
+              .finally(() => {
+                setIsCancellingStartedMatch(false);
+              });
+          },
+        },
+      ]
+    );
+  }, [isCancellingStartedMatch, match, navigation, showWaitingForStartModal]);
+
   const handleAdminResetLiveMatch = () => {
     if (!match || !currentUser.isAdmin) {
       return;
@@ -760,13 +799,18 @@ export function MatchScoringScreen() {
         visible={showWaitingForStartModal || showWaitingForCompletionModal}
         title={showWaitingForStartModal ? `Waiting for ${opponentDisplayName} to start match` : `Waiting for ${opponentDisplayName} to confirm match end`}
         subtitle={showWaitingForStartModal ? "Scoring will unlock automatically as soon as they start the match on their device." : "The result will be committed automatically as soon as they confirm the end of the match."}
-        onClose={() => {}}
+        onClose={showWaitingForStartModal ? handleCancelStartedMatch : () => {}}
         closeOnBackdropPress={false}
-        showCloseButton={false}
+        showCloseButton={showWaitingForStartModal}
+        footer={showWaitingForStartModal ? (
+          <Pressable style={[styles.footerButton, styles.footerButtonDanger]} onPress={handleCancelStartedMatch}>
+            <Text style={styles.footerButtonDangerText}>{isCancellingStartedMatch ? "Closing match..." : "Close Match"}</Text>
+          </Pressable>
+        ) : undefined}
       >
         <Text style={styles.exitBody}>
           {showWaitingForStartModal
-            ? `${opponentDisplayName} has not started the match yet. This modal will disappear automatically when they do.`
+            ? `${opponentDisplayName} has not started the match yet. Close this match if you opened the wrong scorer by accident.`
             : "The official match result will be written automatically once both players have confirmed the completed match."}
         </Text>
       </ScoringModal>

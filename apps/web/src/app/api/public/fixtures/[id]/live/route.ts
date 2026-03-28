@@ -27,6 +27,14 @@ function getPublicMatchStatus(matchStatus: string, liveSessionStatus: string | n
   return matchStatus;
 }
 
+function getVisibleLiveSession<T extends { homeStartedAt: Date | null; awayStartedAt: Date | null }>(liveSession: T | null) {
+  if (!liveSession?.homeStartedAt || !liveSession.awayStartedAt) {
+    return null;
+  }
+
+  return liveSession;
+}
+
 export async function GET(_request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
@@ -57,6 +65,8 @@ export async function GET(_request: Request, context: RouteContext) {
             currentFrameAwayPoints: true,
             activeSide: true,
             scoringState: true,
+            homeStartedAt: true,
+            awayStartedAt: true,
             lastSyncedAt: true,
           },
         },
@@ -67,26 +77,28 @@ export async function GET(_request: Request, context: RouteContext) {
       return publicApiNoStoreJson({ error: "Fixture not found" }, { status: 404 });
     }
 
+    const liveSession = getVisibleLiveSession(match.liveSession);
+
     const response: PublicLiveMatchResponse = {
       item: {
         id: match.id,
         fixtureGroupIdentifier: match.tournamentId,
-        homeScore: match.liveSession?.homeFramesWon ?? match.homeScore,
-        awayScore: match.liveSession?.awayFramesWon ?? match.awayScore,
-        matchStatus: getPublicMatchStatus(match.matchStatus, match.liveSession?.status ?? null),
+        homeScore: liveSession?.homeFramesWon ?? match.homeScore,
+        awayScore: liveSession?.awayFramesWon ?? match.awayScore,
+        matchStatus: getPublicMatchStatus(match.matchStatus, liveSession?.status ?? null),
         scheduleStatus: match.scheduleStatus,
         publicNote: match.publicNote,
-        liveSessionStatus: match.liveSession?.status ?? null,
-        currentFrameNumber: match.liveSession?.currentFrameNumber ?? null,
-        currentFrameHomePoints: match.liveSession?.currentFrameHomePoints ?? null,
-        currentFrameAwayPoints: match.liveSession?.currentFrameAwayPoints ?? null,
+        liveSessionStatus: liveSession?.status ?? null,
+        currentFrameNumber: liveSession?.currentFrameNumber ?? null,
+        currentFrameHomePoints: liveSession?.currentFrameHomePoints ?? null,
+        currentFrameAwayPoints: liveSession?.currentFrameAwayPoints ?? null,
         activeSide:
-          match.liveSession?.activeSide === "home" || match.liveSession?.activeSide === "away"
-            ? match.liveSession.activeSide
+          liveSession?.activeSide === "home" || liveSession?.activeSide === "away"
+            ? liveSession.activeSide
             : null,
-        updatedAt: (match.liveSession?.lastSyncedAt ?? match.updatedAt).toISOString(),
+        updatedAt: (liveSession?.lastSyncedAt ?? match.updatedAt).toISOString(),
       },
-      details: match.liveSession?.scoringState ? derivePublicLiveBroadcastState(match.liveSession.scoringState) : null,
+      details: liveSession?.scoringState ? derivePublicLiveBroadcastState(liveSession.scoringState) : null,
       serverTime: new Date().toISOString(),
     };
 

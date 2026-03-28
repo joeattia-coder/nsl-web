@@ -23,6 +23,8 @@
 # misc
 .DS_Store
 *.pem
+.vscode/settings.json
+bugreport-*.zip
 
 # debug
 npm-debug.log*
