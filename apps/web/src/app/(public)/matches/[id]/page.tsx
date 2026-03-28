@@ -202,6 +202,8 @@ export default async function MatchCentrePage({
           currentFrameAwayPoints: true,
           activeSide: true,
           scoringState: true,
+          homeStartedAt: true,
+          awayStartedAt: true,
           lastSyncedAt: true,
         },
       },
@@ -431,33 +433,34 @@ export default async function MatchCentrePage({
     .filter(Boolean)
     .join(", ");
   const backHref = requestedGroupId ? `/matches?group=${encodeURIComponent(requestedGroupId)}` : "/matches";
+  const liveSession = match.liveSession?.homeStartedAt && match.liveSession?.awayStartedAt ? match.liveSession : null;
   const initialSnapshot: PublicLiveMatchSnapshot = {
     id: match.id,
     fixtureGroupIdentifier: match.tournament.id,
-    homeScore: match.liveSession?.homeFramesWon ?? match.homeScore,
-    awayScore: match.liveSession?.awayFramesWon ?? match.awayScore,
+    homeScore: liveSession?.homeFramesWon ?? match.homeScore,
+    awayScore: liveSession?.awayFramesWon ?? match.awayScore,
     matchStatus:
-      match.liveSession?.status === "ACTIVE" || match.liveSession?.status === "PAUSED"
+      liveSession?.status === "ACTIVE" || liveSession?.status === "PAUSED"
         ? "IN_PROGRESS"
-        : match.liveSession?.status === "COMPLETED"
+        : liveSession?.status === "COMPLETED"
           ? "COMPLETED"
-          : match.liveSession?.status === "ABANDONED"
+          : liveSession?.status === "ABANDONED"
             ? "ABANDONED"
             : match.matchStatus,
     scheduleStatus: match.scheduleStatus,
     publicNote: match.publicNote,
-    liveSessionStatus: match.liveSession?.status ?? null,
-    currentFrameNumber: match.liveSession?.currentFrameNumber ?? null,
-    currentFrameHomePoints: match.liveSession?.currentFrameHomePoints ?? null,
-    currentFrameAwayPoints: match.liveSession?.currentFrameAwayPoints ?? null,
+    liveSessionStatus: liveSession?.status ?? null,
+    currentFrameNumber: liveSession?.currentFrameNumber ?? null,
+    currentFrameHomePoints: liveSession?.currentFrameHomePoints ?? null,
+    currentFrameAwayPoints: liveSession?.currentFrameAwayPoints ?? null,
     activeSide:
-      match.liveSession?.activeSide === "home" || match.liveSession?.activeSide === "away"
-        ? match.liveSession.activeSide
+      liveSession?.activeSide === "home" || liveSession?.activeSide === "away"
+        ? liveSession.activeSide
         : null,
-    updatedAt: (match.liveSession?.lastSyncedAt ?? match.updatedAt).toISOString(),
+    updatedAt: (liveSession?.lastSyncedAt ?? match.updatedAt).toISOString(),
   };
-  const initialDetails: PublicLiveBroadcastState | null = match.liveSession?.scoringState
-    ? derivePublicLiveBroadcastState(match.liveSession.scoringState)
+  const initialDetails: PublicLiveBroadcastState | null = liveSession?.scoringState
+    ? derivePublicLiveBroadcastState(liveSession.scoringState)
     : null;
 
   return (
