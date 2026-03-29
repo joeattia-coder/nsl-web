@@ -231,6 +231,7 @@ export function buildInitialScoringState(match: MatchDetailResponse["match"]) {
     bestOfFrames: match.bestOfFrames,
     snookerFormat: match.snookerFormat,
     startedAt: new Date().toISOString(),
+    completedAt: null,
     frames,
     currentFrameIndex: currentFrameIndex === -1 ? frames.length - 1 : currentFrameIndex,
   } satisfies MatchScoringState;

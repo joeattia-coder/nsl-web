@@ -11,6 +11,7 @@ type LiveFrameState = {
   awayPoints: number;
   breaks: LiveBreak[];
   currentBreak: LiveBreak | null;
+  activeSide: "home" | "away";
   winnerSide: "home" | "away" | null;
   isComplete: boolean;
 };
@@ -19,7 +20,9 @@ type LiveScoringState = {
   matchId: string;
   bestOfFrames: number;
   startedAt: string;
+  completedAt: string | null;
   frames: LiveFrameState[];
+  currentFrameIndex?: number;
 };
 
 type OfficialFrameResult = MatchResultSubmissionFrameValue & {
@@ -59,6 +62,7 @@ function parseFrame(value: unknown): LiveFrameState | null {
 
   const breaks = Array.isArray(value.breaks) ? value.breaks.filter(isBreak) : [];
   const currentBreak = value.currentBreak === null ? null : isBreak(value.currentBreak) ? value.currentBreak : null;
+  const activeSide = value.activeSide;
   const winnerSide = value.winnerSide;
 
   if (
@@ -66,6 +70,7 @@ function parseFrame(value: unknown): LiveFrameState | null {
     !isInteger(value.homePoints) ||
     !isInteger(value.awayPoints) ||
     typeof value.isComplete !== "boolean" ||
+    !(activeSide === "home" || activeSide === "away") ||
     !(winnerSide === "home" || winnerSide === "away" || winnerSide === null)
   ) {
     return null;
@@ -77,6 +82,7 @@ function parseFrame(value: unknown): LiveFrameState | null {
     awayPoints: value.awayPoints,
     breaks,
     currentBreak,
+    activeSide,
     winnerSide,
     isComplete: value.isComplete,
   };
@@ -87,7 +93,13 @@ export function parseLiveScoringState(value: unknown): LiveScoringState | null {
     return null;
   }
 
-  if (typeof value.matchId !== "string" || !isInteger(value.bestOfFrames) || typeof value.startedAt !== "string" || !Array.isArray(value.frames)) {
+  if (
+    typeof value.matchId !== "string" ||
+    !isInteger(value.bestOfFrames) ||
+    typeof value.startedAt !== "string" ||
+    !Array.isArray(value.frames) ||
+    !(value.completedAt === undefined || value.completedAt === null || typeof value.completedAt === "string")
+  ) {
     return null;
   }
 
@@ -101,7 +113,9 @@ export function parseLiveScoringState(value: unknown): LiveScoringState | null {
     matchId: value.matchId,
     bestOfFrames: value.bestOfFrames,
     startedAt: value.startedAt,
+    completedAt: value.completedAt === undefined ? null : value.completedAt,
     frames: frames as LiveFrameState[],
+    currentFrameIndex: isInteger(value.currentFrameIndex) ? value.currentFrameIndex : undefined,
   };
 }
 
@@ -132,6 +146,7 @@ export function deriveMatchResultFromLiveSession(input: {
       awayPoints: 0,
       breaks: [],
       currentBreak: null,
+      activeSide: "home",
       winnerSide: null,
       isComplete: false,
     };
@@ -169,7 +184,7 @@ export function deriveMatchResultFromLiveSession(input: {
     awayHighBreaks: frames.map((frame) => frame.awayHighBreak),
     frames,
     startedAt: scoringState.startedAt || null,
-    completedAt: input.completedAt ?? null,
+    completedAt: scoringState.completedAt ?? input.completedAt ?? null,
     isComplete,
   } satisfies DerivedLiveSessionMatchResult;
 }

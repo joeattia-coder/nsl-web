@@ -40,6 +40,7 @@ export type MatchScoringState = {
   bestOfFrames: number;
   snookerFormat: SnookerFormat;
   startedAt: string;
+  completedAt: string | null;
   frames: LiveFrameState[];
   currentFrameIndex: number;
 };

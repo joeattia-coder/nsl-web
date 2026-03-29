@@ -1357,6 +1357,43 @@ html[data-theme="light"] .terms-modal-close-button:focus-visible {
   border-radius: 12px;
 }
 
+.login-page-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.login-page-close-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border-soft);
+  background: color-mix(in srgb, var(--theme-surface-2) 82%, transparent);
+  color: var(--theme-page-text);
+  font-size: 24px;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-page-close-button:hover,
+.login-page-close-button:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--theme-surface-2) 94%, transparent);
+  border-color: var(--theme-border-strong);
+  box-shadow: var(--theme-shadow-card);
+  outline: none;
+}
+
 .login-page-copy {
   display: flex;
   flex-direction: column;
@@ -6259,20 +6296,28 @@ html[data-theme="light"] .group-pill.active:hover {
 }
 
 .admin-page .admin-icon-action-edit {
-  color: var(--theme-button-solid-text);
-  background: var(--theme-accent-brand);
+  color: #ffffff !important;
+  background: #5393dc !important;
 }
+
 .admin-page .admin-icon-action-edit:hover {
   opacity: 0.92;
 }
 
 .admin-page .admin-icon-action-delete {
-  color: var(--theme-button-solid-text);
-  background: var(--theme-accent-danger);
+  color: #ffffff !important;
+  background: #e85e63 !important;
 }
 
 .admin-page .admin-icon-action-delete:hover {
   opacity: 0.92;
+}
+
+.admin-page .admin-icon-action-edit svg,
+.admin-page .admin-icon-action-edit svg *,
+.admin-page .admin-icon-action-delete svg,
+.admin-page .admin-icon-action-delete svg * {
+  color: #ffffff !important;
 }
 
 .admin-page .admin-icon-action-navigate {
@@ -6281,6 +6326,55 @@ html[data-theme="light"] .group-pill.active:hover {
 }
 .admin-page .admin-icon-action-navigate:hover {
   opacity: 0.92;
+}
+
+.admin-players-page .admin-toolbar-button-import {
+  background: #f9bc4c;
+  color: #ffffff;
+}
+
+.admin-players-page .admin-toolbar-button-export {
+  background: #6fb46f;
+  color: #ffffff;
+}
+
+.admin-players-page .admin-toolbar-button-bulk {
+  background: #e85e63;
+  color: #ffffff;
+}
+
+.admin-players-page .admin-toolbar-button-add {
+  background: #5393dc;
+  color: #ffffff;
+}
+
+.admin-players-page .admin-toolbar-button-import:hover,
+.admin-players-page .admin-toolbar-button-export:hover,
+.admin-players-page .admin-toolbar-button-bulk:hover,
+.admin-players-page .admin-toolbar-button-add:hover {
+  opacity: 0.92;
+}
+
+.admin-players-page .admin-toolbar-button-import svg,
+.admin-players-page .admin-toolbar-button-export svg,
+.admin-players-page .admin-toolbar-button-bulk svg,
+.admin-players-page .admin-toolbar-button-add svg {
+  color: #ffffff;
+}
+
+.admin-page .admin-icon-action-invite {
+  background: #f9bc4c !important;
+  color: #ffffff !important;
+}
+
+.admin-page .admin-icon-action-invite:hover,
+.admin-page .admin-icon-action-invite:focus-visible {
+  opacity: 0.92;
+}
+
+.admin-page .admin-icon-action-invite svg,
+.admin-page .admin-icon-action-invite svg * {
+  color: #ffffff !important;
 }
 
 .admin-players-empty {
@@ -6304,6 +6398,7 @@ html[data-theme="light"] .group-pill.active:hover {
 }
 
 .admin-modal {
+  position: relative;
   width: 100%;
   max-width: 420px;
   border: 1px solid var(--theme-modal-border);
@@ -6312,6 +6407,40 @@ html[data-theme="light"] .group-pill.active:hover {
   box-shadow: var(--theme-shadow-modal);
   padding: 24px;
   animation: modal-panel-rise 240ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.admin-modal-close-button {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border-mid);
+  background: color-mix(in srgb, var(--theme-surface-2) 82%, transparent);
+  color: var(--theme-page-text);
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-modal-close-button:hover,
+.admin-modal-close-button:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--theme-surface-2) 94%, transparent);
+  border-color: var(--theme-border-strong);
+  box-shadow: var(--theme-shadow-card);
+  outline: none;
 }
 
 .admin-modal-title {
