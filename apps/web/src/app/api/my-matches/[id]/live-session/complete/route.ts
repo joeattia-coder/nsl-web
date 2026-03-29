@@ -35,6 +35,22 @@ const sessionSelect = {
   updatedAt: true,
 } as const;
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+async function readJsonBody(request: Request) {
+  try {
+    return await request.json();
+  } catch {
+    return null;
+  }
+}
+
+function shouldAllowAdminOverride(value: unknown, isAdmin: boolean) {
+  return isAdmin && value === true;
+}
+
 function mapSession(session: {
   id: string;
   matchId: string;
@@ -131,6 +147,8 @@ export async function POST(_request: Request, context: RouteContext) {
 
     const currentSide = toCurrentSide(authorization.accessContext);
     const currentCompleteField = currentSide === "home" ? "homeCompletedAt" : "awayCompletedAt";
+    const body = await readJsonBody(_request);
+    const adminOverride = shouldAllowAdminOverride(isRecord(body) ? body.adminOverride : null, authorization.currentUser.isAdmin);
 
     const liveSession = await prisma.matchLiveSession.findUnique({
       where: {
@@ -147,7 +165,7 @@ export async function POST(_request: Request, context: RouteContext) {
       return NextResponse.json({ session: mapSession(liveSession), finalized: true });
     }
 
-    if (!liveSession.homeStartedAt || !liveSession.awayStartedAt) {
+    if (!adminOverride && (!liveSession.homeStartedAt || !liveSession.awayStartedAt)) {
       return NextResponse.json({ error: "Both players must start the match before it can be completed.", session: mapSession(liveSession) }, { status: 409 });
     }
 
@@ -189,7 +207,7 @@ export async function POST(_request: Request, context: RouteContext) {
 
       const bothCompleted = Boolean(updatedSession.homeCompletedAt && updatedSession.awayCompletedAt);
 
-      if (!bothCompleted) {
+      if (!adminOverride && !bothCompleted) {
         return {
           session: updatedSession,
           finalized: false,

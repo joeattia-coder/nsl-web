@@ -61,6 +61,11 @@ class ApiRequestError extends Error {
 
 type LiveMatchSessionCreatePayload = Pick<LiveMatchSessionSyncPayload, "summary" | "status"> & {
   initialState: LiveMatchSessionSyncPayload["scoringState"];
+  adminOverride?: boolean;
+};
+
+type LiveMatchSessionCompletePayload = {
+  adminOverride?: boolean;
 };
 
 function normalizeBaseUrl(baseUrl: string) {
@@ -321,9 +326,10 @@ export const mobileApi = {
     });
   },
 
-  completeLiveMatchSession(matchId: string) {
+  completeLiveMatchSession(matchId: string, payload?: LiveMatchSessionCompletePayload) {
     return requestJson<LiveMatchSessionResponse & { finalized?: boolean }>(`/api/my-matches/${encodeURIComponent(matchId)}/live-session/complete`, {
       method: "POST",
+      body: payload,
     });
   },
 

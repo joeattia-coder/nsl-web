@@ -70,7 +70,7 @@ function buildLiveSessionDraft(state: MatchScoringState) {
 export function MatchScoringScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<RouteProp<RootStackParamList, "MatchScoring">>();
-  const { currentUser } = useAppSession();
+  const { currentRole, currentUser } = useAppSession();
   const { width, height } = useWindowDimensions();
   const [match, setMatch] = useState<Awaited<ReturnType<typeof mobileApi.getMyMatch>>["match"] | null>(null);
   const [scoringState, setScoringState] = useState<MatchScoringState | null>(null);
@@ -94,6 +94,7 @@ export function MatchScoringScreen() {
 
   const isCompact = height < 760 || width < 420;
   const useSingleRowBalls = width >= 680;
+  const usesAdminOverride = currentRole === "league_admin" && currentUser.isAdmin;
 
   useFocusEffect(
     useCallback(() => {
@@ -136,6 +137,7 @@ export function MatchScoringScreen() {
           initialState,
           summary: liveDraft.summary,
           status: liveDraft.status,
+          adminOverride: usesAdminOverride,
         });
         const connectedSession = liveSessionResponse.session;
 
@@ -169,7 +171,7 @@ export function MatchScoringScreen() {
     return () => {
       isMounted = false;
     };
-  }, [applyRemoteSessionState, route.params.matchId]);
+  }, [applyRemoteSessionState, route.params.matchId, usesAdminOverride]);
 
   useEffect(() => {
     if (!match || !isLiveSessionConnected) {
@@ -237,6 +239,7 @@ export function MatchScoringScreen() {
         scoringState,
         summary: liveDraft.summary,
         status: liveDraft.status,
+        adminOverride: usesAdminOverride,
       })
         .then((response) => {
           if (!response.session) {
@@ -275,7 +278,7 @@ export function MatchScoringScreen() {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [applyRemoteSessionState, isLiveSessionConnected, match, scoringState]);
+  }, [applyRemoteSessionState, isLiveSessionConnected, match, scoringState, usesAdminOverride]);
 
   const scoringSummary = useMemo(() => (scoringState ? summarizeScoringState(scoringState) : null), [scoringState]);
   const currentFrame = scoringState ? scoringState.frames[scoringState.currentFrameIndex] : null;
@@ -303,10 +306,12 @@ export function MatchScoringScreen() {
   const currentParticipantState = match ? liveSession?.participants[match.currentSide] ?? null : null;
   const opponentParticipantState = match && opponentSide ? liveSession?.participants[opponentSide] ?? null : null;
   const bothPlayersStarted = Boolean(liveSession?.participants.home.startedAt && liveSession?.participants.away.startedAt);
+  const currentPlayerStarted = Boolean(currentParticipantState?.startedAt);
   const currentPlayerCompleted = Boolean(currentParticipantState?.completedAt);
   const opponentPlayerCompleted = Boolean(opponentParticipantState?.completedAt);
   const liveMatchFinalized = Boolean(liveSession?.finalizedAt);
-  const waitingForStartHandshake = Boolean(match && liveSession && !bothPlayersStarted && !currentPlayerCompleted && !liveMatchFinalized);
+  const startRequirementSatisfied = usesAdminOverride ? currentPlayerStarted : bothPlayersStarted;
+  const waitingForStartHandshake = Boolean(match && liveSession && !startRequirementSatisfied && !currentPlayerCompleted && !liveMatchFinalized);
   const interactionLocked = waitingForStartHandshake || currentPlayerCompleted || liveMatchFinalized;
   const willFrameEndMatch = Boolean(
     projectedFrameWinner &&
@@ -316,7 +321,7 @@ export function MatchScoringScreen() {
   const canConfirmLiveResult = Boolean(
     match &&
     scoringSummary?.isComplete &&
-    bothPlayersStarted &&
+    startRequirementSatisfied &&
     !liveMatchFinalized &&
     !currentPlayerCompleted
   );
@@ -325,6 +330,7 @@ export function MatchScoringScreen() {
   const showWaitingForCompletionModal = Boolean(
     scoringSummary?.isComplete &&
     currentPlayerCompleted &&
+    !usesAdminOverride &&
     !opponentPlayerCompleted &&
     !liveMatchFinalized
   );
@@ -335,13 +341,13 @@ export function MatchScoringScreen() {
     }
 
     finalizedAlertShownRef.current = true;
-    Alert.alert("Match completed", "Both players confirmed the end of the match and the result has been recorded.", [
+    Alert.alert("Match completed", usesAdminOverride ? "The result has been finalized from admin view and recorded." : "Both players confirmed the end of the match and the result has been recorded.", [
       {
         text: "OK",
         onPress: () => navigation.goBack(),
       },
     ]);
-  }, [liveMatchFinalized, navigation]);
+  }, [liveMatchFinalized, navigation, usesAdminOverride]);
 
   const pushAction = (action: ScoringAction) => {
     if (!scoringState || interactionLocked) {
@@ -549,7 +555,9 @@ export function MatchScoringScreen() {
 
     Alert.alert(
       "Confirm match end?",
-      "Once both players confirm the completed match, the official result will be saved everywhere automatically.",
+      usesAdminOverride
+        ? "This will finalize the live-scored result immediately from admin view."
+        : "Once both players confirm the completed match, the official result will be saved everywhere automatically.",
       [
         {
           text: "Cancel",
@@ -561,7 +569,7 @@ export function MatchScoringScreen() {
             setIsSubmittingResult(true);
             setShowOverflowMenu(false);
 
-            void mobileApi.completeLiveMatchSession(match.id)
+            void mobileApi.completeLiveMatchSession(match.id, usesAdminOverride ? { adminOverride: true } : undefined)
               .then((response) => {
                 if (response.session) {
                   setLiveSession(response.session);
@@ -569,7 +577,7 @@ export function MatchScoringScreen() {
 
                 if (response.finalized || response.session?.finalizedAt) {
                   finalizedAlertShownRef.current = true;
-                  Alert.alert("Match completed", "Both players confirmed the end of the match and the result has been recorded.", [
+                  Alert.alert("Match completed", usesAdminOverride ? "The result has been finalized from admin view and recorded." : "Both players confirmed the end of the match and the result has been recorded.", [
                     {
                       text: "OK",
                       onPress: () => navigation.goBack(),

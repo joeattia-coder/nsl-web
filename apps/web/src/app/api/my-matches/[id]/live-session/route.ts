@@ -55,6 +55,10 @@ function isLiveSessionStatus(value: unknown): value is LiveSessionStatus {
   return value === "ACTIVE" || value === "PAUSED" || value === "COMPLETED" || value === "ABANDONED";
 }
 
+function shouldAllowAdminOverride(value: unknown, isAdmin: boolean) {
+  return isAdmin && value === true;
+}
+
 function parseSummary(value: unknown): LiveSessionSummaryPayload | null {
   if (!isRecord(value)) {
     return null;
@@ -232,6 +236,11 @@ export async function POST(request: Request, context: RouteContext) {
       return authorization.error;
     }
 
+    const body = await readJsonBody(request);
+    const initialState = isRecord(body) && isRecord(body.initialState) ? body.initialState : null;
+    const summary = isRecord(body) ? parseSummary(body.summary) : null;
+    const requestedStatus = isRecord(body) ? body.status : null;
+
     const existingSession = await prisma.matchLiveSession.findUnique({
       where: {
         matchId: id,
@@ -277,12 +286,6 @@ export async function POST(request: Request, context: RouteContext) {
 
       return NextResponse.json({ session: mapSession(session) });
     }
-
-    const body = await readJsonBody(request);
-    const initialState = isRecord(body) && isRecord(body.initialState) ? body.initialState : null;
-    const summary = isRecord(body) ? parseSummary(body.summary) : null;
-    const requestedStatus = isRecord(body) ? body.status : null;
-
     if (!initialState || !summary) {
       return NextResponse.json({ error: "Initial live scoring state is required." }, { status: 400 });
     }
@@ -355,6 +358,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const baseVersion = body.baseVersion;
     const scoringState = body.scoringState;
     const requestedStatus = body.status;
+    const adminOverride = shouldAllowAdminOverride(body.adminOverride, authorization.currentUser.isAdmin);
 
     if (!isInteger(baseVersion)) {
       return NextResponse.json({ error: "A valid live session version is required." }, { status: 400 });
@@ -389,7 +393,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "This live session has already been finalized.", session: mapSession(latestSession) }, { status: 409 });
     }
 
-    if (!latestSession.homeStartedAt || !latestSession.awayStartedAt) {
+    if (!adminOverride && (!latestSession.homeStartedAt || !latestSession.awayStartedAt)) {
       return NextResponse.json({ error: "Both players must start the match before scoring can sync.", session: mapSession(latestSession) }, { status: 409 });
     }
 
