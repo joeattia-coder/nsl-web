@@ -1,6 +1,5 @@
 import Image from "next/image";
 import ActiveTurnMarker from "./ActiveTurnMarker";
-import BreakSequence from "./BreakSequence";
 import styles from "./PlayerScorePanel.module.css";
 import type { OverlayPlayerData } from "./types";
 
@@ -9,7 +8,6 @@ type PlayerScorePanelProps = {
   side: "left" | "right";
   isActive: boolean;
   compact?: boolean;
-  breakDisplay?: "chips" | "text";
 };
 
 function getCompactPlayerName(name: string) {
@@ -27,10 +25,8 @@ export default function PlayerScorePanel({
   side,
   isActive,
   compact = false,
-  breakDisplay = "chips",
 }: PlayerScorePanelProps) {
   const isRight = side === "right";
-  const showBreak = player.currentBreak > 0;
   const compactName = getCompactPlayerName(player.name);
 
   return (
@@ -47,12 +43,6 @@ export default function PlayerScorePanel({
                 <span className={styles.nameCompact}>{compactName}</span>
               </span>
             </div>
-            {showBreak ? (
-              <div className={`${styles.breakRow} ${styles.breakRowRight}`.trim()}>
-                <span className={styles.breakValue}>Break {player.currentBreak}</span>
-                <BreakSequence balls={player.breakSequence} mode={breakDisplay} compact={compact} />
-              </div>
-            ) : null}
           </div>
 
           <span className={styles.markerSlot} aria-hidden="true">
@@ -73,12 +63,6 @@ export default function PlayerScorePanel({
                 <span className={styles.nameCompact}>{compactName}</span>
               </span>
             </div>
-            {showBreak ? (
-              <div className={styles.breakRow}>
-                <span className={styles.breakValue}>Break {player.currentBreak}</span>
-                <BreakSequence balls={player.breakSequence} mode={breakDisplay} compact={compact} />
-              </div>
-            ) : null}
           </div>
 
           <div className={styles.scoreBox}>{player.score}</div>

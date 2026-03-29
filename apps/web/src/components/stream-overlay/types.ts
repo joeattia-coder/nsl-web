@@ -15,6 +15,18 @@ export type OverlayPlayerData = {
   breakSequence: OverlayBreakBall[];
 };
 
+export type OverlayFrameContext = {
+  leaderSide: "left" | "right" | null;
+  ahead: number;
+  remaining: number | null;
+};
+
+export type OverlayPlayerBanner = {
+  label: string;
+  detail?: string;
+  balls?: OverlayBreakBall[];
+};
+
 export type OverlayStatus = "LIVE" | "INTERVAL" | "FINAL_FRAME" | "FINISHED" | "PREVIEW";
 
 export type StreamScoreOverlayData = {
@@ -24,6 +36,7 @@ export type StreamScoreOverlayData = {
   frameScoreRight: number;
   bestOf: number;
   activeSide: "left" | "right" | null;
+  frameContext?: OverlayFrameContext;
   matchLabel?: string;
   tournamentLabel?: string;
   tableLabel?: string;
@@ -38,4 +51,6 @@ export type StreamScoreOverlayProps = {
   breakDisplay?: "chips" | "text";
   accentColor?: string;
   className?: string;
+  leftBanner?: OverlayPlayerBanner | null;
+  rightBanner?: OverlayPlayerBanner | null;
 };

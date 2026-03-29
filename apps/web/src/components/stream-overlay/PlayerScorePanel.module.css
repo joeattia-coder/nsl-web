@@ -59,26 +59,6 @@
   display: none;
 }
 
-.breakRow {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--overlay-inline-gap, 6px);
-  min-width: 0;
-}
-
-.breakRowRight {
-  flex-direction: row-reverse;
-}
-
-.breakValue {
-  color: rgba(255, 217, 102, 0.96);
-  font-size: var(--overlay-break-size, 12px);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
 .markerSlot {
   display: inline-flex;
   align-items: center;
@@ -115,10 +95,6 @@
 
 .compact .name {
   font-size: 0.88rem;
-}
-
-.compact .breakValue {
-  font-size: 0.64rem;
 }
 
 @media (max-width: 420px) {
