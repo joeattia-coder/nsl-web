@@ -76,7 +76,7 @@ export default async function AdminPlayersPage() {
   }));
 
   return (
-    <section className="admin-page">
+    <section className="admin-page admin-players-page">
       <div className="admin-players-header">
         <h1 className="admin-page-title">Players</h1>
         <p className="admin-page-subtitle">

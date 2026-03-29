@@ -1,6 +1,6 @@
 import { createPublicApiClient } from "@nsl/api";
 
-export const apiBaseUrl = "https://nsl-web.vercel.app";
+export const apiBaseUrl = "https://dev.nsl-tv.com";
 
 if (__DEV__) {
   console.log(`[mobile-api] using base URL: ${apiBaseUrl}`);

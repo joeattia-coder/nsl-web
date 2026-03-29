@@ -666,7 +666,7 @@ export default function PlayersTable({ players }: PlayersTableProps) {
 
                           <button
                             type="button"
-                            className="admin-icon-action admin-icon-action-edit"
+                            className="admin-icon-action admin-icon-action-invite"
                             aria-label={`Send invite to ${player.fullName}`}
                             title={inviteDisabledReason ?? "Send Invite"}
                             onClick={() => void handleSendInvite(player)}
