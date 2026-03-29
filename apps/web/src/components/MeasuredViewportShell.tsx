@@ -55,8 +55,8 @@ function buildLayoutVars(width: number, height: number): LayoutVars {
   const overlayIdentityGap = clamp(round(landscape ? Math.min(safeWidth, safeHeight) * 0.008 : 2 + portraitScale * 2), 2, 8);
   const overlayInlineGap = clamp(round(landscape ? Math.min(safeWidth, safeHeight) * 0.007 : 2 + portraitScale * 2), 2, 8);
   const overlayCenterWidth = clamp(round(landscape ? Math.min(safeWidth * 0.18, safeHeight * 0.34) : 76 + portraitScale * 14), 76, 220);
-  const overlayNameSize = clamp(round(landscape ? Math.min(safeWidth * 0.015, safeHeight * 0.026) : 10 + portraitScale * 2), 10, 20);
-  const overlayFlagWidth = clamp(round(overlayNameSize * 1.4), 18, 28);
+  const overlayNameSize = 34;
+  const overlayFlagWidth = clamp(round(overlayNameSize * 1.5), 20, 34);
   const overlayFlagHeight = round(overlayFlagWidth * 0.67);
   const overlayBreakSize = clamp(round(landscape ? Math.min(safeWidth * 0.01, safeHeight * 0.016) : 8 + portraitScale * 2), 8, 13);
   const overlayScoreHeight = clamp(round(landscape ? Math.min(safeWidth * 0.065, safeHeight * 0.105) : 20 + portraitScale * 4), 20, 58);
