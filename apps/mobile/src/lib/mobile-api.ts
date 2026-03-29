@@ -14,7 +14,7 @@ import type {
   MatchSummaryResponse,
   MobileHomeFeedResponse,
   PlayerProfileUpdatePayload,
-  PublicFixtureGroupsResponse,
+  PublicLeagueGroupsResponse,
   ProfileResponse,
   PublicFixturesListResponse,
   PublicNewsListResponse,
@@ -67,6 +67,7 @@ type LiveMatchSessionCreatePayload = Pick<LiveMatchSessionSyncPayload, "summary"
 
 type LiveMatchSessionCompletePayload = {
   adminOverride?: boolean;
+  scoringState?: LiveMatchSessionSyncPayload["scoringState"];
 };
 
 function normalizeBaseUrl(baseUrl: string) {
@@ -245,8 +246,8 @@ export const mobileApi = {
     return requestJson<PublicFixturesListResponse>("/api/public/fixtures");
   },
 
-  getPublicFixtureGroups() {
-    return requestJson<PublicFixtureGroupsResponse>("/api/public/fixture-groups");
+  getPublicLeagueGroups() {
+    return requestJson<PublicLeagueGroupsResponse>("/api/public/league-groups");
   },
 
   getPublicPlayerRankings() {

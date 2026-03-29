@@ -90,6 +90,13 @@ export default function AdminIdleSessionManager() {
     return null;
   }
 
+  const handleClose = () => {
+    setExpiredPathname(null);
+    isLoggingOutRef.current = false;
+    router.push("/");
+    router.refresh();
+  };
+
   return (
     <div className="admin-modal-backdrop" role="presentation">
       <div
@@ -98,6 +105,14 @@ export default function AdminIdleSessionManager() {
         aria-modal="true"
         aria-labelledby="admin-session-expired-title"
       >
+        <button
+          type="button"
+          className="admin-modal-close-button"
+          onClick={handleClose}
+          aria-label="Close session expired dialog"
+        >
+          ×
+        </button>
         <h2 id="admin-session-expired-title" className="admin-modal-title">
           Session expired
         </h2>

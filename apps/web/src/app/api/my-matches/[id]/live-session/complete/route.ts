@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { MatchLiveEventType, Prisma } from "@/generated/prisma/client";
 
 import { resolveCurrentUser } from "@/lib/admin-auth";
-import { deriveMatchResultFromLiveSession } from "@/lib/live-session-match-result";
+import { deriveMatchResultFromLiveSession, parseLiveScoringState } from "@/lib/live-session-match-result";
 import { persistOfficialMatchResult } from "@/lib/match-finalization";
 import { recalculateAndPersistPlayerElo } from "@/lib/player-elo";
 import { getPlayerMatchAccessContext } from "@/lib/player-match-access";
@@ -137,6 +137,21 @@ function parseIsoDate(value: string | null | undefined) {
 }
 
 export async function POST(_request: Request, context: RouteContext) {
+
+function getCurrentFrameSummary(scoringState: NonNullable<ReturnType<typeof parseLiveScoringState>>) {
+  const fallbackIndex = Math.max(0, scoringState.frames.length - 1);
+  const currentFrameIndex = typeof scoringState.currentFrameIndex === "number"
+    ? Math.min(Math.max(scoringState.currentFrameIndex, 0), fallbackIndex)
+    : fallbackIndex;
+  const currentFrame = scoringState.frames[currentFrameIndex] ?? scoringState.frames[fallbackIndex] ?? null;
+
+  return {
+    currentFrameNumber: currentFrame?.frameNumber ?? null,
+    currentFrameHomePoints: currentFrame?.homePoints ?? null,
+    currentFrameAwayPoints: currentFrame?.awayPoints ?? null,
+    activeSide: currentFrame?.activeSide ?? null,
+  };
+}
   try {
     const { id } = await context.params;
     const authorization = await getAuthorizedContext(id);
@@ -149,6 +164,7 @@ export async function POST(_request: Request, context: RouteContext) {
     const currentCompleteField = currentSide === "home" ? "homeCompletedAt" : "awayCompletedAt";
     const body = await readJsonBody(_request);
     const adminOverride = shouldAllowAdminOverride(isRecord(body) ? body.adminOverride : null, authorization.currentUser.isAdmin);
+    const submittedScoringState = isRecord(body) ? body.scoringState : null;
 
     const liveSession = await prisma.matchLiveSession.findUnique({
       where: {
@@ -169,8 +185,15 @@ export async function POST(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Both players must start the match before it can be completed.", session: mapSession(liveSession) }, { status: 409 });
     }
 
+    const scoringStateSource = submittedScoringState ?? liveSession.scoringState;
+    const parsedSubmittedScoringState = parseLiveScoringState(scoringStateSource);
+
+    if (!parsedSubmittedScoringState) {
+      return NextResponse.json({ error: "A valid final scoring snapshot is required to complete the match.", session: mapSession(liveSession) }, { status: 400 });
+    }
+
     const derivedResult = deriveMatchResultFromLiveSession({
-      scoringState: liveSession.scoringState,
+      scoringState: parsedSubmittedScoringState,
       homeEntryId: authorization.accessContext.homeEntry.id,
       awayEntryId: authorization.accessContext.awayEntry.id,
       completedAt: liveSession.lastSyncedAt.toISOString(),
@@ -181,6 +204,8 @@ export async function POST(_request: Request, context: RouteContext) {
     }
 
     const now = new Date();
+    const finalSyncedAt = parseIsoDate(derivedResult.completedAt) ?? now;
+    const currentFrameSummary = getCurrentFrameSummary(parsedSubmittedScoringState);
 
     const result = await prisma.$transaction(async (tx) => {
       const updatedSession = await tx.matchLiveSession.update({
@@ -189,14 +214,27 @@ export async function POST(_request: Request, context: RouteContext) {
         },
         data: {
           [currentCompleteField]: liveSession[currentCompleteField] ?? now,
+          status: "COMPLETED",
+          version: {
+            increment: 1,
+          },
+          scoringState: parsedSubmittedScoringState as Prisma.InputJsonValue,
+          homeFramesWon: derivedResult.homeScore,
+          awayFramesWon: derivedResult.awayScore,
+          currentFrameNumber: currentFrameSummary.currentFrameNumber,
+          currentFrameHomePoints: currentFrameSummary.currentFrameHomePoints,
+          currentFrameAwayPoints: currentFrameSummary.currentFrameAwayPoints,
+          activeSide: currentFrameSummary.activeSide,
+          lastSyncedAt: finalSyncedAt,
           updatedByUserId: authorization.currentUser.id,
           events: {
             create: {
-              version: liveSession.version,
+              version: liveSession.version + 1,
               eventType: MatchLiveEventType.STATUS_CHANGED,
               payload: {
                 action: "participant_completed",
                 side: currentSide,
+                finalizedFromScorer: true,
               } as Prisma.InputJsonValue,
               createdByUserId: authorization.currentUser.id,
             },
@@ -204,15 +242,6 @@ export async function POST(_request: Request, context: RouteContext) {
         },
         select: sessionSelect,
       });
-
-      const bothCompleted = Boolean(updatedSession.homeCompletedAt && updatedSession.awayCompletedAt);
-
-      if (!adminOverride && !bothCompleted) {
-        return {
-          session: updatedSession,
-          finalized: false,
-        };
-      }
 
       const startedAt = parseIsoDate(derivedResult.startedAt);
       const completedAt = parseIsoDate(derivedResult.completedAt);

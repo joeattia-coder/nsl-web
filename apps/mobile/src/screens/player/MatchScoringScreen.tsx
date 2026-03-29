@@ -83,6 +83,8 @@ export function MatchScoringScreen() {
   const [showFoulModal, setShowFoulModal] = useState(false);
   const [showFreeBallModal, setShowFreeBallModal] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showEndFrameConfirm, setShowEndFrameConfirm] = useState(false);
+  const [showEndMatchConfirm, setShowEndMatchConfirm] = useState(false);
   const [isSubmittingResult, setIsSubmittingResult] = useState(false);
   const [isCancellingStartedMatch, setIsCancellingStartedMatch] = useState(false);
   const [liveSyncError, setLiveSyncError] = useState<string | null>(null);
@@ -319,7 +321,7 @@ export function MatchScoringScreen() {
     projectedFrameWinner &&
     (projectedHomeFrames >= framesNeededToWin || projectedAwayFrames >= framesNeededToWin)
   );
-  const endFrameActionLabel = willFrameEndMatch ? "End Match" : "End Frame";
+  const endFrameActionLabel = "End Frame";
   const canConfirmLiveResult = Boolean(
     match &&
     scoringSummary?.isComplete &&
@@ -343,7 +345,7 @@ export function MatchScoringScreen() {
     }
 
     finalizedAlertShownRef.current = true;
-    Alert.alert("Match completed", usesAdminOverride ? "The result has been finalized from admin view and recorded." : "Both players confirmed the end of the match and the result has been recorded.", [
+    Alert.alert("Match completed", usesAdminOverride ? "The result has been finalized from admin view and recorded." : "The scorer result has been recorded and written to the official match record.", [
       {
         text: "OK",
         onPress: () => navigation.goBack(),
@@ -373,6 +375,8 @@ export function MatchScoringScreen() {
     setShowOverflowMenu(false);
     setShowFoulModal(false);
     setShowFreeBallModal(false);
+    setShowEndFrameConfirm(false);
+    setShowEndMatchConfirm(false);
   };
 
   const handleUndo = () => {
@@ -441,31 +445,78 @@ export function MatchScoringScreen() {
     setShowFreeBallModal(false);
   };
 
-  const handleEndFrame = () => {
+  const getProjectedFrameWinner = useCallback(() => {
+    if (!currentFrame || !scoringSummary || currentFrame.homePoints === currentFrame.awayPoints) {
+      return null;
+    }
+
+    return currentFrame.homePoints > currentFrame.awayPoints ? "home" : "away";
+  }, [currentFrame, scoringSummary]);
+
+  const handleEndFramePress = () => {
     if (!currentFrame || !scoringSummary) {
       return;
     }
 
-    if (currentFrame.homePoints === currentFrame.awayPoints) {
+    if (!getProjectedFrameWinner()) {
       Alert.alert(endFrameActionLabel, "Record a deciding score before ending a tied frame.");
       return;
     }
 
-    const winnerSide = currentFrame.homePoints > currentFrame.awayPoints ? "home" : "away";
-    const nextHomeFrames = scoringSummary.homeScore + (winnerSide === "home" ? 1 : 0);
-    const nextAwayFrames = scoringSummary.awayScore + (winnerSide === "away" ? 1 : 0);
-    const matchIsComplete = nextHomeFrames >= framesNeededToWin || nextAwayFrames >= framesNeededToWin;
-
-    pushActions(
-      matchIsComplete
-        ? [{ type: "awardFrame", side: winnerSide }]
-        : [
-            { type: "awardFrame", side: winnerSide },
-            { type: "startNextFrame" },
-          ]
-    );
-    resetTransientUI();
+    setShowEndFrameConfirm(true);
   };
+
+  const handleConfirmEndFrame = () => {
+    const winnerSide = getProjectedFrameWinner();
+
+    if (!winnerSide || !scoringSummary || !scoringState) {
+      return;
+    }
+
+    const awardedState = applyScoringAction(scoringState, { type: "awardFrame", side: winnerSide });
+    const awardedSummary = summarizeScoringState(awardedState);
+
+    setHistory((current) => [...current, scoringState]);
+    setScoringState(
+      awardedSummary.isComplete
+        ? awardedState
+        : applyScoringAction(awardedState, { type: "startNextFrame" })
+    );
+    setShowOverflowMenu(false);
+    setShowFoulModal(false);
+    setShowFreeBallModal(false);
+    setShowEndFrameConfirm(false);
+
+    if (awardedSummary.isComplete) {
+      setShowEndMatchConfirm(true);
+    }
+  };
+
+  const buildCompletedScoringState = useCallback(() => {
+    if (!scoringState) {
+      return null;
+    }
+
+    const liveSummary = summarizeScoringState(scoringState);
+
+    if (liveSummary.isComplete) {
+      return {
+        ...scoringState,
+        completedAt: new Date().toISOString(),
+      } satisfies MatchScoringState;
+    }
+
+    const winnerSide = getProjectedFrameWinner();
+
+    if (!winnerSide) {
+      return null;
+    }
+
+    return {
+      ...applyScoringAction(scoringState, { type: "awardFrame", side: winnerSide }),
+      completedAt: new Date().toISOString(),
+    } satisfies MatchScoringState;
+  }, [getProjectedFrameWinner, scoringState]);
 
   const handleExit = () => {
     setScoringState(null);
@@ -550,6 +601,41 @@ export function MatchScoringScreen() {
     );
   };
 
+  const finalizeCompletedMatch = useCallback((completedState: MatchScoringState, successMessage: string) => {
+    if (!match) {
+      return;
+    }
+
+    setIsSubmittingResult(true);
+    resetTransientUI();
+
+    void mobileApi.completeLiveMatchSession(match.id, {
+      ...(usesAdminOverride ? { adminOverride: true } : {}),
+      scoringState: completedState,
+    })
+      .then((response) => {
+        if (response.session) {
+          setLiveSession(response.session);
+        }
+
+        if (response.finalized || response.session?.finalizedAt) {
+          finalizedAlertShownRef.current = true;
+          Alert.alert("Match completed", successMessage, [
+            {
+              text: "OK",
+              onPress: () => navigation.goBack(),
+            },
+          ]);
+        }
+      })
+      .catch((submitError) => {
+        Alert.alert("Unable to complete match", submitError instanceof Error ? submitError.message : "Unable to complete the match right now.");
+      })
+      .finally(() => {
+        setIsSubmittingResult(false);
+      });
+  }, [match, navigation, usesAdminOverride]);
+
   const handleConfirmLiveResult = () => {
     if (!match || !canConfirmLiveResult || isSubmittingResult) {
       return;
@@ -559,7 +645,7 @@ export function MatchScoringScreen() {
       "Confirm match end?",
       usesAdminOverride
         ? "This will finalize the live-scored result immediately from admin view."
-        : "Once both players confirm the completed match, the official result will be saved everywhere automatically.",
+        : "This will finalize the scorer result and write it into the official match record.",
       [
         {
           text: "Cancel",
@@ -568,34 +654,38 @@ export function MatchScoringScreen() {
         {
           text: "Confirm End",
           onPress: () => {
-            setIsSubmittingResult(true);
-            setShowOverflowMenu(false);
+            const completedState = buildCompletedScoringState() ?? scoringState;
 
-            void mobileApi.completeLiveMatchSession(match.id, usesAdminOverride ? { adminOverride: true } : undefined)
-              .then((response) => {
-                if (response.session) {
-                  setLiveSession(response.session);
-                }
+            if (!completedState) {
+              Alert.alert("Confirm match end", "A completed scoring state is required before the match can be confirmed.");
+              return;
+            }
 
-                if (response.finalized || response.session?.finalizedAt) {
-                  finalizedAlertShownRef.current = true;
-                  Alert.alert("Match completed", usesAdminOverride ? "The result has been finalized from admin view and recorded." : "Both players confirmed the end of the match and the result has been recorded.", [
-                    {
-                      text: "OK",
-                      onPress: () => navigation.goBack(),
-                    },
-                  ]);
-                }
-              })
-              .catch((submitError) => {
-                Alert.alert("Unable to confirm match end", submitError instanceof Error ? submitError.message : "Unable to confirm the result right now.");
-              })
-              .finally(() => {
-                setIsSubmittingResult(false);
-              });
+            finalizeCompletedMatch(
+              completedState,
+              usesAdminOverride
+                ? "The result has been finalized from admin view and recorded."
+                : "The result has been recorded from the scorer and written to the official match record."
+            );
           },
         },
       ]
+    );
+  };
+
+  const handleConfirmEndMatch = () => {
+    const completedState = buildCompletedScoringState();
+
+    if (!completedState) {
+      Alert.alert("End Match", "Record a deciding score before ending a tied frame.");
+      return;
+    }
+
+    finalizeCompletedMatch(
+      completedState,
+      usesAdminOverride
+        ? "The result has been finalized from admin view and recorded."
+        : "The result has been recorded from the scorer and written to the official match record."
     );
   };
 
@@ -661,7 +751,7 @@ export function MatchScoringScreen() {
             },
           },
           { key: "foul", label: "Foul", tone: "danger", onPress: () => { setShowFreeBallModal(false); setShowFoulModal(true); } },
-          { key: "end-frame", label: endFrameActionLabel, tone: "emphasis", onPress: handleEndFrame },
+          { key: "end-frame", label: endFrameActionLabel, tone: "emphasis", onPress: handleEndFramePress },
         ]}
       />
     </View>
@@ -703,7 +793,7 @@ export function MatchScoringScreen() {
               <Text style={[styles.playerPoints, styles.playerPointsLeft, isCompact && styles.playerPointsCompact]}>{currentFrame.homePoints}</Text>
             </View>
             <View style={styles.scoreCenter}>
-              <FrameScore leftScore={scoringSummary.homeScore} rightScore={scoringSummary.awayScore} targetScore={framesNeededToWin} compact={isCompact} />
+              <FrameScore leftScore={scoringSummary.homeScore} rightScore={scoringSummary.awayScore} bestOfFrames={match.bestOfFrames} compact={isCompact} />
               <Text style={styles.frameMeta}>Frame {currentFrame.frameNumber} of {match.bestOfFrames}</Text>
             </View>
             <View style={[styles.playerColumn, styles.playerColumnRight]}>
@@ -809,9 +899,49 @@ export function MatchScoringScreen() {
       </ScoringModal>
 
       <ScoringModal
+        visible={showEndFrameConfirm}
+        title="End frame?"
+        subtitle={willFrameEndMatch ? "This will award the current frame. Because it is the deciding frame, you will then be asked to confirm ending the match." : "This will award the current frame using the score currently shown and move the scorer to the next frame."}
+        onClose={() => setShowEndFrameConfirm(false)}
+        footer={(
+          <>
+            <Pressable style={[styles.footerButton, styles.footerButtonNeutral]} onPress={() => setShowEndFrameConfirm(false)}>
+              <Text style={styles.footerButtonNeutralText}>Cancel</Text>
+            </Pressable>
+            <Pressable style={[styles.footerButton, styles.footerButtonDanger]} onPress={handleConfirmEndFrame}>
+              <Text style={styles.footerButtonDangerText}>End Frame</Text>
+            </Pressable>
+          </>
+        )}
+      >
+        <Text style={styles.exitBody}>Cancel keeps the current frame active so scoring can continue.</Text>
+      </ScoringModal>
+
+      <ScoringModal
+        visible={showEndMatchConfirm}
+        title="End match?"
+        subtitle="This will award the current frame, complete the match, and write the scorer result into the official match record."
+        onClose={() => setShowEndMatchConfirm(false)}
+        closeOnBackdropPress={!isSubmittingResult}
+        showCloseButton={!isSubmittingResult}
+        footer={(
+          <>
+            <Pressable style={[styles.footerButton, styles.footerButtonNeutral]} onPress={() => setShowEndMatchConfirm(false)} disabled={isSubmittingResult}>
+              <Text style={styles.footerButtonNeutralText}>Cancel</Text>
+            </Pressable>
+            <Pressable style={[styles.footerButton, styles.footerButtonDanger]} onPress={handleConfirmEndMatch} disabled={isSubmittingResult}>
+              <Text style={styles.footerButtonDangerText}>{isSubmittingResult ? "Ending Match..." : "End Match"}</Text>
+            </Pressable>
+          </>
+        )}
+      >
+        <Text style={styles.exitBody}>Cancel keeps the current frame active so you can continue scoring.</Text>
+      </ScoringModal>
+
+      <ScoringModal
         visible={showWaitingForStartModal || showWaitingForCompletionModal}
         title={showWaitingForStartModal ? `Waiting for ${opponentDisplayName} to start match` : `Waiting for ${opponentDisplayName} to confirm match end`}
-        subtitle={showWaitingForStartModal ? "Scoring will unlock automatically as soon as they start the match on their device." : "The result will be committed automatically as soon as they confirm the end of the match."}
+        subtitle={showWaitingForStartModal ? "Scoring will unlock automatically as soon as they start the match on their device." : "The result is being finalized from the scorer."}
         onClose={showWaitingForStartModal ? handleCancelStartedMatch : () => {}}
         closeOnBackdropPress={false}
         showCloseButton={showWaitingForStartModal}
@@ -824,7 +954,7 @@ export function MatchScoringScreen() {
         <Text style={styles.exitBody}>
           {showWaitingForStartModal
             ? `${opponentDisplayName} has not started the match yet. Close this match if you opened the wrong scorer by accident.`
-            : "The official match result will be written automatically once both players have confirmed the completed match."}
+            : "The official match result is being written from the scorer workflow."}
         </Text>
       </ScoringModal>
     </SafeAreaView>
