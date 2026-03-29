@@ -43,7 +43,7 @@ export default function LiveMatchesCarousel({
   className,
   eyebrow = "Live Now",
   title = "Find active tables fast",
-  body = "Every live-scored match is collected here with direct access to the broadcast match centre.",
+  body = "Every live-scored match is collected here with direct access to its dedicated public live view.",
 }: LiveMatchesCarouselProps) {
   const rowRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

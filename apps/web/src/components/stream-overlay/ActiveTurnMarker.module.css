@@ -1,0 +1,28 @@
+.marker {
+  width: 0;
+  height: 0;
+  border-top: var(--overlay-marker-height, 10px) solid transparent;
+  border-bottom: var(--overlay-marker-height, 10px) solid transparent;
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.45));
+}
+
+.left {
+  border-left: var(--overlay-marker-width, 14px) solid #f59e0b;
+}
+
+.right {
+  border-right: var(--overlay-marker-width, 14px) solid #f59e0b;
+}
+
+.compact {
+  border-top-width: max(5px, calc(var(--overlay-marker-height, 10px) - 1px));
+  border-bottom-width: max(5px, calc(var(--overlay-marker-height, 10px) - 1px));
+}
+
+.compact.left {
+  border-left-width: max(8px, calc(var(--overlay-marker-width, 14px) - 2px));
+}
+
+.compact.right {
+  border-right-width: max(8px, calc(var(--overlay-marker-width, 14px) - 2px));
+}

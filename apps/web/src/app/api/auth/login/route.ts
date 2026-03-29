@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const identifier = String(body.identifier ?? "").trim();
     const password = String(body.password ?? "");
-    const requestedNextPath = String(body.nextPath ?? "").trim();
+    const requestedNextPath = String(body.next ?? body.nextPath ?? "").trim();
     const acceptedTermsVersionId =
       typeof body.acceptedTermsVersionId === "string" ? body.acceptedTermsVersionId.trim() : "";
 

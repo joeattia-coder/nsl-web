@@ -22,11 +22,12 @@ export default function AdminIdleSessionManager() {
   const { currentUser, logout } = useAdminAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [isExpired, setIsExpired] = useState(false);
+  const [expiredPathname, setExpiredPathname] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
   const isLoggingOutRef = useRef(false);
-  const idleTimeoutMs = useMemo(resolveAdminIdleTimeoutMs, []);
+  const idleTimeoutMs = useMemo(() => resolveAdminIdleTimeoutMs(), []);
   const isAdminRoute = pathname.startsWith("/admin");
+  const isExpired = expiredPathname === pathname;
   const shouldTrackIdle = Boolean(currentUser?.isAdmin) && isAdminRoute && !isExpired;
 
   useEffect(() => {
@@ -34,11 +35,6 @@ export default function AdminIdleSessionManager() {
       if (timeoutRef.current !== null) {
         window.clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
-      }
-
-      if (!isAdminRoute) {
-        setIsExpired(false);
-        isLoggingOutRef.current = false;
       }
 
       return;
@@ -50,7 +46,7 @@ export default function AdminIdleSessionManager() {
       }
 
       isLoggingOutRef.current = true;
-      setIsExpired(true);
+      setExpiredPathname(pathname);
       void logout().catch((error) => {
         console.error("Failed to end idle admin session:", error);
       });
@@ -88,7 +84,7 @@ export default function AdminIdleSessionManager() {
         timeoutRef.current = null;
       }
     };
-  }, [idleTimeoutMs, logout, shouldTrackIdle, isAdminRoute]);
+  }, [idleTimeoutMs, logout, pathname, shouldTrackIdle]);
 
   if (!isExpired) {
     return null;
@@ -114,9 +110,9 @@ export default function AdminIdleSessionManager() {
             type="button"
             className="admin-modal-button admin-modal-button-primary"
             onClick={() => {
-              setIsExpired(false);
+              setExpiredPathname(null);
               isLoggingOutRef.current = false;
-              router.push(`/login?nextPath=${encodeURIComponent(pathname)}`);
+              router.push(`/login?next=${encodeURIComponent(pathname)}`);
               router.refresh();
             }}
           >

@@ -1,0 +1,55 @@
+.wrap {
+  display: grid;
+  justify-items: center;
+  gap: max(2px, calc(var(--overlay-inline-gap, 6px) * 0.45));
+}
+
+.matchLabel {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--overlay-frame-label-size, 12px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.score {
+  display: inline-flex;
+  align-items: center;
+  gap: max(4px, calc(var(--overlay-inline-gap, 6px) * 0.8));
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+.side {
+  font-size: var(--overlay-frame-side-size, 28px);
+}
+
+.middle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: var(--overlay-frame-middle-size, 16px);
+}
+
+.compact .matchLabel {
+  font-size: 0.76rem;
+}
+
+.compact .side {
+  font-size: 1.2rem;
+}
+
+.compact .middle {
+  font-size: 0.92rem;
+}
+
+@media (max-width: 480px) {
+  .matchLabel {
+    max-width: min(100%, 9ch);
+    line-height: 1.05;
+  }
+}

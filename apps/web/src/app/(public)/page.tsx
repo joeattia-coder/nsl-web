@@ -532,7 +532,7 @@ export default function Page() {
 
         return {
           id: uiMatch.id,
-          href: groupId ? `/matches/${uiMatch.id}?group=${encodeURIComponent(groupId)}` : `/matches/${uiMatch.id}`,
+          href: groupId ? `/matches/${uiMatch.id}/live?group=${encodeURIComponent(groupId)}` : `/matches/${uiMatch.id}/live`,
           eventLabel: uiMatch.event,
           homeName: uiMatch.home,
           awayName: uiMatch.away,
@@ -751,7 +751,7 @@ export default function Page() {
           matches={liveCarouselMatches}
           className="home-live-carousel-section"
           title="Live Matches"
-          body="Jump straight into any live-scored table from the home page and open the same broadcast match centre view."
+          body="Jump straight into any live-scored table from the home page on its own dedicated live page."
         />
       ) : null}
 
