@@ -1,17 +1,11 @@
 import type {
-  DivisionGroupCard,
   EloHistoryEntry,
-  GroupStandingRow,
-  LeagueRankingCard,
-  LeagueResultCard,
   MatchItem,
   MockUser,
   PerformanceMetric,
   PlayerStat,
-  RankingRow,
   RoleOverviewMetric,
   ScoringSession,
-  TournamentSummary,
   UserRole,
 } from "../types/app";
 
@@ -124,107 +118,6 @@ export const eloHistory: EloHistoryEntry[] = [
   },
 ];
 
-export const tournaments: TournamentSummary[] = [
-  {
-    id: "tour-1",
-    name: "Cairo Premier League",
-    division: "Division A",
-    venue: "NSL Arena - Hall 1",
-    dateLabel: "Apr 2 - May 18",
-    status: "Registered",
-    registrationNote: "Confirmed roster slot",
-    shortDescription: "Top-flight race with weekly fixtures and live ranking movement.",
-    isRegistered: true,
-  },
-  {
-    id: "tour-2",
-    name: "League Cup Spring",
-    division: "Championship Bracket",
-    venue: "Alexandria Sports Club",
-    dateLabel: "Apr 12 - Apr 28",
-    status: "Registered",
-    registrationNote: "Seeded into top half",
-    shortDescription: "Knockout cup built for high-pressure short-format matches.",
-    isRegistered: true,
-  },
-  {
-    id: "tour-3",
-    name: "NSL National Masters",
-    division: "Open Draw",
-    venue: "Heliopolis Snooker Lounge",
-    dateLabel: "May 4 - May 19",
-    status: "Open",
-    registrationNote: "4 days left to enter",
-    shortDescription: "All-league championship with seeded main bracket positions.",
-    isRegistered: false,
-  },
-  {
-    id: "tour-4",
-    name: "Delta Invitational",
-    division: "Division B",
-    venue: "Mansoura Cue House",
-    dateLabel: "May 20 - May 27",
-    status: "Open",
-    registrationNote: "Priority window for ranked players",
-    shortDescription: "Compact travel event featuring round-robin group play.",
-    isRegistered: false,
-  },
-];
-
-export const tournamentGroupsById: Record<string, GroupStandingRow[]> = {
-  "tour-1": [
-    { id: "g1-1", position: 1, player: "Amir Attia", matches: 6, wins: 5, frames: "22-11", points: 15, form: "WWWLW" },
-    { id: "g1-2", position: 2, player: "Hany Saad", matches: 6, wins: 4, frames: "19-13", points: 12, form: "WLWWW" },
-    { id: "g1-3", position: 3, player: "Omar Lotfy", matches: 6, wins: 3, frames: "16-15", points: 9, form: "LWWLL" },
-    { id: "g1-4", position: 4, player: "Tarek Nabil", matches: 6, wins: 1, frames: "9-22", points: 3, form: "LLWLL" },
-  ],
-  "tour-2": [
-    { id: "g2-1", position: 1, player: "Amir Attia", matches: 3, wins: 3, frames: "12-5", points: 9, form: "WWW" },
-    { id: "g2-2", position: 2, player: "Youssef Ali", matches: 3, wins: 2, frames: "9-7", points: 6, form: "LWW" },
-    { id: "g2-3", position: 3, player: "Bassem Adel", matches: 3, wins: 1, frames: "6-10", points: 3, form: "WLL" },
-    { id: "g2-4", position: 4, player: "Mahmoud Saleh", matches: 3, wins: 0, frames: "4-9", points: 0, form: "LLL" },
-  ],
-  "tour-3": [
-    { id: "g3-1", position: 1, player: "Karim Farid", matches: 4, wins: 4, frames: "16-6", points: 12, form: "WWWW" },
-    { id: "g3-2", position: 2, player: "Ahmed Nader", matches: 4, wins: 2, frames: "11-9", points: 6, form: "WLWL" },
-    { id: "g3-3", position: 3, player: "Ramy Tamer", matches: 4, wins: 1, frames: "8-12", points: 3, form: "LLWW" },
-    { id: "g3-4", position: 4, player: "Mostafa Adel", matches: 4, wins: 1, frames: "7-15", points: 3, form: "WLLL" },
-  ],
-  "tour-4": [
-    { id: "g4-1", position: 1, player: "Samir Kamel", matches: 5, wins: 4, frames: "18-8", points: 12, form: "WWLWW" },
-    { id: "g4-2", position: 2, player: "Aly Hassan", matches: 5, wins: 3, frames: "16-11", points: 9, form: "LWWWL" },
-    { id: "g4-3", position: 3, player: "Omar Reda", matches: 5, wins: 2, frames: "11-13", points: 6, form: "WLLWW" },
-    { id: "g4-4", position: 4, player: "Tamer Hegazy", matches: 5, wins: 1, frames: "8-17", points: 3, form: "LLWL" },
-  ],
-};
-
-export const tournamentRankingsById: Record<string, RankingRow[]> = {
-  "tour-1": [
-    { id: "r1-1", rank: 1, player: "Amir Attia", elo: 1684, wins: 5, movement: "up" },
-    { id: "r1-2", rank: 2, player: "Hany Saad", elo: 1668, wins: 4, movement: "same" },
-    { id: "r1-3", rank: 3, player: "Omar Lotfy", elo: 1642, wins: 3, movement: "down" },
-    { id: "r1-4", rank: 4, player: "Tarek Nabil", elo: 1577, wins: 1, movement: "same" },
-  ],
-  "tour-2": [
-    { id: "r2-1", rank: 1, player: "Amir Attia", elo: 1684, wins: 3, movement: "up" },
-    { id: "r2-2", rank: 2, player: "Youssef Ali", elo: 1630, wins: 2, movement: "up" },
-    { id: "r2-3", rank: 3, player: "Bassem Adel", elo: 1601, wins: 1, movement: "same" },
-    { id: "r2-4", rank: 4, player: "Mahmoud Saleh", elo: 1548, wins: 0, movement: "down" },
-  ],
-  "tour-3": [
-    { id: "r3-1", rank: 1, player: "Karim Farid", elo: 1722, wins: 4, movement: "up" },
-    { id: "r3-2", rank: 2, player: "Ahmed Nader", elo: 1661, wins: 2, movement: "same" },
-    { id: "r3-3", rank: 3, player: "Ramy Tamer", elo: 1610, wins: 1, movement: "down" },
-    { id: "r3-4", rank: 4, player: "Mostafa Adel", elo: 1582, wins: 1, movement: "same" },
-  ],
-  "tour-4": [
-    { id: "r4-1", rank: 1, player: "Samir Kamel", elo: 1654, wins: 4, movement: "up" },
-    { id: "r4-2", rank: 2, player: "Aly Hassan", elo: 1635, wins: 3, movement: "same" },
-    { id: "r4-3", rank: 3, player: "Omar Reda", elo: 1596, wins: 2, movement: "same" },
-    { id: "r4-4", rank: 4, player: "Tamer Hegazy", elo: 1542, wins: 1, movement: "down" },
-  ],
-};
-
 export const matches: MatchItem[] = [
   {
     id: "match-1",
@@ -281,36 +174,6 @@ export const scoringSessions: ScoringSession[] = [
     tableLabel: "TV Table",
     status: "Completed and synced",
   },
-];
-
-export const leagueResults: LeagueResultCard[] = [
-  {
-    id: "result-1",
-    title: "Cairo Premier League - Round 6",
-    meta: "NSL Arena",
-    status: "Updated 32 min ago",
-    summary: "Amir Attia 4-2 Hany Saad, Karim Farid 4-0 Bassem Adel.",
-  },
-  {
-    id: "result-2",
-    title: "League Cup Spring - Quarterfinals",
-    meta: "Alexandria Sports Club",
-    status: "Locked",
-    summary: "Top seed advanced in three of four matches with one deciding frame finish.",
-  },
-];
-
-export const leagueRankings: LeagueRankingCard[] = [
-  { id: "lr-1", position: 1, player: "Karim Farid", points: 36, movement: "+2" },
-  { id: "lr-2", position: 2, player: "Amir Attia", points: 34, movement: "+1" },
-  { id: "lr-3", position: 3, player: "Hany Saad", points: 31, movement: "-1" },
-  { id: "lr-4", position: 4, player: "Youssef Ali", points: 28, movement: "0" },
-];
-
-export const leagueGroups: DivisionGroupCard[] = [
-  { id: "group-1", title: "Division A - Group North", leader: "Amir Attia", venue: "NSL Arena", update: "4 fixtures remaining" },
-  { id: "group-2", title: "Division A - Group South", leader: "Karim Farid", venue: "Heliopolis Snooker Lounge", update: "Tight top-three race" },
-  { id: "group-3", title: "Division B - Group East", leader: "Samir Kamel", venue: "Mansoura Cue House", update: "Promotion battle live" },
 ];
 
 export const roleOverviewMetrics: Record<UserRole, RoleOverviewMetric[]> = {

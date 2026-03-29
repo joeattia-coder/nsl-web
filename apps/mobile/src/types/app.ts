@@ -173,30 +173,6 @@ export interface ScoringSession {
   status: string;
 }
 
-export interface LeagueResultCard {
-  id: string;
-  title: string;
-  meta: string;
-  status: string;
-  summary: string;
-}
-
-export interface LeagueRankingCard {
-  id: string;
-  position: number;
-  player: string;
-  points: number;
-  movement: string;
-}
-
-export interface DivisionGroupCard {
-  id: string;
-  title: string;
-  leader: string;
-  venue: string;
-  update: string;
-}
-
 export interface RoleOverviewMetric {
   id: string;
   label: string;
