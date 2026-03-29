@@ -1,0 +1,54 @@
+.overlay {
+  --overlay-accent: #d6a843;
+  position: relative;
+  width: 100%;
+  max-width: var(--broadcast-content-max, 1520px);
+  margin: 0 auto;
+  padding: var(--overlay-pad-y, 12px) var(--overlay-pad-x, 16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--overlay-radius, 14px);
+  background:
+    linear-gradient(180deg, rgba(32, 32, 36, 0.9) 0%, rgba(10, 10, 12, 0.94) 100%),
+    radial-gradient(circle at top, rgba(214, 168, 67, 0.12), transparent 28%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 14px 28px rgba(0, 0, 0, 0.34);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 26%);
+  pointer-events: none;
+}
+
+.bar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(92px, var(--overlay-center-width, 180px)) minmax(0, 1.4fr);
+  align-items: center;
+  gap: var(--overlay-bar-gap, 12px);
+}
+
+.compact {
+  width: min(1320px, calc(100vw - 44px));
+  padding: max(8px, calc(var(--overlay-pad-y, 12px) - 2px)) max(10px, calc(var(--overlay-pad-x, 16px) - 2px));
+  border-radius: max(10px, calc(var(--overlay-radius, 14px) - 2px));
+}
+
+.center {
+  position: relative;
+  min-width: 0;
+  padding: 0 1px;
+}
+
+@media (max-width: 480px) {
+  .bar {
+    grid-template-columns: minmax(0, 1.32fr) minmax(88px, var(--overlay-center-width, 130px)) minmax(0, 1.32fr);
+  }
+}

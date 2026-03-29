@@ -1,0 +1,146 @@
+.page {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  padding: 0 !important;
+}
+
+.layoutStack {
+  display: grid;
+  gap: var(--broadcast-stack-gap, 12px);
+  width: 100%;
+  padding: var(--broadcast-shell-pad-top, 14px) var(--broadcast-shell-pad-x, 18px) var(--broadcast-shell-pad-bottom, 24px);
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(112px, var(--stage-center-width, 220px)) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--stage-gap, 16px);
+  width: 100%;
+  max-width: var(--broadcast-content-max, 1520px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.playerCard {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: var(--stage-player-gap, 12px);
+  min-width: 0;
+}
+
+.playerCard:first-child {
+  justify-self: start;
+  justify-items: start;
+}
+
+.playerCard:last-child {
+  justify-self: end;
+  justify-items: end;
+}
+
+.playerPhotoShell {
+  position: relative;
+  width: var(--stage-avatar-width, 140px);
+  aspect-ratio: 4 / 5;
+  border: 1px solid color-mix(in srgb, var(--theme-border-strong) 78%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 92%, white), var(--theme-surface-3));
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.playerPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playerMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--stage-meta-gap, 10px);
+  min-width: 0;
+}
+
+.playerMetaRight {
+  flex-direction: row-reverse;
+}
+
+.playerFlag {
+  flex: 0 0 auto;
+  width: var(--stage-flag-width, 30px);
+  height: var(--stage-flag-height, 21px);
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--theme-border-strong) 76%, transparent);
+}
+
+.playerName {
+  min-width: 0;
+  color: var(--theme-page-text);
+  font-size: var(--stage-name-size, 18px);
+  font-weight: 650;
+  line-height: 1.08;
+  text-align: left;
+  text-wrap: balance;
+}
+
+.playerCard:last-child .playerName {
+  text-align: right;
+}
+
+.startBlock {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: min(var(--stage-center-width, 220px), 100%);
+  padding: 0;
+}
+
+.startLabel {
+  color: var(--theme-page-muted-4);
+  font-size: var(--stage-start-label-size, 11px);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.startTime {
+  color: var(--theme-page-text);
+  font-size: var(--stage-start-time-size, 34px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-shadow: none;
+}
+
+.overlaySection {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr) minmax(96px, var(--stage-center-width, 170px)) minmax(0, 1fr);
+  }
+
+  .startLabel {
+    letter-spacing: 0.14em;
+  }
+}
+
+@media (max-width: 420px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr) minmax(84px, var(--stage-center-width, 150px)) minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,11 @@
+.shell {
+  width: 100%;
+  min-width: 0;
+}
+
+.content {
+  width: 100%;
+  max-width: var(--broadcast-content-max, 1520px);
+  min-width: 0;
+  margin: 0 auto;
+}

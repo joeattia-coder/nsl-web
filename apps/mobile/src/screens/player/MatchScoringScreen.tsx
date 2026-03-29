@@ -1,7 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, BackHandler, Pressable, SafeAreaView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Alert, BackHandler, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BallSelector } from "../../components/scoring/BallSelector";
 import { Ball } from "../../components/scoring/Ball";
@@ -599,7 +601,8 @@ export function MatchScoringScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.root}>
+      <SafeAreaView edges={["top", "left", "right", "bottom"]} style={styles.root}>
+        <StatusBar style="light" />
         <View style={styles.backgroundGlowLeft} />
         <View style={styles.backgroundGlowRight} />
         <View style={styles.loadingWrap}>
@@ -611,7 +614,8 @@ export function MatchScoringScreen() {
 
   if (error || !match || !scoringState || !currentFrame || !homePlayer || !awayPlayer || !scoringSummary) {
     return (
-      <SafeAreaView style={styles.root}>
+      <SafeAreaView edges={["top", "left", "right", "bottom"]} style={styles.root}>
+        <StatusBar style="light" />
         <View style={styles.backgroundGlowLeft} />
         <View style={styles.backgroundGlowRight} />
         <View style={styles.errorWrap}>
@@ -664,7 +668,8 @@ export function MatchScoringScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={styles.root}>
+      <StatusBar style="light" />
       <View style={styles.backgroundGlowLeft} />
       <View style={styles.backgroundGlowRight} />
       <View style={styles.screen}>
@@ -854,7 +859,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     paddingHorizontal: 18,
-    paddingTop: 12,
+    paddingTop: 16,
     paddingBottom: 20,
     gap: 14,
   },

@@ -1,0 +1,132 @@
+.panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--overlay-panel-gap, 10px);
+  min-width: 0;
+}
+
+.rightPanel {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.identity {
+  display: grid;
+  gap: var(--overlay-identity-gap, 6px);
+  min-width: 0;
+}
+
+.rightIdentity {
+  justify-items: end;
+  text-align: right;
+}
+
+.nameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--overlay-inline-gap, 6px);
+  min-width: 0;
+}
+
+.nameRowRight {
+  flex-direction: row-reverse;
+}
+
+.flag {
+  width: var(--overlay-flag-width, 24px);
+  height: var(--overlay-flag-height, 16px);
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.name {
+  min-width: 0;
+  color: #ffffff;
+  font-size: var(--overlay-name-size, 16px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nameFull {
+  display: inline;
+}
+
+.nameCompact {
+  display: none;
+}
+
+.breakRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--overlay-inline-gap, 6px);
+  min-width: 0;
+}
+
+.breakRowRight {
+  flex-direction: row-reverse;
+}
+
+.breakValue {
+  color: rgba(255, 217, 102, 0.96);
+  font-size: var(--overlay-break-size, 12px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.markerSlot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--overlay-marker-slot-width, 12px);
+  min-width: var(--overlay-marker-slot-width, 12px);
+  height: calc(var(--overlay-marker-height, 8px) * 2 + 2px);
+}
+
+.scoreBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--overlay-score-width, 72px);
+  min-width: var(--overlay-score-width, 72px);
+  height: var(--overlay-score-height, 48px);
+  min-height: var(--overlay-score-height, 48px);
+  padding: 0;
+  border: 1px solid rgba(255, 212, 102, 0.42);
+  border-radius: var(--overlay-score-radius, 10px);
+  background: linear-gradient(180deg, #f8d36a 0%, #b68416 100%);
+  color: #111111;
+  font-size: var(--overlay-score-font-size, 28px);
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 6px 14px rgba(0, 0, 0, 0.24);
+}
+
+.compact .scoreBox {
+  min-width: 62px;
+  min-height: 44px;
+  font-size: 1.35rem;
+}
+
+.compact .name {
+  font-size: 0.88rem;
+}
+
+.compact .breakValue {
+  font-size: 0.64rem;
+}
+
+@media (max-width: 420px) {
+  .nameFull {
+    display: none;
+  }
+
+  .nameCompact {
+    display: inline;
+  }
+}

@@ -30,7 +30,7 @@ export default function LoginForm() {
   const [storedAcceptedTermsVersionId, setStoredAcceptedTermsVersionId] = useState<string | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const nextPath = searchParams.get("next") || "";
+  const nextPath = searchParams.get("next") || searchParams.get("nextPath") || "";
   const resetStatus = searchParams.get("reset") === "success";
   const inviteStatus = searchParams.get("invite") === "success";
   const verifiedStatus = searchParams.get("verified");
@@ -113,7 +113,7 @@ export default function LoginForm() {
         body: JSON.stringify({
           identifier,
           password,
-          nextPath,
+          next: nextPath,
           acceptedTermsVersionId,
         }),
       });

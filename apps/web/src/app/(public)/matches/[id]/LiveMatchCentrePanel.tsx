@@ -35,6 +35,11 @@ type LiveMatchCentrePanelProps = {
     rightWins: number;
   };
   stats: HeadToHeadStatRow[];
+  eyebrow?: string;
+  statusHint?: string;
+  showLiveBoard?: boolean;
+  showHeadToHead?: boolean;
+  showMatchNotes?: boolean;
 };
 
 function formatStatusLabel(value: string) {
@@ -100,6 +105,11 @@ export default function LiveMatchCentrePanel({
   rightPlayerFlagAlt,
   headToHead,
   stats,
+  eyebrow = "Match Centre",
+  statusHint = "Live score polling remains active while the match status changes.",
+  showLiveBoard = true,
+  showHeadToHead = true,
+  showMatchNotes = true,
 }: LiveMatchCentrePanelProps) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [details, setDetails] = useState<PublicLiveBroadcastState | null>(initialDetails);
@@ -141,7 +151,7 @@ export default function LiveMatchCentrePanel({
     <>
       <section className={styles.hero}>
         <div className={styles.heroInner}>
-          <div className={styles.eyebrow}>Match Centre</div>
+          <div className={styles.eyebrow}>{eyebrow}</div>
           <div className={styles.titleRow}>
             <div>
               <h1 className={styles.title}>{tournamentName}</h1>
@@ -154,9 +164,7 @@ export default function LiveMatchCentrePanel({
             <span className={`${styles.statusPill} ${isLive ? styles.statusPillLive : styles.statusPillDefault}`}>
               {formatStatusLabel(snapshot.matchStatus)}
             </span>
-            <span className={styles.statusHint}>
-              Live score polling remains active while the match status changes.
-            </span>
+            <span className={styles.statusHint}>{statusHint}</span>
           </div>
 
           <div className={styles.metaGrid}>
@@ -186,7 +194,7 @@ export default function LiveMatchCentrePanel({
         </div>
       </section>
 
-      {snapshot.liveSessionStatus === "ACTIVE" || snapshot.liveSessionStatus === "PAUSED" || snapshot.liveSessionStatus === "COMPLETED" ? (
+      {showLiveBoard && (snapshot.liveSessionStatus === "ACTIVE" || snapshot.liveSessionStatus === "PAUSED" || snapshot.liveSessionStatus === "COMPLETED") ? (
         details ? (
           <LiveBroadcastBoard
             snapshot={snapshot}
@@ -205,24 +213,26 @@ export default function LiveMatchCentrePanel({
         ) : null
       ) : null}
 
-      <HeadToHeadStats
-        leftPlayerName={leftPlayerName}
-        rightPlayerName={rightPlayerName}
-        leftPlayerHref={leftPlayerHref}
-        rightPlayerHref={rightPlayerHref}
-        leftPlayerPhoto={leftPlayerPhoto}
-        rightPlayerPhoto={rightPlayerPhoto}
-        leftPlayerFlagUrl={leftPlayerFlagUrl}
-        leftPlayerFlagAlt={leftPlayerFlagAlt}
-        rightPlayerFlagUrl={rightPlayerFlagUrl}
-        rightPlayerFlagAlt={rightPlayerFlagAlt}
-        leftScore={snapshot.homeScore ?? 0}
-        rightScore={snapshot.awayScore ?? 0}
-        headToHead={headToHead}
-        stats={stats}
-      />
+      {showHeadToHead ? (
+        <HeadToHeadStats
+          leftPlayerName={leftPlayerName}
+          rightPlayerName={rightPlayerName}
+          leftPlayerHref={leftPlayerHref}
+          rightPlayerHref={rightPlayerHref}
+          leftPlayerPhoto={leftPlayerPhoto}
+          rightPlayerPhoto={rightPlayerPhoto}
+          leftPlayerFlagUrl={leftPlayerFlagUrl}
+          leftPlayerFlagAlt={leftPlayerFlagAlt}
+          rightPlayerFlagUrl={rightPlayerFlagUrl}
+          rightPlayerFlagAlt={rightPlayerFlagAlt}
+          leftScore={snapshot.homeScore ?? 0}
+          rightScore={snapshot.awayScore ?? 0}
+          headToHead={headToHead}
+          stats={stats}
+        />
+      ) : null}
 
-      {snapshot.publicNote ? (
+      {showMatchNotes && snapshot.publicNote ? (
         <section className={styles.notePanel}>
           <h2 className={styles.noteTitle}>Match Notes</h2>
           <p className={styles.noteBody}>{snapshot.publicNote}</p>

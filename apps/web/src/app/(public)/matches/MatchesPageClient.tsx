@@ -490,7 +490,7 @@ export default function MatchesPageClient() {
       })
       .map((match): LiveCarouselMatch => ({
         id: match.id,
-        href: `/matches/${match.id}?group=${encodeURIComponent(match.fixtureGroupId)}`,
+        href: `/matches/${match.id}/live?group=${encodeURIComponent(match.fixtureGroupId)}`,
         eventLabel: match.fixtureGroupDesc || match.roundDesc || "Published fixture",
         homeName: match.homeName,
         awayName: match.roadName,

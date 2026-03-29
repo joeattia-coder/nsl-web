@@ -23,7 +23,7 @@ function getPublicMatchStatus(matchStatus: string, liveSessionStatus: string | n
 }
 
 function getVisibleLiveSession<T extends { homeStartedAt: Date | null; awayStartedAt: Date | null }>(liveSession: T | null) {
-  if (!liveSession?.homeStartedAt || !liveSession.awayStartedAt) {
+  if (!liveSession?.homeStartedAt && !liveSession?.awayStartedAt) {
     return null;
   }
 
