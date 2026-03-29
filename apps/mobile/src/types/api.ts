@@ -199,16 +199,15 @@ export type TournamentsResponse = {
   tournaments: MobileTournamentRecord[];
 };
 
-export type PublicFixtureGroupRecord = {
-  id: string;
-  fixtureGroupIdentifier: string;
-  fixtureGroupDesc: string;
-  seasonId: string | null;
-};
-
-export type PublicFixtureGroupsResponse = {
+export type PublicLeagueGroupsResponse = {
   count: number;
-  fixtureGroups: PublicFixtureGroupRecord[];
+  groups: Array<{
+    id: string;
+    fixtureGroupIdentifier: string;
+    fixtureGroupDesc: string;
+    seasonId: string | null;
+    standings: StandingsResponse;
+  }>;
 };
 
 export type PendingSubmissionMode = "none" | "awaitingYourReview" | "submittedByYou";

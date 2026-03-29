@@ -12,7 +12,7 @@ import { TournamentCard } from "../../components/TournamentCard";
 import { mobileApi } from "../../lib/mobile-api";
 import { mapTournamentSummary } from "../../lib/tournaments";
 import { appTheme } from "../../theme";
-import type { PublicFixtureGroupRecord, RankingsResponse, StandingsResponse } from "../../types/api";
+import type { PublicLeagueGroupsResponse, RankingsResponse, StandingsResponse } from "../../types/api";
 import type { LeagueBrowseSection, RootStackParamList, TournamentSummary } from "../../types/app";
 
 const items = [
@@ -91,7 +91,7 @@ function mapLeagueRankings(players: RankingsResponse["players"]): LeagueRankingI
 }
 
 function mapLeagueGroups(
-  fixtureGroup: PublicFixtureGroupRecord,
+  fixtureGroup: PublicLeagueGroupsResponse["groups"][number],
   standingsGroups: StandingsResponse["groups"]
 ): LeagueGroupItem[] {
   return standingsGroups.map((group) => {
@@ -140,7 +140,7 @@ export function LeagueContentScreen({ route }: LeagueContentScreenProps) {
         mobileApi.getPublicTournaments(),
         mobileApi.getPublicFixtures(),
         mobileApi.getPublicPlayerRankings(),
-        mobileApi.getPublicFixtureGroups(),
+        mobileApi.getPublicLeagueGroups(),
       ]);
 
       if (!isMounted) {
@@ -172,29 +172,13 @@ export function LeagueContentScreen({ route }: LeagueContentScreenProps) {
       setIsLoadingRankings(false);
 
       if (fixtureGroupsResult.status === "fulfilled") {
-        const standingsResults = await Promise.allSettled(
-          fixtureGroupsResult.value.fixtureGroups.map(async (fixtureGroup) => ({
-            fixtureGroup,
-            standings: await mobileApi.getTournamentStandings(fixtureGroup.fixtureGroupIdentifier),
-          }))
-        );
-
-        if (!isMounted) {
-          return;
-        }
-
-        const mappedGroups = standingsResults.flatMap((result) => {
-          if (result.status !== "fulfilled") {
-            return [];
-          }
-
-          return mapLeagueGroups(result.value.fixtureGroup, result.value.standings.groups);
+        const mappedGroups = fixtureGroupsResult.value.groups.flatMap((fixtureGroup) => {
+          return mapLeagueGroups(fixtureGroup, fixtureGroup.standings.groups);
         });
 
         setGroups(mappedGroups);
 
-        const successfulGroupLoads = standingsResults.filter((result) => result.status === "fulfilled").length;
-        if (fixtureGroupsResult.value.fixtureGroups.length > 0 && successfulGroupLoads === 0) {
+        if (fixtureGroupsResult.value.groups.length > 0 && mappedGroups.length === 0) {
           setGroupsError("Unable to load groups.");
         }
       } else {
