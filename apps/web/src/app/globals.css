@@ -975,7 +975,7 @@ html[data-theme="light"] .navbar.navbar-elevated {
   border-radius: 8px;
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--theme-border-soft) 82%, transparent);
-  background: color-mix(in srgb, var(--theme-surface-1) 78%, transparent);
+  background: transparent;
   color: inherit;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -999,18 +999,8 @@ html[data-theme="light"] .navbar.navbar-elevated {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.social-link-facebook {
-  border-color: color-mix(in srgb, #1877f2 24%, var(--theme-border-soft));
-  background: color-mix(in srgb, #1877f2 10%, var(--theme-surface-1));
-}
-
 .social-link-icon-facebook {
   color: #1877f2;
-}
-
-.social-link-youtube {
-  border-color: color-mix(in srgb, #1877f2 24%, var(--theme-border-soft));
-  background: color-mix(in srgb, #1877f2 10%, var(--theme-surface-1));
 }
 
 .social-link-icon-youtube {
