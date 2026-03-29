@@ -199,6 +199,18 @@ export type TournamentsResponse = {
   tournaments: MobileTournamentRecord[];
 };
 
+export type PublicFixtureGroupRecord = {
+  id: string;
+  fixtureGroupIdentifier: string;
+  fixtureGroupDesc: string;
+  seasonId: string | null;
+};
+
+export type PublicFixtureGroupsResponse = {
+  count: number;
+  fixtureGroups: PublicFixtureGroupRecord[];
+};
+
 export type PendingSubmissionMode = "none" | "awaitingYourReview" | "submittedByYou";
 
 export type MatchSummaryResponse = {

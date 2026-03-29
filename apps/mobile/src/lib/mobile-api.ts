@@ -14,6 +14,7 @@ import type {
   MatchSummaryResponse,
   MobileHomeFeedResponse,
   PlayerProfileUpdatePayload,
+  PublicFixtureGroupsResponse,
   ProfileResponse,
   PublicFixturesListResponse,
   PublicNewsListResponse,
@@ -242,6 +243,10 @@ export const mobileApi = {
 
   getPublicFixtures() {
     return requestJson<PublicFixturesListResponse>("/api/public/fixtures");
+  },
+
+  getPublicFixtureGroups() {
+    return requestJson<PublicFixtureGroupsResponse>("/api/public/fixture-groups");
   },
 
   getPublicPlayerRankings() {
