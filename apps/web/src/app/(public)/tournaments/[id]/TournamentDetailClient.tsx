@@ -433,7 +433,16 @@ export default function TournamentDetailClient({ tournament }: { tournament: Tou
 
                 <div className={styles.tableWrap}>
                   <div className={styles.tableViewport}>
-                    <table className={styles.table}>
+                    <table className={`${styles.table} ${styles.groupTable}`}>
+                      <colgroup>
+                        <col className={styles.colRank} />
+                        <col className={styles.colPlayer} />
+                        <col className={styles.colMatches} />
+                        <col className={styles.colSmallStat} />
+                        <col className={styles.colSmallStat} />
+                        <col className={styles.colDiff} />
+                        <col className={styles.colPoints} />
+                      </colgroup>
                       <thead>
                         <tr>
                           <th>{renderHeaderLabel("RK", "Rank")}</th>
@@ -449,7 +458,7 @@ export default function TournamentDetailClient({ tournament }: { tournament: Tou
                         {group.rows.map((row, index) => (
                           <tr key={`${group.standingsDesc}-${row.playerId ?? row.teamName}`} className={index % 2 === 0 ? styles.tableRow : `${styles.tableRow} ${styles.tableRowAlt}`}>
                             <td>{row.rank}</td>
-                            <td>
+                            <td className={styles.playerTextCell}>
                               {row.playerId ? (
                                 <Link href={`/players/${row.playerId}`} className="public-player-link">
                                   {row.teamName}

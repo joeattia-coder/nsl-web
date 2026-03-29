@@ -101,10 +101,6 @@
   min-width: min(100%, 260px);
   display: grid;
   gap: 4px;
-  padding: 18px 20px;
-  border: 1px solid color-mix(in srgb, var(--theme-border-mid) 72%, transparent);
-  border-radius: 8px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-surface-1) 98%, transparent), color-mix(in srgb, var(--theme-surface-2) 94%, transparent));
   text-align: right;
 }
 
@@ -246,6 +242,12 @@
   color: var(--theme-page-text);
 }
 
+.groupTable {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+}
+
 .table th,
 .table td {
   padding: 0.95rem 1rem;
@@ -271,6 +273,44 @@
 
 .tableRow:hover {
   background: color-mix(in srgb, var(--theme-accent-brand) 6%, var(--theme-surface-2));
+}
+
+.colRank {
+  width: 4.5rem;
+}
+
+.colPlayer {
+  width: auto;
+}
+
+.colMatches {
+  width: 6rem;
+}
+
+.colSmallStat {
+  width: 5rem;
+}
+
+.colDiff {
+  width: 6rem;
+}
+
+.colPoints {
+  width: 5.25rem;
+}
+
+.playerTextCell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerTextCell :global(.public-player-link) {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tableHeaderTrigger {

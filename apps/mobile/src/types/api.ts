@@ -354,6 +354,7 @@ export type LiveMatchSessionSyncPayload = {
     isComplete: boolean;
   };
   status?: LiveMatchSessionStatus;
+  adminOverride?: boolean;
 };
 
 export type StandingsResponse = {
